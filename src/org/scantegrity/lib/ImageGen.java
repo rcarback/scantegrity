@@ -18,10 +18,23 @@ import org.scantegrity.lib.exceptions.FontNotFoundException;
 
 public class ImageGen {
 	
+	static float[] yellow  = {0, 0, 1, 0};
+	static float[] magenta = {0, 1, 0, 0};
+	static float[] cyan    = {1, 0, 0, 0};
+	
 	// Driver Method for testing
 	public static void main(String[] args) throws FontNotFoundException {
 		File out = new File("img.jpg");
-		makeImage("AE", "Courier New", 32, Color.YELLOW, Color.MAGENTA, 50, 50, 100,	out);
+		makeImage("AE",
+				  "Courier New", 
+				  33, 
+				  Color.YELLOW,
+				  Color.MAGENTA,
+				  50, 
+				  50, 
+				  0,
+				  (float) 0,
+				  out);
 	}
 
 	/**
@@ -46,7 +59,8 @@ public class ImageGen {
 										  Color bgColor, 
 										  int width,
 										  int height, 
-										  int threshold
+										  int cyanThreshold,
+										  float brightThreshold
 										) throws FontNotFoundException {
 		return makeImage(text,
 						 font,
@@ -55,7 +69,8 @@ public class ImageGen {
 						 bgColor,
 						 width,
 						 height,
-						 threshold,
+						 cyanThreshold,
+						 brightThreshold,
 						 null);
 	}
 
@@ -84,7 +99,8 @@ public class ImageGen {
 			  Color bgColor, 
 			  int width,
 			  int height, 
-			  int threshold,
+			  int cyanThreshold,
+			  float brightnessThreshold,
 			  File outfile
 			) throws FontNotFoundException {
 		
@@ -126,8 +142,10 @@ public class ImageGen {
 		// Draw the string into the image
 		g2d.drawString(text, (int) xOffset, (int) yOffset);
 
-		// Randomize the Brightness
-		RandomizeBrightness(img, threshold);
+		// Add Random Cyan and Randomize the Brightness
+		RandomizeBrightness(img, brightnessThreshold);
+		AddRandomCyan(img, cyanThreshold);
+		
 
 		// Output the image
 		if (outfile != null) {
@@ -141,28 +159,66 @@ public class ImageGen {
 		return img;
 	}
 
-	private static void RandomizeBrightness(BufferedImage img, int threshold) {
+	private static void AddRandomCyan(BufferedImage img, int threshold) {
+		// Handle the trivial case.
+		if(threshold == 0) return;
+		System.out.println("RC");
 		SecureRandom srand = new SecureRandom();
 		
 		// For each pixel...
 		for (int x = 0; x < img.getWidth(); x++) {
 			for (int y = 0; y < img.getHeight(); y++) {
-				int v = Math.abs(srand.nextInt() % threshold);
+				int v = 500; // Obviously way above threshold 
 
 				Color c = new Color(img.getRGB(x, y));
 				int r = c.getRed();
 				int g = c.getGreen();
 				int b = c.getBlue();
 
-				// If the color is 0, don't mess with its brightness,
-				// otherwise, subtract v from it (all start at 255)
-				if (r != 0)
-					r -= v;
-				if (g != 0)
-					g -= v;
-				if (b != 0)
-					b -= v;
+				// Cyan translates to Green + Blue in RGB, so
+				// by reducing the remaining color (red), we
+				// cause a certain amount of CYAN to be
+				// introduced (since CMYK is subtractive, 
+				// taking away some red actually adds more of
+				// the other colors).
+				while(v > r) v = Math.abs(srand.nextInt() & threshold);
+				r -= v;
 
+				// Set the new color to the pixel
+				Color newColor = new Color(r, g, b);
+				img.setRGB(x, y, newColor.getRGB());
+			}
+		}
+	}
+	
+	private static void RandomizeBrightness(BufferedImage img, float threshold){
+		// Handle the trivial case.
+		if(threshold == 0) return;
+		System.out.println("RB");
+		SecureRandom srand = new SecureRandom();
+		
+		// For each pixel...
+		for (int x = 0; x < img.getWidth(); x++){
+			for (int y = 0; y < img.getHeight(); y++){
+				float v = 10; // Obviously greater than the threshold
+				while(v > threshold) v = Math.abs(v - srand.nextFloat());
+				
+				// Invert v to _take away_ up to "threshold" amount of
+				// color, not leave only that much.
+				v = 1 - v;
+				
+				Color c = new Color(img.getRGB(x, y));
+				int r = c.getRed();
+				int g = c.getGreen();
+				int b = c.getBlue();
+
+				// Muliplying each color by the same value < 1 will reduce
+				// the brightness of the image.
+				r = (int) Math.floor(r*v);
+				g = (int) Math.floor(g*v);
+				b = (int) Math.floor(b*v);
+
+				
 				// Set the new color to the pixel
 				Color newColor = new Color(r, g, b);
 				img.setRGB(x, y, newColor.getRGB());
