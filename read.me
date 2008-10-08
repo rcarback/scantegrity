@@ -1,0 +1,56 @@
+This file has instructions on how to build the punchscan project.
+
+To open a command prompt on windows Start->Run->type "cmd"->OK.
+If you are running unix or mac I assume you know how to do this.
+
+Leave the command prompt opened
+
+1. You need java 1.5 or latter
+	To check if you have java 1.5, at the command prompt type "java -fullversion".
+	If you do not have java 1.5, you can download it from 
+		http://java.sun.com/javase/downloads/index.jsp
+2	Create an enviromental variable called JAVA_HOME pointing to your jdk.
+	Control Panel->System->Advanced->Enviroment Variables->New->
+	Variable Name: JAVA_HOME , 
+	Variable value: the folder where you've installed your jdk, 
+		most probabily C:\Program Files\Java\jdk1.5.0_xx	
+	
+3. To build the project you nee ANT.
+	To check if you have ANT, at the command prompt, type "ant". 
+	if you do not have ANT, you can download it from 
+		http://ant.apache.org/bindownload.cgi
+	After you have unzipped the ANT files, put the ant "bin" in your path.
+	Control Panel->System->Advanced->Enviroment Variables->Path->Edit-> 
+		put a semicolon and add the full path to the ant bin folder
+	Exit the command prompt and open it again (to read the new configration).
+	
+4. Unzip the PunchScan archive. In the command prompt, 
+	go to the unzipped folder and type "ant"
+
+5. To run a demo election, type "java -jar PunchScan-engine-1.0.jar"
+
+
+troubleshooting
+
+Problem
+When running ANT you get an exception related to not finding tools.jar
+and the class Main.
+Solution: You did not set your JAVA_HOME variable. go to step 2
+
+Problem
+When trying to run the engine you get an exception related to an incorrect version number
+of the class files.
+Solution:
+Most probabily you have two java instalation, one older, that gets used for running java code
+and one newer, that gets used for compiling it (e.g. JRE 1.5 and JDK 1.6).
+Either revome the old version altogether or explicitily call "java.exe" from the same
+folder where you have your "javac.exe".
+
+Problem
+When running the auhtoring software you get an out of memory exception
+Solution
+Increase the memory available for java with -Xmx256M
+E.g. java -Xmx256M -jar PunchScan-engine-1.0.jar
+
+For other problems, contact Stefan POPOVENIUC at poste@gwu.edu with a full stack trace and
+a description of the error. 
