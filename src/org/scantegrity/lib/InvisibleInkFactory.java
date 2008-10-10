@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
+import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.image.BufferedImage;
@@ -46,24 +47,38 @@ import java.util.ArrayList;
  */
 public class InvisibleInkFactory {
 
-	private byte l_flags;
-	private Font l_font;
-	private int l_fontSize;
-	private int l_padding;
-	private SecureRandom l_csprng;
+	static final short BLOCK = 1; 
+	static final short TWO = 2; 
+	static final short THREE = 4; 
+	static final short FOUR = 8; 
+	static final byte FIVE = 16; 
+	static final short SIX = 32; 
+	static final short SEVEN = 64; 
+	static final short EIGHT = 128; 
+	
+	
+	private short c_flags;
+	private Font c_font;
+	private int c_padding;
+	private SecureRandom c_csprng;
 	
 	/**
-	 * Default constructor for the class, which uses a 12pt Times New Roman 
-	 * Font, 10 pixel padding, and block mode without any csprng stuff.
-	 *   
+	 * Default constructor for the class, which uses a 12pt Serif
+	 * Font, 10 pixel padding, and block mode without any csprng stuff.   
 	 */
-	public InvisibleInkFactory ()
-	{
-		//Defaults
-		InvisibleInkFactory ("Times New Roman", 12, 10, 0);
+	public InvisibleInkFactory () {
+		this ("Serif", 18, 10, (short)0, null);
 	}
 	
-	
+	/**
+	 * Overloaded constructor for the standard constructor. Defaults csprng to 
+	 * null.
+	 */	
+	public InvisibleInkFactory (String p_fontName, int p_fontSize, int p_pad,
+			short p_flags) {
+		this (p_fontName, p_fontSize, p_pad, p_flags, null);
+	}
+
 	/**
 	 * Standard constructor that allows user to set font, fontsize, padding,
 	 * flags for the class, and optionally, a CSPRNG.
@@ -72,13 +87,63 @@ public class InvisibleInkFactory {
 	 * @param p_
 	 */
 	public InvisibleInkFactory (String p_fontName, int p_fontSize, int p_pad,
-			byte p_flags, SecureRandom p_csprng = null) 
-			throws FontNotFoundException {
+			short p_flags, SecureRandom p_csprng) {
 
-		l_flags = p_flags;
-		l_font = new Font(p_fontName, Font.BOLD, p_fontsize);
-		
+		c_flags = p_flags;
+		c_font = new Font(p_fontName, Font.BOLD, p_fontSize);
+		c_padding = p_pad;
+		c_csprng = p_csprng;		
 	}
 	
+	
+	
+	public BufferedImage getBufferedImage(String p_txt) {
+		float l_height, l_width;
+		BufferedImage l_ret;
+		Graphics2D l_g2d;
+		
+		//Get the size of the string
+		FontRenderContext l_frc = new FontRenderContext(null, false, true);
+		l_height = (int)c_font.getStringBounds(p_txt, l_frc).getHeight();
+		l_width = (int)c_font.getStringBounds(p_txt, l_frc).getWidth();
+		
+		//Add padding
+		l_height += c_padding*2;
+		l_width += c_padding*2;
+		
+		//Generate image and set colors
+		l_ret = new BufferedImage((int)l_width, (int)l_height, 
+									BufferedImage.TYPE_INT_RGB);
+		l_g2d = l_ret.createGraphics();
+		
+		
+		//Draw Background
+		l_g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, 
+								RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		l_g2d.setColor(Color.MAGENTA);
+		l_g2d.fillRect(0, 0, (int)l_width, (int)l_height);
+		
+		//Draw Text
+		l_g2d.setFont(c_font);
+		l_g2d.setColor(Color.CYAN);
+		
+		float l_fontOff = (l_height-2*c_padding-c_font.getLineMetrics(p_txt, l_frc).getAscent())/2;
+		
+		l_g2d.drawString(p_txt, c_padding, l_height-c_padding-l_fontOff); 
+						 ///(int)(l_height-c_padding-(c_font.getStringBounds(p_txt, l_frc).getHeight()-c_font.getLineMetrics(p_txt, l_frc).getAscent())));
+		
+	    l_g2d.setColor(Color.GREEN);
+	    l_g2d.drawLine(0, c_padding, (int)l_width, c_padding);
+	    l_g2d.drawLine(0, (int)l_height-c_padding, (int)l_width, (int)l_height-c_padding);
+	    l_g2d.drawLine(0, (int)(l_height-2*c_padding-c_font.getLineMetrics(p_txt, l_frc).getAscent()), (int)l_width, (int)(l_height-2*c_padding-c_font.getLineMetrics(p_txt, l_frc).getAscent()));
+		//Process flags
+		if ((c_flags & BLOCK) == 0) {
+			//Block Operations
+		} else {
+			//Pixel Operations
+		}
+		
+		return l_ret;
+	}
 }
  

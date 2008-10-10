@@ -11,10 +11,10 @@ import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 
 import org.scantegrity.lib.exceptions.FontNotFoundException;
+import org.scantegrity.lib.InvisibleInkFactory;
 
 public class ImageGen {
 	
@@ -24,17 +24,15 @@ public class ImageGen {
 	
 	// Driver Method for testing
 	public static void main(String[] args) throws FontNotFoundException {
-		File out = new File("img.jpg");
-		makeImage("AE",
-				  "Courier New", 
-				  33, 
-				  Color.YELLOW,
-				  Color.MAGENTA,
-				  50, 
-				  50, 
-				  0,
-				  (float) 0,
-				  out);
+		File out = new File("img.png");
+		InvisibleInkFactory x = new InvisibleInkFactory();
+		try {
+			ImageIO.write(x.getBufferedImage("ABDC"), "png", out);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	/**
