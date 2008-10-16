@@ -34,7 +34,7 @@ public class ImageGen {
 		try {
 			img = x.getBufferedImage("AC");
 			System.out.println(System.currentTimeMillis()-start);
-			ImageIO.write(img, "png", out);
+			ImageIO.write(img, "png", out);			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

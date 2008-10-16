@@ -70,10 +70,10 @@ public class InvisibleInkFactory {
 	 * If these arrays are sized > 1, then it creates a pattern as it 
 	 * pastes itself across the image.
 	 */
-	private int[] c_hGridSpace = { 2 };
-	private int[] c_vGridSpace = { 2 };
-	private int[] c_hGridSize = { 20 };
-	private int[] c_vGridSize = { 20 };
+	private int[] c_hGridSpace = { 1 };
+	private int[] c_vGridSpace = { 1 };
+	private int[] c_hGridSize = { 6,4,2,5,7,3,9,4,2 };
+	private int[] c_vGridSize = { 6,4,2,5,7,3,9,4,2 };
 	private Color c_gridColor = Color.WHITE;
 	private Vector<Integer> c_xGridCoords = null;
 	private Vector<Integer> c_yGridCoords = null;
@@ -82,7 +82,7 @@ public class InvisibleInkFactory {
 	 * Font, 10 pixel padding, and block mode without any csprng stuff.   
 	 */
 	public InvisibleInkFactory () {
-		this ("SansSerif", 256, 20, (short)1, null);
+		this ("SanSerif", 96, 10, (short)1, null);
 	}
 	
 	/**
@@ -243,82 +243,110 @@ public class InvisibleInkFactory {
 		int l_height = p_img.getHeight();
 		int l_h = c_hGridSize[0];
 		int l_v = c_vGridSize[0];
-		do {
-			l_g2d.setColor(c_gridColor);
-			//Add vertical line
-			if (l_h < l_width - c_hGridSpace[l_index%c_hGridSpace.length]) {
-				l_g2d.fillRect(l_h, 0, 
-								c_hGridSpace[l_index%c_hGridSpace.length], 
-								l_height);
-				l_h += c_hGridSize[l_index%c_hGridSize.length] 
-			                     + c_hGridSpace[l_index%c_hGridSpace.length];
+		int l_hCurSpace = c_hGridSpace[0];
+		int l_vCurSpace = c_vGridSpace[0];
+		int l_hCurSize = l_h;
+		int l_vCurSize = l_v;
+		c_xGridCoords.add(0);
+		c_yGridCoords.add(0);
+		p_img = FillGridCell(p_img, 0, 0, l_h, l_v);
+		while ((l_h + l_hCurSpace) < l_width || 
+				  (l_v + l_vCurSpace) < l_height) {
 
-				c_xGridCoords.add(l_h-c_hGridSize[l_index%c_hGridSize.length]);
-				
+			l_index++;
+			l_g2d.setColor(c_gridColor);
+			//Vertical Lines
+			if (l_h + l_hCurSpace < l_width) {
+				l_g2d.fillRect(l_h, 0, l_hCurSpace, l_height);
+				l_hCurSize = c_hGridSize[l_index%c_hGridSize.length];
+				l_h += l_hCurSpace + l_hCurSize;				
+				l_hCurSpace = c_hGridSpace[l_index%c_hGridSpace.length];
+				c_xGridCoords.add(Math.min(l_width-1, l_h - l_hCurSize));
+			}
+
+			//Horizontal Lines
+			if (l_v + l_vCurSpace < l_height) {
+				l_g2d.fillRect(0, l_v, l_width, l_vCurSpace);
+				l_vCurSize = c_vGridSize[l_index%c_vGridSize.length];
+				l_v += l_vCurSpace + l_vCurSize;				
+				l_vCurSpace = c_vGridSpace[l_index%c_vGridSpace.length];
+				c_yGridCoords.add(Math.min(l_height-1, l_v - l_vCurSize));
+			}			
+		
+			if (c_xGridCoords.lastElement() + l_hCurSize > l_width) {
+				l_hCurSize = l_width - c_xGridCoords.lastElement();
+			}
+			if (c_yGridCoords.lastElement() + l_vCurSize > l_height) {
+				l_vCurSize = l_height - c_yGridCoords.lastElement();
 			}
 			
-			//Add horizontal line
-			if (l_v < l_height - c_vGridSpace[l_index%c_vGridSpace.length]) {
-				l_g2d.fillRect(0, l_v, l_width, 
-								c_vGridSpace[l_index%c_vGridSpace.length]);
-				l_v += c_vGridSize[l_index%c_vGridSize.length] 
-		                     + c_vGridSpace[l_index%c_vGridSpace.length];
-
-				c_yGridCoords.add(l_v-c_vGridSize[l_index%c_vGridSize.length]);
-			} 
- 
 			
-			//Prevent index OOB
-			if (l_h >= l_width) l_h = l_width-1;
-			if (l_v >= l_height) l_v = l_height-1;
-			
-			l_index++;
-			//Current Block
-			int l_xCoord = c_xGridCoords.lastElement();
-			int l_yCoord = c_yGridCoords.lastElement();
-			Color l_c = new Color(p_img.getRGB(l_h - (l_h-l_xCoord)/2, 
-											   l_v - (l_v-l_yCoord)/2));
-			l_g2d.setColor(l_c);
-			l_g2d.fillRect(l_xCoord, l_yCoord, (l_h-l_xCoord), 
-						   (l_v-l_yCoord));
-			//Blocks above or below current block.
+			//Color the Current (Next) Diagonal Block
+			p_img = FillGridCell(p_img, c_xGridCoords.lastElement(), 
+					 c_yGridCoords.lastElement(), 
+					 l_hCurSize, l_vCurSize);
+			//Blocks above or below current block.				
 			for (int l_i = l_index-1; l_i >= 0; l_i--) {
-				int l_size = 0;
-				
-				//Horizontal blocks
-				l_size = c_hGridSize[l_i%c_hGridSize.length];
-				if (l_i < c_xGridCoords.size() &&
-						(l_width-c_xGridCoords.elementAt(l_i) > l_size)) {
-					l_c = new Color(p_img.getRGB(
-									l_size/2 + c_xGridCoords.elementAt(l_i), 
-									l_v - (l_v-l_yCoord)/2));
-					l_g2d.setColor(l_c);
-					l_g2d.fillRect(c_xGridCoords.elementAt(l_i), 
-								   l_yCoord, 
-								   l_size, 
-								   (l_v-l_yCoord));
+				int l_tmpSize = 0;
+				//Horizontal
+				if (l_i < c_xGridCoords.size()) {
+					l_tmpSize = Math.min(c_hGridSize[l_i%c_hGridSize.length],
+										l_width-c_xGridCoords.elementAt(l_i));
+					p_img = FillGridCell(p_img, c_xGridCoords.elementAt(l_i),
+									 c_yGridCoords.lastElement(), 
+									 l_tmpSize,
+									 l_vCurSize);
 				}
-				
-				//Vertical Blocks
-				l_size = c_vGridSize[l_i%c_vGridSize.length];
-				if (l_i < c_yGridCoords.size() && 
-						(l_height - c_yGridCoords.elementAt(l_i) > l_size )) {
-					l_c = new Color(p_img.getRGB(l_h - (l_h-l_xCoord)/2, 
-									l_size/2 + c_yGridCoords.elementAt(l_i)));
-					l_g2d.setColor(l_c);
-					l_g2d.fillRect(l_xCoord, 
-								   c_yGridCoords.elementAt(l_i), 
-								   (l_h-l_xCoord), 
-								   l_size);
-
+				//Vertical
+				if (l_i < c_yGridCoords.size()) {
+					l_tmpSize = Math.min(c_vGridSize[l_i%c_vGridSize.length],
+							l_height-c_yGridCoords.elementAt(l_i));
+					p_img = FillGridCell(p_img, c_xGridCoords.lastElement(),
+						 c_yGridCoords.elementAt(l_i),
+						 l_hCurSize,
+						 l_tmpSize);
 				}
-			}	
-		} while (l_h < l_width - c_hGridSpace[l_index%c_hGridSpace.length] ||
-				 l_v < l_height - c_vGridSpace[l_index%c_vGridSpace.length]);
+			}
+			System.out.println(" Done ");
 
-		
-		
+		}
 		return p_img;
 	}	
+	
+	/**
+	 * Samples and fills a cell with magenta or yellow depending on which has 
+	 * the most instances of it.
+	 * @param p_img - the image containing the cell
+	 * @param p_x - the rightmost col of the cell
+	 * @param p_y - the top row of the cell
+	 * @param p_sizeX - width of cell
+	 * @param p_sizeY - length of cell
+	 * @return - a modified image
+	 */
+	private BufferedImage FillGridCell(BufferedImage p_img, int p_x, int p_y, 
+									int p_sizeX, int p_sizeY) {
+		int l_mCount, l_magenta;
+		l_magenta = (Color.MAGENTA).getRGB();
+		l_mCount = 0;
+		
+		
+		for (int l_i = 0; l_i < p_sizeX; l_i++) {
+			for (int l_j = 0; l_j < p_sizeY; l_j++) {
+				if (p_img.getRGB(p_x+l_i, p_y+l_j) == l_magenta) l_mCount++;
+			}
+		}
+		
+		
+		Graphics2D l_g2d = p_img.createGraphics();
+		if (l_mCount < p_sizeX*p_sizeY/1.5) {
+			l_g2d.setColor(Color.YELLOW);
+		}
+		else {
+			l_g2d.setColor(Color.MAGENTA);
+		}
+		l_g2d.fillRect(p_x, p_y, p_sizeX, p_sizeY);
+		
+		return p_img;
+	}
 }
  
