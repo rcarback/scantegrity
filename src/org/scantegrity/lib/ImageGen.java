@@ -10,7 +10,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
+
 import javax.imageio.ImageIO;
 
 import org.scantegrity.lib.exceptions.FontNotFoundException;
@@ -24,10 +27,14 @@ public class ImageGen {
 	
 	// Driver Method for testing
 	public static void main(String[] args) throws FontNotFoundException {
+		long start = System.currentTimeMillis();
 		File out = new File("img.png");
+		BufferedImage img;
 		InvisibleInkFactory x = new InvisibleInkFactory();
 		try {
-			ImageIO.write(x.getBufferedImage("CP"), "png", out);
+			img = x.getBufferedImage("AC");
+			System.out.println(System.currentTimeMillis()-start);
+			ImageIO.write(img, "png", out);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

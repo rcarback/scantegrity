@@ -70,10 +70,10 @@ public class InvisibleInkFactory {
 	 * If these arrays are sized > 1, then it creates a pattern as it 
 	 * pastes itself across the image.
 	 */
-	private int[] c_hGridSpace = { 1 };
-	private int[] c_vGridSpace = { 1 };
-	private int[] c_hGridSize = { 10 };
-	private int[] c_vGridSize = { 10 };
+	private int[] c_hGridSpace = { 2 };
+	private int[] c_vGridSpace = { 2 };
+	private int[] c_hGridSize = { 20 };
+	private int[] c_vGridSize = { 20 };
 	private Color c_gridColor = Color.WHITE;
 	private Vector<Integer> c_xGridCoords = null;
 	private Vector<Integer> c_yGridCoords = null;
@@ -246,25 +246,27 @@ public class InvisibleInkFactory {
 		do {
 			l_g2d.setColor(c_gridColor);
 			//Add vertical line
-			if (l_h < l_width) {
+			if (l_h < l_width - c_hGridSpace[l_index%c_hGridSpace.length]) {
 				l_g2d.fillRect(l_h, 0, 
 								c_hGridSpace[l_index%c_hGridSpace.length], 
 								l_height);
 				l_h += c_hGridSize[l_index%c_hGridSize.length] 
 			                     + c_hGridSpace[l_index%c_hGridSpace.length];
-				
+
 				c_xGridCoords.add(l_h-c_hGridSize[l_index%c_hGridSize.length]);
+				
 			}
 			
 			//Add horizontal line
-			if (l_v < l_height) {
+			if (l_v < l_height - c_vGridSpace[l_index%c_vGridSpace.length]) {
 				l_g2d.fillRect(0, l_v, l_width, 
 								c_vGridSpace[l_index%c_vGridSpace.length]);
 				l_v += c_vGridSize[l_index%c_vGridSize.length] 
 		                     + c_vGridSpace[l_index%c_vGridSpace.length];
-				
+
 				c_yGridCoords.add(l_v-c_vGridSize[l_index%c_vGridSize.length]);
-			}
+			} 
+ 
 			
 			//Prevent index OOB
 			if (l_h >= l_width) l_h = l_width-1;
@@ -311,7 +313,8 @@ public class InvisibleInkFactory {
 
 				}
 			}	
-		} while (l_h < l_width-1 || l_v < l_height-1);
+		} while (l_h < l_width - c_hGridSpace[l_index%c_hGridSpace.length] ||
+				 l_v < l_height - c_vGridSpace[l_index%c_vGridSpace.length]);
 
 		
 		
