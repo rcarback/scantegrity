@@ -27,7 +27,7 @@ public class ImageGen {
 		File out = new File("img.png");
 		InvisibleInkFactory x = new InvisibleInkFactory();
 		try {
-			ImageIO.write(x.getBufferedImage("ABDC"), "png", out);
+			ImageIO.write(x.getBufferedImage("CP"), "png", out);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
