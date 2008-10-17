@@ -23,16 +23,10 @@ package org.scantegrity.lib;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
-import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Vector;
  
 /**
@@ -50,19 +44,15 @@ import java.util.Vector;
 public class InvisibleInkFactory {
 
 	static final short BLOCK = 1; 
-	static final short MUNGE = 2; 
-	static final short THREE = 4; 
-	static final short FOUR = 8; 
-	static final byte FIVE = 16; 
-	static final short SIX = 32; 
-	static final short SEVEN = 64; 
-	static final short EIGHT = 128; 
+	static final short MASK = 2; 
+	static final short MUNGE = 4; 
 	static final String DEFAULT_SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";	
 	
 	private short c_flags; 
 	private Font c_font;
 	private int c_padding;
 	private SecureRandom c_csprng;
+
 	//The True ascent of the current font.
 	private int c_txtAscent;
 	
@@ -72,8 +62,8 @@ public class InvisibleInkFactory {
 	 */
 	private int[] c_hGridSpace = { 1 };
 	private int[] c_vGridSpace = { 1 };
-	private int[] c_hGridSize = { 6,4,2,5,7,3,9,4,2 };
-	private int[] c_vGridSize = { 6,4,2,5,7,3,9,4,2 };
+	private int[] c_hGridSize = { 5 };
+	private int[] c_vGridSize = { 5 };
 	private Color c_gridColor = Color.WHITE;
 	private Vector<Integer> c_xGridCoords = null;
 	private Vector<Integer> c_yGridCoords = null;
@@ -82,7 +72,7 @@ public class InvisibleInkFactory {
 	 * Font, 10 pixel padding, and block mode without any csprng stuff.   
 	 */
 	public InvisibleInkFactory () {
-		this ("SanSerif", 96, 10, (short)1, null);
+		this ("SanSerif", 96, 10, (short)7, null);
 	}
 	
 	/**
@@ -148,28 +138,25 @@ public class InvisibleInkFactory {
 		
 		//Draw Text
 		l_g2d.setFont(c_font);
-		l_g2d.setColor(Color.MAGENTA);
-				
+		l_g2d.setColor(Color.MAGENTA);				
 		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding); 
 		
-	    l_g2d.setColor(Color.GREEN);
-	    /*
-	    l_g2d.drawLine(0, c_padding, (int)l_width, c_padding);
-	    l_g2d.drawLine(0, (int)l_height-c_padding, (int)l_width, 
-	    					(int)l_height-c_padding);
-	    l_g2d.drawLine(0, (int)(l_height-2*c_padding-c_font.getLineMetrics(p_txt, l_frc).getAscent()), (int)l_width, (int)(l_height-2*c_padding-c_font.getLineMetrics(p_txt, l_frc).getAscent()));
-	    */
-		//Process flags
-		if ((c_flags & BLOCK) == BLOCK) {
-			//Block Operations
-			l_ret = GenGrid(l_ret);
-			if((c_flags & MUNGE) == MUNGE) {
-			}
-		} else {
-			//Pixel Operations
-		}
+		//Process Block flag, or set grid to pixel resolution.
+		if ((c_flags & BLOCK) == BLOCK) l_ret = GenBlockGrid(l_ret);
+		else GenGrid(l_ret);
+		
+		if ((c_flags & MASK) == MASK) l_ret = AddRandomCyan(l_ret);
+		if ((c_flags & MUNGE) == MUNGE) l_ret = RandomizeBrightness(l_ret);
 		
 		return l_ret;
+	}
+	
+	/**
+	 * setCSPRNG - Sets the CSPRNG (if not set by Constructor).
+	 * @param p_csprng - the CSPRNG to use.
+	 */
+	public void setCSPRNG(SecureRandom p_csprng) {
+		this.c_csprng = p_csprng;
 	}
 		
 	/**
@@ -233,7 +220,8 @@ public class InvisibleInkFactory {
 	 * @param p_img
 	 * @return
 	 */
-	private BufferedImage GenGrid(BufferedImage p_img) {
+	private BufferedImage GenBlockGrid(BufferedImage p_img) {
+		/* TODO: This function is probably too long */
 		Graphics2D l_g2d = p_img.createGraphics();
 		
 		c_xGridCoords = new Vector<Integer>();
@@ -307,11 +295,26 @@ public class InvisibleInkFactory {
 						 l_tmpSize);
 				}
 			}
-			System.out.println(" Done ");
-
 		}
 		return p_img;
 	}	
+	
+	/**
+	 * GenGrid - Sets the class grid variabls to pixels for the given image.
+	 * @param p_img - The image to be gridded.
+	 */
+	private void GenGrid(BufferedImage p_img) {
+		int[] l_size = { 1 };
+		int[] l_space = { 0 };
+		c_xGridCoords = new Vector<Integer>();
+		c_yGridCoords = new Vector<Integer>();
+		for (int l_i = 0; l_i < p_img.getWidth(); l_i++) c_xGridCoords.add(l_i);
+		for (int l_j = 0; l_j < p_img.getHeight(); l_j++) c_yGridCoords.add(l_j);
+		c_vGridSize = l_size;
+		c_hGridSize = l_size;
+		c_vGridSpace = l_space;
+		c_hGridSpace = l_space;
+	}
 	
 	/**
 	 * Samples and fills a cell with magenta or yellow depending on which has 
@@ -327,16 +330,14 @@ public class InvisibleInkFactory {
 									int p_sizeX, int p_sizeY) {
 		int l_mCount, l_magenta;
 		l_magenta = (Color.MAGENTA).getRGB();
-		l_mCount = 0;
-		
-		
+		l_mCount = 0;	
+		//For each pixel, count instance of magenta
 		for (int l_i = 0; l_i < p_sizeX; l_i++) {
 			for (int l_j = 0; l_j < p_sizeY; l_j++) {
 				if (p_img.getRGB(p_x+l_i, p_y+l_j) == l_magenta) l_mCount++;
 			}
 		}
-		
-		
+		//Draw the best.
 		Graphics2D l_g2d = p_img.createGraphics();
 		if (l_mCount < p_sizeX*p_sizeY/1.5) {
 			l_g2d.setColor(Color.YELLOW);
@@ -344,8 +345,86 @@ public class InvisibleInkFactory {
 		else {
 			l_g2d.setColor(Color.MAGENTA);
 		}
-		l_g2d.fillRect(p_x, p_y, p_sizeX, p_sizeY);
-		
+		l_g2d.fillRect(p_x, p_y, p_sizeX, p_sizeY);		
+		return p_img;
+	}
+	
+	/**
+	 * AddRandomCyan - Uses the preset CSPRNG to generate random additions of
+	 * cyan to the image.
+	 * @param p_img - image to modify.
+	 * @return modified image.
+	 */
+	private BufferedImage AddRandomCyan(BufferedImage p_img) {
+		/* It might be better to have one "addcolor" function, then in this
+		 * just use them differently, instead of 2 that do specific things...
+		 */
+		if (c_csprng == null) {
+			throw new NullPointerException("CSPRNG is not Set!");			
+		}
+		// For each pixel...
+		for (int l_x = 0; l_x < c_xGridCoords.size(); l_x++) {
+			for (int l_y = 0; l_y < c_yGridCoords.size(); l_y++) {
+				Color l_c = new Color(p_img.getRGB(c_xGridCoords.elementAt(l_x),
+												   c_yGridCoords.elementAt(l_y)));
+				int l_r = l_c.getRed();
+				int l_g = l_c.getGreen();
+				int l_b = l_c.getBlue();
+
+				// Cyan translates to Green + Blue in RGB, so
+				// by reducing the remaining color (red), we
+				// cause a certain amount of CYAN to be
+				// introduced (since CMYK is subtractive, 
+				// taking away some red actually adds more of
+				// the other colors).
+				l_r -= c_csprng.nextInt((int)((255 - (255-l_r))*.5));
+
+				// Set the new color to the Grid Cell
+				Graphics2D l_g2d = p_img.createGraphics();
+				l_g2d.setColor(new Color(l_r, l_g, l_b));
+				l_g2d.fillRect(c_xGridCoords.elementAt(l_x), 
+							   c_yGridCoords.elementAt(l_y), 
+							   c_hGridSize[l_x%c_hGridSize.length], 
+							   c_vGridSize[l_y%c_vGridSize.length]);				
+			}
+		}
+		return p_img;
+	}
+	
+	private BufferedImage RandomizeBrightness(BufferedImage p_img) {
+		if (c_csprng == null) {
+			throw new NullPointerException("CSPRNG is not Set!");			
+		}
+		// For each pixel...
+		for (int l_x = 0; l_x < c_xGridCoords.size(); l_x++) {
+			for (int l_y = 0; l_y < c_yGridCoords.size(); l_y++) {
+				Color l_c = new Color(p_img.getRGB(c_xGridCoords.elementAt(l_x),
+												   c_yGridCoords.elementAt(l_y)));
+				int l_r = l_c.getRed();
+				int l_g = l_c.getGreen();
+				int l_b = l_c.getBlue();
+				
+				// Invert l_rand to _take away_ amount of
+				// color, not leave only that much.
+				double l_rand = 1 - c_csprng.nextDouble()*.33;
+				System.out.println("Result: " + l_rand);
+				
+
+				// Muliplying each color by the same value < 1 will reduce
+				// the brightness of the image.
+				l_r = (int) Math.floor(l_r*l_rand);
+				l_g = (int) Math.floor(l_g*l_rand);
+				l_b = (int) Math.floor(l_b*l_rand);
+				
+				// Set the new color to the Grid Cell
+				Graphics2D l_g2d = p_img.createGraphics();
+				l_g2d.setColor(new Color(l_r, l_g, l_b));
+				l_g2d.fillRect(c_xGridCoords.elementAt(l_x), 
+							   c_yGridCoords.elementAt(l_y), 
+							   c_hGridSize[l_x%c_hGridSize.length], 
+							   c_vGridSize[l_y%c_vGridSize.length]);				
+			}
+		}
 		return p_img;
 	}
 }
