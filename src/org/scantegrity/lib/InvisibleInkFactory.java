@@ -60,10 +60,10 @@ public class InvisibleInkFactory {
 	 * If these arrays are sized > 1, then it creates a pattern as it 
 	 * pastes itself across the image.
 	 */
-	private int[] c_hGridSpace = { 1 };
-	private int[] c_vGridSpace = { 1 };
-	private int[] c_hGridSize = { 5 };
-	private int[] c_vGridSize = { 5 };
+	private Integer[] c_hGridSpace = { 1 };
+	private Integer[] c_vGridSpace = { 1 };
+	private Integer[] c_hGridSize = { 5 };
+	private Integer[] c_vGridSize = { 5 };
 	private Color c_gridColor = Color.WHITE;
 	private Vector<Integer> c_xGridCoords = null;
 	private Vector<Integer> c_yGridCoords = null;
@@ -157,6 +157,40 @@ public class InvisibleInkFactory {
 	 */
 	public void setCSPRNG(SecureRandom p_csprng) {
 		this.c_csprng = p_csprng;
+	}
+	
+	/**
+	 * setFlags - sets the current flag set on the factory.
+	 * @param p_flags - the flags.
+	 */
+	public void setFlags(short p_flags) {
+		c_flags = p_flags;
+	}
+	
+	/**
+	 * Sets the current font.
+	 * @param p_font - font to tuse.
+	 */
+	public void setFont(Font p_font) {
+		c_font = p_font;
+		SetTrueAscent(DEFAULT_SYMBOLS);
+	}
+	
+	public void setGrid(Integer[] p_vGridSize, Integer[] p_vGridSpace, 
+						Integer[] p_hGridSize, Integer[] p_hGridSpace)
+	{
+		//check for 0's
+		for (int l_i = 0; l_i < p_vGridSize.length; l_i++) {
+			if (p_vGridSize[l_i] <= 0) p_vGridSize[l_i] = 1;
+		}
+		for (int l_i = 0; l_i < p_hGridSize.length; l_i++) {
+			if (p_hGridSize[l_i] <= 0) p_hGridSize[l_i] = 1;
+		}
+
+		c_vGridSize = p_vGridSize;
+		c_hGridSize = p_hGridSize;
+		c_vGridSpace = p_vGridSpace;
+		c_hGridSpace = p_hGridSpace;		
 	}
 		
 	/**
@@ -304,8 +338,8 @@ public class InvisibleInkFactory {
 	 * @param p_img - The image to be gridded.
 	 */
 	private void GenGrid(BufferedImage p_img) {
-		int[] l_size = { 1 };
-		int[] l_space = { 0 };
+		Integer[] l_size = { 1 };
+		Integer[] l_space = { 0 };
 		c_xGridCoords = new Vector<Integer>();
 		c_yGridCoords = new Vector<Integer>();
 		for (int l_i = 0; l_i < p_img.getWidth(); l_i++) c_xGridCoords.add(l_i);
@@ -407,7 +441,6 @@ public class InvisibleInkFactory {
 				// Invert l_rand to _take away_ amount of
 				// color, not leave only that much.
 				double l_rand = 1 - c_csprng.nextDouble()*.33;
-				System.out.println("Result: " + l_rand);
 				
 
 				// Muliplying each color by the same value < 1 will reduce

@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="extJars/ballotStandard-1.0.jar"/>
-	<classpathentry kind="lib" path="extJars/bcmail-jdk15-135.jar"/>
-	<classpathentry kind="lib" path="extJars/bcprov-jdk15-135.jar"/>
-	<classpathentry kind="lib" path="extJars/itext-1.4.5.jar"/>
-	<classpathentry kind="lib" path="extJars/iText-2.0.8.jar"/>
-	<classpathentry kind="lib" path="extJars/jai_codec.jar"/>
-	<classpathentry kind="lib" path="extJars/jai_core.jar"/>
-	<classpathentry kind="lib" path="extJars/simplecaptcha-20050925.jar"/>
-	<classpathentry kind="lib" path="extJars/swing-layout-1.0.jar"/>
-	<classpathentry kind="lib" path="extJars/xmlSig/dom.jar"/>
-	<classpathentry kind="lib" path="extJars/xmlSig/jaxp-api.jar"/>
-	<classpathentry kind="lib" path="extJars/xmlSig/xalan.jar"/>
-	<classpathentry kind="lib" path="extJars/xmlSig/xercesImpl.jar"/>
-	<classpathentry kind="lib" path="extJars/xmlSig/xmldsig.jar"/>
-	<classpathentry kind="lib" path="extJars/xmlSig/xmlsec.jar"/>
+	<classpathentry excluding=".DS_Store|auditor/|authoring/|common/|engine/|scanner/" including="org/scantegrity/lib/Inkerator.java|org/scantegrity/lib/InvisibleInkFactory.java" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
