@@ -4,7 +4,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageProducer;
 import java.awt.Event;
 import java.awt.BorderLayout;
 
@@ -35,20 +34,16 @@ import java.awt.Image;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
-import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.security.SecureRandom;
 import java.util.Vector;
 
 import javax.swing.JScrollPane;
-import javax.swing.JList;
-import javax.swing.JScrollBar;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 
 public class Inkerator {
 
@@ -98,6 +93,7 @@ public class Inkerator {
 	private JLabel FontSizeLabel = null;
 	private JSlider FontSizeSlider = null;
 	private int c_c = 0;
+	private JSpinner ZoomSpinner = null;
 	/**
 	 * This method initializes jFrame
 	 * 
@@ -358,6 +354,10 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
+			GridBagConstraints gridBagConstraints16 = new GridBagConstraints();
+			gridBagConstraints16.gridx = 1;
+			gridBagConstraints16.fill = GridBagConstraints.BOTH;
+			gridBagConstraints16.gridy = 10;
 			GridBagConstraints gridBagConstraints19 = new GridBagConstraints();
 			gridBagConstraints19.fill = GridBagConstraints.VERTICAL;
 			gridBagConstraints19.gridy = 9;
@@ -371,7 +371,7 @@ public class Inkerator {
 			FontSizeLabel.setText("Font Size:");
 			GridBagConstraints gridBagConstraints17 = new GridBagConstraints();
 			gridBagConstraints17.fill = GridBagConstraints.VERTICAL;
-			gridBagConstraints17.gridy = 10;
+			gridBagConstraints17.gridy = 11;
 			gridBagConstraints17.weightx = 1.0;
 			gridBagConstraints17.gridx = 1;
 			GridBagConstraints gridBagConstraints15 = new GridBagConstraints();
@@ -487,6 +487,7 @@ public class Inkerator {
 			jPanel.add(getZoomLevelSlider(), gridBagConstraints17);
 			jPanel.add(FontSizeLabel, gridBagConstraints18);
 			jPanel.add(getFontSizeSlider(), gridBagConstraints19);
+			jPanel.add(getZoomSpinner(), gridBagConstraints16);
 		}
 		return jPanel;
 	}
@@ -701,14 +702,8 @@ public class Inkerator {
 		JLabel l_imgLabel = getImageLabel();
 		//Get Settings                 
 		String l_imgText = getImageText().getText();
-		boolean l_munge = getMungeBox().isSelected();
-		boolean l_mask = getMaskBox().isSelected();
 		double l_zoom = (double)getZoomLevelSlider().getValue()/10;
 		
-		short l_flags = InvisibleInkFactory.BLOCK;
-		if (l_munge) l_flags |= InvisibleInkFactory.MUNGE;
-		if (l_mask) l_flags |= InvisibleInkFactory.MASK;
-		imgFactory.setFlags(l_flags);
 		imgFactory.setGrid(GetList(getVGridSizeString(), 5), 
 						   GetList(getVGridSpaces(), 1),
 						   GetList(getHGridSizes(), 5), 
@@ -731,7 +726,6 @@ public class Inkerator {
 		l_imgLabel.repaint();
 		
 		c_stream.println("==Image Generated==");
-		c_stream.print("Flags=" + l_flags);
 		c_stream.print(", Text=" + l_imgText);
 		c_stream.print(", vGridSizes= { ");
 		c_stream.print(" }, vGridSpaces= { ");
@@ -867,6 +861,18 @@ public class Inkerator {
 			});
 		}
 		return FontSizeSlider;
+	}
+
+	/**
+	 * This method initializes ZoomSpinner	
+	 * 	
+	 * @return javax.swing.JSpinner	
+	 */
+	private JSpinner getZoomSpinner() {
+		if (ZoomSpinner == null) {
+			ZoomSpinner = new JSpinner();
+		}
+		return ZoomSpinner;
 	}
 
 	/**

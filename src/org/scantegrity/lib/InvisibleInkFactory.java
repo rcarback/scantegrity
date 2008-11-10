@@ -38,21 +38,22 @@ import java.util.Vector;
  * paper. 
  * 
  * @author Richard Carback
- * @version 0.0.1 
- * @date 08/10/09
+ * @version 0.1.0 
+ * @date 09/11/09
  */
 public class InvisibleInkFactory {
 
-	static final short BLOCK = 1; 
-	static final short MASK = 2; 
-	static final short MUNGE = 4; 
 	static final String DEFAULT_SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";	
 	
-	private short c_flags; 
 	private Font c_font;
 	private int c_padding;
 	private SecureRandom c_csprng;
-
+	//Default colors
+	private float[] c_foreground = {0,(float) 0.5,0,0}; 
+	private float[] c_background = {0,0,(float) 0.5,0}; 
+	private float[] c_mask = {(float) 0.5,0,0,0}; 
+	private float[] c_munge = {0,0,0,(float) 0.5};
+	
 	//The True ascent of the current font.
 	private int c_txtAscent;
 	
@@ -72,21 +73,20 @@ public class InvisibleInkFactory {
 	 * Font, 10 pixel padding, and block mode without any csprng stuff.   
 	 */
 	public InvisibleInkFactory () {
-		this ("SanSerif", 96, 10, (short)7, null);
+		this ("SanSerif", 96, 10, null);
 	}
 	
 	/**
 	 * Overloaded constructor for the standard constructor. Defaults csprng to 
 	 * null.
 	 */	
-	public InvisibleInkFactory (String p_fontName, int p_fontSize, int p_pad,
-			short p_flags) {
-		this (p_fontName, p_fontSize, p_pad, p_flags, null);
+	public InvisibleInkFactory (String p_fontName, int p_fontSize, int p_pad) {
+		this (p_fontName, p_fontSize, p_pad, null);
 	}
 
 	/**
 	 * Standard constructor that allows user to set font, fontsize, padding,
-	 * flags for the class, and optionally, a CSPRNG.
+	 * and optionally, a CSPRNG.
 	 * 
 	 * @param p_fontName - Name of the font, e.g. "Times New Roman".
 	 * @param p_fontSize - Font Size
@@ -95,9 +95,8 @@ public class InvisibleInkFactory {
 	 * 					 generator
 	 */
 	public InvisibleInkFactory (String p_fontName, int p_fontSize, int p_pad,
-			short p_flags, SecureRandom p_csprng) {
+			SecureRandom p_csprng) {
 
-		c_flags = p_flags;
 		c_font = new Font(p_fontName, Font.BOLD, p_fontSize);
 		c_padding = p_pad;
 		c_csprng = p_csprng;
@@ -133,20 +132,18 @@ public class InvisibleInkFactory {
 		//Draw Background
 		l_g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, 
 								RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-		l_g2d.setColor(Color.YELLOW);
+		l_g2d.setColor(CMYKtoRGB(c_background));
 		l_g2d.fillRect(0, 0, (int)l_width, (int)l_height);
 		
 		//Draw Text
 		l_g2d.setFont(c_font);
-		l_g2d.setColor(Color.MAGENTA);				
+		l_g2d.setColor(CMYKtoRGB(c_foreground));
 		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding); 
 		
 		//Process Block flag, or set grid to pixel resolution.
-		if ((c_flags & BLOCK) == BLOCK) l_ret = GenBlockGrid(l_ret);
-		else GenGrid(l_ret);
-		
-		if ((c_flags & MASK) == MASK) l_ret = AddRandomCyan(l_ret);
-		if ((c_flags & MUNGE) == MUNGE) l_ret = RandomizeBrightness(l_ret);
+		/*l_ret = GenBlockGrid(l_ret);
+		l_ret = AddRandomCyan(l_ret);
+		l_ret = RandomizeBrightness(l_ret);*/
 		
 		return l_ret;
 	}
@@ -160,16 +157,8 @@ public class InvisibleInkFactory {
 	}
 	
 	/**
-	 * setFlags - sets the current flag set on the factory.
-	 * @param p_flags - the flags.
-	 */
-	public void setFlags(short p_flags) {
-		c_flags = p_flags;
-	}
-	
-	/**
 	 * Sets the current font.
-	 * @param p_font - font to tuse.
+	 * @param p_font - font to use.
 	 */
 	public void setFont(Font p_font) {
 		c_font = p_font;
@@ -247,6 +236,43 @@ public class InvisibleInkFactory {
 			c_txtAscent = (int) l_height;
 		}
 	}
+	
+	/**
+	 * CMYKtoRGB - Converts a float of CMYK values to a Color in sRGB. We could 
+	 * use ColorProfile, but CMYK is not a default color profile in Java. It's
+	 * easier to have these utility functions here than to expect the user to 
+	 * install the color profile or provide an installer for it.
+	 * 
+	 * According to: http://coding.derkeiler.com/Archive/Java/comp.lang.java/2003-10/0100.html
+	 * 
+	 * This is how it's done:
+	 * 
+	 *       int colors = 255 - black;
+     *       rgb[0] = colors * (255 - cyan)/255;
+     *       rgb[1] = colors * (255 - magenta)/255;
+     *       rgb[2] = colors * (255 - yellow)/255; 
+	 * 
+	 * @param p_cmykColor - The color to translate
+	 * @return The color in sRGB.
+	 */
+	private Color CMYKtoRGB(float[] p_cmykColor) {
+		int[] l_cmykIntColor = {
+				(int)(p_cmykColor[0]*255),
+				(int)(p_cmykColor[1]*255),
+				(int)(p_cmykColor[2]*255),
+				(int)(p_cmykColor[3]*255)
+			};
+		int l_colors = 255 - l_cmykIntColor[3];
+		System.out.println("Colors: " + l_colors);
+		int l_red = l_colors * (255 - l_cmykIntColor[0])/255;
+		int l_green = l_colors * (255 - l_cmykIntColor[1])/255;
+		int l_blue = l_colors * (255 - l_cmykIntColor[2])/255;
+		System.out.println(l_red + ", " + l_green + ", " + l_blue);
+		
+		return new Color(l_red, l_green, l_blue);
+	}
+	
+	
 	
 	/**
 	 * GenGrid - Generates a grid across a pre-generated image, and sets the 
@@ -333,10 +359,10 @@ public class InvisibleInkFactory {
 		return p_img;
 	}	
 	
-	/**
-	 * GenGrid - Sets the class grid variabls to pixels for the given image.
+	/*
+	 * GenGrid - Sets the class grid variables to pixels for the given image.
 	 * @param p_img - The image to be gridded.
-	 */
+	 *
 	private void GenGrid(BufferedImage p_img) {
 		Integer[] l_size = { 1 };
 		Integer[] l_space = { 0 };
@@ -348,11 +374,11 @@ public class InvisibleInkFactory {
 		c_hGridSize = l_size;
 		c_vGridSpace = l_space;
 		c_hGridSpace = l_space;
-	}
+	}*/
 	
 	/**
-	 * Samples and fills a cell with magenta or yellow depending on which has 
-	 * the most instances of it.
+	 * Samples and fills a cell with foreground or background depending on which 
+	 * has the most instances of it.
 	 * @param p_img - the image containing the cell
 	 * @param p_x - the rightmost col of the cell
 	 * @param p_y - the top row of the cell
