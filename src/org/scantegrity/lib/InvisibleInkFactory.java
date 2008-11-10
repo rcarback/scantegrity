@@ -141,9 +141,9 @@ public class InvisibleInkFactory {
 		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding); 
 		
 		//Process Block flag, or set grid to pixel resolution.
-		/*l_ret = GenBlockGrid(l_ret);
+		l_ret = GenBlockGrid(l_ret);
 		l_ret = AddRandomCyan(l_ret);
-		l_ret = RandomizeBrightness(l_ret);*/
+		l_ret = RandomizeBrightness(l_ret);
 		
 		return l_ret;
 	}
@@ -263,11 +263,9 @@ public class InvisibleInkFactory {
 				(int)(p_cmykColor[3]*255)
 			};
 		int l_colors = 255 - l_cmykIntColor[3];
-		System.out.println("Colors: " + l_colors);
 		int l_red = l_colors * (255 - l_cmykIntColor[0])/255;
 		int l_green = l_colors * (255 - l_cmykIntColor[1])/255;
 		int l_blue = l_colors * (255 - l_cmykIntColor[2])/255;
-		System.out.println(l_red + ", " + l_green + ", " + l_blue);
 		
 		return new Color(l_red, l_green, l_blue);
 	}
@@ -389,7 +387,7 @@ public class InvisibleInkFactory {
 	private BufferedImage FillGridCell(BufferedImage p_img, int p_x, int p_y, 
 									int p_sizeX, int p_sizeY) {
 		int l_mCount, l_magenta;
-		l_magenta = (Color.MAGENTA).getRGB();
+		l_magenta = CMYKtoRGB(c_foreground).getRGB();
 		l_mCount = 0;	
 		//For each pixel, count instance of magenta
 		for (int l_i = 0; l_i < p_sizeX; l_i++) {
@@ -400,10 +398,10 @@ public class InvisibleInkFactory {
 		//Draw the best.
 		Graphics2D l_g2d = p_img.createGraphics();
 		if (l_mCount < p_sizeX*p_sizeY/1.5) {
-			l_g2d.setColor(Color.YELLOW);
+			l_g2d.setColor(CMYKtoRGB(c_background));
 		}
 		else {
-			l_g2d.setColor(Color.MAGENTA);
+			l_g2d.setColor(CMYKtoRGB(c_foreground));
 		}
 		l_g2d.fillRect(p_x, p_y, p_sizeX, p_sizeY);		
 		return p_img;

@@ -13,7 +13,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.KeyStroke;
 import java.awt.Point;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -31,7 +30,6 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Image;
 
-import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import java.io.File;
@@ -42,7 +40,6 @@ import java.security.SecureRandom;
 import java.util.Vector;
 
 import javax.swing.JScrollPane;
-import javax.swing.JSlider;
 import javax.swing.JSpinner;
 
 public class Inkerator {
@@ -66,8 +63,6 @@ public class Inkerator {
 	private JPanel jPanel = null;
 	private JButton Update = null;
 	private JButton Save = null;
-	private JCheckBox MungeBox = null;
-	private JCheckBox MaskBox = null;
 	private JTextField ImageText = null;
 	private JLabel ImageTextLabel = null;
 	private JTextField vGridSizeString = null;
@@ -89,11 +84,12 @@ public class Inkerator {
 	private JPanel jPanel1 = null;
 	private JScrollPane jScrollPane = null;
 	private JLabel ZoomLabel = null;
-	private JSlider ZoomLevelSlider = null;
 	private JLabel FontSizeLabel = null;
-	private JSlider FontSizeSlider = null;
 	private int c_c = 0;
 	private JSpinner ZoomSpinner = null;
+	private JSpinner FontSpinner = null;
+	private JLabel SeedLabel = null;
+	private JSpinner SeedSpinner = null;
 	/**
 	 * This method initializes jFrame
 	 * 
@@ -104,7 +100,7 @@ public class Inkerator {
 			jFrame = new JFrame();
 			jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			jFrame.setJMenuBar(getJJMenuBar());
-			jFrame.setSize(662, 338);
+			jFrame.setSize(757, 449);
 			jFrame.setContentPane(getJContentPane());
 			jFrame.setTitle("Application");
 		}
@@ -354,41 +350,48 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
+			GridBagConstraints gridBagConstraints51 = new GridBagConstraints();
+			gridBagConstraints51.gridx = 1;
+			gridBagConstraints51.fill = GridBagConstraints.BOTH;
+			gridBagConstraints51.anchor = GridBagConstraints.WEST;
+			gridBagConstraints51.gridy = 9;
+			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
+			gridBagConstraints2.gridx = 0;
+			gridBagConstraints2.anchor = GridBagConstraints.WEST;
+			gridBagConstraints2.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints2.gridy = 9;
+			SeedLabel = new JLabel();
+			SeedLabel.setText("Random Seed:");
+			GridBagConstraints gridBagConstraints17 = new GridBagConstraints();
+			gridBagConstraints17.gridx = 1;
+			gridBagConstraints17.fill = GridBagConstraints.BOTH;
+			gridBagConstraints17.gridwidth = 2;
+			gridBagConstraints17.gridy = 12;
 			GridBagConstraints gridBagConstraints16 = new GridBagConstraints();
 			gridBagConstraints16.gridx = 1;
 			gridBagConstraints16.fill = GridBagConstraints.BOTH;
-			gridBagConstraints16.gridy = 10;
-			GridBagConstraints gridBagConstraints19 = new GridBagConstraints();
-			gridBagConstraints19.fill = GridBagConstraints.VERTICAL;
-			gridBagConstraints19.gridy = 9;
-			gridBagConstraints19.weightx = 1.0;
-			gridBagConstraints19.gridx = 1;
+			gridBagConstraints16.gridy = 13;
 			GridBagConstraints gridBagConstraints18 = new GridBagConstraints();
 			gridBagConstraints18.gridx = 0;
 			gridBagConstraints18.anchor = GridBagConstraints.WEST;
-			gridBagConstraints18.gridy = 9;
+			gridBagConstraints18.gridy = 12;
 			FontSizeLabel = new JLabel();
 			FontSizeLabel.setText("Font Size:");
-			GridBagConstraints gridBagConstraints17 = new GridBagConstraints();
-			gridBagConstraints17.fill = GridBagConstraints.VERTICAL;
-			gridBagConstraints17.gridy = 11;
-			gridBagConstraints17.weightx = 1.0;
-			gridBagConstraints17.gridx = 1;
 			GridBagConstraints gridBagConstraints15 = new GridBagConstraints();
 			gridBagConstraints15.gridx = 0;
 			gridBagConstraints15.anchor = GridBagConstraints.WEST;
-			gridBagConstraints15.gridy = 10;
+			gridBagConstraints15.gridy = 13;
 			ZoomLabel = new JLabel();
 			ZoomLabel.setText("Zoom:");
 			GridBagConstraints gridBagConstraints14 = new GridBagConstraints();
 			gridBagConstraints14.gridx = 0;
 			gridBagConstraints14.anchor = GridBagConstraints.WEST;
-			gridBagConstraints14.gridy = 8;
+			gridBagConstraints14.gridy = 10;
 			fontChooserLabel = new JLabel();
 			fontChooserLabel.setText("Font:");
 			GridBagConstraints gridBagConstraints13 = new GridBagConstraints();
 			gridBagConstraints13.fill = GridBagConstraints.BOTH;
-			gridBagConstraints13.gridy = 8;
+			gridBagConstraints13.gridy = 10;
 			gridBagConstraints13.weightx = 1.0;
 			gridBagConstraints13.anchor = GridBagConstraints.WEST;
 			gridBagConstraints13.gridx = 1;
@@ -453,24 +456,16 @@ public class Inkerator {
 			gridBagConstraints21.gridwidth = 1;
 			gridBagConstraints21.anchor = GridBagConstraints.WEST;
 			gridBagConstraints21.gridx = 1;
-			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
-			gridBagConstraints3.gridx = 1;
-			gridBagConstraints3.gridy = 12;
-			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
-			gridBagConstraints2.gridx = 0;
-			gridBagConstraints2.gridy = 12;
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.gridx = 1;
-			gridBagConstraints1.gridy = 13;
+			gridBagConstraints1.gridy = 16;
 			GridBagConstraints gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 13;
+			gridBagConstraints.gridy = 16;
 			jPanel = new JPanel();
 			jPanel.setLayout(new GridBagLayout());
 			jPanel.add(getUpdate(), gridBagConstraints);
 			jPanel.add(getSave(), gridBagConstraints1);
-			jPanel.add(getMungeBox(), gridBagConstraints2);
-			jPanel.add(getMaskBox(), gridBagConstraints3);
 			jPanel.add(getImageText(), gridBagConstraints21);
 			jPanel.add(ImageTextLabel, gridBagConstraints31);
 			jPanel.add(getVGridSizeString(), gridBagConstraints4);
@@ -484,10 +479,11 @@ public class Inkerator {
 			jPanel.add(getFontChooser(), gridBagConstraints13);
 			jPanel.add(fontChooserLabel, gridBagConstraints14);
 			jPanel.add(ZoomLabel, gridBagConstraints15);
-			jPanel.add(getZoomLevelSlider(), gridBagConstraints17);
 			jPanel.add(FontSizeLabel, gridBagConstraints18);
-			jPanel.add(getFontSizeSlider(), gridBagConstraints19);
 			jPanel.add(getZoomSpinner(), gridBagConstraints16);
+			jPanel.add(getFontSpinner(), gridBagConstraints17);
+			jPanel.add(SeedLabel, gridBagConstraints2);
+			jPanel.add(getSeedSpinner(), gridBagConstraints51);
 		}
 		return jPanel;
 	}
@@ -526,43 +522,6 @@ public class Inkerator {
 			});
 		}
 		return Save;
-	}
-
-	/**
-	 * This method initializes MungeBox	
-	 * 	
-	 * @return javax.swing.JCheckBox	
-	 */
-	private JCheckBox getMungeBox() {
-		if (MungeBox == null) {
-			MungeBox = new JCheckBox();
-			MungeBox.setText("Munge");
-			MungeBox.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
-					UpdateImage();
-				}
-			});
-		}
-		return MungeBox;
-	}
-
-	/**
-	 * This method initializes MaskBox	
-	 * 	
-	 * @return javax.swing.JCheckBox	
-	 */
-	private JCheckBox getMaskBox() {
-		if (MaskBox == null) {
-			MaskBox = new JCheckBox();
-			MaskBox.setText("Mask");
-			MaskBox.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
-					UpdateImage();
-				}
-			});
-			
-		}
-		return MaskBox;
 	}
 
 	/**
@@ -685,24 +644,20 @@ public class Inkerator {
 				System.out.println("Error: Cannot write logfile, will use console!");
 			}
 		}
-		if (c_csprng == null) {
-			try {
-				c_csprng = SecureRandom.getInstance("SHA1PRNG");
-				long seed = System.currentTimeMillis();
-				c_csprng.setSeed(seed);
-				c_stream.println("Seed: " + seed);
-				imgFactory.setCSPRNG(c_csprng);
-			} catch (Exception e) {
-				c_stream.println(e.getStackTrace().toString());					
-				getMaskBox().setEnabled(false);
-				getMungeBox().setEnabled(false);
-				c_csprng = null;
-			}					
-		}
+		try {
+			c_csprng = SecureRandom.getInstance("SHA1PRNG");
+			long seed = System.currentTimeMillis();
+			c_stream.println("Seed: " + seed);
+			c_csprng.setSeed(Integer.parseInt(SeedSpinner.getValue().toString()));
+			imgFactory.setCSPRNG(c_csprng);
+		} catch (Exception e) {
+			c_stream.println(e.getStackTrace().toString());					
+			c_csprng = null;
+		}					
 		JLabel l_imgLabel = getImageLabel();
 		//Get Settings                 
 		String l_imgText = getImageText().getText();
-		double l_zoom = (double)getZoomLevelSlider().getValue()/10;
+		double l_zoom = (double)Integer.parseInt(ZoomSpinner.getValue().toString())/10;
 		
 		imgFactory.setGrid(GetList(getVGridSizeString(), 5), 
 						   GetList(getVGridSpaces(), 1),
@@ -710,7 +665,7 @@ public class Inkerator {
 						   GetList(getHGridSpaces(), 1));
 		
 		Font l_font = new Font((String)getFontChooser().getSelectedItem(), 
-								Font.BOLD, getFontSizeSlider().getValue());
+				   Font.BOLD, Integer.parseInt(FontSpinner.getValue().toString()));
 		imgFactory.setFont(l_font);
 		
 		long l_time = System.currentTimeMillis();
@@ -814,56 +769,6 @@ public class Inkerator {
 	}
 
 	/**
-	 * This method initializes ZoomLevelSlider	
-	 * 	
-	 * @return javax.swing.JSlider	
-	 */
-	private JSlider getZoomLevelSlider() {
-		if (ZoomLevelSlider == null) {
-			ZoomLevelSlider = new JSlider();
-			ZoomLevelSlider.setMaximum(100);
-			ZoomLevelSlider.setMinimum(1);
-			ZoomLevelSlider.setValue(10);
-			ZoomLevelSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
-					JLabel l_imgLabel = getImageLabel();
-					double l_zoom = (double)getZoomLevelSlider().getValue()/10;
-					
-					Image l_result = c_img.getScaledInstance(
-												(int)(c_img.getWidth()*l_zoom), 
-												(int)(c_img.getHeight()*l_zoom), 
-												BufferedImage.SCALE_FAST);	
-					
-					Icon l_icon = new ImageIcon(l_result);
-					l_imgLabel.setIcon(l_icon);
-					l_imgLabel.repaint();				
-				}
-			});
-		}
-		return ZoomLevelSlider;
-	}
-
-	/**
-	 * This method initializes FontSizeSlider	
-	 * 	
-	 * @return javax.swing.JSlider	
-	 */
-	private JSlider getFontSizeSlider() {
-		if (FontSizeSlider == null) {
-			FontSizeSlider = new JSlider();
-			FontSizeSlider.setMinimum(12);
-			FontSizeSlider.setMaximum(512);
-			FontSizeSlider.setValue(96);
-			FontSizeSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
-					UpdateImage();
-				}
-			});
-		}
-		return FontSizeSlider;
-	}
-
-	/**
 	 * This method initializes ZoomSpinner	
 	 * 	
 	 * @return javax.swing.JSpinner	
@@ -871,8 +776,51 @@ public class Inkerator {
 	private JSpinner getZoomSpinner() {
 		if (ZoomSpinner == null) {
 			ZoomSpinner = new JSpinner();
+			ZoomSpinner.setValue(10);
+
+			ZoomSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+				public void stateChanged(javax.swing.event.ChangeEvent e) {
+					UpdateImage();
+				}
+			});
 		}
 		return ZoomSpinner;
+	}
+
+	/**
+	 * This method initializes FontSpinner	
+	 * 	
+	 * @return javax.swing.JSpinner	
+	 */
+	private JSpinner getFontSpinner() {
+		if (FontSpinner == null) {
+			FontSpinner = new JSpinner();
+			FontSpinner.setValue(96);
+			FontSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+				public void stateChanged(javax.swing.event.ChangeEvent e) {
+					UpdateImage();
+				}
+			});
+		}
+		return FontSpinner;
+	}
+
+	/**
+	 * This method initializes SeedSpinner	
+	 * 	
+	 * @return javax.swing.JSpinner	
+	 */
+	private JSpinner getSeedSpinner() {
+		if (SeedSpinner == null) {
+			SeedSpinner = new JSpinner();
+			SeedSpinner.setValue(1024);
+			SeedSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
+				public void stateChanged(javax.swing.event.ChangeEvent e) {
+					UpdateImage();
+				}
+			});
+		}
+		return SeedSpinner;
 	}
 
 	/**
