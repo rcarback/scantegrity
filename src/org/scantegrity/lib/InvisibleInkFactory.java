@@ -270,8 +270,77 @@ public class InvisibleInkFactory {
 		return new Color(l_red, l_green, l_blue);
 	}
 	
+	/**
+	 * RGBtoCMYK - Converts RGB colors to a float of 4 SMYK values.
+	 * All we do here is the reverse of the prior.
+	 * 
+	 * @param p_c - The color to convert.
+	 * @return a float[4] of the CMYK values.
+	 */
+	private float[] RGBtoCMYK(Color p_c) {
+		float[] l_res = {0,0,0,0};
+		
+		
+		return l_res;
+	}
 	
 	
+	/**
+	 * @return the c_foreground
+	 */
+	public float[] getForegroundColor() {
+		return c_foreground;
+	}
+
+	/**
+	 * @param c_foreground the c_foreground to set
+	 */
+	public void setForegroundColor(float[] p_foreground) {
+		this.c_foreground = p_foreground;
+	}
+
+	/**
+	 * @return the c_background
+	 */
+	public float[] getBackgroundColor() {
+		return c_background;
+	}
+
+	/**
+	 * @param c_background the c_background to set
+	 */
+	public void setBackgroundColor(float[] p_background) {
+		this.c_background = p_background;
+	}
+
+	/**
+	 * @return the c_mask
+	 */
+	public float[] getMaskColor() {
+		return c_mask;
+	}
+
+	/**
+	 * @param c_mask the c_mask to set
+	 */
+	public void setMaskColor(float[] p_mask) {
+		this.c_mask = p_mask;
+	}
+
+	/**
+	 * @return the c_munge
+	 */
+	public float[] getMungeColor() {
+		return c_munge;
+	}
+
+	/**
+	 * @param c_munge the c_munge to set
+	 */
+	public void setMungeColor(float[] p_munge) {
+		this.c_munge = p_munge;
+	}
+
 	/**
 	 * GenGrid - Generates a grid across a pre-generated image, and sets the 
 	 * color inside each grid element to the middle-most pixel. 
