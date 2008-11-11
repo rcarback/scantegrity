@@ -39,7 +39,7 @@ import java.util.Vector;
  * 
  * @author Richard Carback
  * @version 0.1.0 
- * @date 09/11/09
+ * @date 10/11/09
  */
 public class InvisibleInkFactory {
 
@@ -49,6 +49,7 @@ public class InvisibleInkFactory {
 	private int c_padding;
 	private SecureRandom c_csprng;
 	private float c_mungeLevel = (float)0.5;
+	private float c_mungeThreshhold = (float)0.5;
 	private float c_maskLevel = (float)0.5;
 	//Default colors
 	private float[] c_foreground = {0,(float) 0.5,0,0}; 
@@ -145,8 +146,8 @@ public class InvisibleInkFactory {
 		
 		//Process Block flag, or set grid to pixel resolution.
 		l_ret = GenBlockGrid(l_ret);
-		l_ret = AddRandomCyan(l_ret);
 		l_ret = RandomizeBrightness(l_ret);
+		l_ret = AddRandomCyan(l_ret);
 		
 		return l_ret;
 	}
@@ -556,26 +557,37 @@ public class InvisibleInkFactory {
 		// For each pixel...
 		for (int l_x = 0; l_x < c_xGridCoords.size(); l_x++) {
 			for (int l_y = 0; l_y < c_yGridCoords.size(); l_y++) {
-				Color l_c = new Color(p_img.getRGB(c_xGridCoords.elementAt(l_x),
-												   c_yGridCoords.elementAt(l_y)));
-				int l_r = l_c.getRed();
-				int l_g = l_c.getGreen();
-				int l_b = l_c.getBlue();
+				float[] l_c = RGBtoCMYK(new Color(p_img.getRGB(
+						   c_xGridCoords.elementAt(l_x),
+						   c_yGridCoords.elementAt(l_y))
+						  ));
 				
-				// Invert l_rand to _take away_ amount of
-				// color, not leave only that much.
-				double l_rand = 1 - c_csprng.nextDouble()*.33;
+				float l_add = (float)c_csprng.nextFloat()*2 - 1;
+				//We are just trying to do color intensity here..
+				//Shoudl only due on "pure" images.
+				l_add *= c_mungeLevel;
+				//System.out.println("Before: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);
+				if (l_add > 0) {
+					if (l_c[0] != 0)
+						l_c[0] += l_add*Math.min(c_mungeThreshhold, 1-l_c[0]);
+					if (l_c[1] != 0)
+						l_c[1] += l_add*Math.min(c_mungeThreshhold, 1-l_c[1]);
+					if (l_c[2] != 0)
+						l_c[2] += l_add*Math.min(c_mungeThreshhold, 1-l_c[2]);
+					if (l_c[3] != 0)
+						l_c[3] += l_add*Math.min(c_mungeThreshhold, 1-l_c[3]);
+				} else {
+					l_c[0] += l_add*Math.min(c_mungeThreshhold, l_c[0]);
+					l_c[1] += l_add*Math.min(c_mungeThreshhold, l_c[1]);
+					l_c[2] += l_add*Math.min(c_mungeThreshhold, l_c[2]);
+					l_c[3] += l_add*Math.min(c_mungeThreshhold, l_c[3]);					
+				}
 				
-
-				// Muliplying each color by the same value < 1 will reduce
-				// the brightness of the image.
-				l_r = (int) Math.floor(l_r*l_rand);
-				l_g = (int) Math.floor(l_g*l_rand);
-				l_b = (int) Math.floor(l_b*l_rand);
+				//System.out.println("After: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);
 				
 				// Set the new color to the Grid Cell
 				Graphics2D l_g2d = p_img.createGraphics();
-				l_g2d.setColor(new Color(l_r, l_g, l_b));
+				l_g2d.setColor(CMYKtoRGB(l_c));
 				l_g2d.fillRect(c_xGridCoords.elementAt(l_x), 
 							   c_yGridCoords.elementAt(l_y), 
 							   c_hGridSize[l_x%c_hGridSize.length], 
