@@ -41,6 +41,7 @@ import java.util.Vector;
 
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 
 public class Inkerator {
 
@@ -90,6 +91,10 @@ public class Inkerator {
 	private JSpinner FontSpinner = null;
 	private JLabel SeedLabel = null;
 	private JSpinner SeedSpinner = null;
+	private JLabel MungeLevelLabel = null;
+	private JTextField MungeLevelTextField = null;
+	private JTextField MaskLevelTextField = null;
+	private JLabel MaskLevelLabel = null;
 	/**
 	 * This method initializes jFrame
 	 * 
@@ -350,6 +355,32 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
+			GridBagConstraints gridBagConstraints61 = new GridBagConstraints();
+			gridBagConstraints61.gridx = 0;
+			gridBagConstraints61.anchor = GridBagConstraints.WEST;
+			gridBagConstraints61.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints61.gridy = 15;
+			MaskLevelLabel = new JLabel();
+			MaskLevelLabel.setText("Mask Level");
+			GridBagConstraints gridBagConstraints52 = new GridBagConstraints();
+			gridBagConstraints52.fill = GridBagConstraints.BOTH;
+			gridBagConstraints52.gridy = 15;
+			gridBagConstraints52.weightx = 1.0;
+			gridBagConstraints52.anchor = GridBagConstraints.WEST;
+			gridBagConstraints52.gridx = 1;
+			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
+			gridBagConstraints3.fill = GridBagConstraints.BOTH;
+			gridBagConstraints3.gridy = 14;
+			gridBagConstraints3.weightx = 1.0;
+			gridBagConstraints3.anchor = GridBagConstraints.WEST;
+			gridBagConstraints3.gridx = 1;
+			GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
+			gridBagConstraints22.gridx = 0;
+			gridBagConstraints22.anchor = GridBagConstraints.WEST;
+			gridBagConstraints22.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints22.gridy = 14;
+			MungeLevelLabel = new JLabel();
+			MungeLevelLabel.setText("Munge Level");
 			GridBagConstraints gridBagConstraints51 = new GridBagConstraints();
 			gridBagConstraints51.gridx = 1;
 			gridBagConstraints51.fill = GridBagConstraints.BOTH;
@@ -484,6 +515,10 @@ public class Inkerator {
 			jPanel.add(getFontSpinner(), gridBagConstraints17);
 			jPanel.add(SeedLabel, gridBagConstraints2);
 			jPanel.add(getSeedSpinner(), gridBagConstraints51);
+			jPanel.add(MungeLevelLabel, gridBagConstraints22);
+			jPanel.add(getMungeLevelTextField(), gridBagConstraints3);
+			jPanel.add(getMaskLevelTextField(), gridBagConstraints52);
+			jPanel.add(MaskLevelLabel, gridBagConstraints61);
 		}
 		return jPanel;
 	}
@@ -659,6 +694,20 @@ public class Inkerator {
 		String l_imgText = getImageText().getText();
 		double l_zoom = (double)Integer.parseInt(ZoomSpinner.getValue().toString())/10;
 		
+		float l_mask = (float)Float.parseFloat(MaskLevelTextField.getText());
+		if (l_mask < 0 || l_mask > 1) {
+			l_mask = 0;
+			MaskLevelTextField.setText("0");
+		}		
+		imgFactory.setMaskLevel(l_mask);
+		
+		float l_munge = (float)Float.parseFloat(MungeLevelTextField.getText());
+		if (l_munge < 0 || l_munge > 1) {
+			l_munge = 0;
+			MungeLevelTextField.setText("0");
+		}		
+		imgFactory.setMungeLevel(l_munge);		
+		
 		imgFactory.setGrid(GetList(getVGridSizeString(), 5), 
 						   GetList(getVGridSpaces(), 1),
 						   GetList(getHGridSizes(), 5), 
@@ -821,6 +870,32 @@ public class Inkerator {
 			});
 		}
 		return SeedSpinner;
+	}
+
+	/**
+	 * This method initializes MungeLevelTextField	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getMungeLevelTextField() {
+		if (MungeLevelTextField == null) {
+			MungeLevelTextField = new JTextField();
+			MungeLevelTextField.setText(".5");
+		}
+		return MungeLevelTextField;
+	}
+
+	/**
+	 * This method initializes MaskLevelTextField	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getMaskLevelTextField() {
+		if (MaskLevelTextField == null) {
+			MaskLevelTextField = new JTextField();
+			MaskLevelTextField.setText(".5");
+		}
+		return MaskLevelTextField;
 	}
 
 	/**

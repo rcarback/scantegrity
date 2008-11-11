@@ -48,11 +48,14 @@ public class InvisibleInkFactory {
 	private Font c_font;
 	private int c_padding;
 	private SecureRandom c_csprng;
+	private float c_mungeLevel = (float)0.5;
+	private float c_maskLevel = (float)0.5;
 	//Default colors
 	private float[] c_foreground = {0,(float) 0.5,0,0}; 
 	private float[] c_background = {0,0,(float) 0.5,0}; 
 	private float[] c_mask = {(float) 0.5,0,0,0}; 
 	private float[] c_munge = {0,0,0,(float) 0.5};
+	
 	
 	//The True ascent of the current font.
 	private int c_txtAscent;
@@ -271,16 +274,18 @@ public class InvisibleInkFactory {
 	}
 	
 	/**
-	 * RGBtoCMYK - Converts RGB colors to a float of 4 SMYK values.
-	 * All we do here is the reverse of the prior.
+	 * RGBtoCMYK - Converts RGB colors to a float of 4 CMYK values.
+	 * All we do here is the reverse of the prior. Note, the K value is by 
+	 * default non-existent. Do NOT use this for true approximations.
 	 * 
 	 * @param p_c - The color to convert.
 	 * @return a float[4] of the CMYK values.
 	 */
 	private float[] RGBtoCMYK(Color p_c) {
 		float[] l_res = {0,0,0,0};
-		
-		
+		l_res[0] = (255-(float)p_c.getRed())/255;
+		l_res[1] = (255-(float)p_c.getGreen())/255;
+		l_res[2] = (255-(float)p_c.getBlue())/255;
 		return l_res;
 	}
 	
@@ -340,6 +345,34 @@ public class InvisibleInkFactory {
 	public void setMungeColor(float[] p_munge) {
 		this.c_munge = p_munge;
 	}
+	
+	/**
+	 * @return the c_mungeLevel
+	 */
+	public float getMungeLevel() {
+		return c_mungeLevel;
+	}
+
+	/**
+	 * @param level the c_mungeLevel to set
+	 */
+	public void setMungeLevel(float p_level) {
+		c_mungeLevel = p_level;
+	}
+
+	/**
+	 * @return the c_maskLevel
+	 */
+	public float getMaskLevel() {
+		return c_maskLevel;
+	}
+
+	/**
+	 * @param level the c_maskLevel to set
+	 */
+	public void setMaskLevel(float p_level) {
+		c_maskLevel = p_level;
+	}	
 
 	/**
 	 * GenGrid - Generates a grid across a pre-generated image, and sets the 
@@ -492,23 +525,21 @@ public class InvisibleInkFactory {
 		// For each pixel...
 		for (int l_x = 0; l_x < c_xGridCoords.size(); l_x++) {
 			for (int l_y = 0; l_y < c_yGridCoords.size(); l_y++) {
-				Color l_c = new Color(p_img.getRGB(c_xGridCoords.elementAt(l_x),
-												   c_yGridCoords.elementAt(l_y)));
-				int l_r = l_c.getRed();
-				int l_g = l_c.getGreen();
-				int l_b = l_c.getBlue();
+				float[] l_c = RGBtoCMYK(new Color(p_img.getRGB(
+												   c_xGridCoords.elementAt(l_x),
+												   c_yGridCoords.elementAt(l_y))
+												  ));
 
-				// Cyan translates to Green + Blue in RGB, so
-				// by reducing the remaining color (red), we
-				// cause a certain amount of CYAN to be
-				// introduced (since CMYK is subtractive, 
-				// taking away some red actually adds more of
-				// the other colors).
-				l_r -= c_csprng.nextInt((int)((255 - (255-l_r))*.5));
-
+				float l_add = c_csprng.nextFloat(); 
+				l_c[0] += c_mask[0]*l_add*c_maskLevel;
+				l_c[1] += c_mask[1]*l_add*c_maskLevel;
+				l_c[2] += c_mask[2]*l_add*c_maskLevel;
+				l_c[3] += c_mask[3]*l_add*c_maskLevel;
+				
+				
 				// Set the new color to the Grid Cell
 				Graphics2D l_g2d = p_img.createGraphics();
-				l_g2d.setColor(new Color(l_r, l_g, l_b));
+				l_g2d.setColor(CMYKtoRGB(l_c));
 				l_g2d.fillRect(c_xGridCoords.elementAt(l_x), 
 							   c_yGridCoords.elementAt(l_y), 
 							   c_hGridSize[l_x%c_hGridSize.length], 
