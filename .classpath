@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding=".DS_Store|auditor/|authoring/|common/|engine/|scanner/" including="org/scantegrity/lib/Inkerator.java|org/scantegrity/lib/InvisibleInkFactory.java" kind="src" path="src"/>
+	<classpathentry excluding=".DS_Store|auditor/|authoring/|common/|engine/|scanner/" including="org/" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/iText-2.1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
