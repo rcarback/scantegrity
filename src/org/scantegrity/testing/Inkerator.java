@@ -17,14 +17,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 package org.scantegrity.testing;
 
 //Utility libs
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import javax.imageio.ImageIO;
 import java.security.SecureRandom;
 import java.util.Vector;
 //AWT graphical elements
@@ -59,6 +60,13 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Rectangle;
+import com.lowagie.text.pdf.PdfWriter;
+
+import org.scantegrity.lib.InvisibleInkFactory;
+
 /**
  * Inkerator is a testing application for invisible ink printers. It utilizes
  * the "InvisibleInkFactory" library to generate the images and allows a user
@@ -66,7 +74,7 @@ import javax.swing.JComboBox;
  * 
  * 
  * @author Richard Carback
- * @version 0.1.0 
+ * @version 0.1.1 
  * @date 12/11/09
  */
 public class Inkerator {
@@ -293,7 +301,7 @@ public class Inkerator {
 	private JLabel getAboutVersionLabel() {
 		if (aboutVersionLabel == null) {
 			aboutVersionLabel = new JLabel();
-			aboutVersionLabel.setText("Version 0.1.0");
+			aboutVersionLabel.setText("Version 0.1.1");
 			aboutVersionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		}
 		return aboutVersionLabel;
@@ -853,11 +861,26 @@ public class Inkerator {
 	 * Save - Saves the current image as a PDF.
 	 */
 	private void Save() {
-		File out = new File("inkeratorout" + c_c + ".png");
 		try {
-			ImageIO.write(c_img, "png", out);
+			com.lowagie.text.Image l_img = com.lowagie.text.Image.getInstance(c_img,
+					null);
+			l_img.setDpi(300, 300);
+			
+			Document l_doc = new Document(new Rectangle(0,0,l_img.getWidth(), 
+															l_img.getHeight()));
+			l_doc.setMargins(0,0,0,0);
+
+			PdfWriter.getInstance(l_doc, 
+						new FileOutputStream("inkeratorout" + c_c + ".pdf"));
+			l_doc.open();
+			l_doc.add(l_img);
+			l_doc.close();
+						
 			c_c++;
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DocumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		

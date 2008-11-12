@@ -38,7 +38,7 @@ import java.util.Vector;
  * paper. 
  * 
  * @author Richard Carback
- * @version 0.1.0 
+ * @version 0.1.1 
  * @date 10/11/09
  */
 public class InvisibleInkFactory {
