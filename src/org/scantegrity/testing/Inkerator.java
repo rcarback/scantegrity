@@ -303,7 +303,7 @@ public class Inkerator {
 	private JLabel getAboutVersionLabel() {
 		if (aboutVersionLabel == null) {
 			aboutVersionLabel = new JLabel();
-			aboutVersionLabel.setText("Version 0.1.1");
+			aboutVersionLabel.setText("Version 0.1.2");
 			aboutVersionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		}
 		return aboutVersionLabel;
