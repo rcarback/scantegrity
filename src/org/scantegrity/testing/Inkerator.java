@@ -74,7 +74,7 @@ import org.scantegrity.lib.InvisibleInkFactory;
  * 
  * 
  * @author Richard Carback
- * @version 0.1.1 
+ * @version 0.1.2 
  * @date 12/11/09
  */
 public class Inkerator {
@@ -132,6 +132,8 @@ public class Inkerator {
 	private PrintStream c_stream = null;
 	private BufferedImage c_img = null;
 	private int c_c = 0;
+	private JTextField CMYKTextField = null;
+	private JLabel CMYKLabel = null;
 		
 	/**
 	 * This method initializes jFrame
@@ -393,6 +395,19 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
+			GridBagConstraints gridBagConstraints23 = new GridBagConstraints();
+			gridBagConstraints23.gridx = 0;
+			gridBagConstraints23.anchor = GridBagConstraints.WEST;
+			gridBagConstraints23.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints23.gridy = 0;
+			CMYKLabel = new JLabel();
+			CMYKLabel.setText("CMYK/Ink Order:");
+			GridBagConstraints gridBagConstraints19 = new GridBagConstraints();
+			gridBagConstraints19.fill = GridBagConstraints.BOTH;
+			gridBagConstraints19.gridy = 0;
+			gridBagConstraints19.weightx = 1.0;
+			gridBagConstraints19.anchor = GridBagConstraints.WEST;
+			gridBagConstraints19.gridx = 1;
 			GridBagConstraints gridBagConstraints61 = new GridBagConstraints();
 			gridBagConstraints61.gridx = 0;
 			gridBagConstraints61.anchor = GridBagConstraints.WEST;
@@ -557,6 +572,8 @@ public class Inkerator {
 			jPanel.add(getMungeLevelTextField(), gridBagConstraints3);
 			jPanel.add(getMaskLevelTextField(), gridBagConstraints52);
 			jPanel.add(MaskLevelLabel, gridBagConstraints61);
+			jPanel.add(getCMYKTextField(), gridBagConstraints19);
+			jPanel.add(CMYKLabel, gridBagConstraints23);
 		}
 		return jPanel;
 	}
@@ -825,6 +842,19 @@ public class Inkerator {
 		}
 		return MaskLevelTextField;
 	}
+	
+	/**
+	 * This method initializes CMYKTextField	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getCMYKTextField() {
+		if (CMYKTextField == null) {
+			CMYKTextField = new JTextField();
+			CMYKTextField.setText("CMYK");
+		}
+		return CMYKTextField;
+	}	
 
 
 	/**
@@ -914,7 +944,47 @@ public class Inkerator {
 		} catch (Exception e) {
 			c_stream.println(e.getStackTrace().toString());					
 			c_csprng = null;
-		}					
+		}
+		
+		String l_cmyk = getCMYKTextField().getText();
+		float l_colors[][] = { {1,0,0,0},
+								{0,1,0,0},
+								{0,0,1,0},
+								{0,0,0,1}
+							 };
+		for (int l_i = 0; l_i < 4; l_i++) {
+			switch (l_cmyk.charAt(l_i)){
+			case 'C':
+				l_colors[l_i][0] = 1; 
+				l_colors[l_i][1] = 0;
+				l_colors[l_i][2] = 0;
+				l_colors[l_i][3] = 0;
+				break;
+			case 'M':
+				l_colors[l_i][0] = 0; 
+				l_colors[l_i][1] = 1;
+				l_colors[l_i][2] = 0;
+				l_colors[l_i][3] = 0;
+				break;
+			case 'Y':
+				l_colors[l_i][0] = 0; 
+				l_colors[l_i][1] = 0;
+				l_colors[l_i][2] = 1;
+				l_colors[l_i][3] = 0;
+				break;
+			case 'K':
+				l_colors[l_i][0] = 0; 
+				l_colors[l_i][1] = 0;
+				l_colors[l_i][2] = 0;
+				l_colors[l_i][3] = 1;
+				break;
+			}
+		}
+		imgFactory.setMaskColor(l_colors[0]);
+		imgFactory.setForegroundColor(l_colors[1]);
+		imgFactory.setBackgroundColor(l_colors[2]);
+		imgFactory.setMungeColor(l_colors[3]);
+		
 		JLabel l_imgLabel = getImageLabel();
 		//Get Settings                 
 		String l_imgText = getImageText().getText();
@@ -966,7 +1036,7 @@ public class Inkerator {
 		c_stream.println(", Size=" + l_font.getSize());
 		c_stream.println("Generated in: " + l_time + "ms");
 	}	
-	
+
 	/**
 	 * Launches this application
 	 */

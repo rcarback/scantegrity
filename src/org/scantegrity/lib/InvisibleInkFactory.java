@@ -38,7 +38,7 @@ import java.util.Vector;
  * paper. 
  * 
  * @author Richard Carback
- * @version 0.1.1 
+ * @version 0.1.2 
  * @date 10/11/09
  */
 public class InvisibleInkFactory {
@@ -266,10 +266,14 @@ public class InvisibleInkFactory {
 				(int)(p_cmykColor[2]*255),
 				(int)(p_cmykColor[3]*255)
 			};
+		/*System.out.println(p_cmykColor[0] + ", " + p_cmykColor[1] + ", " + 
+						   p_cmykColor[2] + ", " + p_cmykColor[3]);*/
+		
 		int l_colors = 255 - l_cmykIntColor[3];
 		int l_red = l_colors * (255 - l_cmykIntColor[0])/255;
 		int l_green = l_colors * (255 - l_cmykIntColor[1])/255;
 		int l_blue = l_colors * (255 - l_cmykIntColor[2])/255;
+
 		
 		return new Color(l_red, l_green, l_blue);
 	}
@@ -532,10 +536,10 @@ public class InvisibleInkFactory {
 												  ));
 
 				float l_add = c_csprng.nextFloat(); 
-				l_c[0] += c_mask[0]*l_add*c_maskLevel;
-				l_c[1] += c_mask[1]*l_add*c_maskLevel;
-				l_c[2] += c_mask[2]*l_add*c_maskLevel;
-				l_c[3] += c_mask[3]*l_add*c_maskLevel;
+				l_c[0] = Math.min(1, l_c[0]+c_mask[0]*l_add*c_maskLevel);
+				l_c[1] = Math.min(1, l_c[1]+c_mask[1]*l_add*c_maskLevel);
+				l_c[2] = Math.min(1, l_c[2]+c_mask[2]*l_add*c_maskLevel);
+				l_c[3] = Math.min(1, l_c[3]+c_mask[3]*l_add*c_maskLevel);
 				
 				
 				// Set the new color to the Grid Cell
