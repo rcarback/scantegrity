@@ -66,7 +66,6 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfWriter;
 
 import org.scantegrity.lib.InvisibleInkFactory;
-import java.awt.Dimension;
 
 /**
  * Inkerator is a testing application for invisible ink printers. It utilizes
@@ -75,7 +74,7 @@ import java.awt.Dimension;
  * 
  * 
  * @author Richard Carback
- * @version 0.1.2 
+ * @version 0.1.3
  * @date 12/11/09
  */
 public class Inkerator {
