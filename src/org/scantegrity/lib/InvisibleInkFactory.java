@@ -38,8 +38,8 @@ import java.util.Vector;
  * paper. 
  * 
  * @author Richard Carback
- * @version 0.1.2 
- * @date 10/11/09
+ * @version 0.2.0 
+ * @date 17/11/09
  */
 public class InvisibleInkFactory {
 
@@ -48,9 +48,9 @@ public class InvisibleInkFactory {
 	private Font c_font;
 	private int c_padding;
 	private SecureRandom c_csprng;
-	private float c_mungeLevel = (float)0.5;
-	private float c_mungeThreshhold = (float)0.5;
-	private float c_maskLevel = (float)0.5;
+	private float c_maxMask = (float)0.5;
+	private float c_maxTextMunge = (float)0.5;
+	private float c_maxBackgroundMunge = (float)0.5;
 	//Default colors
 	private float[] c_foreground = {0,(float) 0.5,0,0}; 
 	private float[] c_background = {0,0,(float) 0.5,0}; 
@@ -288,9 +288,9 @@ public class InvisibleInkFactory {
 	 */
 	private float[] RGBtoCMYK(Color p_c) {
 		float[] l_res = {0,0,0,0};
-		l_res[0] = (255-(float)p_c.getRed())/255;
-		l_res[1] = (255-(float)p_c.getGreen())/255;
-		l_res[2] = (255-(float)p_c.getBlue())/255;
+		l_res[0] = (float)(Math.round(100*(255-(float)p_c.getRed())/255))/100;
+		l_res[1] = (float)(Math.round(100*(255-(float)p_c.getGreen())/255))/100;
+		l_res[2] = (float)(Math.round(100*(255-(float)p_c.getBlue())/255))/100;
 		return l_res;
 	}
 	
@@ -352,32 +352,46 @@ public class InvisibleInkFactory {
 	}
 	
 	/**
-	 * @return the c_mungeLevel
+	 * @return the c_maxMask
 	 */
-	public float getMungeLevel() {
-		return c_mungeLevel;
+	public float getMaxMask() {
+		return c_maxMask;
 	}
 
 	/**
-	 * @param level the c_mungeLevel to set
+	 * @param mask the c_maxMask to set
 	 */
-	public void setMungeLevel(float p_level) {
-		c_mungeLevel = p_level;
+	public void setMaxMask(float mask) {
+		c_maxMask = mask;
 	}
 
 	/**
-	 * @return the c_maskLevel
+	 * @return the c_maxTextMunge
 	 */
-	public float getMaskLevel() {
-		return c_maskLevel;
+	public float getMaxTextMunge() {
+		return c_maxTextMunge;
 	}
 
 	/**
-	 * @param level the c_maskLevel to set
+	 * @param textMunge the c_maxTextMunge to set
 	 */
-	public void setMaskLevel(float p_level) {
-		c_maskLevel = p_level;
-	}	
+	public void setMaxTextMunge(float textMunge) {
+		c_maxTextMunge = textMunge;
+	}
+
+	/**
+	 * @return the c_maxBackgroundMunge
+	 */
+	public float getMaxBackgroundMunge() {
+		return c_maxBackgroundMunge;
+	}
+
+	/**
+	 * @param backgroundMunge the c_maxBackgroundMunge to set
+	 */
+	public void setMaxBackgroundMunge(float backgroundMunge) {
+		c_maxBackgroundMunge = backgroundMunge;
+	}
 
 	/**
 	 * GenGrid - Generates a grid across a pre-generated image, and sets the 
@@ -464,23 +478,6 @@ public class InvisibleInkFactory {
 		return p_img;
 	}	
 	
-	/*
-	 * GenGrid - Sets the class grid variables to pixels for the given image.
-	 * @param p_img - The image to be gridded.
-	 *
-	private void GenGrid(BufferedImage p_img) {
-		Integer[] l_size = { 1 };
-		Integer[] l_space = { 0 };
-		c_xGridCoords = new Vector<Integer>();
-		c_yGridCoords = new Vector<Integer>();
-		for (int l_i = 0; l_i < p_img.getWidth(); l_i++) c_xGridCoords.add(l_i);
-		for (int l_j = 0; l_j < p_img.getHeight(); l_j++) c_yGridCoords.add(l_j);
-		c_vGridSize = l_size;
-		c_hGridSize = l_size;
-		c_vGridSpace = l_space;
-		c_hGridSpace = l_space;
-	}*/
-	
 	/**
 	 * Samples and fills a cell with foreground or background depending on which 
 	 * has the most instances of it.
@@ -536,10 +533,10 @@ public class InvisibleInkFactory {
 												  ));
 
 				float l_add = c_csprng.nextFloat(); 
-				l_c[0] = Math.min(1, l_c[0]+c_mask[0]*l_add*c_maskLevel);
-				l_c[1] = Math.min(1, l_c[1]+c_mask[1]*l_add*c_maskLevel);
-				l_c[2] = Math.min(1, l_c[2]+c_mask[2]*l_add*c_maskLevel);
-				l_c[3] = Math.min(1, l_c[3]+c_mask[3]*l_add*c_maskLevel);
+				l_c[0] = Math.min(1, l_c[0]+c_mask[0]*l_add*c_maxMask);
+				l_c[1] = Math.min(1, l_c[1]+c_mask[1]*l_add*c_maxMask);
+				l_c[2] = Math.min(1, l_c[2]+c_mask[2]*l_add*c_maxMask);
+				l_c[3] = Math.min(1, l_c[3]+c_mask[3]*l_add*c_maxMask);
 				
 				
 				// Set the new color to the Grid Cell
@@ -566,25 +563,36 @@ public class InvisibleInkFactory {
 						   c_yGridCoords.elementAt(l_y))
 						  ));
 				
-				float l_add = (float)c_csprng.nextFloat()*2 - 1;
+				float l_s = (float)c_csprng.nextFloat()*2 - 1;
 				//We are just trying to do color intensity here..
 				//Shoudl only due on "pure" images.
-				l_add *= c_mungeLevel;
-				//System.out.println("Before: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);
-				if (l_add > 0) {
-					if (l_c[0] != 0)
-						l_c[0] += l_add*Math.min(c_mungeThreshhold, 1-l_c[0]);
-					if (l_c[1] != 0)
-						l_c[1] += l_add*Math.min(c_mungeThreshhold, 1-l_c[1]);
-					if (l_c[2] != 0)
-						l_c[2] += l_add*Math.min(c_mungeThreshhold, 1-l_c[2]);
-					if (l_c[3] != 0)
-						l_c[3] += l_add*Math.min(c_mungeThreshhold, 1-l_c[3]);
+				
+				//Default to background
+				if (l_c[0] == c_foreground[0] && 
+						l_c[1] == c_foreground[1] &&
+						l_c[2] == c_foreground[2] &&
+						l_c[3] == c_foreground[3]) {
+					l_s *= c_maxTextMunge; 
 				} else {
-					l_c[0] += l_add*Math.min(c_mungeThreshhold, l_c[0]);
-					l_c[1] += l_add*Math.min(c_mungeThreshhold, l_c[1]);
-					l_c[2] += l_add*Math.min(c_mungeThreshhold, l_c[2]);
-					l_c[3] += l_add*Math.min(c_mungeThreshhold, l_c[3]);					
+					l_s *= c_maxBackgroundMunge;
+				}
+				System.out.println(c_maxTextMunge + ", " + c_maxBackgroundMunge);
+				System.out.println("Before: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);
+				if (l_s > 0) {
+					if (l_c[0] != 0)
+						l_c[0] += Math.min(1-l_c[0], l_s);
+					if (l_c[1] != 0)
+						l_c[1] += Math.min(1-l_c[1], l_s);
+					if (l_c[2] != 0)
+						l_c[2] += Math.min(1-l_c[2], l_s);
+					if (l_c[3] != 0)
+						l_c[3] += Math.min(1-l_c[3], l_s);
+				} else {
+					l_s = Math.abs(l_s);
+					l_c[0] -= Math.min(l_c[0], l_s);
+					l_c[1] -= Math.min(l_c[1], l_s);
+					l_c[2] -= Math.min(l_c[2], l_s);
+					l_c[3] -= Math.min(l_c[3], l_s);
 				}
 				
 				//System.out.println("After: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);

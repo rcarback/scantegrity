@@ -66,6 +66,8 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfWriter;
 
 import org.scantegrity.lib.InvisibleInkFactory;
+import java.awt.Dimension;
+import javax.swing.JTextArea;
 
 /**
  * Inkerator is a testing application for invisible ink printers. It utilizes
@@ -74,8 +76,8 @@ import org.scantegrity.lib.InvisibleInkFactory;
  * 
  * 
  * @author Richard Carback
- * @version 0.1.3
- * @date 12/11/09
+ * @version 0.2.0
+ * @date 17/11/09
  */
 public class Inkerator {
 
@@ -92,7 +94,7 @@ public class Inkerator {
 	private JMenuItem copyMenuItem = null;
 	private JMenuItem pasteMenuItem = null;
 	private JMenuItem saveMenuItem = null;
-	private JDialog aboutDialog = null;
+	private JDialog aboutDialog = null;  //  @jve:decl-index=0:visual-constraint="839,10"
 	private JPanel aboutContentPane = null;
 	private JLabel aboutVersionLabel = null;
 	private JSplitPane jSplitPane = null;
@@ -120,8 +122,6 @@ public class Inkerator {
 	private JSpinner FontSpinner = null;
 	private JLabel SeedLabel = null;
 	private JSpinner SeedSpinner = null;
-	private JLabel MungeLevelLabel = null;
-	private JTextField MungeLevelTextField = null;
 	private JTextField MaskLevelTextField = null;
 	private JLabel MaskLevelLabel = null;
 
@@ -140,6 +140,11 @@ public class Inkerator {
 	private JTextField mValue = null;
 	private JTextField yValue = null;
 	private JTextField kValue = null;
+	private JLabel TextMungeLabel = null;
+	private JTextField TextMunge = null;
+	private JLabel BackgroundMungeLabel = null;
+	private JTextField BackgroundMunge = null;
+	private JTextArea DirectionsTextArea = null;
 	
 	
 	/**
@@ -285,14 +290,21 @@ public class Inkerator {
 			l_mask = 0;
 			MaskLevelTextField.setText("0");
 		}		
-		imgFactory.setMaskLevel(l_mask);
+		imgFactory.setMaxMask(l_mask);
 		
-		float l_munge = (float)Float.parseFloat(MungeLevelTextField.getText());
-		if (l_munge < 0 || l_munge > 1) {
-			l_munge = 0;
-			MungeLevelTextField.setText("0");
+		float l_tmunge = (float)Float.parseFloat(TextMunge.getText());
+		if (l_tmunge < 0 || l_tmunge > 1) {
+			l_tmunge = 0;
+			TextMunge.setText("0");
 		}		
-		imgFactory.setMungeLevel(l_munge);		
+		imgFactory.setMaxTextMunge(l_tmunge);		
+
+		float l_bmunge = (float)Float.parseFloat(BackgroundMunge.getText());
+		if (l_bmunge < 0 || l_bmunge > 1) {
+			l_bmunge = 0;
+			BackgroundMunge.setText("0");
+		}		
+		imgFactory.setMaxBackgroundMunge(l_bmunge);	
 		
 		imgFactory.setGrid(GetList(getVGridSizeString(), 5), 
 						   GetList(getVGridSpaces(), 1),
@@ -468,6 +480,7 @@ public class Inkerator {
 		if (aboutDialog == null) {
 			aboutDialog = new JDialog(getJFrame(), true);
 			aboutDialog.setTitle("About");
+			aboutDialog.setSize(new Dimension(328, 111));
 			aboutDialog.setContentPane(getAboutContentPane());
 		}
 		return aboutDialog;
@@ -480,9 +493,13 @@ public class Inkerator {
 	 */
 	private JPanel getAboutContentPane() {
 		if (aboutContentPane == null) {
+			BorderLayout borderLayout = new BorderLayout();
+			borderLayout.setHgap(0);
+			borderLayout.setVgap(0);
 			aboutContentPane = new JPanel();
-			aboutContentPane.setLayout(new BorderLayout());
-			aboutContentPane.add(getAboutVersionLabel(), BorderLayout.CENTER);
+			aboutContentPane.setLayout(borderLayout);
+			aboutContentPane.add(getAboutVersionLabel(), BorderLayout.SOUTH);
+			aboutContentPane.add(getDirectionsTextArea(), BorderLayout.CENTER);
 		}
 		return aboutContentPane;
 	}
@@ -495,7 +512,7 @@ public class Inkerator {
 	private JLabel getAboutVersionLabel() {
 		if (aboutVersionLabel == null) {
 			aboutVersionLabel = new JLabel();
-			aboutVersionLabel.setText("Version 0.1.3");
+			aboutVersionLabel.setText("Version 0.2.0");
 			aboutVersionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		}
 		return aboutVersionLabel;
@@ -587,6 +604,32 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
+			GridBagConstraints gridBagConstraints42 = new GridBagConstraints();
+			gridBagConstraints42.fill = GridBagConstraints.BOTH;
+			gridBagConstraints42.gridy = 18;
+			gridBagConstraints42.weightx = 1.0;
+			gridBagConstraints42.anchor = GridBagConstraints.WEST;
+			gridBagConstraints42.gridx = 1;
+			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
+			gridBagConstraints3.gridx = 0;
+			gridBagConstraints3.anchor = GridBagConstraints.WEST;
+			gridBagConstraints3.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints3.gridy = 18;
+			BackgroundMungeLabel = new JLabel();
+			BackgroundMungeLabel.setText("Max Background Munge:");
+			GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
+			gridBagConstraints22.fill = GridBagConstraints.BOTH;
+			gridBagConstraints22.gridy = 17;
+			gridBagConstraints22.weightx = 1.0;
+			gridBagConstraints22.anchor = GridBagConstraints.WEST;
+			gridBagConstraints22.gridx = 1;
+			GridBagConstraints gridBagConstraints110 = new GridBagConstraints();
+			gridBagConstraints110.gridx = 0;
+			gridBagConstraints110.anchor = GridBagConstraints.WEST;
+			gridBagConstraints110.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints110.gridy = 17;
+			TextMungeLabel = new JLabel();
+			TextMungeLabel.setText("Max Text Munge:");
 			GridBagConstraints gridBagConstraints81 = new GridBagConstraints();
 			gridBagConstraints81.fill = GridBagConstraints.BOTH;
 			gridBagConstraints81.gridy = 3;
@@ -624,47 +667,34 @@ public class Inkerator {
 			gridBagConstraints32.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints32.gridy = 2;
 			yLabel = new JLabel();
-			yLabel.setText("Yellow Value:");
+			yLabel.setText("Background Color (Yellow): ");
 			GridBagConstraints gridBagConstraints23 = new GridBagConstraints();
 			gridBagConstraints23.gridx = 0;
 			gridBagConstraints23.anchor = GridBagConstraints.WEST;
 			gridBagConstraints23.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints23.gridy = 1;
 			mLabel = new JLabel();
-			mLabel.setText("Magenta Value:");
+			mLabel.setText("Text Color (Magenta):");
 			GridBagConstraints gridBagConstraints19 = new GridBagConstraints();
 			gridBagConstraints19.gridx = 0;
 			gridBagConstraints19.anchor = GridBagConstraints.WEST;
 			gridBagConstraints19.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints19.gridy = 0;
 			cLabel = new JLabel();
-			cLabel.setText("Cyan Value:");
+			cLabel.setText("Masking Color (Cyan):");
 			GridBagConstraints gridBagConstraints61 = new GridBagConstraints();
 			gridBagConstraints61.gridx = 0;
 			gridBagConstraints61.anchor = GridBagConstraints.WEST;
 			gridBagConstraints61.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints61.gridy = 18;
+			gridBagConstraints61.gridy = 19;
 			MaskLevelLabel = new JLabel();
-			MaskLevelLabel.setText("Mask Level");
+			MaskLevelLabel.setText("Max Mask (Cyan) Addition:");
 			GridBagConstraints gridBagConstraints52 = new GridBagConstraints();
 			gridBagConstraints52.fill = GridBagConstraints.BOTH;
-			gridBagConstraints52.gridy = 18;
+			gridBagConstraints52.gridy = 19;
 			gridBagConstraints52.weightx = 1.0;
 			gridBagConstraints52.anchor = GridBagConstraints.WEST;
 			gridBagConstraints52.gridx = 1;
-			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
-			gridBagConstraints3.fill = GridBagConstraints.BOTH;
-			gridBagConstraints3.gridy = 17;
-			gridBagConstraints3.weightx = 1.0;
-			gridBagConstraints3.anchor = GridBagConstraints.WEST;
-			gridBagConstraints3.gridx = 1;
-			GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
-			gridBagConstraints22.gridx = 0;
-			gridBagConstraints22.anchor = GridBagConstraints.WEST;
-			gridBagConstraints22.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints22.gridy = 17;
-			MungeLevelLabel = new JLabel();
-			MungeLevelLabel.setText("Munge Level");
 			GridBagConstraints gridBagConstraints51 = new GridBagConstraints();
 			gridBagConstraints51.gridx = 1;
 			gridBagConstraints51.fill = GridBagConstraints.BOTH;
@@ -773,10 +803,10 @@ public class Inkerator {
 			gridBagConstraints21.gridx = 1;
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.gridx = 1;
-			gridBagConstraints1.gridy = 19;
+			gridBagConstraints1.gridy = 20;
 			GridBagConstraints gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 19;
+			gridBagConstraints.gridy = 20;
 			jPanel = new JPanel();
 			jPanel.setLayout(new GridBagLayout());
 			jPanel.add(getUpdate(), gridBagConstraints);
@@ -799,8 +829,6 @@ public class Inkerator {
 			jPanel.add(getFontSpinner(), gridBagConstraints17);
 			jPanel.add(SeedLabel, gridBagConstraints2);
 			jPanel.add(getSeedSpinner(), gridBagConstraints51);
-			jPanel.add(MungeLevelLabel, gridBagConstraints22);
-			jPanel.add(getMungeLevelTextField(), gridBagConstraints3);
 			jPanel.add(getMaskLevelTextField(), gridBagConstraints52);
 			jPanel.add(MaskLevelLabel, gridBagConstraints61);
 			jPanel.add(cLabel, gridBagConstraints19);
@@ -811,6 +839,10 @@ public class Inkerator {
 			jPanel.add(getMValue(), gridBagConstraints62);
 			jPanel.add(getYValue(), gridBagConstraints71);
 			jPanel.add(getKValue(), gridBagConstraints81);
+			jPanel.add(TextMungeLabel, gridBagConstraints110);
+			jPanel.add(getTextMunge(), gridBagConstraints22);
+			jPanel.add(BackgroundMungeLabel, gridBagConstraints3);
+			jPanel.add(getBackgroundMunge(), gridBagConstraints42);
 		}
 		return jPanel;
 	}
@@ -1055,19 +1087,6 @@ public class Inkerator {
 	}
 
 	/**
-	 * This method initializes MungeLevelTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getMungeLevelTextField() {
-		if (MungeLevelTextField == null) {
-			MungeLevelTextField = new JTextField();
-			MungeLevelTextField.setText(".5");
-		}
-		return MungeLevelTextField;
-	}
-
-	/**
 	 * This method initializes MaskLevelTextField	
 	 * 	
 	 * @return javax.swing.JTextField	
@@ -1130,6 +1149,50 @@ public class Inkerator {
 			kValue.setText("0,0,0,.5");
 		}
 		return kValue;
+	}
+
+	/**
+	 * This method initializes TextMunge	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getTextMunge() {
+		if (TextMunge == null) {
+			TextMunge = new JTextField();
+			TextMunge.setText(".5");
+		}
+		return TextMunge;
+	}
+
+	/**
+	 * This method initializes BackgroundMunge	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getBackgroundMunge() {
+		if (BackgroundMunge == null) {
+			BackgroundMunge = new JTextField();
+			BackgroundMunge.setText(".5");
+		}
+		return BackgroundMunge;
+	}
+
+	/**
+	 * This method initializes DirectionsTextArea	
+	 * 	
+	 * @return javax.swing.JTextArea	
+	 */
+	private JTextArea getDirectionsTextArea() {
+		if (DirectionsTextArea == null) {
+			DirectionsTextArea = new JTextArea();
+			DirectionsTextArea.setText("Inkerator is a testing application for " +
+									   "invisible ink\nprinters. It utilizes " +
+									   "the InvisibleInkFactory library\nto " +
+									   "generate the images and allows a user" +
+									   " to save\nthem to file.");
+			DirectionsTextArea.setEditable(false);
+		}
+		return DirectionsTextArea;
 	}
 
 	/**
