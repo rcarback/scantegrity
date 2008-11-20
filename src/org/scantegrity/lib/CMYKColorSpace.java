@@ -62,7 +62,7 @@ public class CMYKColorSpace extends ColorSpace implements Serializable {
 	 * 		M = 1-G
 	 * 		Y = 1-B
 	 * 
-	 * @param p_rgbvalue - 
+	 * @param p_rgbvalue - The color to translate 
 	 * @return a float[4] of the CMYK values.
 	 * @see java.awt.color.ColorSpace#fromRGB(float[])
 	 */
@@ -73,10 +73,12 @@ public class CMYKColorSpace extends ColorSpace implements Serializable {
 		 * (Scantegrity's) uses.
 		 */
 		float[] l_res = {0,0,0,0};
-		l_res[0] = (float)1.0 - p_rgbvalue[0];
-		l_res[1] = (float)1.0 - p_rgbvalue[1];
-		l_res[2] = (float)1.0 - p_rgbvalue[2];
-		return l_res;
+		if (p_rgbvalue.length >= 3) {
+			l_res[0] = (float)1.0 - p_rgbvalue[0];
+			l_res[1] = (float)1.0 - p_rgbvalue[1];
+			l_res[2] = (float)1.0 - p_rgbvalue[2];			
+		}
+		return normalize(l_res);
 	}
 
 	/* (non-Javadoc)
@@ -88,13 +90,43 @@ public class CMYKColorSpace extends ColorSpace implements Serializable {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Converts CMYK colors to RGB. Note that converting back will be lossy. The
+	 * formula for this is:
+	 * 
+	 * K = 1 - K (go to additive)
+	 * R = K * (1 - C)
+	 * G = K * (1 - M)
+	 * B = K * (1 - Y)
+	 * 
+	 * @param p_colorvalue The color in CMYK.
 	 * @see java.awt.color.ColorSpace#toRGB(float[])
 	 */
 	@Override
-	public float[] toRGB(float[] colorvalue) {
-		// TODO Auto-generated method stub
-		return null;
+	public float[] toRGB(float[] p_colorvalue) {
+		float[] l_res = {0,0,0};
+		if (p_colorvalue.length >= 4)
+		{
+			float l_black = (float)1.0 - p_colorvalue[3]; 
+			l_res[0] = l_black * ((float)1.0 - p_colorvalue[0]);
+			l_res[1] = l_black * ((float)1.0 - p_colorvalue[1]);
+			l_res[2] = l_black * ((float)1.0 - p_colorvalue[2]);			
+		}
+		return normalize(l_res);
 	}
-
+	
+	/**
+	 * Normalize ensures all color values returned are between 0 and 1.
+	 * 
+	 * @param p_colors
+	 * @return p_colors, with any values greater than 1 set to 1, and less than
+	 * 0 set to 0.
+	 */
+	private float[] normalize(float[] p_colors) {
+		for (int l_i = 0; l_i < p_colors.length; l_i++) {
+			if (p_colors[l_i] > (float)1.0) p_colors[l_i] = (float)1.0;
+			else if (p_colors[l_i] < (float)0.0) p_colors[l_i] = (float)0.0;
+		}		
+		return p_colors;
+	}
 }
