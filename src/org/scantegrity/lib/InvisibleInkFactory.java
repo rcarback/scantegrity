@@ -23,11 +23,23 @@ package org.scantegrity.lib;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
+import java.awt.image.BandedSampleModel;
 import java.awt.image.BufferedImage;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.PixelInterleavedSampleModel;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.security.SecureRandom;
 import java.util.Vector;
+
+import javax.media.jai.DataBufferFloat;
+
+import org.scantegrity.lib.CMYKColorSpace;
  
 /**
  * Generates images to print text in reactive (yellow) and dummy (magenta) ink.
@@ -51,11 +63,12 @@ public class InvisibleInkFactory {
 	private float c_maxMask = (float)0.5;
 	private float c_maxTextMunge = (float)0.5;
 	private float c_maxBackgroundMunge = (float)0.5;
+	private CMYKColorSpace c_cs = new CMYKColorSpace();
 	//Default colors
-	private float[] c_foreground = {0,(float) 0.5,0,0}; 
-	private float[] c_background = {0,0,(float) 0.5,0}; 
-	private float[] c_mask = {(float) 0.5,0,0,0}; 
-	private float[] c_munge = {0,0,0,(float) 0.5};
+	private Color c_foreground = null; 
+	private Color c_background = null; 
+	private Color c_mask = null; 
+	private Color c_munge = null;
 	
 	
 	//The True ascent of the current font.
@@ -105,6 +118,15 @@ public class InvisibleInkFactory {
 		c_padding = p_pad;
 		c_csprng = p_csprng;
 		SetTrueAscent(DEFAULT_SYMBOLS);
+		
+		float[] l_foreground = {0,(float) 0.5,0,0}; 
+		float[] l_background = {0,0,(float) 0.5,0}; 
+		float[] l_mask = {(float) 0.5,0,0,0}; 
+		float[] l_munge = {0,0,0,(float) 0.5};
+		c_foreground = new Color(c_cs, l_foreground, 1);
+		c_background = new Color(c_cs, l_background, 1);
+		c_mask = new Color(c_cs, l_mask, 1);
+		c_munge = new Color(c_cs, l_munge, 1);
 	}
 	
 	
@@ -128,20 +150,30 @@ public class InvisibleInkFactory {
 		l_width += c_padding*2;
 		
 		//Generate image and set colors
-		l_ret = new BufferedImage((int)l_width, (int)l_height, 
-									BufferedImage.TYPE_INT_RGB);
-		l_g2d = l_ret.createGraphics();
+		ComponentColorModel l_ccm = new ComponentColorModel(c_cs, false, false,
+													1, DataBuffer.TYPE_FLOAT);
+		int[] l_bandoff = {0, 1, 2, 3};
+		PixelInterleavedSampleModel l_sm = new PixelInterleavedSampleModel(
+												   DataBuffer.TYPE_FLOAT,
+												   (int)l_width, (int)l_height, 
+										     	   4,(int)l_width*4, l_bandoff);
+		WritableRaster l_raster = WritableRaster.createWritableRaster(l_sm, 
+																new Point(0,0));
+		l_ret = new BufferedImage(l_ccm, l_raster, false, null);
+		 
 		
+		
+		l_g2d = l_ret.createGraphics();
 		
 		//Draw Background
 		l_g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, 
 								RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-		l_g2d.setColor(CMYKtoRGB(c_background));
+		l_g2d.setColor(c_background);
 		l_g2d.fillRect(0, 0, (int)l_width, (int)l_height);
 		
 		//Draw Text
 		l_g2d.setFont(c_font);
-		l_g2d.setColor(CMYKtoRGB(c_foreground));
+		l_g2d.setColor(c_foreground);
 		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding); 
 		
 		//Process Block flag, or set grid to pixel resolution.
@@ -242,112 +274,60 @@ public class InvisibleInkFactory {
 	}
 	
 	/**
-	 * CMYKtoRGB - Converts a float of CMYK values to a Color in sRGB. We could 
-	 * use ColorProfile, but CMYK is not a default color profile in Java. It's
-	 * easier to have these utility functions here than to expect the user to 
-	 * install the color profile or provide an installer for it.
-	 * 
-	 * According to: http://coding.derkeiler.com/Archive/Java/comp.lang.java/2003-10/0100.html
-	 * 
-	 * This is how it's done:
-	 * 
-	 *       int colors = 255 - black;
-     *       rgb[0] = colors * (255 - cyan)/255;
-     *       rgb[1] = colors * (255 - magenta)/255;
-     *       rgb[2] = colors * (255 - yellow)/255; 
-	 * 
-	 * @param p_cmykColor - The color to translate
-	 * @return The color in sRGB.
-	 */
-	private Color CMYKtoRGB(float[] p_cmykColor) {
-		int[] l_cmykIntColor = {
-				(int)(p_cmykColor[0]*255),
-				(int)(p_cmykColor[1]*255),
-				(int)(p_cmykColor[2]*255),
-				(int)(p_cmykColor[3]*255)
-			};
-		/*System.out.println(p_cmykColor[0] + ", " + p_cmykColor[1] + ", " + 
-						   p_cmykColor[2] + ", " + p_cmykColor[3]);*/
-		
-		int l_colors = 255 - l_cmykIntColor[3];
-		int l_red = l_colors * (255 - l_cmykIntColor[0])/255;
-		int l_green = l_colors * (255 - l_cmykIntColor[1])/255;
-		int l_blue = l_colors * (255 - l_cmykIntColor[2])/255;
-
-		
-		return new Color(l_red, l_green, l_blue);
-	}
-	
-	/**
-	 * RGBtoCMYK - Converts RGB colors to a float of 4 CMYK values.
-	 * All we do here is the reverse of the prior. Note, the K value is by 
-	 * default non-existent. Do NOT use this for true approximations.
-	 * 
-	 * @param p_c - The color to convert.
-	 * @return a float[4] of the CMYK values.
-	 */
-	private float[] RGBtoCMYK(Color p_c) {
-		float[] l_res = {0,0,0,0};
-		l_res[0] = (float)(Math.round(100*(255-(float)p_c.getRed())/255))/100;
-		l_res[1] = (float)(Math.round(100*(255-(float)p_c.getGreen())/255))/100;
-		l_res[2] = (float)(Math.round(100*(255-(float)p_c.getBlue())/255))/100;
-		return l_res;
-	}
-	
-	
-	/**
 	 * @return the c_foreground
 	 */
-	public float[] getForegroundColor() {
+	public Color getForegroundColor() {
 		return c_foreground;
 	}
 
 	/**
 	 * @param c_foreground the c_foreground to set
 	 */
-	public void setForegroundColor(float[] p_foreground) {
-		this.c_foreground = p_foreground;
+	public void setForegroundColor(Color p_foreground) {
+		if (p_foreground != null) {
+			this.c_foreground = p_foreground;			
+		}
 	}
 
 	/**
 	 * @return the c_background
 	 */
-	public float[] getBackgroundColor() {
+	public Color getBackgroundColor() {
 		return c_background;
 	}
 
 	/**
 	 * @param c_background the c_background to set
 	 */
-	public void setBackgroundColor(float[] p_background) {
+	public void setBackgroundColor(Color p_background) {
 		this.c_background = p_background;
 	}
 
 	/**
 	 * @return the c_mask
 	 */
-	public float[] getMaskColor() {
+	public Color getMaskColor() {
 		return c_mask;
 	}
 
 	/**
 	 * @param c_mask the c_mask to set
 	 */
-	public void setMaskColor(float[] p_mask) {
+	public void setMaskColor(Color p_mask) {
 		this.c_mask = p_mask;
 	}
 
 	/**
 	 * @return the c_munge
 	 */
-	public float[] getMungeColor() {
+	public Color getMungeColor() {
 		return c_munge;
 	}
 
 	/**
 	 * @param c_munge the c_munge to set
 	 */
-	public void setMungeColor(float[] p_munge) {
+	public void setMungeColor(Color p_munge) {
 		this.c_munge = p_munge;
 	}
 	
@@ -490,22 +470,25 @@ public class InvisibleInkFactory {
 	 */
 	private BufferedImage FillGridCell(BufferedImage p_img, int p_x, int p_y, 
 									int p_sizeX, int p_sizeY) {
-		int l_mCount, l_magenta;
-		l_magenta = CMYKtoRGB(c_foreground).getRGB();
-		l_mCount = 0;	
+		int l_mCount = 0;	
+		Color l_tmp = null;
+		float[] tmpFloat = {0,0,0,0};
 		//For each pixel, count instance of magenta
+		Raster l_tmpRaster = p_img.getRaster();
 		for (int l_i = 0; l_i < p_sizeX; l_i++) {
 			for (int l_j = 0; l_j < p_sizeY; l_j++) {
-				if (p_img.getRGB(p_x+l_i, p_y+l_j) == l_magenta) l_mCount++;
+				l_tmpRaster.getPixel(l_i+p_x, l_j+p_y, tmpFloat);
+				l_tmp = new Color(c_cs, tmpFloat, 1);
+				if (l_tmp.equals(c_foreground)) l_mCount++;
 			}
 		}
 		//Draw the best.
 		Graphics2D l_g2d = p_img.createGraphics();
 		if (l_mCount < p_sizeX*p_sizeY/1.5) {
-			l_g2d.setColor(CMYKtoRGB(c_background));
+			l_g2d.setColor(c_background);
 		}
 		else {
-			l_g2d.setColor(CMYKtoRGB(c_foreground));
+			l_g2d.setColor(c_foreground);
 		}
 		l_g2d.fillRect(p_x, p_y, p_sizeX, p_sizeY);		
 		return p_img;
@@ -518,7 +501,7 @@ public class InvisibleInkFactory {
 	 * @return modified image.
 	 */
 	private BufferedImage AddRandomCyan(BufferedImage p_img) {
-		/* It might be better to have one "addcolor" function, then in this
+		/* TODO: It might be better to have one "addcolor" function, then
 		 * just use them differently, instead of 2 that do specific things...
 		 */
 		if (c_csprng == null) {
@@ -527,21 +510,22 @@ public class InvisibleInkFactory {
 		// For each pixel...
 		for (int l_x = 0; l_x < c_xGridCoords.size(); l_x++) {
 			for (int l_y = 0; l_y < c_yGridCoords.size(); l_y++) {
-				float[] l_c = RGBtoCMYK(new Color(p_img.getRGB(
-												   c_xGridCoords.elementAt(l_x),
-												   c_yGridCoords.elementAt(l_y))
-												  ));
-
+				float[] l_c = {0,0,0,0}, l_mask = {0,0,0,0};
+				c_mask.getColorComponents(l_mask);
+				p_img.getRaster().getPixel(c_xGridCoords.elementAt(l_x),
+						   				   c_yGridCoords.elementAt(l_y), l_c);
+				
 				float l_add = c_csprng.nextFloat(); 
-				l_c[0] = Math.min(1, l_c[0]+c_mask[0]*l_add*c_maxMask);
-				l_c[1] = Math.min(1, l_c[1]+c_mask[1]*l_add*c_maxMask);
-				l_c[2] = Math.min(1, l_c[2]+c_mask[2]*l_add*c_maxMask);
-				l_c[3] = Math.min(1, l_c[3]+c_mask[3]*l_add*c_maxMask);
+				l_c[0] = Math.min(1, l_c[0]+l_mask[0]*l_add*c_maxMask);
+				l_c[1] = Math.min(1, l_c[1]+l_mask[1]*l_add*c_maxMask);
+				l_c[2] = Math.min(1, l_c[2]+l_mask[2]*l_add*c_maxMask);
+				l_c[3] = Math.min(1, l_c[3]+l_mask[3]*l_add*c_maxMask);
 				
-				
+				System.out.print(l_c[0] + ", " + l_c[1] + ", ");
+				System.out.println(l_c[2] + ", " + l_c[3]);
 				// Set the new color to the Grid Cell
 				Graphics2D l_g2d = p_img.createGraphics();
-				l_g2d.setColor(CMYKtoRGB(l_c));
+				l_g2d.setColor(new Color(c_cs, l_c, 1));
 				l_g2d.fillRect(c_xGridCoords.elementAt(l_x), 
 							   c_yGridCoords.elementAt(l_y), 
 							   c_hGridSize[l_x%c_hGridSize.length], 
@@ -558,26 +542,22 @@ public class InvisibleInkFactory {
 		// For each pixel...
 		for (int l_x = 0; l_x < c_xGridCoords.size(); l_x++) {
 			for (int l_y = 0; l_y < c_yGridCoords.size(); l_y++) {
-				float[] l_c = RGBtoCMYK(new Color(p_img.getRGB(
-						   c_xGridCoords.elementAt(l_x),
-						   c_yGridCoords.elementAt(l_y))
-						  ));
+				float[] l_c = {0,0,0,0};
+				p_img.getRaster().getPixel(c_xGridCoords.elementAt(l_x),
+						   				   c_yGridCoords.elementAt(l_y), l_c);
 				
 				float l_s = (float)c_csprng.nextFloat()*2 - 1;
 				//We are just trying to do color intensity here..
-				//Shoudl only due on "pure" images.
+				//Should only do on "pure" images.
 				
 				//Default to background
-				if (l_c[0] == c_foreground[0] && 
-						l_c[1] == c_foreground[1] &&
-						l_c[2] == c_foreground[2] &&
-						l_c[3] == c_foreground[3]) {
+				if (new Color(c_cs, l_c, 1).equals(c_foreground)) {
 					l_s *= c_maxTextMunge; 
 				} else {
 					l_s *= c_maxBackgroundMunge;
 				}
-				System.out.println(c_maxTextMunge + ", " + c_maxBackgroundMunge);
-				System.out.println("Before: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);
+				//System.out.println(c_maxTextMunge + ", " + c_maxBackgroundMunge);
+				//System.out.println("Before: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);
 				if (l_s > 0) {
 					if (l_c[0] != 0)
 						l_c[0] += Math.min(1-l_c[0], l_s);
@@ -599,7 +579,7 @@ public class InvisibleInkFactory {
 				
 				// Set the new color to the Grid Cell
 				Graphics2D l_g2d = p_img.createGraphics();
-				l_g2d.setColor(CMYKtoRGB(l_c));
+				l_g2d.setColor(new Color(c_cs, l_c, 1));
 				l_g2d.fillRect(c_xGridCoords.elementAt(l_x), 
 							   c_yGridCoords.elementAt(l_y), 
 							   c_hGridSize[l_x%c_hGridSize.length], 

@@ -33,6 +33,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.awt.Color;
 import java.awt.Event;
 import java.awt.BorderLayout;
 import java.awt.Point;
@@ -62,9 +63,11 @@ import javax.swing.JComboBox;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.ImgRaw;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfWriter;
 
+import org.scantegrity.lib.CMYKColorSpace;
 import org.scantegrity.lib.InvisibleInkFactory;
 import java.awt.Dimension;
 import javax.swing.JTextArea;
@@ -212,8 +215,9 @@ public class Inkerator {
 		try {
 			com.lowagie.text.Image l_img = com.lowagie.text.Image.getInstance(c_img,
 					null);
-			l_img.setDpi(300, 300);
-			
+			//com.lowagie.text.Image l_img = (new ImgRaw(3, 3, 4, 8, l_b));
+			//l_img.setDpi(300, 300);
+
 			Document l_doc = new Document(new Rectangle(0,0,l_img.getWidth(), 
 															l_img.getHeight()));
 			l_doc.setMargins(0,0,0,0);
@@ -223,7 +227,17 @@ public class Inkerator {
 			l_doc.open();
 			l_doc.add(l_img);
 			l_doc.close();
-						
+			/*
+			byte[] l_byte = l_img.getRawData();
+			System.out.println("Bytes: " + l_byte.length);
+			for (int l_i = 0; l_i < l_byte.length; l_i++)
+			{
+				System.out.println("\tByte " + l_i + ": " + l_byte[l_i]);
+				if (l_i % 3 == 0) {
+					System.out.println("RGB: " + c_img.getRGB(0, 0));
+				}
+			}
+			*/			
 			c_c++;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -238,6 +252,7 @@ public class Inkerator {
 	 * UpdateImage - Updates the image display.
 	 */
 	private void UpdateImage() {
+		CMYKColorSpace l_cs = new CMYKColorSpace();
 		if (imgFactory == null) imgFactory = new InvisibleInkFactory();
 		if (c_file == null) {
 			c_stream = new PrintStream(System.out);
@@ -275,10 +290,10 @@ public class Inkerator {
 		l_colors[2] = GetFloatList(yValue, l_colors[2], 4);
 		l_colors[3] = GetFloatList(kValue, l_colors[3], 4);
 
-		imgFactory.setMaskColor(l_colors[0]);
-		imgFactory.setForegroundColor(l_colors[1]);
-		imgFactory.setBackgroundColor(l_colors[2]);
-		imgFactory.setMungeColor(l_colors[3]);
+		imgFactory.setMaskColor(new Color(l_cs, l_colors[0], 1));
+		imgFactory.setForegroundColor(new Color(l_cs, l_colors[1], 1));
+		imgFactory.setBackgroundColor(new Color(l_cs, l_colors[2], 1));
+		imgFactory.setMungeColor(new Color(l_cs, l_colors[3], 1));
 		
 		JLabel l_imgLabel = getImageLabel();
 		//Get Settings                 
