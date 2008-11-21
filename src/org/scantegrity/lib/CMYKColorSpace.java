@@ -37,19 +37,25 @@ public class CMYKColorSpace extends ColorSpace implements Serializable {
 	private static final long serialVersionUID = -5982040365555064012L;
 	
 	/**
-	 * 
+	 * Create a new CMYKColorSpace Instance.
 	 */
 	public CMYKColorSpace() {
 		super(ColorSpace.TYPE_CMYK, 4);
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Converts to CMYK from CIEXYZ. We cheat here, using the RGB colorspace
+	 * to do the math for us. The toCIEXYZ function has a description of how
+	 * this is supposed to work, which may be implemented in the future.
+	 * 
 	 * @see java.awt.color.ColorSpace#fromCIEXYZ(float[])
+	 * @see org.scantegrity.lib.CMYKColorSpace#toCIEXYZ
 	 */
 	@Override
 	public float[] fromCIEXYZ(float[] p_colorvalue) {
-		// TODO Auto-generated method stub
-		return null;
+		ColorSpace l_cs = ColorSpace.getInstance(ColorSpace.TYPE_RGB);
+		float[] l_rgb = l_cs.toCIEXYZ(p_colorvalue);		
+		return fromRGB(l_rgb);
 	}
 
 	/**
@@ -81,13 +87,34 @@ public class CMYKColorSpace extends ColorSpace implements Serializable {
 		return normalize(l_res);
 	}
 
-	/* (non-Javadoc)
+	/** 
+	 * Converts the CMYK color to CIEXYZ. Because CIEXYZ is 3-component, we 
+	 * cheat, converting to RGB and then using the RGB colorspace function
+	 * to do the conversion. Details on this colorspace are available on 
+	 * wikipedia: 
+	 * 
+	 * http://en.wikipedia.org/wiki/CIE_XYZ_color_space
+	 * 
+	 * There is also an "ideal relationship" to CMYK, which might be implemented
+	 * in the future (don't recall the reference we got this from, probably
+	 * color.org):
+	 * 
+	 * C = (C' - K)/(1 - K)
+	 * M = (M' - K)/(1 - K)
+	 * Y = (Y' - K)/(1 - K)
+	 * K = Min(C', M', Y')
+	 * 
+	 * X   41.2453 35.7580 18.0423 | 1-C'
+	 * Y = 21.2671 71.5160 07.2169 | 1-M'
+	 * Z   01.9334 11.9193 95.0227 | 1-Y'
+	 * 
 	 * @see java.awt.color.ColorSpace#toCIEXYZ(float[])
 	 */
 	@Override
 	public float[] toCIEXYZ(float[] p_colorvalue) {
-		// TODO Auto-generated method stub
-		return null;
+		float[] l_rgb = toRGB(p_colorvalue);
+		ColorSpace l_cs = ColorSpace.getInstance(ColorSpace.TYPE_RGB);
+		return l_cs.toCIEXYZ(l_rgb);
 	}
 
 	/**
