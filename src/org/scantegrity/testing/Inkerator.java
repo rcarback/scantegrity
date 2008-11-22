@@ -33,6 +33,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
 import java.awt.Color;
 import java.awt.Event;
 import java.awt.BorderLayout;
@@ -63,7 +65,6 @@ import javax.swing.JComboBox;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
-import com.lowagie.text.ImgRaw;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfWriter;
 
@@ -79,8 +80,8 @@ import javax.swing.JTextArea;
  * 
  * 
  * @author Richard Carback
- * @version 0.2.0
- * @date 17/11/09
+ * @version 0.3.1
+ * @date 22/11/09
  */
 public class Inkerator {
 
@@ -213,10 +214,22 @@ public class Inkerator {
 	 */
 	private void Save() {
 		try {
-			com.lowagie.text.Image l_img = com.lowagie.text.Image.getInstance(c_img,
-					null);
-			//com.lowagie.text.Image l_img = (new ImgRaw(3, 3, 4, 8, l_b));
-			//l_img.setDpi(300, 300);
+			Raster l_tmpRaster = c_img.getRaster();
+			DataBuffer l_db = l_tmpRaster.getDataBuffer();
+			byte[] l_bytes = new byte[l_db.getSize()];
+
+			for (int l_i = 0; l_i < l_bytes.length; l_i++) {
+				l_bytes[l_i] = (byte)Math.round(l_db.getElemFloat(l_i)*(float)255);
+				System.out.print(l_bytes[l_i] + ", ");
+				if (l_i%3 == 0) System.out.println(""); 
+			}
+			
+			
+			com.lowagie.text.Image l_img = com.lowagie.text.Image.getInstance(
+														l_tmpRaster.getWidth(), 
+														l_tmpRaster.getHeight(), 
+														4, 8, l_bytes);
+			l_img.setDpi(300, 300);
 
 			Document l_doc = new Document(new Rectangle(0,0,l_img.getWidth(), 
 															l_img.getHeight()));

@@ -24,10 +24,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
-import java.awt.image.BandedSampleModel;
 import java.awt.image.BufferedImage;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
@@ -36,9 +34,6 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.security.SecureRandom;
 import java.util.Vector;
-
-import javax.media.jai.DataBufferFloat;
-
 import org.scantegrity.lib.CMYKColorSpace;
  
 /**
@@ -50,8 +45,8 @@ import org.scantegrity.lib.CMYKColorSpace;
  * paper. 
  * 
  * @author Richard Carback
- * @version 0.2.0 
- * @date 17/11/09
+ * @version 0.3.1 
+ * @date 22/11/09
  */
 public class InvisibleInkFactory {
 
@@ -521,8 +516,8 @@ public class InvisibleInkFactory {
 				l_c[2] = Math.min(1, l_c[2]+l_mask[2]*l_add*c_maxMask);
 				l_c[3] = Math.min(1, l_c[3]+l_mask[3]*l_add*c_maxMask);
 				
-				System.out.print(l_c[0] + ", " + l_c[1] + ", ");
-				System.out.println(l_c[2] + ", " + l_c[3]);
+				//System.out.print(l_c[0] + ", " + l_c[1] + ", ");
+				//System.out.println(l_c[2] + ", " + l_c[3]);
 				// Set the new color to the Grid Cell
 				Graphics2D l_g2d = p_img.createGraphics();
 				l_g2d.setColor(new Color(c_cs, l_c, 1));
