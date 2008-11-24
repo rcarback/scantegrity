@@ -149,7 +149,7 @@ public class CMYKColorSpace extends ColorSpace implements Serializable {
 	 * @return p_colors, with any values greater than 1 set to 1, and less than
 	 * 0 set to 0.
 	 */
-	private float[] normalize(float[] p_colors) {
+	static public float[] normalize(float[] p_colors) {
 		for (int l_i = 0; l_i < p_colors.length; l_i++) {
 			if (p_colors[l_i] > (float)1.0) p_colors[l_i] = (float)1.0;
 			else if (p_colors[l_i] < (float)0.0) p_colors[l_i] = (float)0.0;

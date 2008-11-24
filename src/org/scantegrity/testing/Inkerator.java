@@ -122,13 +122,9 @@ public class Inkerator {
 	private JScrollPane jScrollPane = null;
 	private JLabel ZoomLabel = null;
 	private JLabel FontSizeLabel = null;
-	private JSpinner ZoomSpinner = null;
 	private JSpinner FontSpinner = null;
 	private JLabel SeedLabel = null;
 	private JSpinner SeedSpinner = null;
-	private JTextField MaskLevelTextField = null;
-	private JLabel MaskLevelLabel = null;
-
 	//Manually Added variables.
 	private InvisibleInkFactory imgFactory = null;  //  @jve:decl-index=0:
 	private SecureRandom c_csprng = null;  //  @jve:decl-index=0:
@@ -136,21 +132,21 @@ public class Inkerator {
 	private PrintStream c_stream = null;
 	private BufferedImage c_img = null;
 	private int c_c = 0;
-	private JLabel cLabel = null;
-	private JLabel mLabel = null;
-	private JLabel yLabel = null;
-	private JLabel kLabel = null;
-	private JTextField cValue = null;
-	private JTextField mValue = null;
-	private JTextField yValue = null;
-	private JTextField kValue = null;
-	private JLabel TextMungeLabel = null;
-	private JTextField TextMunge = null;
-	private JLabel BackgroundMungeLabel = null;
-	private JTextField BackgroundMunge = null;
 	private JTextArea DirectionsTextArea = null;
-	
-	
+	private JLabel FontColorRangeLabel = null;
+	private JLabel BGColorRangeLabel = null;
+	private JLabel MaskColorRangeLabel = null;
+	private JTextField FontColorRange = null;
+	private JTextField BGColorRange = null;
+	private JTextField MaskColorRange = null;
+	private JLabel ImgHeightLabel = null;
+	private JLabel imgWidthLabel = null;
+	private JTextField ImgHeight = null;
+	private JTextField ImgWidth = null;
+	private JTextField Zoom = null;
+	private String c_imgDetails = null;
+	private JLabel ColorOrderingLabel = null;
+	private JTextField ColorOrdering = null;
 	/**
 	 * GetList - Grabs a list of comma separated integer values from a 
 	 * JTextField element. 
@@ -187,15 +183,21 @@ public class Inkerator {
 	 *
 	 * @param p_txtField - The textfield to parse.
 	 * @param p_default - a default value to return if the parse is broken.
+	 * @param p_size - the limit of values to return, set to 0 for no limit.
 	 * @return A list of floats that were comma separated.
 	 */
 	private float[] GetFloatList(JTextField p_txtField, float[] p_default,
 								 int p_size) {
 		String l_str = p_txtField.getText();
 		String[] l_list = l_str.split(",", l_str.length());
-		float[] l_ret = p_default;
 		float l_tmp = -1;
-		for (int l_i = 0; l_i < p_size && l_i < l_list.length; l_i++) {
+		int l_size = l_list.length;
+		if (p_size != 0) l_size = Math.min(l_size, p_size);
+
+		float[] l_ret = new float[l_size];		
+		for (int l_i = 0; l_i < l_size; l_i++) {
+			if (l_i < p_default.length) l_ret[l_i] = p_default[l_i];
+			else l_ret[l_i] = 0;
 			try {
 				l_tmp = Float.parseFloat(l_list[l_i]);
 			} catch (Exception e) {
@@ -239,18 +241,7 @@ public class Inkerator {
 						new FileOutputStream("inkeratorout" + c_c + ".pdf"));
 			l_doc.open();
 			l_doc.add(l_img);
-			l_doc.close();
-			/*
-			byte[] l_byte = l_img.getRawData();
-			System.out.println("Bytes: " + l_byte.length);
-			for (int l_i = 0; l_i < l_byte.length; l_i++)
-			{
-				System.out.println("\tByte " + l_i + ": " + l_byte[l_i]);
-				if (l_i % 3 == 0) {
-					System.out.println("RGB: " + c_img.getRGB(0, 0));
-				}
-			}
-			*/			
+			l_doc.close();		
 			c_c++;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -266,29 +257,17 @@ public class Inkerator {
 	 */
 	private void UpdateImage() {
 		CMYKColorSpace l_cs = new CMYKColorSpace();
+		c_imgDetails = "--Image Details-- \n";
+		
 		if (imgFactory == null) imgFactory = new InvisibleInkFactory();
-		if (c_file == null) {
-			c_stream = new PrintStream(System.out);
-			c_file = new File("inkerator.log");
-			if (c_file.canWrite()) {
-				try {
-					c_stream = new PrintStream(c_file);
-				} catch (FileNotFoundException e) {
-					System.out.println("Error: Cannot write logfile, will use console!");
-					c_stream.println(e.getStackTrace().toString());					
-				}
-			} else {
-				System.out.println("Error: Cannot write logfile, will use console!");
-			}
-		}
+		
 		try {
 			c_csprng = SecureRandom.getInstance("SHA1PRNG");
-			long seed = System.currentTimeMillis();
-			c_stream.println("Seed: " + seed);
-			c_csprng.setSeed(Integer.parseInt(SeedSpinner.getValue().toString()));
+			long l_seed = Integer.parseInt(SeedSpinner.getValue().toString());
+			c_csprng.setSeed(l_seed);
+			c_imgDetails += "Seed: " + l_seed + "\n";
 			imgFactory.setCSPRNG(c_csprng);
 		} catch (Exception e) {
-			c_stream.println(e.getStackTrace().toString());					
 			c_csprng = null;
 		}
 		
@@ -298,73 +277,71 @@ public class Inkerator {
 								{0,0,0,(float).5}
 							 };
 		
-		l_colors[0] = GetFloatList(cValue, l_colors[0], 4);
-		l_colors[1] = GetFloatList(mValue, l_colors[1], 4);
-		l_colors[2] = GetFloatList(yValue, l_colors[2], 4);
-		l_colors[3] = GetFloatList(kValue, l_colors[3], 4);
-
+		//Font Color
+		float[] l_rangeDefault = {0, 1};
+		float[] l_BGColorRange = CMYKColorSpace.normalize(GetFloatList(
+																BGColorRange, 
+																l_rangeDefault, 
+																2));
+		float[] l_maskColorRange = CMYKColorSpace.normalize(GetFloatList(
+																MaskColorRange, 
+																l_rangeDefault, 
+																2));
+		
+		float[] l_fontColorRange = CMYKColorSpace.normalize(GetFloatList(
+				FontColorRange, 
+				l_rangeDefault, 
+				2));
+		float l_mid = (l_fontColorRange[1] + l_fontColorRange[0])/2;
+		float l_range = Math.abs(l_fontColorRange[1]-l_fontColorRange[0])/2;
+		
+		
+		
 		imgFactory.setMaskColor(new Color(l_cs, l_colors[0], 1));
 		imgFactory.setForegroundColor(new Color(l_cs, l_colors[1], 1));
 		imgFactory.setBackgroundColor(new Color(l_cs, l_colors[2], 1));
 		imgFactory.setMungeColor(new Color(l_cs, l_colors[3], 1));
 		
-		JLabel l_imgLabel = getImageLabel();
 		//Get Settings                 
 		String l_imgText = getImageText().getText();
-		double l_zoom = (double)Integer.parseInt(ZoomSpinner.getValue().toString())/10;
+		c_imgDetails += "Text: " + l_imgText + "\n";
+		double l_zoom = Double.parseDouble((Zoom.getText()));
+		c_imgDetails += "Zoom: " + l_zoom + "\n";
 		
-		float l_mask = (float)Float.parseFloat(MaskLevelTextField.getText());
-		if (l_mask < 0 || l_mask > 1) {
-			l_mask = 0;
-			MaskLevelTextField.setText("0");
-		}		
-		imgFactory.setMaxMask(l_mask);
+		Integer[][] l_grids = {GetList(getVGridSizeString(), 5), 
+							 GetList(getVGridSpaces(), 1),
+							 GetList(getHGridSizes(), 5), 
+							 GetList(getHGridSpaces(), 1)};
 		
-		float l_tmunge = (float)Float.parseFloat(TextMunge.getText());
-		if (l_tmunge < 0 || l_tmunge > 1) {
-			l_tmunge = 0;
-			TextMunge.setText("0");
-		}		
-		imgFactory.setMaxTextMunge(l_tmunge);		
-
-		float l_bmunge = (float)Float.parseFloat(BackgroundMunge.getText());
-		if (l_bmunge < 0 || l_bmunge > 1) {
-			l_bmunge = 0;
-			BackgroundMunge.setText("0");
-		}		
-		imgFactory.setMaxBackgroundMunge(l_bmunge);	
+		c_imgDetails += "vGridSize: " + l_grids[0].toString() + "\n";
+		c_imgDetails += "vGridSpaceSize: " + l_grids[1].toString() + "\n";
+		c_imgDetails += "hGridSize: " + l_grids[2].toString() + "\n";
+		c_imgDetails += "hGridSpaceSize: " + l_grids[3].toString() + "\n";
 		
-		imgFactory.setGrid(GetList(getVGridSizeString(), 5), 
-						   GetList(getVGridSpaces(), 1),
-						   GetList(getHGridSizes(), 5), 
-						   GetList(getHGridSpaces(), 1));
+		imgFactory.setGrid(l_grids[0], l_grids[1], l_grids[2], l_grids[3]); 
+		
+		
 		
 		Font l_font = new Font((String)getFontChooser().getSelectedItem(), 
 				   Font.BOLD, Integer.parseInt(FontSpinner.getValue().toString()));
 		imgFactory.setFont(l_font);
+		c_imgDetails += "Font: " + l_font.getName() + "\n";
+		c_imgDetails += "Font Size: " + l_font.getSize() + "\n";
 		
 		long l_time = System.currentTimeMillis();
 		c_img = imgFactory.getBufferedImage(l_imgText);
 		l_time = System.currentTimeMillis() - l_time;
 		
+		c_imgDetails += "Time to Generate: " + l_time + "\n";
+		
+		//Display image in the GUI.
 		Image l_result = c_img.getScaledInstance((int)(c_img.getWidth()*l_zoom), 
 											  (int)(c_img.getHeight()*l_zoom), 
 												BufferedImage.SCALE_FAST);	
-		
 		ImageIcon l_icon = new ImageIcon(l_result);
+		JLabel l_imgLabel = getImageLabel();
 		l_imgLabel.setIcon(l_icon);
 		l_imgLabel.repaint();
-		
-		c_stream.println("==Image Generated==");
-		c_stream.print(", Text=" + l_imgText);
-		c_stream.print(", vGridSizes= { ");
-		c_stream.print(" }, vGridSpaces= { ");
-		c_stream.print(" }, hGridSizes= { ");
-		c_stream.print(" }, hGridSpaces= { ");	
-		c_stream.println(" }, zoom=" + l_zoom);
-		c_stream.print("Font Name=" + l_font.getName());
-		c_stream.println(", Size=" + l_font.getSize());
-		c_stream.println("Generated in: " + l_time + "ms");
 	}		
 	
 	/**
@@ -632,97 +609,90 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
-			GridBagConstraints gridBagConstraints42 = new GridBagConstraints();
-			gridBagConstraints42.fill = GridBagConstraints.BOTH;
-			gridBagConstraints42.gridy = 18;
-			gridBagConstraints42.weightx = 1.0;
-			gridBagConstraints42.anchor = GridBagConstraints.WEST;
-			gridBagConstraints42.gridx = 1;
-			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
-			gridBagConstraints3.gridx = 0;
-			gridBagConstraints3.anchor = GridBagConstraints.WEST;
-			gridBagConstraints3.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints3.gridy = 18;
-			BackgroundMungeLabel = new JLabel();
-			BackgroundMungeLabel.setText("Max Background Munge:");
-			GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
-			gridBagConstraints22.fill = GridBagConstraints.BOTH;
-			gridBagConstraints22.gridy = 17;
-			gridBagConstraints22.weightx = 1.0;
-			gridBagConstraints22.anchor = GridBagConstraints.WEST;
-			gridBagConstraints22.gridx = 1;
-			GridBagConstraints gridBagConstraints110 = new GridBagConstraints();
-			gridBagConstraints110.gridx = 0;
-			gridBagConstraints110.anchor = GridBagConstraints.WEST;
-			gridBagConstraints110.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints110.gridy = 17;
-			TextMungeLabel = new JLabel();
-			TextMungeLabel.setText("Max Text Munge:");
-			GridBagConstraints gridBagConstraints81 = new GridBagConstraints();
-			gridBagConstraints81.fill = GridBagConstraints.BOTH;
-			gridBagConstraints81.gridy = 3;
-			gridBagConstraints81.weightx = 1.0;
-			gridBagConstraints81.anchor = GridBagConstraints.WEST;
-			gridBagConstraints81.gridx = 1;
-			GridBagConstraints gridBagConstraints71 = new GridBagConstraints();
-			gridBagConstraints71.fill = GridBagConstraints.BOTH;
-			gridBagConstraints71.gridy = 2;
-			gridBagConstraints71.weightx = 1.0;
-			gridBagConstraints71.anchor = GridBagConstraints.WEST;
-			gridBagConstraints71.gridx = 1;
-			GridBagConstraints gridBagConstraints62 = new GridBagConstraints();
-			gridBagConstraints62.fill = GridBagConstraints.BOTH;
-			gridBagConstraints62.gridy = 1;
-			gridBagConstraints62.weightx = 1.0;
-			gridBagConstraints62.anchor = GridBagConstraints.WEST;
-			gridBagConstraints62.gridx = 1;
-			GridBagConstraints gridBagConstraints53 = new GridBagConstraints();
-			gridBagConstraints53.fill = GridBagConstraints.BOTH;
-			gridBagConstraints53.gridy = 0;
-			gridBagConstraints53.weightx = 1.0;
-			gridBagConstraints53.anchor = GridBagConstraints.WEST;
-			gridBagConstraints53.gridx = 1;
-			GridBagConstraints gridBagConstraints41 = new GridBagConstraints();
-			gridBagConstraints41.gridx = 0;
-			gridBagConstraints41.anchor = GridBagConstraints.WEST;
-			gridBagConstraints41.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints41.gridy = 3;
-			kLabel = new JLabel();
-			kLabel.setText("Black (K) Value:");
-			GridBagConstraints gridBagConstraints32 = new GridBagConstraints();
-			gridBagConstraints32.gridx = 0;
-			gridBagConstraints32.anchor = GridBagConstraints.WEST;
-			gridBagConstraints32.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints32.gridy = 2;
-			yLabel = new JLabel();
-			yLabel.setText("Background Color (Yellow): ");
+			GridBagConstraints gridBagConstraints24 = new GridBagConstraints();
+			gridBagConstraints24.fill = GridBagConstraints.BOTH;
+			gridBagConstraints24.gridy = 17;
+			gridBagConstraints24.weightx = 1.0;
+			gridBagConstraints24.anchor = GridBagConstraints.WEST;
+			gridBagConstraints24.gridx = 1;
 			GridBagConstraints gridBagConstraints23 = new GridBagConstraints();
 			gridBagConstraints23.gridx = 0;
 			gridBagConstraints23.anchor = GridBagConstraints.WEST;
 			gridBagConstraints23.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints23.gridy = 1;
-			mLabel = new JLabel();
-			mLabel.setText("Text Color (Magenta):");
+			gridBagConstraints23.gridy = 17;
+			ColorOrderingLabel = new JLabel();
+			ColorOrderingLabel.setText("Color Ordering:");
+			GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
+			gridBagConstraints22.fill = GridBagConstraints.BOTH;
+			gridBagConstraints22.gridy = 16;
+			gridBagConstraints22.weightx = 1.0;
+			gridBagConstraints22.anchor = GridBagConstraints.WEST;
+			gridBagConstraints22.gridx = 1;
+			GridBagConstraints gridBagConstraints211 = new GridBagConstraints();
+			gridBagConstraints211.fill = GridBagConstraints.BOTH;
+			gridBagConstraints211.gridy = 22;
+			gridBagConstraints211.weightx = 1.0;
+			gridBagConstraints211.anchor = GridBagConstraints.WEST;
+			gridBagConstraints211.gridx = 1;
 			GridBagConstraints gridBagConstraints19 = new GridBagConstraints();
-			gridBagConstraints19.gridx = 0;
+			gridBagConstraints19.fill = GridBagConstraints.BOTH;
+			gridBagConstraints19.gridy = 21;
+			gridBagConstraints19.weightx = 1.0;
 			gridBagConstraints19.anchor = GridBagConstraints.WEST;
-			gridBagConstraints19.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints19.gridy = 0;
-			cLabel = new JLabel();
-			cLabel.setText("Masking Color (Cyan):");
-			GridBagConstraints gridBagConstraints61 = new GridBagConstraints();
-			gridBagConstraints61.gridx = 0;
-			gridBagConstraints61.anchor = GridBagConstraints.WEST;
-			gridBagConstraints61.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints61.gridy = 19;
-			MaskLevelLabel = new JLabel();
-			MaskLevelLabel.setText("Max Mask (Cyan) Addition:");
-			GridBagConstraints gridBagConstraints52 = new GridBagConstraints();
-			gridBagConstraints52.fill = GridBagConstraints.BOTH;
-			gridBagConstraints52.gridy = 19;
-			gridBagConstraints52.weightx = 1.0;
-			gridBagConstraints52.anchor = GridBagConstraints.WEST;
-			gridBagConstraints52.gridx = 1;
+			gridBagConstraints19.gridx = 1;
+			GridBagConstraints gridBagConstraints181 = new GridBagConstraints();
+			gridBagConstraints181.gridx = 0;
+			gridBagConstraints181.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints181.anchor = GridBagConstraints.WEST;
+			gridBagConstraints181.gridy = 22;
+			imgWidthLabel = new JLabel();
+			imgWidthLabel.setText("Save Width:");
+			GridBagConstraints gridBagConstraints171 = new GridBagConstraints();
+			gridBagConstraints171.gridx = 0;
+			gridBagConstraints171.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints171.anchor = GridBagConstraints.WEST;
+			gridBagConstraints171.gridy = 21;
+			ImgHeightLabel = new JLabel();
+			ImgHeightLabel.setText("Save Height:");
+			GridBagConstraints gridBagConstraints131 = new GridBagConstraints();
+			gridBagConstraints131.fill = GridBagConstraints.BOTH;
+			gridBagConstraints131.gridy = 20;
+			gridBagConstraints131.weightx = 1.0;
+			gridBagConstraints131.anchor = GridBagConstraints.WEST;
+			gridBagConstraints131.gridx = 1;
+			GridBagConstraints gridBagConstraints111 = new GridBagConstraints();
+			gridBagConstraints111.fill = GridBagConstraints.BOTH;
+			gridBagConstraints111.gridy = 19;
+			gridBagConstraints111.weightx = 1.0;
+			gridBagConstraints111.anchor = GridBagConstraints.WEST;
+			gridBagConstraints111.gridx = 1;
+			GridBagConstraints gridBagConstraints101 = new GridBagConstraints();
+			gridBagConstraints101.fill = GridBagConstraints.BOTH;
+			gridBagConstraints101.gridy = 18;
+			gridBagConstraints101.weightx = 1.0;
+			gridBagConstraints101.anchor = GridBagConstraints.WEST;
+			gridBagConstraints101.gridx = 1;
+			GridBagConstraints gridBagConstraints91 = new GridBagConstraints();
+			gridBagConstraints91.gridx = 0;
+			gridBagConstraints91.anchor = GridBagConstraints.WEST;
+			gridBagConstraints91.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints91.gridy = 20;
+			MaskColorRangeLabel = new JLabel();
+			MaskColorRangeLabel.setText("Mask Color Range:");
+			GridBagConstraints gridBagConstraints81 = new GridBagConstraints();
+			gridBagConstraints81.gridx = 0;
+			gridBagConstraints81.anchor = GridBagConstraints.WEST;
+			gridBagConstraints81.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints81.gridy = 19;
+			BGColorRangeLabel = new JLabel();
+			BGColorRangeLabel.setText("BG Color Range:");
+			GridBagConstraints gridBagConstraints71 = new GridBagConstraints();
+			gridBagConstraints71.gridx = 0;
+			gridBagConstraints71.anchor = GridBagConstraints.WEST;
+			gridBagConstraints71.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints71.gridy = 18;
+			FontColorRangeLabel = new JLabel();
+			FontColorRangeLabel.setText("Font Color Range:");
 			GridBagConstraints gridBagConstraints51 = new GridBagConstraints();
 			gridBagConstraints51.gridx = 1;
 			gridBagConstraints51.fill = GridBagConstraints.BOTH;
@@ -740,10 +710,6 @@ public class Inkerator {
 			gridBagConstraints17.fill = GridBagConstraints.BOTH;
 			gridBagConstraints17.gridwidth = 2;
 			gridBagConstraints17.gridy = 15;
-			GridBagConstraints gridBagConstraints16 = new GridBagConstraints();
-			gridBagConstraints16.gridx = 1;
-			gridBagConstraints16.fill = GridBagConstraints.BOTH;
-			gridBagConstraints16.gridy = 16;
 			GridBagConstraints gridBagConstraints18 = new GridBagConstraints();
 			gridBagConstraints18.gridx = 0;
 			gridBagConstraints18.anchor = GridBagConstraints.WEST;
@@ -831,10 +797,10 @@ public class Inkerator {
 			gridBagConstraints21.gridx = 1;
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.gridx = 1;
-			gridBagConstraints1.gridy = 20;
+			gridBagConstraints1.gridy = 25;
 			GridBagConstraints gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 20;
+			gridBagConstraints.gridy = 25;
 			jPanel = new JPanel();
 			jPanel.setLayout(new GridBagLayout());
 			jPanel.add(getUpdate(), gridBagConstraints);
@@ -853,24 +819,22 @@ public class Inkerator {
 			jPanel.add(fontChooserLabel, gridBagConstraints14);
 			jPanel.add(ZoomLabel, gridBagConstraints15);
 			jPanel.add(FontSizeLabel, gridBagConstraints18);
-			jPanel.add(getZoomSpinner(), gridBagConstraints16);
 			jPanel.add(getFontSpinner(), gridBagConstraints17);
 			jPanel.add(SeedLabel, gridBagConstraints2);
 			jPanel.add(getSeedSpinner(), gridBagConstraints51);
-			jPanel.add(getMaskLevelTextField(), gridBagConstraints52);
-			jPanel.add(MaskLevelLabel, gridBagConstraints61);
-			jPanel.add(cLabel, gridBagConstraints19);
-			jPanel.add(mLabel, gridBagConstraints23);
-			jPanel.add(yLabel, gridBagConstraints32);
-			jPanel.add(kLabel, gridBagConstraints41);
-			jPanel.add(getCValue(), gridBagConstraints53);
-			jPanel.add(getMValue(), gridBagConstraints62);
-			jPanel.add(getYValue(), gridBagConstraints71);
-			jPanel.add(getKValue(), gridBagConstraints81);
-			jPanel.add(TextMungeLabel, gridBagConstraints110);
-			jPanel.add(getTextMunge(), gridBagConstraints22);
-			jPanel.add(BackgroundMungeLabel, gridBagConstraints3);
-			jPanel.add(getBackgroundMunge(), gridBagConstraints42);
+			jPanel.add(FontColorRangeLabel, gridBagConstraints71);
+			jPanel.add(BGColorRangeLabel, gridBagConstraints81);
+			jPanel.add(MaskColorRangeLabel, gridBagConstraints91);
+			jPanel.add(getFontColorRange(), gridBagConstraints101);
+			jPanel.add(getBGColorRange(), gridBagConstraints111);
+			jPanel.add(getMaskColorRange(), gridBagConstraints131);
+			jPanel.add(ImgHeightLabel, gridBagConstraints171);
+			jPanel.add(imgWidthLabel, gridBagConstraints181);
+			jPanel.add(getImgHeight(), gridBagConstraints19);
+			jPanel.add(getImgWidth(), gridBagConstraints211);
+			jPanel.add(getZoom(), gridBagConstraints22);
+			jPanel.add(ColorOrderingLabel, gridBagConstraints23);
+			jPanel.add(getColorOrdering(), gridBagConstraints24);
 		}
 		return jPanel;
 	}
@@ -1060,25 +1024,6 @@ public class Inkerator {
 	}
 
 	/**
-	 * This method initializes ZoomSpinner	
-	 * 	
-	 * @return javax.swing.JSpinner	
-	 */
-	private JSpinner getZoomSpinner() {
-		if (ZoomSpinner == null) {
-			ZoomSpinner = new JSpinner();
-			ZoomSpinner.setValue(10);
-
-			ZoomSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
-				public void stateChanged(javax.swing.event.ChangeEvent e) {
-					UpdateImage();
-				}
-			});
-		}
-		return ZoomSpinner;
-	}
-
-	/**
 	 * This method initializes FontSpinner	
 	 * 	
 	 * @return javax.swing.JSpinner	
@@ -1115,97 +1060,6 @@ public class Inkerator {
 	}
 
 	/**
-	 * This method initializes MaskLevelTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getMaskLevelTextField() {
-		if (MaskLevelTextField == null) {
-			MaskLevelTextField = new JTextField();
-			MaskLevelTextField.setText(".5");
-		}
-		return MaskLevelTextField;
-	}
-
-	/**
-	 * This method initializes cValue	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getCValue() {
-		if (cValue == null) {
-			cValue = new JTextField();
-			cValue.setText(".5,0,0,0");
-		}
-		return cValue;
-	}
-
-	/**
-	 * This method initializes mValue	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getMValue() {
-		if (mValue == null) {
-			mValue = new JTextField();
-			mValue.setText("0,.5,0,0");
-		}
-		return mValue;
-	}
-
-	/**
-	 * This method initializes yValue	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getYValue() {
-		if (yValue == null) {
-			yValue = new JTextField();
-			yValue.setText("0,0,.5,0");
-		}
-		return yValue;
-	}
-
-	/**
-	 * This method initializes kValue	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getKValue() {
-		if (kValue == null) {
-			kValue = new JTextField();
-			kValue.setText("0,0,0,.5");
-		}
-		return kValue;
-	}
-
-	/**
-	 * This method initializes TextMunge	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getTextMunge() {
-		if (TextMunge == null) {
-			TextMunge = new JTextField();
-			TextMunge.setText(".5");
-		}
-		return TextMunge;
-	}
-
-	/**
-	 * This method initializes BackgroundMunge	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getBackgroundMunge() {
-		if (BackgroundMunge == null) {
-			BackgroundMunge = new JTextField();
-			BackgroundMunge.setText(".5");
-		}
-		return BackgroundMunge;
-	}
-
-	/**
 	 * This method initializes DirectionsTextArea	
 	 * 	
 	 * @return javax.swing.JTextArea	
@@ -1221,6 +1075,97 @@ public class Inkerator {
 			DirectionsTextArea.setEditable(false);
 		}
 		return DirectionsTextArea;
+	}
+
+	/**
+	 * This method initializes FontColorRange	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getFontColorRange() {
+		if (FontColorRange == null) {
+			FontColorRange = new JTextField();
+			FontColorRange.setText("0.0,1.0");
+		}
+		return FontColorRange;
+	}
+
+	/**
+	 * This method initializes BGColorRange	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getBGColorRange() {
+		if (BGColorRange == null) {
+			BGColorRange = new JTextField();
+			BGColorRange.setText("0.0,1.0");
+		}
+		return BGColorRange;
+	}
+
+	/**
+	 * This method initializes MaskColorRange	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getMaskColorRange() {
+		if (MaskColorRange == null) {
+			MaskColorRange = new JTextField();
+			MaskColorRange.setText("0.0,1.0");
+		}
+		return MaskColorRange;
+	}
+
+	/**
+	 * This method initializes ImgHeight	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getImgHeight() {
+		if (ImgHeight == null) {
+			ImgHeight = new JTextField();
+			ImgHeight.setText("0");
+		}
+		return ImgHeight;
+	}
+
+	/**
+	 * This method initializes ImgWidth	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getImgWidth() {
+		if (ImgWidth == null) {
+			ImgWidth = new JTextField();
+			ImgWidth.setText("0");
+		}
+		return ImgWidth;
+	}
+
+	/**
+	 * This method initializes Zoom	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getZoom() {
+		if (Zoom == null) {
+			Zoom = new JTextField();
+			Zoom.setText("1");
+		}
+		return Zoom;
+	}
+
+	/**
+	 * This method initializes ColorOrdering	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getColorOrdering() {
+		if (ColorOrdering == null) {
+			ColorOrdering = new JTextField();
+			ColorOrdering.setText("CMYK");
+		}
+		return ColorOrdering;
 	}
 
 	/**
