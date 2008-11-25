@@ -145,8 +145,6 @@ public class Inkerator {
 	private JTextField ImgWidth = null;
 	private JTextField Zoom = null;
 	private String c_imgDetails = null;
-	private JLabel ColorOrderingLabel = null;
-	private JTextField ColorOrdering = null;
 	/**
 	 * GetList - Grabs a list of comma separated integer values from a 
 	 * JTextField element. 
@@ -609,19 +607,6 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
-			GridBagConstraints gridBagConstraints24 = new GridBagConstraints();
-			gridBagConstraints24.fill = GridBagConstraints.BOTH;
-			gridBagConstraints24.gridy = 17;
-			gridBagConstraints24.weightx = 1.0;
-			gridBagConstraints24.anchor = GridBagConstraints.WEST;
-			gridBagConstraints24.gridx = 1;
-			GridBagConstraints gridBagConstraints23 = new GridBagConstraints();
-			gridBagConstraints23.gridx = 0;
-			gridBagConstraints23.anchor = GridBagConstraints.WEST;
-			gridBagConstraints23.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints23.gridy = 17;
-			ColorOrderingLabel = new JLabel();
-			ColorOrderingLabel.setText("Color Ordering:");
 			GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
 			gridBagConstraints22.fill = GridBagConstraints.BOTH;
 			gridBagConstraints22.gridy = 16;
@@ -833,8 +818,6 @@ public class Inkerator {
 			jPanel.add(getImgHeight(), gridBagConstraints19);
 			jPanel.add(getImgWidth(), gridBagConstraints211);
 			jPanel.add(getZoom(), gridBagConstraints22);
-			jPanel.add(ColorOrderingLabel, gridBagConstraints23);
-			jPanel.add(getColorOrdering(), gridBagConstraints24);
 		}
 		return jPanel;
 	}
@@ -1085,7 +1068,7 @@ public class Inkerator {
 	private JTextField getFontColorRange() {
 		if (FontColorRange == null) {
 			FontColorRange = new JTextField();
-			FontColorRange.setText("0.0,1.0");
+			FontColorRange.setText("0.0,0.0,0.0;0.0,1.0,0.0");
 		}
 		return FontColorRange;
 	}
@@ -1098,7 +1081,7 @@ public class Inkerator {
 	private JTextField getBGColorRange() {
 		if (BGColorRange == null) {
 			BGColorRange = new JTextField();
-			BGColorRange.setText("0.0,1.0");
+			BGColorRange.setText("0.0,0.0,0.0;0.0,0.0,1.0");
 		}
 		return BGColorRange;
 	}
@@ -1111,7 +1094,7 @@ public class Inkerator {
 	private JTextField getMaskColorRange() {
 		if (MaskColorRange == null) {
 			MaskColorRange = new JTextField();
-			MaskColorRange.setText("0.0,1.0");
+			MaskColorRange.setText("0.0,0.0,0.0;1.0,0.0,0.0");
 		}
 		return MaskColorRange;
 	}
@@ -1153,19 +1136,6 @@ public class Inkerator {
 			Zoom.setText("1");
 		}
 		return Zoom;
-	}
-
-	/**
-	 * This method initializes ColorOrdering	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getColorOrdering() {
-		if (ColorOrdering == null) {
-			ColorOrdering = new JTextField();
-			ColorOrdering.setText("CMYK");
-		}
-		return ColorOrdering;
 	}
 
 	/**
