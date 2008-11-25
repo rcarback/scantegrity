@@ -45,8 +45,8 @@ import org.scantegrity.lib.CMYKColorSpace;
  * paper. 
  * 
  * @author Richard Carback
- * @version 0.3.1 
- * @date 22/11/09
+ * @version 0.4.1 
+ * @date 24/11/08
  */
 public class InvisibleInkFactory {
 
@@ -55,15 +55,17 @@ public class InvisibleInkFactory {
 	private Font c_font;
 	private int c_padding;
 	private SecureRandom c_csprng;
-	private float c_maxMask = (float)0.5;
-	private float c_maxTextMunge = (float)0.5;
-	private float c_maxBackgroundMunge = (float)0.5;
 	private CMYKColorSpace c_cs = new CMYKColorSpace();
-	//Default colors
-	private Color c_foreground = null; 
-	private Color c_background = null; 
-	private Color c_mask = null; 
-	private Color c_munge = null;
+	private Color c_defFontColor = null;
+	private Color c_defBgColor = null;
+	
+	private float[] c_minFontColor = {0,0,0,0};
+	private float[] c_maxFontColor = {0,1,0,0};
+	private float[] c_minBgColor = {0,0,0,0};
+	private float[] c_maxBgColor = {0,0,1,0};
+	private float[] c_minMaskColor = {0,0,0,0};
+	private float[] c_maxMaskColor = {1,0,0,0};
+
 	
 	
 	//The True ascent of the current font.
@@ -113,15 +115,9 @@ public class InvisibleInkFactory {
 		c_padding = p_pad;
 		c_csprng = p_csprng;
 		SetTrueAscent(DEFAULT_SYMBOLS);
-		
-		float[] l_foreground = {0,(float) 0.5,0,0}; 
-		float[] l_background = {0,0,(float) 0.5,0}; 
-		float[] l_mask = {(float) 0.5,0,0,0}; 
-		float[] l_munge = {0,0,0,(float) 0.5};
-		c_foreground = new Color(c_cs, l_foreground, 1);
-		c_background = new Color(c_cs, l_background, 1);
-		c_mask = new Color(c_cs, l_mask, 1);
-		c_munge = new Color(c_cs, l_munge, 1);
+		float[][] l_defColors = { {0,1,0,0}, {0,0,1,0} };
+		c_defFontColor = new Color(c_cs, l_defColors[0], 1);
+		c_defBgColor = new Color(c_cs, l_defColors[1], 1);
 	}
 	
 	
@@ -163,12 +159,12 @@ public class InvisibleInkFactory {
 		//Draw Background
 		l_g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, 
 								RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-		l_g2d.setColor(c_background);
+		l_g2d.setColor(c_defBgColor);
 		l_g2d.fillRect(0, 0, (int)l_width, (int)l_height);
 		
 		//Draw Text
 		l_g2d.setFont(c_font);
-		l_g2d.setColor(c_foreground);
+		l_g2d.setColor(c_defFontColor);
 		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding); 
 		
 		//Process Block flag, or set grid to pixel resolution.
@@ -199,12 +195,18 @@ public class InvisibleInkFactory {
 	public void setGrid(Integer[] p_vGridSize, Integer[] p_vGridSpace, 
 						Integer[] p_hGridSize, Integer[] p_hGridSpace)
 	{
-		//check for 0's
+		//check for 0's and negatives
 		for (int l_i = 0; l_i < p_vGridSize.length; l_i++) {
 			if (p_vGridSize[l_i] <= 0) p_vGridSize[l_i] = 1;
 		}
 		for (int l_i = 0; l_i < p_hGridSize.length; l_i++) {
 			if (p_hGridSize[l_i] <= 0) p_hGridSize[l_i] = 1;
+		}
+		for (int l_i = 0; l_i < p_vGridSpace.length; l_i++) {
+			if (p_vGridSpace[l_i] < 0) p_vGridSpace[l_i] = 0;
+		}
+		for (int l_i = 0; l_i < p_hGridSpace.length; l_i++) {
+			if (p_hGridSpace[l_i] < 0) p_hGridSpace[l_i] = 0;
 		}
 
 		c_vGridSize = p_vGridSize;
@@ -268,106 +270,6 @@ public class InvisibleInkFactory {
 		}
 	}
 	
-	/**
-	 * @return the c_foreground
-	 */
-	public Color getForegroundColor() {
-		return c_foreground;
-	}
-
-	/**
-	 * @param c_foreground the c_foreground to set
-	 */
-	public void setForegroundColor(Color p_foreground) {
-		if (p_foreground != null) {
-			this.c_foreground = p_foreground;			
-		}
-	}
-
-	/**
-	 * @return the c_background
-	 */
-	public Color getBackgroundColor() {
-		return c_background;
-	}
-
-	/**
-	 * @param c_background the c_background to set
-	 */
-	public void setBackgroundColor(Color p_background) {
-		this.c_background = p_background;
-	}
-
-	/**
-	 * @return the c_mask
-	 */
-	public Color getMaskColor() {
-		return c_mask;
-	}
-
-	/**
-	 * @param c_mask the c_mask to set
-	 */
-	public void setMaskColor(Color p_mask) {
-		this.c_mask = p_mask;
-	}
-
-	/**
-	 * @return the c_munge
-	 */
-	public Color getMungeColor() {
-		return c_munge;
-	}
-
-	/**
-	 * @param c_munge the c_munge to set
-	 */
-	public void setMungeColor(Color p_munge) {
-		this.c_munge = p_munge;
-	}
-	
-	/**
-	 * @return the c_maxMask
-	 */
-	public float getMaxMask() {
-		return c_maxMask;
-	}
-
-	/**
-	 * @param mask the c_maxMask to set
-	 */
-	public void setMaxMask(float mask) {
-		c_maxMask = mask;
-	}
-
-	/**
-	 * @return the c_maxTextMunge
-	 */
-	public float getMaxTextMunge() {
-		return c_maxTextMunge;
-	}
-
-	/**
-	 * @param textMunge the c_maxTextMunge to set
-	 */
-	public void setMaxTextMunge(float textMunge) {
-		c_maxTextMunge = textMunge;
-	}
-
-	/**
-	 * @return the c_maxBackgroundMunge
-	 */
-	public float getMaxBackgroundMunge() {
-		return c_maxBackgroundMunge;
-	}
-
-	/**
-	 * @param backgroundMunge the c_maxBackgroundMunge to set
-	 */
-	public void setMaxBackgroundMunge(float backgroundMunge) {
-		c_maxBackgroundMunge = backgroundMunge;
-	}
-
 	/**
 	 * GenGrid - Generates a grid across a pre-generated image, and sets the 
 	 * color inside each grid element to the middle-most pixel. 
@@ -474,16 +376,16 @@ public class InvisibleInkFactory {
 			for (int l_j = 0; l_j < p_sizeY; l_j++) {
 				l_tmpRaster.getPixel(l_i+p_x, l_j+p_y, tmpFloat);
 				l_tmp = new Color(c_cs, tmpFloat, 1);
-				if (l_tmp.equals(c_foreground)) l_mCount++;
+				if (l_tmp.equals(c_defFontColor)) l_mCount++;
 			}
 		}
 		//Draw the best.
 		Graphics2D l_g2d = p_img.createGraphics();
 		if (l_mCount < p_sizeX*p_sizeY/1.5) {
-			l_g2d.setColor(c_background);
+			l_g2d.setColor(c_defBgColor);
 		}
 		else {
-			l_g2d.setColor(c_foreground);
+			l_g2d.setColor(c_defFontColor);
 		}
 		l_g2d.fillRect(p_x, p_y, p_sizeX, p_sizeY);		
 		return p_img;
@@ -505,16 +407,17 @@ public class InvisibleInkFactory {
 		// For each pixel...
 		for (int l_x = 0; l_x < c_xGridCoords.size(); l_x++) {
 			for (int l_y = 0; l_y < c_yGridCoords.size(); l_y++) {
-				float[] l_c = {0,0,0,0}, l_mask = {0,0,0,0};
-				c_mask.getColorComponents(l_mask);
+				float[] l_c = {0,0,0,0};
 				p_img.getRaster().getPixel(c_xGridCoords.elementAt(l_x),
 						   				   c_yGridCoords.elementAt(l_y), l_c);
 				
 				float l_add = c_csprng.nextFloat(); 
-				l_c[0] = Math.min(1, l_c[0]+l_mask[0]*l_add*c_maxMask);
-				l_c[1] = Math.min(1, l_c[1]+l_mask[1]*l_add*c_maxMask);
-				l_c[2] = Math.min(1, l_c[2]+l_mask[2]*l_add*c_maxMask);
-				l_c[3] = Math.min(1, l_c[3]+l_mask[3]*l_add*c_maxMask);
+				l_c[0] += (c_maxMaskColor[0]-c_minMaskColor[0])*l_add
+							+ c_minMaskColor[0];
+				l_c[1] += (c_maxMaskColor[1]-c_minMaskColor[1])*l_add
+							+ c_minMaskColor[1];
+				l_c[2] += (c_maxMaskColor[2]-c_minMaskColor[2])*l_add
+							+ c_minMaskColor[2];
 				
 				//System.out.print(l_c[0] + ", " + l_c[1] + ", ");
 				//System.out.println(l_c[2] + ", " + l_c[3]);
@@ -541,33 +444,23 @@ public class InvisibleInkFactory {
 				p_img.getRaster().getPixel(c_xGridCoords.elementAt(l_x),
 						   				   c_yGridCoords.elementAt(l_y), l_c);
 				
-				float l_s = (float)c_csprng.nextFloat()*2 - 1;
-				//We are just trying to do color intensity here..
-				//Should only do on "pure" images.
+				float l_s = (float)c_csprng.nextFloat();
 				
 				//Default to background
-				if (new Color(c_cs, l_c, 1).equals(c_foreground)) {
-					l_s *= c_maxTextMunge; 
+				if (new Color(c_cs, l_c, 1).equals(c_defFontColor)) {
+					l_c[0] = (c_maxFontColor[0]-c_minFontColor[0])*l_s
+								+ c_minFontColor[0];
+					l_c[1] = (c_maxFontColor[1]-c_minFontColor[1])*l_s
+								+ c_minFontColor[1];
+					l_c[2] = (c_maxFontColor[2]-c_minFontColor[2])*l_s
+								+ c_minFontColor[2];					
 				} else {
-					l_s *= c_maxBackgroundMunge;
-				}
-				//System.out.println(c_maxTextMunge + ", " + c_maxBackgroundMunge);
-				//System.out.println("Before: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);
-				if (l_s > 0) {
-					if (l_c[0] != 0)
-						l_c[0] += Math.min(1-l_c[0], l_s);
-					if (l_c[1] != 0)
-						l_c[1] += Math.min(1-l_c[1], l_s);
-					if (l_c[2] != 0)
-						l_c[2] += Math.min(1-l_c[2], l_s);
-					if (l_c[3] != 0)
-						l_c[3] += Math.min(1-l_c[3], l_s);
-				} else {
-					l_s = Math.abs(l_s);
-					l_c[0] -= Math.min(l_c[0], l_s);
-					l_c[1] -= Math.min(l_c[1], l_s);
-					l_c[2] -= Math.min(l_c[2], l_s);
-					l_c[3] -= Math.min(l_c[3], l_s);
+					l_c[0] = (c_maxBgColor[0]-c_minBgColor[0])*l_s
+								+ c_minBgColor[0];
+					l_c[1] = (c_maxBgColor[1]-c_minBgColor[1])*l_s
+								+ c_minBgColor[1];
+					l_c[2] = (c_maxBgColor[2]-c_minBgColor[2])*l_s
+								+ c_minBgColor[2];					
 				}
 				
 				//System.out.println("After: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);
@@ -582,6 +475,55 @@ public class InvisibleInkFactory {
 			}
 		}
 		return p_img;
+	}
+	
+	public float[] getMinFontColor() { 
+		return c_minFontColor;
+	}
+
+	public void setMinFontColor(float[] p_newVal) { 
+		c_minFontColor = CMYKColorSpace.normalize(p_newVal);
+	}
+
+	
+	public float[] getMaxFontColor() {
+		return c_maxFontColor;		
+	}
+	
+	public void setMaxFontColor(float[] p_newVal) {
+		c_maxFontColor = CMYKColorSpace.normalize(p_newVal);
+	}
+
+	public float[] getMinBgColor() {
+		return c_minBgColor;		
+	}
+	
+	public void setMinBgColor(float[] p_newVal) {
+		c_minBgColor = CMYKColorSpace.normalize(p_newVal);	
+	}
+
+	public float[] getMaxBgColor() {
+		return c_maxBgColor;		
+	}
+	
+	public void setMaxBgColor(float[] p_newVal) {
+		c_maxBgColor = CMYKColorSpace.normalize(p_newVal);
+	}
+
+	public float[] getMinMaskColor() {
+		return c_minMaskColor;
+	}
+	
+	public void setMinMaskColor(float[] p_newVal) {
+		c_minMaskColor = CMYKColorSpace.normalize(p_newVal);
+	}
+	
+	public float[] getMaxMaskColor() {
+		return c_maxMaskColor;
+	}
+	
+	public void setMaxMaskColor(float[] p_newVal) {
+		c_maxMaskColor = CMYKColorSpace.normalize(p_newVal);		
 	}
 }
  

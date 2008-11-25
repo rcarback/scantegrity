@@ -21,12 +21,10 @@
 package org.scantegrity.testing;
 
 //Utility libs
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Vector;
 //AWT graphical elements
 import java.awt.event.KeyEvent;
@@ -35,7 +33,6 @@ import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
-import java.awt.Color;
 import java.awt.Event;
 import java.awt.BorderLayout;
 import java.awt.Point;
@@ -65,13 +62,13 @@ import javax.swing.JComboBox;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
-import com.lowagie.text.Rectangle;
+import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
 
-import org.scantegrity.lib.CMYKColorSpace;
 import org.scantegrity.lib.InvisibleInkFactory;
 import java.awt.Dimension;
 import javax.swing.JTextArea;
+
 
 /**
  * Inkerator is a testing application for invisible ink printers. It utilizes
@@ -80,8 +77,8 @@ import javax.swing.JTextArea;
  * 
  * 
  * @author Richard Carback
- * @version 0.3.1
- * @date 22/11/09
+ * @version 0.4.1
+ * @date 24/11/08
  */
 public class Inkerator {
 
@@ -128,23 +125,25 @@ public class Inkerator {
 	//Manually Added variables.
 	private InvisibleInkFactory imgFactory = null;  //  @jve:decl-index=0:
 	private SecureRandom c_csprng = null;  //  @jve:decl-index=0:
-	private File c_file = null;  //  @jve:decl-index=0:
-	private PrintStream c_stream = null;
 	private BufferedImage c_img = null;
 	private int c_c = 0;
 	private JTextArea DirectionsTextArea = null;
-	private JLabel FontColorRangeLabel = null;
-	private JLabel BGColorRangeLabel = null;
-	private JLabel MaskColorRangeLabel = null;
-	private JTextField FontColorRange = null;
-	private JTextField BGColorRange = null;
-	private JTextField MaskColorRange = null;
-	private JLabel ImgHeightLabel = null;
-	private JLabel imgWidthLabel = null;
-	private JTextField ImgHeight = null;
-	private JTextField ImgWidth = null;
 	private JTextField Zoom = null;
-	private String c_imgDetails = null;
+	private String c_imgDetails = null;  //  @jve:decl-index=0:
+	private JLabel HeightLabel = null;
+	private JTextField Height = null;
+	private JTextField MinFontColor = null;
+	private JTextField MaxFontColor = null;
+	private JTextField MinBGColor = null;
+	private JTextField MaxBGColor = null;
+	private JTextField MinMaskColor = null;
+	private JTextField MaxMaskColor = null;
+	private JLabel MinFontColorLabel = null;
+	private JLabel MaxFontColorLabel = null;
+	private JLabel MinBGColorLabel = null;
+	private JLabel MaxBGColorLabel = null;
+	private JLabel MinMaskColorLabel = null;
+	private JLabel MaxMaskColorLabel = null;
 	/**
 	 * GetList - Grabs a list of comma separated integer values from a 
 	 * JTextField element. 
@@ -190,7 +189,7 @@ public class Inkerator {
 		String[] l_list = l_str.split(",", l_str.length());
 		float l_tmp = -1;
 		int l_size = l_list.length;
-		if (p_size != 0) l_size = Math.min(l_size, p_size);
+		if (p_size != 0) l_size = p_size;
 
 		float[] l_ret = new float[l_size];		
 		for (int l_i = 0; l_i < l_size; l_i++) {
@@ -220,8 +219,6 @@ public class Inkerator {
 
 			for (int l_i = 0; l_i < l_bytes.length; l_i++) {
 				l_bytes[l_i] = (byte)Math.round(l_db.getElemFloat(l_i)*(float)255);
-				System.out.print(l_bytes[l_i] + ", ");
-				if (l_i%3 == 0) System.out.println(""); 
 			}
 			
 			
@@ -230,15 +227,18 @@ public class Inkerator {
 														l_tmpRaster.getHeight(), 
 														4, 8, l_bytes);
 			l_img.setDpi(300, 300);
-
-			Document l_doc = new Document(new Rectangle(0,0,l_img.getWidth(), 
-															l_img.getHeight()));
-			l_doc.setMargins(0,0,0,0);
+			float l_percent = Float.parseFloat(Height.getText());
+			l_percent = 100*(l_percent/l_img.getHeight());
+			l_img.scalePercent(l_percent);
+			Document l_doc = new Document();
+			//l_doc.setMargins(0,0,0,0);
 
 			PdfWriter.getInstance(l_doc, 
 						new FileOutputStream("inkeratorout" + c_c + ".pdf"));
 			l_doc.open();
 			l_doc.add(l_img);
+			Paragraph l_p = new Paragraph("Version: 0.4.1\n" + c_imgDetails);
+			l_doc.add(l_p);
 			l_doc.close();		
 			c_c++;
 		} catch (IOException e) {
@@ -254,7 +254,6 @@ public class Inkerator {
 	 * UpdateImage - Updates the image display.
 	 */
 	private void UpdateImage() {
-		CMYKColorSpace l_cs = new CMYKColorSpace();
 		c_imgDetails = "--Image Details-- \n";
 		
 		if (imgFactory == null) imgFactory = new InvisibleInkFactory();
@@ -269,52 +268,74 @@ public class Inkerator {
 			c_csprng = null;
 		}
 		
-		float l_colors[][] = { {(float).5,0,0,0},
+		float l_colors[][] = { {0,0,0,0},
+								{(float).5,0,0,0},
+								{0,0,0,0},
 								{0,(float).5,0,0},
-								{0,0,(float).5,0},
-								{0,0,0,(float).5}
+								{0,0,0,0},
+								{0,0,(float).5,0}
 							 };
+		String l_cStr = "";
+				
+		l_colors[0] = GetFloatList(MinMaskColor, l_colors[0], 4);
+		l_cStr = Arrays.toString(l_colors[0]);
+		MinMaskColor.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_colors[1] = GetFloatList(MaxMaskColor, l_colors[1], 4);
+		l_cStr = Arrays.toString(l_colors[1]);
+		MaxMaskColor.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_colors[2] = GetFloatList(MinFontColor, l_colors[2], 4);
+		l_cStr = Arrays.toString(l_colors[2]);
+		MinFontColor.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_colors[3] = GetFloatList(MaxFontColor, l_colors[3], 4);
+		l_cStr = Arrays.toString(l_colors[3]);
+		MaxFontColor.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_colors[4] = GetFloatList(MinBGColor, l_colors[4], 4);
+		l_cStr = Arrays.toString(l_colors[4]);
+		MinBGColor.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_colors[5] = GetFloatList(MaxBGColor, l_colors[5], 4);
+		l_cStr = Arrays.toString(l_colors[5]);
+		MaxBGColor.setText(l_cStr.substring(1, l_cStr.length()-1));
 		
-		//Font Color
-		float[] l_rangeDefault = {0, 1};
-		float[] l_BGColorRange = CMYKColorSpace.normalize(GetFloatList(
-																BGColorRange, 
-																l_rangeDefault, 
-																2));
-		float[] l_maskColorRange = CMYKColorSpace.normalize(GetFloatList(
-																MaskColorRange, 
-																l_rangeDefault, 
-																2));
+		imgFactory.setMinMaskColor(l_colors[0]);
+		imgFactory.setMaxMaskColor(l_colors[1]);
+		imgFactory.setMinFontColor(l_colors[2]);
+		imgFactory.setMaxFontColor(l_colors[3]);
+		imgFactory.setMinBgColor(l_colors[4]);
+		imgFactory.setMaxBgColor(l_colors[5]);
 		
-		float[] l_fontColorRange = CMYKColorSpace.normalize(GetFloatList(
-				FontColorRange, 
-				l_rangeDefault, 
-				2));
-		float l_mid = (l_fontColorRange[1] + l_fontColorRange[0])/2;
-		float l_range = Math.abs(l_fontColorRange[1]-l_fontColorRange[0])/2;
+		c_imgDetails += "Color Details:\n";
+		c_imgDetails += "\tFont Color: " + Arrays.toString(l_colors[2]) + ";" 
+						+ Arrays.toString(l_colors[3]) + "\n";
+		c_imgDetails += "\tBG Color: " + Arrays.toString(l_colors[4]) + ";" 
+						+ Arrays.toString(l_colors[5]) + "\n";
+		c_imgDetails += "\tMask Color: " + Arrays.toString(l_colors[0]) + ";" 
+						+ Arrays.toString(l_colors[1]) + "\n";
 		
-		
-		
-		imgFactory.setMaskColor(new Color(l_cs, l_colors[0], 1));
-		imgFactory.setForegroundColor(new Color(l_cs, l_colors[1], 1));
-		imgFactory.setBackgroundColor(new Color(l_cs, l_colors[2], 1));
-		imgFactory.setMungeColor(new Color(l_cs, l_colors[3], 1));
 		
 		//Get Settings                 
 		String l_imgText = getImageText().getText();
 		c_imgDetails += "Text: " + l_imgText + "\n";
 		double l_zoom = Double.parseDouble((Zoom.getText()));
 		c_imgDetails += "Zoom: " + l_zoom + "\n";
+		Zoom.setText("" + l_zoom);
 		
 		Integer[][] l_grids = {GetList(getVGridSizeString(), 5), 
 							 GetList(getVGridSpaces(), 1),
 							 GetList(getHGridSizes(), 5), 
 							 GetList(getHGridSpaces(), 1)};
 		
-		c_imgDetails += "vGridSize: " + l_grids[0].toString() + "\n";
-		c_imgDetails += "vGridSpaceSize: " + l_grids[1].toString() + "\n";
-		c_imgDetails += "hGridSize: " + l_grids[2].toString() + "\n";
-		c_imgDetails += "hGridSpaceSize: " + l_grids[3].toString() + "\n";
+		l_cStr = Arrays.toString(l_grids[0]);
+		c_imgDetails += "vGridSize: " + l_cStr + "\n";
+		vGridSizeString.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_cStr = Arrays.toString(l_grids[1]);		
+		c_imgDetails += "vGridSpaceSize: " + l_cStr + "\n";
+		vGridSpaces.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_cStr = Arrays.toString(l_grids[2]);		
+		c_imgDetails += "hGridSize: " + l_cStr + "\n";
+		hGridSizes.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_cStr = Arrays.toString(l_grids[3]);		
+		c_imgDetails += "hGridSpaceSize: " + l_cStr + "\n";
+		hGridSpaces.setText(l_cStr.substring(1, l_cStr.length()-1));
 		
 		imgFactory.setGrid(l_grids[0], l_grids[1], l_grids[2], l_grids[3]); 
 		
@@ -330,12 +351,13 @@ public class Inkerator {
 		c_img = imgFactory.getBufferedImage(l_imgText);
 		l_time = System.currentTimeMillis() - l_time;
 		
-		c_imgDetails += "Time to Generate: " + l_time + "\n";
+		c_imgDetails += "Time to Generate: " + l_time + "ms\n";
 		
 		//Display image in the GUI.
 		Image l_result = c_img.getScaledInstance((int)(c_img.getWidth()*l_zoom), 
 											  (int)(c_img.getHeight()*l_zoom), 
-												BufferedImage.SCALE_FAST);	
+												BufferedImage.SCALE_FAST);
+		Height.setText("" + l_result.getHeight(null));
 		ImageIcon l_icon = new ImageIcon(l_result);
 		JLabel l_imgLabel = getImageLabel();
 		l_imgLabel.setIcon(l_icon);
@@ -515,7 +537,7 @@ public class Inkerator {
 	private JLabel getAboutVersionLabel() {
 		if (aboutVersionLabel == null) {
 			aboutVersionLabel = new JLabel();
-			aboutVersionLabel.setText("Version 0.2.0");
+			aboutVersionLabel.setText("Version 0.4.1");
 			aboutVersionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		}
 		return aboutVersionLabel;
@@ -607,77 +629,103 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
+			GridBagConstraints gridBagConstraints141 = new GridBagConstraints();
+			gridBagConstraints141.gridx = 0;
+			gridBagConstraints141.anchor = GridBagConstraints.WEST;
+			gridBagConstraints141.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints141.gridy = 23;
+			MaxMaskColorLabel = new JLabel();
+			MaxMaskColorLabel.setText("Max Mask Color:");
+			GridBagConstraints gridBagConstraints131 = new GridBagConstraints();
+			gridBagConstraints131.gridx = 0;
+			gridBagConstraints131.anchor = GridBagConstraints.WEST;
+			gridBagConstraints131.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints131.gridy = 22;
+			MinMaskColorLabel = new JLabel();
+			MinMaskColorLabel.setText("Min Mask Color:");
+			GridBagConstraints gridBagConstraints121 = new GridBagConstraints();
+			gridBagConstraints121.gridx = 0;
+			gridBagConstraints121.anchor = GridBagConstraints.WEST;
+			gridBagConstraints121.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints121.gridy = 21;
+			MaxBGColorLabel = new JLabel();
+			MaxBGColorLabel.setText("Max BG Color:");
+			GridBagConstraints gridBagConstraints111 = new GridBagConstraints();
+			gridBagConstraints111.gridx = 0;
+			gridBagConstraints111.anchor = GridBagConstraints.WEST;
+			gridBagConstraints111.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints111.gridy = 20;
+			MinBGColorLabel = new JLabel();
+			MinBGColorLabel.setText("Min BG Color:");
+			GridBagConstraints gridBagConstraints101 = new GridBagConstraints();
+			gridBagConstraints101.gridx = 0;
+			gridBagConstraints101.anchor = GridBagConstraints.WEST;
+			gridBagConstraints101.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints101.gridy = 19;
+			MaxFontColorLabel = new JLabel();
+			MaxFontColorLabel.setText("Max Font Color (CMY):");
+			GridBagConstraints gridBagConstraints91 = new GridBagConstraints();
+			gridBagConstraints91.gridx = 0;
+			gridBagConstraints91.anchor = GridBagConstraints.WEST;
+			gridBagConstraints91.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints91.gridy = 18;
+			MinFontColorLabel = new JLabel();
+			MinFontColorLabel.setText("Min Font Color (CMY):");
+			GridBagConstraints gridBagConstraints81 = new GridBagConstraints();
+			gridBagConstraints81.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints81.gridy = 23;
+			gridBagConstraints81.weightx = 1.0;
+			gridBagConstraints81.anchor = GridBagConstraints.WEST;
+			gridBagConstraints81.gridx = 1;
+			GridBagConstraints gridBagConstraints71 = new GridBagConstraints();
+			gridBagConstraints71.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints71.gridy = 22;
+			gridBagConstraints71.weightx = 1.0;
+			gridBagConstraints71.anchor = GridBagConstraints.WEST;
+			gridBagConstraints71.gridx = 1;
+			GridBagConstraints gridBagConstraints61 = new GridBagConstraints();
+			gridBagConstraints61.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints61.gridy = 21;
+			gridBagConstraints61.weightx = 1.0;
+			gridBagConstraints61.anchor = GridBagConstraints.WEST;
+			gridBagConstraints61.gridx = 1;
+			GridBagConstraints gridBagConstraints52 = new GridBagConstraints();
+			gridBagConstraints52.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints52.gridy = 20;
+			gridBagConstraints52.weightx = 1.0;
+			gridBagConstraints52.anchor = GridBagConstraints.WEST;
+			gridBagConstraints52.gridx = 1;
+			GridBagConstraints gridBagConstraints41 = new GridBagConstraints();
+			gridBagConstraints41.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints41.gridy = 19;
+			gridBagConstraints41.weightx = 1.0;
+			gridBagConstraints41.anchor = GridBagConstraints.WEST;
+			gridBagConstraints41.gridx = 1;
+			GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
+			gridBagConstraints3.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints3.gridy = 18;
+			gridBagConstraints3.weightx = 1.0;
+			gridBagConstraints3.anchor = GridBagConstraints.WEST;
+			gridBagConstraints3.gridx = 1;
+			GridBagConstraints gridBagConstraints23 = new GridBagConstraints();
+			gridBagConstraints23.fill = GridBagConstraints.BOTH;
+			gridBagConstraints23.gridy = 17;
+			gridBagConstraints23.weightx = 1.0;
+			gridBagConstraints23.anchor = GridBagConstraints.WEST;
+			gridBagConstraints23.gridx = 1;
+			GridBagConstraints gridBagConstraints16 = new GridBagConstraints();
+			gridBagConstraints16.gridx = 0;
+			gridBagConstraints16.anchor = GridBagConstraints.WEST;
+			gridBagConstraints16.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints16.gridy = 17;
+			HeightLabel = new JLabel();
+			HeightLabel.setText("Save Height:");
 			GridBagConstraints gridBagConstraints22 = new GridBagConstraints();
 			gridBagConstraints22.fill = GridBagConstraints.BOTH;
 			gridBagConstraints22.gridy = 16;
 			gridBagConstraints22.weightx = 1.0;
 			gridBagConstraints22.anchor = GridBagConstraints.WEST;
 			gridBagConstraints22.gridx = 1;
-			GridBagConstraints gridBagConstraints211 = new GridBagConstraints();
-			gridBagConstraints211.fill = GridBagConstraints.BOTH;
-			gridBagConstraints211.gridy = 22;
-			gridBagConstraints211.weightx = 1.0;
-			gridBagConstraints211.anchor = GridBagConstraints.WEST;
-			gridBagConstraints211.gridx = 1;
-			GridBagConstraints gridBagConstraints19 = new GridBagConstraints();
-			gridBagConstraints19.fill = GridBagConstraints.BOTH;
-			gridBagConstraints19.gridy = 21;
-			gridBagConstraints19.weightx = 1.0;
-			gridBagConstraints19.anchor = GridBagConstraints.WEST;
-			gridBagConstraints19.gridx = 1;
-			GridBagConstraints gridBagConstraints181 = new GridBagConstraints();
-			gridBagConstraints181.gridx = 0;
-			gridBagConstraints181.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints181.anchor = GridBagConstraints.WEST;
-			gridBagConstraints181.gridy = 22;
-			imgWidthLabel = new JLabel();
-			imgWidthLabel.setText("Save Width:");
-			GridBagConstraints gridBagConstraints171 = new GridBagConstraints();
-			gridBagConstraints171.gridx = 0;
-			gridBagConstraints171.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints171.anchor = GridBagConstraints.WEST;
-			gridBagConstraints171.gridy = 21;
-			ImgHeightLabel = new JLabel();
-			ImgHeightLabel.setText("Save Height:");
-			GridBagConstraints gridBagConstraints131 = new GridBagConstraints();
-			gridBagConstraints131.fill = GridBagConstraints.BOTH;
-			gridBagConstraints131.gridy = 20;
-			gridBagConstraints131.weightx = 1.0;
-			gridBagConstraints131.anchor = GridBagConstraints.WEST;
-			gridBagConstraints131.gridx = 1;
-			GridBagConstraints gridBagConstraints111 = new GridBagConstraints();
-			gridBagConstraints111.fill = GridBagConstraints.BOTH;
-			gridBagConstraints111.gridy = 19;
-			gridBagConstraints111.weightx = 1.0;
-			gridBagConstraints111.anchor = GridBagConstraints.WEST;
-			gridBagConstraints111.gridx = 1;
-			GridBagConstraints gridBagConstraints101 = new GridBagConstraints();
-			gridBagConstraints101.fill = GridBagConstraints.BOTH;
-			gridBagConstraints101.gridy = 18;
-			gridBagConstraints101.weightx = 1.0;
-			gridBagConstraints101.anchor = GridBagConstraints.WEST;
-			gridBagConstraints101.gridx = 1;
-			GridBagConstraints gridBagConstraints91 = new GridBagConstraints();
-			gridBagConstraints91.gridx = 0;
-			gridBagConstraints91.anchor = GridBagConstraints.WEST;
-			gridBagConstraints91.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints91.gridy = 20;
-			MaskColorRangeLabel = new JLabel();
-			MaskColorRangeLabel.setText("Mask Color Range:");
-			GridBagConstraints gridBagConstraints81 = new GridBagConstraints();
-			gridBagConstraints81.gridx = 0;
-			gridBagConstraints81.anchor = GridBagConstraints.WEST;
-			gridBagConstraints81.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints81.gridy = 19;
-			BGColorRangeLabel = new JLabel();
-			BGColorRangeLabel.setText("BG Color Range:");
-			GridBagConstraints gridBagConstraints71 = new GridBagConstraints();
-			gridBagConstraints71.gridx = 0;
-			gridBagConstraints71.anchor = GridBagConstraints.WEST;
-			gridBagConstraints71.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints71.gridy = 18;
-			FontColorRangeLabel = new JLabel();
-			FontColorRangeLabel.setText("Font Color Range:");
 			GridBagConstraints gridBagConstraints51 = new GridBagConstraints();
 			gridBagConstraints51.gridx = 1;
 			gridBagConstraints51.fill = GridBagConstraints.BOTH;
@@ -807,17 +855,21 @@ public class Inkerator {
 			jPanel.add(getFontSpinner(), gridBagConstraints17);
 			jPanel.add(SeedLabel, gridBagConstraints2);
 			jPanel.add(getSeedSpinner(), gridBagConstraints51);
-			jPanel.add(FontColorRangeLabel, gridBagConstraints71);
-			jPanel.add(BGColorRangeLabel, gridBagConstraints81);
-			jPanel.add(MaskColorRangeLabel, gridBagConstraints91);
-			jPanel.add(getFontColorRange(), gridBagConstraints101);
-			jPanel.add(getBGColorRange(), gridBagConstraints111);
-			jPanel.add(getMaskColorRange(), gridBagConstraints131);
-			jPanel.add(ImgHeightLabel, gridBagConstraints171);
-			jPanel.add(imgWidthLabel, gridBagConstraints181);
-			jPanel.add(getImgHeight(), gridBagConstraints19);
-			jPanel.add(getImgWidth(), gridBagConstraints211);
 			jPanel.add(getZoom(), gridBagConstraints22);
+			jPanel.add(HeightLabel, gridBagConstraints16);
+			jPanel.add(getHeight(), gridBagConstraints23);
+			jPanel.add(getMinFontColor(), gridBagConstraints3);
+			jPanel.add(getMaxFontColor(), gridBagConstraints41);
+			jPanel.add(getMinBGColor(), gridBagConstraints52);
+			jPanel.add(getMaxBGColor(), gridBagConstraints61);
+			jPanel.add(getMinMaskColor(), gridBagConstraints71);
+			jPanel.add(getMaxMaskColor(), gridBagConstraints81);
+			jPanel.add(MinFontColorLabel, gridBagConstraints91);
+			jPanel.add(MaxFontColorLabel, gridBagConstraints101);
+			jPanel.add(MinBGColorLabel, gridBagConstraints111);
+			jPanel.add(MaxBGColorLabel, gridBagConstraints121);
+			jPanel.add(MinMaskColorLabel, gridBagConstraints131);
+			jPanel.add(MaxMaskColorLabel, gridBagConstraints141);
 		}
 		return jPanel;
 	}
@@ -1061,71 +1113,6 @@ public class Inkerator {
 	}
 
 	/**
-	 * This method initializes FontColorRange	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getFontColorRange() {
-		if (FontColorRange == null) {
-			FontColorRange = new JTextField();
-			FontColorRange.setText("0.0,0.0,0.0;0.0,1.0,0.0");
-		}
-		return FontColorRange;
-	}
-
-	/**
-	 * This method initializes BGColorRange	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getBGColorRange() {
-		if (BGColorRange == null) {
-			BGColorRange = new JTextField();
-			BGColorRange.setText("0.0,0.0,0.0;0.0,0.0,1.0");
-		}
-		return BGColorRange;
-	}
-
-	/**
-	 * This method initializes MaskColorRange	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getMaskColorRange() {
-		if (MaskColorRange == null) {
-			MaskColorRange = new JTextField();
-			MaskColorRange.setText("0.0,0.0,0.0;1.0,0.0,0.0");
-		}
-		return MaskColorRange;
-	}
-
-	/**
-	 * This method initializes ImgHeight	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getImgHeight() {
-		if (ImgHeight == null) {
-			ImgHeight = new JTextField();
-			ImgHeight.setText("0");
-		}
-		return ImgHeight;
-	}
-
-	/**
-	 * This method initializes ImgWidth	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getImgWidth() {
-		if (ImgWidth == null) {
-			ImgWidth = new JTextField();
-			ImgWidth.setText("0");
-		}
-		return ImgWidth;
-	}
-
-	/**
 	 * This method initializes Zoom	
 	 * 	
 	 * @return javax.swing.JTextField	
@@ -1133,9 +1120,100 @@ public class Inkerator {
 	private JTextField getZoom() {
 		if (Zoom == null) {
 			Zoom = new JTextField();
-			Zoom.setText("1");
+			Zoom.setText("1.0");
 		}
 		return Zoom;
+	}
+
+	/**
+	 * This method initializes Height	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getHeight() {
+		if (Height == null) {
+			Height = new JTextField();
+			Height.setText("0");
+		}
+		return Height;
+	}
+
+	/**
+	 * This method initializes MinFontColor	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getMinFontColor() {
+		if (MinFontColor == null) {
+			MinFontColor = new JTextField();
+			MinFontColor.setText("0.0,0.0,0.0");
+		}
+		return MinFontColor;
+	}
+
+	/**
+	 * This method initializes MaxFontColor	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getMaxFontColor() {
+		if (MaxFontColor == null) {
+			MaxFontColor = new JTextField();
+			MaxFontColor.setText("0.0,1.0,0.0");
+		}
+		return MaxFontColor;
+	}
+
+	/**
+	 * This method initializes MinBGColor	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getMinBGColor() {
+		if (MinBGColor == null) {
+			MinBGColor = new JTextField();
+			MinBGColor.setText("0.0,0.0,0.0");
+		}
+		return MinBGColor;
+	}
+
+	/**
+	 * This method initializes MaxBGColor	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getMaxBGColor() {
+		if (MaxBGColor == null) {
+			MaxBGColor = new JTextField();
+			MaxBGColor.setText("0.0,0.0,1.0");
+		}
+		return MaxBGColor;
+	}
+
+	/**
+	 * This method initializes MinMaskColor	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getMinMaskColor() {
+		if (MinMaskColor == null) {
+			MinMaskColor = new JTextField();
+			MinMaskColor.setText("0.0,0.0,0.0");
+		}
+		return MinMaskColor;
+	}
+
+	/**
+	 * This method initializes MaxMaskColor	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getMaxMaskColor() {
+		if (MaxMaskColor == null) {
+			MaxMaskColor = new JTextField();
+			MaxMaskColor.setText("1.0,0.0,0.0");
+		}
+		return MaxMaskColor;
 	}
 
 	/**

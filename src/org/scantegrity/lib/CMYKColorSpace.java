@@ -28,7 +28,7 @@ import java.io.Serializable;
  * the ICC ColorSpace. This is a convenience class to avoid doing that.
  * 
  * @author carback1
- * @version 0.0.1 
+ * @version 0.0.2 
  * @date 18/11/09
  * @see java.awt.color.ColorSpace, java.awt.color.ICC_ColorSpace
  */
