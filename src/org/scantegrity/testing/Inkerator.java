@@ -336,21 +336,39 @@ public class Inkerator {
 							 };
 				
 		l_colors[0] = GetFloatList(MinMaskColor, l_colors[0], 4);
+		l_colors[1] = GetFloatList(MaxMaskColor, l_colors[1], 4);
+		l_colors[2] = GetFloatList(MinFontColor, l_colors[2], 4);
+		l_colors[3] = GetFloatList(MaxFontColor, l_colors[3], 4);
+		l_colors[4] = GetFloatList(MinBGColor, l_colors[4], 4);
+		l_colors[5] = GetFloatList(MaxBGColor, l_colors[5], 4);
+		
+		//Check for additive errors with the Cyan and fix them if possible.
+		/* TODO: This doesn't really work all that great. The Factory should
+		 * probably just handle all this stuff for us. 
+		 */
+		for (int l_j = 2; l_j < 5; l_j++) {
+			for (int l_i = 0; l_i < 4; l_i++) {
+				//Min Cyan + Font
+				if ((l_colors[0][l_i] + l_colors[l_j][l_i]) > 1 ||
+						(l_colors[1][l_i] + l_colors[l_j][l_i]) > 1) {
+					c_imgDetails += "Error! Color overloaded. Mask + Font/BG Colors " +
+					"added together should not be more than 1! \n";
+					l_colors[0][l_i] = 0;
+					l_colors[l_j][l_i] = 0;
+				}
+			}
+		}
+		//Report results back to users
 		l_cStr = Arrays.toString(l_colors[0]);
 		MinMaskColor.setText(l_cStr.substring(1, l_cStr.length()-1));
-		l_colors[1] = GetFloatList(MaxMaskColor, l_colors[1], 4);
 		l_cStr = Arrays.toString(l_colors[1]);
 		MaxMaskColor.setText(l_cStr.substring(1, l_cStr.length()-1));
-		l_colors[2] = GetFloatList(MinFontColor, l_colors[2], 4);
 		l_cStr = Arrays.toString(l_colors[2]);
 		MinFontColor.setText(l_cStr.substring(1, l_cStr.length()-1));
-		l_colors[3] = GetFloatList(MaxFontColor, l_colors[3], 4);
 		l_cStr = Arrays.toString(l_colors[3]);
 		MaxFontColor.setText(l_cStr.substring(1, l_cStr.length()-1));
-		l_colors[4] = GetFloatList(MinBGColor, l_colors[4], 4);
 		l_cStr = Arrays.toString(l_colors[4]);
 		MinBGColor.setText(l_cStr.substring(1, l_cStr.length()-1));
-		l_colors[5] = GetFloatList(MaxBGColor, l_colors[5], 4);
 		l_cStr = Arrays.toString(l_colors[5]);
 		MaxBGColor.setText(l_cStr.substring(1, l_cStr.length()-1));
 		
