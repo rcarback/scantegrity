@@ -21,6 +21,7 @@
 package org.scantegrity.testing;
 
 //Utility libs
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -144,6 +145,9 @@ public class Inkerator {
 	private JLabel MaxBGColorLabel = null;
 	private JLabel MinMaskColorLabel = null;
 	private JLabel MaxMaskColorLabel = null;
+	private JLabel Status = null;
+	private JLabel SaveNameLabel = null;
+	private JTextField SaveName = null;
 	/**
 	 * GetList - Grabs a list of comma separated integer values from a 
 	 * JTextField element. 
@@ -233,14 +237,25 @@ public class Inkerator {
 			Document l_doc = new Document();
 			//l_doc.setMargins(0,0,0,0);
 
-			PdfWriter.getInstance(l_doc, 
-						new FileOutputStream("inkeratorout" + c_c + ".pdf"));
+			//Make sure we don't overwrite previous saves.
+			String l_saveName = SaveName.getText();
+			String l_tmpStr = l_saveName.replace("#", ""+c_c);;
+			File l_tmpFile = new File(l_tmpStr);
+			while (l_tmpFile.exists() && l_saveName != l_tmpStr) {
+				c_c++;
+				l_tmpStr = l_saveName.replace("#", ""+c_c);
+				l_tmpFile = new File(l_tmpStr);
+			}
+			l_saveName = l_saveName.replace("#", ""+c_c);
+			
+			PdfWriter.getInstance(l_doc, new FileOutputStream(l_saveName));
 			l_doc.open();
 			l_doc.add(l_img);
-			Paragraph l_p = new Paragraph("Version: 0.4.1\n" + c_imgDetails);
+			Paragraph l_p = new Paragraph("Version: 0.4.2\n" + c_imgDetails);
 			l_doc.add(l_p);
 			l_doc.close();		
 			c_c++;
+			Status.setText("Status: Saved " + l_saveName);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -374,7 +389,7 @@ public class Inkerator {
 			jFrame = new JFrame();
 			jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			jFrame.setJMenuBar(getJJMenuBar());
-			jFrame.setSize(827, 522);
+			jFrame.setSize(876, 553);
 			jFrame.setContentPane(getJContentPane());
 			jFrame.setTitle("Application");
 		}
@@ -629,6 +644,27 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
+			GridBagConstraints gridBagConstraints53 = new GridBagConstraints();
+			gridBagConstraints53.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints53.gridy = 24;
+			gridBagConstraints53.weightx = 1.0;
+			gridBagConstraints53.anchor = GridBagConstraints.WEST;
+			gridBagConstraints53.gridx = 1;
+			GridBagConstraints gridBagConstraints32 = new GridBagConstraints();
+			gridBagConstraints32.gridx = 0;
+			gridBagConstraints32.anchor = GridBagConstraints.WEST;
+			gridBagConstraints32.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints32.gridy = 24;
+			SaveNameLabel = new JLabel();
+			SaveNameLabel.setText("Save Name:");
+			GridBagConstraints gridBagConstraints24 = new GridBagConstraints();
+			gridBagConstraints24.gridx = 0;
+			gridBagConstraints24.gridwidth = 2;
+			gridBagConstraints24.anchor = GridBagConstraints.WEST;
+			gridBagConstraints24.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints24.gridy = 26;
+			Status = new JLabel();
+			Status.setText("Status: ");
 			GridBagConstraints gridBagConstraints141 = new GridBagConstraints();
 			gridBagConstraints141.gridx = 0;
 			gridBagConstraints141.anchor = GridBagConstraints.WEST;
@@ -663,14 +699,14 @@ public class Inkerator {
 			gridBagConstraints101.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints101.gridy = 19;
 			MaxFontColorLabel = new JLabel();
-			MaxFontColorLabel.setText("Max Font Color (CMY):");
+			MaxFontColorLabel.setText("Max Font Color:");
 			GridBagConstraints gridBagConstraints91 = new GridBagConstraints();
 			gridBagConstraints91.gridx = 0;
 			gridBagConstraints91.anchor = GridBagConstraints.WEST;
 			gridBagConstraints91.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints91.gridy = 18;
 			MinFontColorLabel = new JLabel();
-			MinFontColorLabel.setText("Min Font Color (CMY):");
+			MinFontColorLabel.setText("Min Font Color:");
 			GridBagConstraints gridBagConstraints81 = new GridBagConstraints();
 			gridBagConstraints81.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints81.gridy = 23;
@@ -870,6 +906,9 @@ public class Inkerator {
 			jPanel.add(MaxBGColorLabel, gridBagConstraints121);
 			jPanel.add(MinMaskColorLabel, gridBagConstraints131);
 			jPanel.add(MaxMaskColorLabel, gridBagConstraints141);
+			jPanel.add(Status, gridBagConstraints24);
+			jPanel.add(SaveNameLabel, gridBagConstraints32);
+			jPanel.add(getSaveName(), gridBagConstraints53);
 		}
 		return jPanel;
 	}
@@ -1214,6 +1253,19 @@ public class Inkerator {
 			MaxMaskColor.setText("1.0,0.0,0.0");
 		}
 		return MaxMaskColor;
+	}
+
+	/**
+	 * This method initializes SaveName	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getSaveName() {
+		if (SaveName == null) {
+			SaveName = new JTextField();
+			SaveName.setText("inkerator#.pdf");
+		}
+		return SaveName;
 	}
 
 	/**
