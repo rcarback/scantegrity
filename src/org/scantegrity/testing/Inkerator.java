@@ -78,8 +78,8 @@ import javax.swing.JTextArea;
  * 
  * 
  * @author Richard Carback
- * @version 0.4.1
- * @date 24/11/08
+ * @version 0.4.2
+ * @date 26/11/08
  */
 public class Inkerator {
 
@@ -96,7 +96,7 @@ public class Inkerator {
 	private JMenuItem copyMenuItem = null;
 	private JMenuItem pasteMenuItem = null;
 	private JMenuItem saveMenuItem = null;
-	private JDialog aboutDialog = null;  //  @jve:decl-index=0:visual-constraint="839,10"
+	private JDialog aboutDialog = null;  //  @jve:decl-index=0:visual-constraint="918,10"
 	private JPanel aboutContentPane = null;
 	private JLabel aboutVersionLabel = null;
 	private JSplitPane jSplitPane = null;
@@ -233,6 +233,7 @@ public class Inkerator {
 			l_img.setDpi(300, 300);
 			float l_percent = Float.parseFloat(Height.getText());
 			l_percent = 100*(l_percent/l_img.getHeight());
+			c_imgDetails += "Final Scaling Percentage: " + l_percent + "\n";
 			l_img.scalePercent(l_percent);
 			Document l_doc = new Document();
 			//l_doc.setMargins(0,0,0,0);
@@ -273,6 +274,33 @@ public class Inkerator {
 		
 		if (imgFactory == null) imgFactory = new InvisibleInkFactory();
 		
+		//The text to Display                 
+		String l_imgText = getImageText().getText();
+		c_imgDetails += "Text: " + l_imgText + "\n";
+		
+		//Set the grids.
+		Integer[][] l_grids = {GetList(getVGridSizeString(), 5), 
+							 GetList(getVGridSpaces(), 1),
+							 GetList(getHGridSizes(), 5), 
+							 GetList(getHGridSpaces(), 1)};
+		String l_cStr = "";
+		
+		l_cStr = Arrays.toString(l_grids[0]);
+		c_imgDetails += "vGridSize: " + l_cStr + "\n";
+		vGridSizeString.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_cStr = Arrays.toString(l_grids[1]);		
+		c_imgDetails += "vGridSpaceSize: " + l_cStr + "\n";
+		vGridSpaces.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_cStr = Arrays.toString(l_grids[2]);		
+		c_imgDetails += "hGridSize: " + l_cStr + "\n";
+		hGridSizes.setText(l_cStr.substring(1, l_cStr.length()-1));
+		l_cStr = Arrays.toString(l_grids[3]);		
+		c_imgDetails += "hGridSpaceSize: " + l_cStr + "\n";
+		hGridSpaces.setText(l_cStr.substring(1, l_cStr.length()-1));
+		
+		imgFactory.setGrid(l_grids[0], l_grids[1], l_grids[2], l_grids[3]); 
+		
+		//The CSPRNG Seed
 		try {
 			c_csprng = SecureRandom.getInstance("SHA1PRNG");
 			long l_seed = Integer.parseInt(SeedSpinner.getValue().toString());
@@ -283,6 +311,22 @@ public class Inkerator {
 			c_csprng = null;
 		}
 		
+		//Create and set font size.
+		Font l_font = new Font((String)getFontChooser().getSelectedItem(), 
+				   Font.BOLD, Integer.parseInt(FontSpinner.getValue().toString()));
+		imgFactory.setFont(l_font);
+		c_imgDetails += "Font: " + l_font.getName() + "\n";
+		c_imgDetails += "Font Size: " + l_font.getSize() + "\n";
+
+		//The zoom factor.
+		double l_zoom = Double.parseDouble((Zoom.getText()));
+		c_imgDetails += "Zoom: " + l_zoom + "\n";
+		Zoom.setText("" + l_zoom);
+
+		//Save Height
+		c_imgDetails += "Save Height: " + Height.getText() + "\n";
+		
+		//Read in and set all the colors
 		float l_colors[][] = { {0,0,0,0},
 								{(float).5,0,0,0},
 								{0,0,0,0},
@@ -290,7 +334,6 @@ public class Inkerator {
 								{0,0,0,0},
 								{0,0,(float).5,0}
 							 };
-		String l_cStr = "";
 				
 		l_colors[0] = GetFloatList(MinMaskColor, l_colors[0], 4);
 		l_cStr = Arrays.toString(l_colors[0]);
@@ -324,43 +367,7 @@ public class Inkerator {
 		c_imgDetails += "\tBG Color: " + Arrays.toString(l_colors[4]) + ";" 
 						+ Arrays.toString(l_colors[5]) + "\n";
 		c_imgDetails += "\tMask Color: " + Arrays.toString(l_colors[0]) + ";" 
-						+ Arrays.toString(l_colors[1]) + "\n";
-		
-		
-		//Get Settings                 
-		String l_imgText = getImageText().getText();
-		c_imgDetails += "Text: " + l_imgText + "\n";
-		double l_zoom = Double.parseDouble((Zoom.getText()));
-		c_imgDetails += "Zoom: " + l_zoom + "\n";
-		Zoom.setText("" + l_zoom);
-		
-		Integer[][] l_grids = {GetList(getVGridSizeString(), 5), 
-							 GetList(getVGridSpaces(), 1),
-							 GetList(getHGridSizes(), 5), 
-							 GetList(getHGridSpaces(), 1)};
-		
-		l_cStr = Arrays.toString(l_grids[0]);
-		c_imgDetails += "vGridSize: " + l_cStr + "\n";
-		vGridSizeString.setText(l_cStr.substring(1, l_cStr.length()-1));
-		l_cStr = Arrays.toString(l_grids[1]);		
-		c_imgDetails += "vGridSpaceSize: " + l_cStr + "\n";
-		vGridSpaces.setText(l_cStr.substring(1, l_cStr.length()-1));
-		l_cStr = Arrays.toString(l_grids[2]);		
-		c_imgDetails += "hGridSize: " + l_cStr + "\n";
-		hGridSizes.setText(l_cStr.substring(1, l_cStr.length()-1));
-		l_cStr = Arrays.toString(l_grids[3]);		
-		c_imgDetails += "hGridSpaceSize: " + l_cStr + "\n";
-		hGridSpaces.setText(l_cStr.substring(1, l_cStr.length()-1));
-		
-		imgFactory.setGrid(l_grids[0], l_grids[1], l_grids[2], l_grids[3]); 
-		
-		
-		
-		Font l_font = new Font((String)getFontChooser().getSelectedItem(), 
-				   Font.BOLD, Integer.parseInt(FontSpinner.getValue().toString()));
-		imgFactory.setFont(l_font);
-		c_imgDetails += "Font: " + l_font.getName() + "\n";
-		c_imgDetails += "Font Size: " + l_font.getSize() + "\n";
+						+ Arrays.toString(l_colors[1]) + "\n";		
 		
 		long l_time = System.currentTimeMillis();
 		c_img = imgFactory.getBufferedImage(l_imgText);
@@ -372,7 +379,12 @@ public class Inkerator {
 		Image l_result = c_img.getScaledInstance((int)(c_img.getWidth()*l_zoom), 
 											  (int)(c_img.getHeight()*l_zoom), 
 												BufferedImage.SCALE_FAST);
-		Height.setText("" + l_result.getHeight(null));
+		if (Height.getText().equalsIgnoreCase("0")) {
+			Height.setText("" + l_result.getHeight(null));
+			c_imgDetails += "Save Height Updated (it was originally 0): " +
+									Height.getText() + "\n";
+		}
+		
 		ImageIcon l_icon = new ImageIcon(l_result);
 		JLabel l_imgLabel = getImageLabel();
 		l_imgLabel.setIcon(l_icon);
@@ -389,7 +401,7 @@ public class Inkerator {
 			jFrame = new JFrame();
 			jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			jFrame.setJMenuBar(getJJMenuBar());
-			jFrame.setSize(876, 553);
+			jFrame.setSize(905, 604);
 			jFrame.setContentPane(getJContentPane());
 			jFrame.setTitle("Application");
 		}
