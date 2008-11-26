@@ -167,7 +167,6 @@ public class InvisibleInkFactory {
 		l_g2d.setColor(c_defFontColor);
 		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding); 
 		
-		//Process Block flag, or set grid to pixel resolution.
 		l_ret = GenBlockGrid(l_ret);
 		l_ret = RandomizeBrightness(l_ret);
 		l_ret = AddRandomCyan(l_ret);
@@ -524,6 +523,14 @@ public class InvisibleInkFactory {
 	
 	public void setMaxMaskColor(float[] p_newVal) {
 		c_maxMaskColor = CMYKColorSpace.normalize(p_newVal);		
+	}
+	
+	public int getPadding() {
+		return c_padding;
+	}
+	
+	public void setPadding(int p_padding) {
+		c_padding = Math.abs(p_padding);
 	}
 }
  

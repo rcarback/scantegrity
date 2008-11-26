@@ -148,6 +148,8 @@ public class Inkerator {
 	private JLabel Status = null;
 	private JLabel SaveNameLabel = null;
 	private JTextField SaveName = null;
+	private JLabel PaddingLabel = null;
+	private JTextField Padding = null;
 	/**
 	 * GetList - Grabs a list of comma separated integer values from a 
 	 * JTextField element. 
@@ -277,6 +279,11 @@ public class Inkerator {
 		//The text to Display                 
 		String l_imgText = getImageText().getText();
 		c_imgDetails += "Text: " + l_imgText + "\n";
+		
+		//Padding
+		int l_pad = Integer.parseInt(Padding.getText());
+		c_imgDetails += "Padding: " + l_pad + "\n";
+		imgFactory.setPadding(l_pad);
 		
 		//Set the grids.
 		Integer[][] l_grids = {GetList(getVGridSizeString(), 5), 
@@ -674,6 +681,19 @@ public class Inkerator {
 	 */
 	private JPanel getJPanel() {
 		if (jPanel == null) {
+			GridBagConstraints gridBagConstraints72 = new GridBagConstraints();
+			gridBagConstraints72.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints72.gridy = 5;
+			gridBagConstraints72.weightx = 1.0;
+			gridBagConstraints72.anchor = GridBagConstraints.WEST;
+			gridBagConstraints72.gridx = 1;
+			GridBagConstraints gridBagConstraints62 = new GridBagConstraints();
+			gridBagConstraints62.gridx = 0;
+			gridBagConstraints62.anchor = GridBagConstraints.WEST;
+			gridBagConstraints62.fill = GridBagConstraints.HORIZONTAL;
+			gridBagConstraints62.gridy = 5;
+			PaddingLabel = new JLabel();
+			PaddingLabel.setText("Padding:");
 			GridBagConstraints gridBagConstraints53 = new GridBagConstraints();
 			gridBagConstraints53.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints53.gridy = 24;
@@ -692,7 +712,7 @@ public class Inkerator {
 			gridBagConstraints24.gridwidth = 2;
 			gridBagConstraints24.anchor = GridBagConstraints.WEST;
 			gridBagConstraints24.fill = GridBagConstraints.HORIZONTAL;
-			gridBagConstraints24.gridy = 26;
+			gridBagConstraints24.gridy = 27;
 			Status = new JLabel();
 			Status.setText("Status: ");
 			GridBagConstraints gridBagConstraints141 = new GridBagConstraints();
@@ -896,10 +916,10 @@ public class Inkerator {
 			gridBagConstraints21.gridx = 1;
 			GridBagConstraints gridBagConstraints1 = new GridBagConstraints();
 			gridBagConstraints1.gridx = 1;
-			gridBagConstraints1.gridy = 25;
+			gridBagConstraints1.gridy = 26;
 			GridBagConstraints gridBagConstraints = new GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 25;
+			gridBagConstraints.gridy = 26;
 			jPanel = new JPanel();
 			jPanel.setLayout(new GridBagLayout());
 			jPanel.add(getUpdate(), gridBagConstraints);
@@ -939,6 +959,8 @@ public class Inkerator {
 			jPanel.add(Status, gridBagConstraints24);
 			jPanel.add(SaveNameLabel, gridBagConstraints32);
 			jPanel.add(getSaveName(), gridBagConstraints53);
+			jPanel.add(PaddingLabel, gridBagConstraints62);
+			jPanel.add(getPadding(), gridBagConstraints72);
 		}
 		return jPanel;
 	}
@@ -1296,6 +1318,19 @@ public class Inkerator {
 			SaveName.setText("inkerator#.pdf");
 		}
 		return SaveName;
+	}
+
+	/**
+	 * This method initializes Padding	
+	 * 	
+	 * @return javax.swing.JTextField	
+	 */
+	private JTextField getPadding() {
+		if (Padding == null) {
+			Padding = new JTextField();
+			Padding.setText("10");
+		}
+		return Padding;
 	}
 
 	/**
