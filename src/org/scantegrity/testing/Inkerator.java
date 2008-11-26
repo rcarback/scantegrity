@@ -362,6 +362,7 @@ public class Inkerator {
 					"added together should not be more than 1! \n";
 					l_colors[0][l_i] = 0;
 					l_colors[l_j][l_i] = 0;
+					Status.setText("Color overload error!");
 				}
 			}
 		}

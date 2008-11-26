@@ -45,8 +45,8 @@ import org.scantegrity.lib.CMYKColorSpace;
  * paper. 
  * 
  * @author Richard Carback
- * @version 0.4.1 
- * @date 24/11/08
+ * @version 0.4.2 
+ * @date 26/11/08
  */
 public class InvisibleInkFactory {
 
@@ -168,8 +168,6 @@ public class InvisibleInkFactory {
 		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding); 
 		
 		l_ret = GenBlockGrid(l_ret);
-		l_ret = RandomizeBrightness(l_ret);
-		l_ret = AddRandomCyan(l_ret);
 		
 		return l_ret;
 	}
@@ -378,104 +376,79 @@ public class InvisibleInkFactory {
 				if (l_tmp.equals(c_defFontColor)) l_mCount++;
 			}
 		}
-		//Draw the best.
 		Graphics2D l_g2d = p_img.createGraphics();
+		//Background Color
+		float[] l_color = {0,0,0,0};
 		if (l_mCount < p_sizeX*p_sizeY/1.5) {
-			l_g2d.setColor(c_defBgColor);
+			l_color = getRandomBgColor();
 		}
-		else {
-			l_g2d.setColor(c_defFontColor);
+		else { //Font Color
+			l_color = getRandomFontColor();
 		}
+		l_color = AddMask(l_color);
+		l_g2d.setColor(new Color(c_cs, l_color, 1));
 		l_g2d.fillRect(p_x, p_y, p_sizeX, p_sizeY);		
 		return p_img;
 	}
 	
 	/**
-	 * AddRandomCyan - Uses the preset CSPRNG to generate random additions of
+	 * AddMask - Uses the preset CSPRNG to generate random additions of
 	 * cyan to the image.
 	 * @param p_img - image to modify.
 	 * @return modified image.
 	 */
-	private BufferedImage AddRandomCyan(BufferedImage p_img) {
+	private float[] AddMask(float[] p_color) {
 		/* TODO: It might be better to have one "addcolor" function, then
 		 * just use them differently, instead of 2 that do specific things...
 		 */
 		if (c_csprng == null) {
 			throw new NullPointerException("CSPRNG is not Set!");			
 		}
-		// For each pixel...
-		for (int l_x = 0; l_x < c_xGridCoords.size(); l_x++) {
-			for (int l_y = 0; l_y < c_yGridCoords.size(); l_y++) {
-				float[] l_c = {0,0,0,0};
-				p_img.getRaster().getPixel(c_xGridCoords.elementAt(l_x),
-						   				   c_yGridCoords.elementAt(l_y), l_c);
-				
-				float l_add = c_csprng.nextFloat(); 
-				l_c[0] += (c_maxMaskColor[0]-c_minMaskColor[0])*l_add
-							+ c_minMaskColor[0];
-				l_c[1] += (c_maxMaskColor[1]-c_minMaskColor[1])*l_add
-							+ c_minMaskColor[1];
-				l_c[2] += (c_maxMaskColor[2]-c_minMaskColor[2])*l_add
-							+ c_minMaskColor[2];
-				
-				//System.out.print(l_c[0] + ", " + l_c[1] + ", ");
-				//System.out.println(l_c[2] + ", " + l_c[3]);
-				// Set the new color to the Grid Cell
-				Graphics2D l_g2d = p_img.createGraphics();
-				l_g2d.setColor(new Color(c_cs, l_c, 1));
-				l_g2d.fillRect(c_xGridCoords.elementAt(l_x), 
-							   c_yGridCoords.elementAt(l_y), 
-							   c_hGridSize[l_x%c_hGridSize.length], 
-							   c_vGridSize[l_y%c_vGridSize.length]);				
-			}
-		}
-		return p_img;
+		
+		float l_add = c_csprng.nextFloat(); 
+		p_color[0] += (c_maxMaskColor[0]-c_minMaskColor[0])*l_add
+					+ c_minMaskColor[0];
+		p_color[1] += (c_maxMaskColor[1]-c_minMaskColor[1])*l_add
+					+ c_minMaskColor[1];
+		p_color[2] += (c_maxMaskColor[2]-c_minMaskColor[2])*l_add
+					+ c_minMaskColor[2];
+		
+		return p_color;
 	}
 	
-	private BufferedImage RandomizeBrightness(BufferedImage p_img) {
+	private float[] getRandomFontColor() {
 		if (c_csprng == null) {
 			throw new NullPointerException("CSPRNG is not Set!");			
 		}
-		// For each pixel...
-		for (int l_x = 0; l_x < c_xGridCoords.size(); l_x++) {
-			for (int l_y = 0; l_y < c_yGridCoords.size(); l_y++) {
-				float[] l_c = {0,0,0,0};
-				p_img.getRaster().getPixel(c_xGridCoords.elementAt(l_x),
-						   				   c_yGridCoords.elementAt(l_y), l_c);
-				
-				float l_s = (float)c_csprng.nextFloat();
-				
-				//Default to background
-				if (new Color(c_cs, l_c, 1).equals(c_defFontColor)) {
-					l_c[0] = (c_maxFontColor[0]-c_minFontColor[0])*l_s
-								+ c_minFontColor[0];
-					l_c[1] = (c_maxFontColor[1]-c_minFontColor[1])*l_s
-								+ c_minFontColor[1];
-					l_c[2] = (c_maxFontColor[2]-c_minFontColor[2])*l_s
-								+ c_minFontColor[2];					
-				} else {
-					l_c[0] = (c_maxBgColor[0]-c_minBgColor[0])*l_s
-								+ c_minBgColor[0];
-					l_c[1] = (c_maxBgColor[1]-c_minBgColor[1])*l_s
-								+ c_minBgColor[1];
-					l_c[2] = (c_maxBgColor[2]-c_minBgColor[2])*l_s
-								+ c_minBgColor[2];					
-				}
-				
-				//System.out.println("After: " + l_c[0] + ", " + l_c[1] + ", " + l_c[2] + ", " + l_c[3]);
-				
-				// Set the new color to the Grid Cell
-				Graphics2D l_g2d = p_img.createGraphics();
-				l_g2d.setColor(new Color(c_cs, l_c, 1));
-				l_g2d.fillRect(c_xGridCoords.elementAt(l_x), 
-							   c_yGridCoords.elementAt(l_y), 
-							   c_hGridSize[l_x%c_hGridSize.length], 
-							   c_vGridSize[l_y%c_vGridSize.length]);				
-			}
-		}
-		return p_img;
+		float[] l_c = {0,0,0,0};
+		float l_s = (float)c_csprng.nextFloat();
+
+		l_c[0] = (c_maxFontColor[0]-c_minFontColor[0])*l_s
+					+ c_minFontColor[0];
+		l_c[1] = (c_maxFontColor[1]-c_minFontColor[1])*l_s
+					+ c_minFontColor[1];
+		l_c[2] = (c_maxFontColor[2]-c_minFontColor[2])*l_s
+					+ c_minFontColor[2];
+		
+		return l_c;
 	}
-	
+
+	private float[] getRandomBgColor() {
+		if (c_csprng == null) {
+			throw new NullPointerException("CSPRNG is not Set!");			
+		}
+		float[] l_c = {0,0,0,0};
+		float l_s = (float)c_csprng.nextFloat();
+
+		l_c[0] = (c_maxBgColor[0]-c_minBgColor[0])*l_s
+					+ c_minBgColor[0];
+		l_c[1] = (c_maxBgColor[1]-c_minBgColor[1])*l_s
+					+ c_minBgColor[1];
+		l_c[2] = (c_maxBgColor[2]-c_minBgColor[2])*l_s
+					+ c_minBgColor[2];							
+		return l_c;		
+	}
+		
 	public float[] getMinFontColor() { 
 		return c_minFontColor;
 	}
