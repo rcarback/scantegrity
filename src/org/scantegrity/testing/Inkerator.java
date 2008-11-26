@@ -400,6 +400,7 @@ public class Inkerator {
 		l_time = System.currentTimeMillis() - l_time;
 		
 		c_imgDetails += "Time to Generate: " + l_time + "ms\n";
+		Status.setText("Status: Generated in " + l_time + "ms");
 		
 		//Display image in the GUI.
 		Image l_result = c_img.getScaledInstance((int)(c_img.getWidth()*l_zoom), 
