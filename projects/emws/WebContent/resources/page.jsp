@@ -28,10 +28,28 @@ by emws, and some other minor functionality (like SQL and time tracking).
 
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-<%@ taglib uri="http://java.sun.com/jstl/fmt" prefix="fmt" %>
+<%
+	//Record the time for measurement purposes, works with: 
+	//    /resources/tiles/footer.jsp
+	request.setAttribute("sTime", System.currentTimeMillis()); 
+%>
+    
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 
+<%-- 
+-- Internationalization Support
+-- Automatically detect language settings if not already set.
+<c:if test="${sessionScope.locale == null}">
+	<%
+		java.util.Enumeration l_loc = request.getLocales();
+		while (l_loc.hasMoreElements()) {
+			if (l_loc.nextElement()) {
 
-
+			}
+		}
+	%>
+</c:if>
+--%>
 

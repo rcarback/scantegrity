@@ -1,34 +1,27 @@
 <%@ include file="resources/page.jsp" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Internationalization Test</title>
-</head>
-<body>
+<tiles:insertDefinition name="myapp.homepage">
+	<tiles:putAttribute name="title">Internationalization Test</tiles:putAttribute>
+	<tiles:putAttribute name="body">
 
-<c:choose>
-	<c:when test="${param.locale != null}">
-		<c:set var="locale" value="${param.locale}" />
-	</c:when>
-	<%-- Try to get locale from Header. --%>
-	<c:when test="${header['Accept-Language'] != null}">
-		<c:set var="locale" value="${header['Accept-Language']}" />	
-	</c:when>
-	<c:otherwise>
-		<c:set var="locale" value="en" />	
-	</c:otherwise>  
-</c:choose>
+<c:if test="${param.locale != null}">
+		<c:set var="locale" value="${param.locale}" scope="session" />
+</c:if>
+<c:if test="${param.name != null}">
+		<c:set var="name" value="${param.name}" scope="session" />
+</c:if>
 
 <h1>Scantegrity Internationalization Test</h1>
 The selected name and language, or your Browser's name and default language, 
 should appear in the text below:
 
-<fmt:setLocale value="de" />
+
+<fmt:setLocale value="${sessionScope.locale}" />
 <fmt:setBundle basename="i18n/Messages" />
 <pre>
-			<fmt:message key="greeting"><fmt:param value="Rick"/></fmt:message>
+			<fmt:message key="greeting">
+				<fmt:param>${sessionScope.name}</fmt:param>
+			</fmt:message>
 			<fmt:message key="return"/>
 </pre>
 
@@ -38,7 +31,7 @@ should appear in the text below:
 <ol>
 	<li>
     	<label for="name">Name</label>
-	  	<input type="text" id="name" name="name" value="Rick" /><br />
+	  	<input type="text" id="name" name="name" value="${sessionScope.name}" /><br />
     </li>
     <li>
     	<label for="locale">Locale</label>
@@ -59,9 +52,12 @@ should appear in the text below:
 <br /><br />
 <h3>Other Info</h3>
 
-<p>Your browser's detected locale was: <c:out value="${header['Accept-Language']}" /></p>
-<p>Your browser's detected name was: <c:out value="${header['User-Agent']}" />
-<p>The current set locale is: <c:out value="${locale}" />
+<p>Your browser's detected locale was: ${header['Accept-Language']}</p>
+<p>Your browser's detected name was: ${header['User-Agent']}
+<p>The current set locale is: ${locale}
 <br /><br />
-</body>
-</html>
+
+	</tiles:putAttribute>
+</tiles:insertDefinition>
+
+

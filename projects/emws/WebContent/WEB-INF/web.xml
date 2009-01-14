@@ -7,18 +7,14 @@
         <servlet-class>org.apache.tiles.web.startup.TilesServlet</servlet-class>
         <init-param>
             <param-name>definitions-config</param-name>
-            <param-value>/WEB-INF/tiles-defs.xml,/org/apache/tiles/classpath-defs.xml</param-value>
+            <param-value>/WEB-INF/tiles-defs.xml</param-value>
         </init-param>
         <load-on-startup>2</load-on-startup>
     </servlet>
 
-    <servlet>
-        <servlet-name>Tiles Dispatch Servlet</servlet-name>
-        <servlet-class>org.apache.tiles.web.util.TilesDispatchServlet</servlet-class>
-    </servlet>
-    
     <servlet-mapping>
-        <servlet-name>Tiles Dispatch Servlet</servlet-name>
-        <url-pattern>*.tiles</url-pattern>
+        <servlet-name>tiles</servlet-name>
+        <url-pattern>*.dummy</url-pattern>
     </servlet-mapping>
+    
 </web-app>
