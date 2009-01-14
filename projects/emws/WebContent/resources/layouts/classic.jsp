@@ -4,7 +4,7 @@
     <title><tiles:getAsString name="title"/></title>
   </head>
   <body>
-        <table>
+        <table border="1">
       <tr>
         <td colspan="2">
           <tiles:insertAttribute name="header" />
