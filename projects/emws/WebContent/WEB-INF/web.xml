@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+  <display-name>emws</display-name>
+  <servlet>
+    <servlet-name>tiles</servlet-name>
+    <servlet-class>org.apache.tiles.web.startup.TilesServlet</servlet-class>
+    <init-param>
+      <param-name>definitions-config</param-name>
+      <param-value>/WEB-INF/tiles-defs.xml</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>tiles</servlet-name>
+    <url-pattern>*.dummy</url-pattern>
+  </servlet-mapping>
+  
+  
+    <!-- BEGIN Stripes Configuration -->
+    <filter>
+        <filter-name>StripesFilter</filter-name>
+        <filter-class>
+            net.sourceforge.stripes.controller.StripesFilter
+        </filter-class>
+        <init-param>
+            <param-name>ActionResolver.Packages</param-name>
+            <param-value>action</param-value>
+        </init-param>
+        <init-param>
+            <param-name>LocalePicker.Locales</param-name>
+            <param-value>en,de,fr,es,en_CA,en_US</param-value>
+        </init-param>    
+        <init-param>
+            <param-name>Extension.Packages</param-name>
+            <param-value>stripes.ext</param-value>
+        </init-param>        
+    </filter>
+    
+    <servlet>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <servlet-class>
+            net.sourceforge.stripes.controller.DispatcherServlet
+        </servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <filter>
+        <filter-name>DynamicMappingFilter</filter-name>
+        <filter-class>
+            net.sourceforge.stripes.controller.DynamicMappingFilter
+        </filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>DynamicMappingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>DynamicMappingFilter</filter-name>
+        <url-pattern>/</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+    <!-- END Stripes Configuration -->
+
+    
+    <context-param>
+        <param-name>
+            javax.servlet.jsp.jstl.fmt.localizationContext
+        </param-name>
+        <param-value>StripesResources</param-value>
+    </context-param>
+        
+    <context-param>
+        <param-name>
+            javax.servlet.jsp.jstl.fmt.localizationContext
+        </param-name>
+        <param-value>i18n/Messages</param-value>
+    </context-param>    
+    
+    
+    <welcome-file-list>
+        <welcome-file>/WEB-INF/jsp/index.jsp</welcome-file>        
+    </welcome-file-list>
+    
+    <!--<error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/jsp/not_found.jsp</location>
+    </error-page>-->    
+</web-app>
