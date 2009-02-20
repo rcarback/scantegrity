@@ -1,5 +1,0 @@
-This directory is being phased out in favor of the more consistent "org" format
-found in most other open source Java projects.
-
-Please move things to "org.scantegrity.scanner" or another appropriate place
-in the org directory.
