@@ -86,7 +86,6 @@ public class PollingPlaceGUI extends JFrame
 	//card panels
 	private JPanel c_chiefJudgeLoginPanel;
 	private JPanel c_startElectionPanel;
-	private JPanel c_AdminPanel;
 	private JPanel c_scanningBallotsPanel;
 	private JPanel c_waitingForBallotsPanel;
 	private JPanel c_ballotResultsPanel;
@@ -184,7 +183,6 @@ public class PollingPlaceGUI extends JFrame
 		//set up internal panels
 		buildTopPanel();
 		buildElectionInfoPanel(); 
-		buildCompactElectionInfoPanel();
 		buildScannerPanel(); 
 		buildInfoBar(); 
 		
@@ -192,8 +190,6 @@ public class PollingPlaceGUI extends JFrame
 		JPanel l_tempPanel = new JPanel(); 
 		l_tempPanel.add(c_electionInfoCardPanel, BorderLayout.NORTH);
 		l_tempPanel.add(c_scannerInfoPanel, BorderLayout.CENTER);
-		
-		l_tempPanel.setBorder(BorderFactory.createLoweredBevelBorder());
 		
 		c_frame.add(c_topPanel, BorderLayout.NORTH);
 		c_frame.add(l_tempPanel, BorderLayout.CENTER);
@@ -240,27 +236,20 @@ public class PollingPlaceGUI extends JFrame
 	 */
 	private void buildElectionInfoPanel()
 	{
-		c_electionInfoPanel = new JPanel(); 
 		c_electionInfoCardPanel = new JPanel();
 		
 		//set layout manager
 		c_electionInfoCardLayout = new CardLayout();
 		
-		c_electionInfoPanel.setLayout(new BorderLayout());
 		c_electionInfoCardPanel.setLayout(c_electionInfoCardLayout);
 		
 		//build the card panels
 		buildExtendedElectionInfoPanel();
 		buildCompactElectionInfoPanel();
 		
-		//add the card panel to the main panel
-		c_electionInfoPanel.add(c_electionInfoCardPanel, BorderLayout.CENTER);
-		
 		//set default card 
 		c_electionInfoCardLayout.show(c_electionInfoCardPanel,
 				ScannerUIConstants.EXTENDED_ELECTION_INFO_CARD);
-		
-		c_electionInfoPanel.setDoubleBuffered(true);
 	}
 		
 	private void buildExtendedElectionInfoPanel()
@@ -417,38 +406,38 @@ public class PollingPlaceGUI extends JFrame
 		//Row 1
 		 l_c = new GridBagConstraints();
 		 l_c.gridx = 0; 
-		 l_c.gridy = 2; 
+		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_ppIdLabel, l_c);
 		 
 		 l_c.gridx = 1;
-		 l_c.gridy = 2; 
+		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_ppId, l_c);
 
 		 l_c.gridx = 2;
-		 l_c.gridy = 2; 
+		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_ppNameLabel, l_c);
 		 
 		 l_c.gridx = 3;
-		 l_c.gridy = 2;
+		 l_c.gridy = 0;
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_ppName, l_c);
 		 
 		 l_c = new GridBagConstraints();
 		 l_c.gridx = 4; 
-		 l_c.gridy = 2; 
+		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_ppLocLabel, l_c);
 		 
 		 l_c.gridx = 5;
-		 l_c.gridy = 2; 
+		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_ppLoc, l_c);
@@ -456,38 +445,37 @@ public class PollingPlaceGUI extends JFrame
 		 //Row 2
 		 l_c = new GridBagConstraints();
 		 l_c.gridx = 0; 
-		 l_c.gridy = 3; 
+		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_elecDateLabel, l_c);
 		 
 		 l_c.gridx = 1;
-		 l_c.gridy = 3;
+		 l_c.gridy = 1;
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_elecDate, l_c);
 		
 		 l_c.gridx = 2;
-		 l_c.gridy = 3; 
+		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_elecStartTimeLabel, l_c);
 		 
 		 l_c.gridx = 3;
-		 l_c.gridy = 3; 
+		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_elecStartTime, l_c);
-		 
-		 l_c = new GridBagConstraints();
+
 		 l_c.gridx = 4; 
-		 l_c.gridy = 3; 
+		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 l_electionInfoPanel.add(l_chiefJudgeLabel, l_c);
 		 
 		 l_c.gridx = 5;
-		 l_c.gridy = 3; 
+		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets;
 		 l_electionInfoPanel.add(l_chiefJudge, l_c);
@@ -495,6 +483,8 @@ public class PollingPlaceGUI extends JFrame
 		//add the Border
 		Border l_border = BorderFactory.createLoweredBevelBorder(); 
 		l_electionInfoPanel.setBorder(l_border);
+		
+		l_electionInfoPanel.setPreferredSize(new Dimension((int)Toolkit.getDefaultToolkit().getScreenSize().getWidth(),100));
 		 
 		 c_electionInfoCardPanel.add(l_electionInfoPanel, ScannerUIConstants.COMPACT_ELECTION_INFO_CARD);
 	}
@@ -682,15 +672,11 @@ public class PollingPlaceGUI extends JFrame
 		}		
 		else if(e.getActionCommand().equals(c_startElectionButton.getText()))
 		{
-			//begin election procedures
-			c_frame.remove(c_electionInfoCardPanel);
-			
 			//build compacted election info 
 			c_electionInfoCardLayout.show(c_electionInfoCardPanel, 
 					ScannerUIConstants.COMPACT_ELECTION_INFO_CARD);
 			c_electionInfoCardPanel.doLayout();
-			
-			c_frame.add(c_electionInfoCardPanel, BorderLayout.NORTH);
+	
 			c_frame.validate();
 			
 			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
