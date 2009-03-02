@@ -32,6 +32,14 @@
  * display the data in as many formats as possible. Most applications will only
  * call one of these to get the data in the format they need.
  * 
+ * The intended usage is for the application to get the configuration and use it
+ * to determine the method type and (possibly) data format. Then it can feed
+ * the data to the VotingMethod, which validates and calculates results. Thus,
+ * we expect a config class to be able to return properly configured objects 
+ * that implement the VotingMethod interface and the user of these methods
+ * will simply send them (currently only) dark mark logic matrices of the 
+ * results they parsed, scanned, or otherwise obtained.
+ * 
  * @author Richard Carback
  * @version 0.0.1 
  * @date 24/02/09
@@ -39,9 +47,31 @@
 
 package org.scantegrity.common.methods;
 
+import java.util.logging.Logger;
+
 public interface VotingMethod {
-	/* TODO: This might be better as an abstract class. Not sure until we get
-	 * some of the implementations done. */
+	/* TODO: It might turn out that this is better done through abstract
+	 * classes, but that's indeterminate at this time.
+	 */
+	
+	/**
+	 * setLogger - sets the logging context for the Voting method using the
+	 * configuration passed to it.
+	 * 
+	 * @param p_logger the configured logger to use.
+	 */
+	void setLogger(Logger p_logger);
+	
+	/**
+	 * calculateResults - tells the method to take the current data set and
+	 * calculate results from it. This may throw exceptions if the format
+	 * of a ballot is invalid. It's assumed at this point in time that the
+	 * ballot data will be in darkmark logic (0 for unmarked, 1 for marked). 
+	 * 
+	 * @param p_ballots an array of 2 dimensional darkmark logic contest 
+	 * results.  
+	 */
+	void calculateResults(Integer p_ballots[][][]);
 	
 	/**
 	 * GetWinners - Return an array of the winners. The map should contain
@@ -51,14 +81,10 @@ public interface VotingMethod {
 	 * elected). The last piece could be an int or a double (or something else),
 	 * which is why it is represented as a string.
 	 * 
-	 * @param p_config - Configuration for the election.
-	 * @param p_cid - Contest ID.
-	 * @param p_results - an array of results scanned by the system. Typically,
-	 * this is represented as a matrix.
+	 * @param bp_ballotsMatrix a darkmark logic representation of each ballot
 	 * @return an array of the winning candidates
 	 */
-	CandidateResult[] getWinners(ElectionConfiguration p_config, Integer p_cid,
-								RawResults p_results);
+	CandidateResult[] getWinners();
 	
 	/**
 	 * GetRankings - Return an array of the full ranking of candidates, and not 
@@ -69,43 +95,28 @@ public interface VotingMethod {
 	 * elected). The last piece could be an int or a double (or something else),
 	 * which is why it is represented as a string.
 	 * 
-	 * @param p_config - Configuration for the election.
-	 * @param p_cid - Contest ID.
-	 * @param p_results - an array of results scanned by the system. Typically,
-	 * this is represented as a matrix.
 	 * @return an array of the full ranking of candidates, and not 
 	 * just the winners.
 	 */
-	CandidateResult[] getRankings(ElectionConfiguration p_config, Integer p_cid,
-								RawResults p_results);
+	CandidateResult[] getRankings();
 	
 	/**
 	 * getDecisionLog - Report each decision made by the algorithm (including
 	 * deciding of the final result). Each decision should be a separate entry 
 	 * in the array.
 	 * 
-	 * @param p_config - Configuration for the election.
-	 * @param p_cid - Contest ID.
-	 * @param p_results - an array of results scanned by the system. Typically,
-	 * this is represented as a matrix.
 	 * @return An array of unformatted strings describing the decisions made.
 	 */
-	String[] getDecisionLog(ElectionConfiguration p_config, Integer p_cid,
-								RawResults p_results);
+	String[] getDecisionLog();
 	
 	
 	/**
-	 * getResults - Return a fully formatted summary of the election results.
+	 * getResults - Return a formatted summary of the election results.
 	 * 
-	 * @param p_config - Configuration for the election.
-	 * @param p_cid - Contest ID.
-	 * @param p_results - an array of results scanned by the system. Typically,
-	 * this is represented as a matrix.
 	 * @return An formatted string describing the tally results. This could be
 	 * a simple list, or it could be a string of decisions (as in IRV).
 	 */
-	String getResults(ElectionConfiguration p_config, Integer p_cid,
-			RawResults p_results);
+	String getResults();
 	
 	
 }
