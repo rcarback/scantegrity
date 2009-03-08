@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
 Sealed: true
+Main-Class: org.scantegrity.scanner.test.GUITest
+SplashScreen-Image: images/LoadingScreen.png
 

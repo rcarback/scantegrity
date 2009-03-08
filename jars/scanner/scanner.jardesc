@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
     <jar path="Scantegrity/jars/scanner/Scanner.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/Scantegrity/jars/scanner/scanner.jardesc" exportErrors="false" exportWarnings="false" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/Scantegrity/jars/scanner/scanner.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
-    <manifest generateManifest="true" manifestLocation="/Scantegrity/jars/scanner/scanner.mf" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+    <manifest generateManifest="false" mainClassHandleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.test{GUITest.java[GUITest" manifestLocation="/Scantegrity/jars/scanner/scanner.mf" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
         <sealing sealJar="true">
             <packagesToSeal/>
             <packagesToUnSeal/>
@@ -13,34 +13,30 @@
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{ImageToCoordinatesInches.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner{ScannedBallotWithPdfOverlaysAndXmlSignatures.java"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.gui{PollingPlaceConfigurationScreen.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner{ScannedBallotInterface.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Rrow.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common.methods{VotingMethod.java"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.gui{ScannerUIConstants.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner{UploadEncBallots.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{ImagePanel.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InvisibleInkCodes.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InputConstants.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{MeetingReaderSax.java"/>
+        <file path="/Scantegrity/images/LoadingScreen.png"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{SecurityUtil.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common.methods{CandidateResult.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Util.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common.methods{Plurality.java"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.gui{UploadEncBallots.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{MarkPermutations.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.test"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Meeting.java"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.gui{ScannerInfoPanels.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.scantegrity"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.gui{FileWatcher.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner{ScannedBallot.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InvisibleInkCodes2.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Prow.java"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Constants.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner{DigitDeffinition.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Constants.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common.gui"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.gui{VoterLocalScreen2.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.gui"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{BallotGeometry.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{SymbolRow.java"/>
         <file path="/Scantegrity/src/org/scantegrity/common/README"/>
