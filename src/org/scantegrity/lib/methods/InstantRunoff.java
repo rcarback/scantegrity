@@ -1,3 +1,4 @@
+package org.scantegrity.lib.methods;
 import java.util.logging.Logger;
 
 /*

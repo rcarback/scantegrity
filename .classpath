@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="extJars/bcmail-jdk15-135.jar"/>
 	<classpathentry kind="lib" path="extJars/bcprov-jdk15-135.jar"/>
 	<classpathentry kind="lib" path="extJars/simplecaptcha-20050925.jar"/>
+	<classpathentry kind="lib" path="lib/simple-xml-2.0.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

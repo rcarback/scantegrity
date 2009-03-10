@@ -274,7 +274,7 @@ public class PollingPlaceGUI extends JFrame
 		JLabel l_elecDate = new JLabel("<html><font size=\"" + l_fs + "\">01/01/2009</font></html>");
 		JLabel l_elecStartTime = new JLabel("<html><font size=\"" + l_fs + "\">07:00</font></html>");
 		JLabel l_chiefJudge = new JLabel("<html><font size=\"" + l_fs + "\">John Smith</font></html>");
-		
+
 		//Insets 
 		Insets l_insets = new Insets(0, 0, 10, 50);
 		

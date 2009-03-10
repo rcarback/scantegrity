@@ -15,7 +15,7 @@
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner{ScannedBallotWithPdfOverlaysAndXmlSignatures.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner{ScannedBallotInterface.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Rrow.java"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common.methods{VotingMethod.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.lib.methods{VotingMethod.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner{UploadEncBallots.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{ImagePanel.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InvisibleInkCodes.java"/>
@@ -23,9 +23,9 @@
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{MeetingReaderSax.java"/>
         <file path="/Scantegrity/images/LoadingScreen.png"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{SecurityUtil.java"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common.methods{CandidateResult.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.lib.methods{CandidateResult.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Util.java"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common.methods{Plurality.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.lib.methods{Plurality.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{MarkPermutations.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.test"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Meeting.java"/>

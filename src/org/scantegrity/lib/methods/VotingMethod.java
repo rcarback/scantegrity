@@ -45,7 +45,7 @@
  * @date 24/02/09
  */
 
-package org.scantegrity.common.methods;
+package org.scantegrity.lib.methods;
 
 import java.util.logging.Logger;
 

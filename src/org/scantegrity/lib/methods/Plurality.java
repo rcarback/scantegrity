@@ -29,7 +29,7 @@
  * @version 0.0.1 
  * @date 01/03/09
  */
-package org.scantegrity.common.methods;
+package org.scantegrity.lib.methods;
 
 import java.util.TreeMap;
 import java.util.Map.Entry;
