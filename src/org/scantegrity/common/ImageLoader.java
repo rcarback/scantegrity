@@ -55,8 +55,9 @@ public class ImageLoader {
 	 * @throws IOException - thrown when the file could not be read or moved
 	 * @throws FileNotFoundException - when either the source file or destination folder
 	 * do not exist
+	 * @return - Returns true if the image was loaded successfully and false otherwise
 	 */
-	public void loadImage(String p_srcFile, String p_destFolder) throws IOException
+	public boolean loadImage(String p_srcFile, String p_destFolder) throws IOException
 	{
 		File l_inputFile = new File(p_srcFile);
 		
@@ -68,14 +69,22 @@ public class ImageLoader {
 		if( !l_destFolder.exists() )
 			throw new FileNotFoundException("Destination directory does not exist.");
 		
-		BufferedImage l_image = ImageIO.read( l_inputFile );
+		return loadImage(l_inputFile, l_destFolder);
+	}
+
+	public boolean loadImage(File p_inputFile, File p_destFolder) throws IOException {
+		
+		BufferedImage l_image = ImageIO.read( p_inputFile );
+		if( l_image == null )
+			return false;
 		
 		//Move file to destination directory
-		if( !l_inputFile.renameTo( new File( l_destFolder, l_inputFile.getName() ) ) )
+		if( !p_inputFile.renameTo( new File( p_destFolder, p_inputFile.getName() ) ) )
 		{
 			throw new IOException("Could not move file");
 		}
 		
 		c_handler.handleImage(l_image);
+		return true;
 	}
 }
