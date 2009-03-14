@@ -49,7 +49,6 @@ class TestHandler implements ImageHandler
 	public TestHandler()
 	{}
 
-	@Override
 	public void handleImage(BufferedImage p_image) {
 		String[] l_properties = p_image.getPropertyNames();
 		

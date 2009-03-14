@@ -57,7 +57,7 @@ public interface StorageInterface {
 	 * 
 	 * @param p_config - The configuration object to be used
 	 */
-	void storeBallot(ScannerConfiguration p_config, ScanContest p_ballot);
+	//void storeBallot(ScannerConfiguration p_config, ScanContest p_ballot);
 	
 	/**
 	 * retrieveBallot - Retrieves and decrypts a single ballot.  Throws BallotNotFoundException
@@ -67,7 +67,7 @@ public interface StorageInterface {
 	 * @param p_serial - The serial number of the ballot being retrieved
 	 * @return - The ballot with the provided serial number
 	 */
-	ScanContest retrieveBallot(ScannerConfiguration p_config, String p_serial) throws BallotNotFoundException;
+	//ScanContest retrieveBallot(ScannerConfiguration p_config, String p_serial) throws BallotNotFoundException;
 	
 	/**
 	 * retrieveBallots - Retrieves and decrypts all ballots. 
@@ -75,6 +75,6 @@ public interface StorageInterface {
 	 * @param p_config - The configuration object to be used
 	 * @return - All ballots stored in this storage object
 	 */
-	ScanContest[] retrieveBallots(ScannerConfiguration p_config);
+	//ScanContest[] retrieveBallots(ScannerConfiguration p_config);
 
 }

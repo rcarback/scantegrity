@@ -18,6 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+
+package org.scantegrity.scanner;
+
+import java.util.Date;
+
 /**
  * ScannerConfig represents the configuration needed for the scanner in an 
  * election. This information is read from an XML file and this class is used
@@ -37,60 +42,166 @@
  * @version 0.0.1 
  * @date 07/03/09
  */
-package org.scantegrity.scanner;
-
-import java.util.Date;
-
 public class ScannerConfig {
-	
 	/**
-	 Currently undefined attributes:
-	  
-	 private Authentication c_ChiefJudgeAuth;
-	 private Pin[] c_JudgePins;
-	  
-	 // Object to parse serial number data 
-	 private SerialParser c_serialParser;
-	 
-	 // Object to parse different types of contests, and a mapper to map
-	 // each contest to a particular Parser.
-	 private ContestParser[] c_contestParsers;
-	 private Vector<Integer> c_contestParseMap;
-	 
-	 // Object to generate results for each contest, and a mapper.
-	 private VotingMethod[] c_contestMethods;
-	 private Vector<Integer> c_contestMethodMap;
-	 
-	 // (Highly optional, and probably won't make it into final version).
-	 private ScannerInterface c_scanInterface;
+	 * TODO: Needs to add authentication for chief judge and possibly the 
+	 * other judge pins. 
 	 */
-	
 	private int c_pollID = -1;
 	private int c_scannerID = -1;
 	private String c_name = "Unknown Name";
 	private String c_location = "Unknown Location";
 	private Date c_date = new Date(); //Date and time are stored here.
 	private String c_chiefJudge = "Unknown Chief Judge";
+	private BallotReader c_reader = null;
+	private Contest[] c_contests = null;
 	
 	
 	public ScannerConfig() {
-		// Load the configuration file
-		
-		// Chief Judge Authentication
-		
-		// Judge pins
-		
-		// Polling place info.
-		
-		// Determine what serial number parser the ballot needs (and how many
-		// ballot styles there are).
-		
-		// Determine what contest parsers are needed (and which ballot styles
-		// they belong to).
-		
-		// Determine what Method calculators are needed (and which ballot 
-		// styles they belong to). 
-		
-		// Determine the scanner image getter. 
+		//TODO
+	}
+
+
+	/**
+	 * @return the pollID
+	 */
+	public int getPollID()
+	{
+		return c_pollID;
+	}
+
+
+	/**
+	 * @param p_pollID the pollID to set
+	 */
+	public void setPollID(int p_pollID)
+	{
+		c_pollID = p_pollID;
+	}
+
+
+	/**
+	 * @return the scannerID
+	 */
+	public int getScannerID()
+	{
+		return c_scannerID;
+	}
+
+
+	/**
+	 * @param p_scannerID the scannerID to set
+	 */
+	public void setScannerID(int p_scannerID)
+	{
+		c_scannerID = p_scannerID;
+	}
+
+
+	/**
+	 * @return the name
+	 */
+	public String getName()
+	{
+		return c_name;
+	}
+
+
+	/**
+	 * @param p_name the name to set
+	 */
+	public void setName(String p_name)
+	{
+		c_name = p_name;
+	}
+
+
+	/**
+	 * @return the location
+	 */
+	public String getLocation()
+	{
+		return c_location;
+	}
+
+
+	/**
+	 * @param p_location the location to set
+	 */
+	public void setLocation(String p_location)
+	{
+		c_location = p_location;
+	}
+
+
+	/**
+	 * @return the date
+	 */
+	public Date getDate()
+	{
+		return c_date;
+	}
+
+
+	/**
+	 * @param p_date the date to set
+	 */
+	public void setDate(Date p_date)
+	{
+		c_date = p_date;
+	}
+
+
+	/**
+	 * @return the chiefJudge
+	 */
+	public String getChiefJudge()
+	{
+		return c_chiefJudge;
+	}
+
+
+	/**
+	 * @param p_chiefJudge the chiefJudge to set
+	 */
+	public void setChiefJudge(String p_chiefJudge)
+	{
+		c_chiefJudge = p_chiefJudge;
+	}
+
+
+	/**
+	 * @return the reader
+	 */
+	public BallotReader getReader()
+	{
+		return c_reader;
+	}
+
+
+	/**
+	 * @param p_reader the reader to set
+	 */
+	public void setReader(BallotReader p_reader)
+	{
+		c_reader = p_reader;
+	}
+	
+	/**
+	 * @return the contests
+	 */
+	public Contest[] getContests()
+	{
+		return c_contests;
+	}
+
+
+	/**
+	 * @param p_contests the contests to set
+	 */
+	public void setContests(Contest[] p_contests)
+	{
+		c_contests = p_contests;
 	}
 }
+

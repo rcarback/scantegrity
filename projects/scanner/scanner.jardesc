@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="Scantegrity/jars/scanner/Scanner.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/Scantegrity/jars/scanner/scanner.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="Scantegrity/projects/scanner/Scanner.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/Scantegrity/projects/scanner/scanner.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
-    <manifest generateManifest="false" mainClassHandleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.test{GUITest.java[GUITest" manifestLocation="/Scantegrity/jars/scanner/scanner.mf" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+    <manifest generateManifest="false" mainClassHandleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.test{GUITest.java[GUITest" manifestLocation="/Scantegrity/projects/scanner/scanner.mf" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
         <sealing sealJar="true">
             <packagesToSeal/>
             <packagesToUnSeal/>

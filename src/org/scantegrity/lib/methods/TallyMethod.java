@@ -1,5 +1,5 @@
 /*
- * @(#)VotingMethod.java
+ * @(#)TallyMethod.java
  *  
  * Copyright (C) 2008 Scantegrity Project
  * 
@@ -19,11 +19,11 @@
  */
 
 /**
- * VotingMethod is an abstract class or Interface that defines the functions
+ * TallyMethod is an abstract class or Interface that defines the functions
  * a voting method needs to implement in order to work with the rest of the
  * scantegrity applications.
  * 
- * This should be generalized enough to support Plurality, Ranked Choice, Score
+ * This should be generalized enough to support PluralityTally, Ranked Choice, Score
  * Voting, MultiWinner Elections, etc. Part of that support is the "log" and
  * "listing candidate rankings." The latter should include a rank that could be
  * a percentage (If Necessary), which is why it is represented as a String. 
@@ -34,9 +34,9 @@
  * 
  * The intended usage is for the application to get the configuration and use it
  * to determine the method type and (possibly) data format. Then it can feed
- * the data to the VotingMethod, which validates and calculates results. Thus,
+ * the data to the TallyMethod, which validates and calculates results. Thus,
  * we expect a config class to be able to return properly configured objects 
- * that implement the VotingMethod interface and the user of these methods
+ * that implement the TallyMethod interface and the user of these methods
  * will simply send them (currently only) dark mark logic matrices of the 
  * results they parsed, scanned, or otherwise obtained.
  * 
@@ -49,7 +49,7 @@ package org.scantegrity.lib.methods;
 
 import java.util.logging.Logger;
 
-public interface VotingMethod {
+public interface TallyMethod {
 	/* TODO: It might turn out that this is better done through abstract
 	 * classes, but that's indeterminate at this time.
 	 */
@@ -71,7 +71,7 @@ public interface VotingMethod {
 	 * @param p_ballots an array of 2 dimensional darkmark logic contest 
 	 * results.  
 	 */
-	void calculateResults(Integer p_ballots[][][]);
+	void tallyResults(Integer p_ballots[][][], MarkRules p_rules);
 	
 	/**
 	 * GetWinners - Return an array of the winners. The map should contain

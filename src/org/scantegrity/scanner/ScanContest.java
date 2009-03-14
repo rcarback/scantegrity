@@ -44,7 +44,7 @@ public interface ScanContest {
 	 * 
 	 * @param p_geometry - The new ballot geometry
 	 */
-	void setBallotGeometry(BallotGeometry p_geometry);
+	//void setBallotGeometry(BallotGeometry p_geometry);
 	
 	/**
 	 * getSerial - Returns the serial number on the ballot.  Calls 
@@ -60,7 +60,7 @@ public interface ScanContest {
 	 * @throws AlignmentException - Thrown if one or both of the alignment marks cannot be found
 	 * @throws SerialNotFoundException - Thrown if the serial number of the ballot cannot be found or read
 	 */
-	void detectMarks() throws AlignmentException, SerialNotFoundException;
+	//void detectMarks() throws AlignmentException, SerialNotFoundException;
 	
 	/**
 	 * getMarks - Returns the ballot marks in the form of a three dimensional array of integers

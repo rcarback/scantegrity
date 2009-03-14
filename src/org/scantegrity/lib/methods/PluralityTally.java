@@ -1,5 +1,5 @@
 /*
- * @(#)Plurality.java
+ * @(#)PluralityTally.java
  *  
  * Copyright (C) 2008-2009 Scantegrity Project
  * 
@@ -19,7 +19,7 @@
  */
 
 /**
- * Plurality accepts and publishes election results using the first past the
+ * PluralityTally accepts and publishes election results using the first past the
  * post or plurality election method.
  * 
  * This is currently a quickly written example. Don't take this to be any sort 
@@ -35,7 +35,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-public class Plurality implements VotingMethod {
+public class PluralityTally implements TallyMethod {
 	/**
 	 * TODO: Should be tracking number of busted ballots, make better use of 
 	 * logging facility, use more specific exceptions, preserve candidate ids. 
@@ -53,7 +53,7 @@ public class Plurality implements VotingMethod {
 	 * 
 	 * @param p_names
 	 */
-	public Plurality(String p_names[]) {
+	public PluralityTally(String p_names[]) {
 		c_names = p_names;
 		c_totals = new Integer[p_names.length];
 		
@@ -67,7 +67,7 @@ public class Plurality implements VotingMethod {
 		c_numCandidates = c_names.length;
 	}
 	
-	public void calculateResults(Integer p_ballots[][][]) {
+	public void tallyResults(Integer p_ballots[][][], MarkRules p_rules) {
 		c_logger.finest("Entering calculateResults");
 		
 		//Sum up the ballots

@@ -2,7 +2,7 @@ package org.scantegrity.lib.methods;
 import java.util.logging.Logger;
 
 /*
- * @(#)InstantRunoff.java
+ * @(#)InstantRunoffTally.java
  *  
  * Copyright (C) 2009 Scantegrity Project
  * 
@@ -22,7 +22,7 @@ import java.util.logging.Logger;
  */
 
 /**
- * InstantRunoff accepts and publishes election results using Instant Runoff
+ * InstantRunoffTally accepts and publishes election results using Instant Runoff
  * rules. The current ruleset and reporting is specific to Takoma Park, who's 
  * relevant law I will cite here:
  * 
@@ -84,9 +84,9 @@ import java.util.logging.Logger;
  * @date 01/03/09
  */
 
-public class InstantRunoff implements VotingMethod {
+public class InstantRunoffTally implements TallyMethod {
 
-	public void calculateResults(Integer[][][] p_ballots) {
+	public void tallyResults(Integer[][][] p_ballots, MarkRules p_rules) {
 		// TODO Auto-generated method stub
 		
 	}
