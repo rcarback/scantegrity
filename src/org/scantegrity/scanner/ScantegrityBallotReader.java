@@ -42,9 +42,10 @@ public class ScantegrityBallotReader extends BallotReader
 	 * @see org.scantegrity.scanner.BallotReader#scanBallot(org.scantegrity.scanner.SerialNumberReader, org.scantegrity.scanner.BallotStyle[], java.awt.image.BufferedImage)
 	 */
 	@Override
-	public Ballot scanBallot(SerialNumberReader p_serial,
-			BallotStyle[] p_styles, BufferedImage p_img)
+	public Ballot scanBallot(BallotStyle[] p_styles, 
+								BufferedImage p_img)
 	{
+		super.normalizeImage(p_img);
 		//Normalize the Ballot
 		
 		//Read in the Serial Number
