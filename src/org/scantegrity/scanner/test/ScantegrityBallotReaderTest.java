@@ -32,6 +32,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
 import org.scantegrity.scanner.BallotStyle;
+import org.scantegrity.scanner.QRCodeReader;
 import org.scantegrity.scanner.ScantegrityBallotReader;
 import org.scantegrity.scanner.SerialNumberReader;
 
@@ -80,7 +81,12 @@ public class ScantegrityBallotReaderTest
 		l_marks[1] = new Point(2092, 1322);
 		//Test 6
 		l_marks[0] = new Point(2148, 584);
-		l_marks[1] = new Point(2492, 1322);*/
+		l_marks[1] = new Point(2492, 1322);
+		//Test 7 -- False Positives?
+		l_marks[0] = new Point(1148, 584);
+		l_marks[1] = new Point(1492, 1322);*/
+		QRCodeReader l_code = new QRCodeReader();
+		l_reader.setSerial(l_code);
 		l_reader.setAlignment(l_marks);
 		l_reader.setBlack(Color.BLACK);
 		l_reader.setDimension(l_d);

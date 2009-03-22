@@ -103,13 +103,27 @@ public abstract class BallotReader
 		int p_radius = (int)(c_radius*l_scale);
 		//p_radius = c_radius;
 		long l_start = System.currentTimeMillis();
+		try
+		{
 		Point l_foundmark = findAlignmentMark(p_img, l_alignment[0], p_radius);
 		System.out.println("Alignment Mark found: " + l_foundmark.x + ", " +
 							l_foundmark.y);
 		l_foundmark = findAlignmentMark(p_img, l_alignment[1], p_radius);
 		System.out.println("Alignment Mark found: " + l_foundmark.x + ", " +
 							l_foundmark.y);
+		} catch(Exception e) {}
 		System.out.println(System.currentTimeMillis()-l_start + "ms");
+		
+		try
+		{
+			System.out.println("Serial Number!");
+			c_serial.getSerialNumber(p_img);
+		}
+		catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		/* Stefan's Old Code
 		BufferedImage img = p_img;
