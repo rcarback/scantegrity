@@ -19,22 +19,17 @@
  */
 package org.scantegrity.scanner.test;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
-import org.scantegrity.scanner.BallotStyle;
+import org.scantegrity.scanner.CircleAlignmentMarkReader;
 import org.scantegrity.scanner.QRCodeReader;
 import org.scantegrity.scanner.ScantegrityBallotReader;
-import org.scantegrity.scanner.SerialNumberReader;
 
 /**
  * Tests the scantegrityBallotReader object methods.
@@ -64,11 +59,11 @@ public class ScantegrityBallotReaderTest
 		ScantegrityBallotReader l_reader = new ScantegrityBallotReader();
 		Dimension l_d = new Dimension(2550, 3300);
 		Point[] l_marks = new Point[2];
-		l_marks[0] = new Point(2348, 484);
-		l_marks[1] = new Point(2392, 1622);
-		/*
+		l_marks[0] = new Point(2341, 478);
+		l_marks[1] = new Point(2390, 1609);
+		
 		//Test 2
-		l_marks[0] = new Point(2248, 484);
+		/*l_marks[0] = new Point(2248, 484);
 		l_marks[1] = new Point(2292, 1622);
 		//Test 3
 		l_marks[0] = new Point(2248, 384);
@@ -88,10 +83,10 @@ public class ScantegrityBallotReaderTest
 		QRCodeReader l_code = new QRCodeReader();
 		l_reader.setSerial(l_code);
 		l_reader.setAlignment(l_marks);
-		l_reader.setBlack(Color.BLACK);
 		l_reader.setDimension(l_d);
+		l_reader.setAlignmentMark(new CircleAlignmentMarkReader(36, .05));
 		long l_start = System.currentTimeMillis();
-		PlanarImage pi = JAI.create("fileload", "testing/scanner/sample-images/test1.tiff");
+		PlanarImage pi = JAI.create("fileload", "testing/scanner/sample-images/test1-inv.tiff");
 		BufferedImage img = pi.getAsBufferedImage();
 		l_reader.scanBallot(null, img);
 		System.out.println(System.currentTimeMillis() - l_start + "ms");

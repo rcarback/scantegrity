@@ -19,18 +19,16 @@
  */
 package org.scantegrity.scanner;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
-import org.scantegrity.common.Cluster;
-import org.scantegrity.common.ImageToCoordinatesInches;
+import javax.imageio.ImageIO;
 
 /**
  * BallotReader is an interface for reading ballot data, normalizing the ballot
@@ -51,18 +49,13 @@ public abstract class BallotReader
 {
 	//Alignment marks
 	private Point[] c_alignment;
-	private Integer c_radius = 36;
 	private Double c_tolerance = .05;
 	//Dimensions of the ballot
 	private Dimension c_dimension;
 	private SerialNumberReader c_serial = null;
 	private BallotStyle[] c_styles = null;
-	
-	
-	//RGB for black.
-	private int c_br, c_bg, c_bb;
-	
-	
+	private AlignmentMarkReader c_alignmentMark = null;
+	private boolean debug = true;
 	/**
 	 * Create a ballot from the ballot image. 
 	 * @param p_serial
@@ -97,33 +90,77 @@ public abstract class BallotReader
 		for (Point l_mark : l_alignment) {
 			l_mark.setLocation(l_mark.getX()*l_scale, l_mark.getY()*l_scale);
 			//TODO: Logging!
-			System.out.println("Scaling Alignment Mark: " + l_mark.getX() + ", "
-								+ l_mark.getY());
+			//System.out.println("Scaling Alignment Mark: " + l_mark.getX() + ", "
+				//				+ l_mark.getY());
 		}
-		int p_radius = (int)(c_radius*l_scale);
 		//p_radius = c_radius;
+		
+		//Find the alignment marks
 		long l_start = System.currentTimeMillis();
+		Point l_foundMarks[] = new Point[2];
 		try
 		{
-		Point l_foundmark = findAlignmentMark(p_img, l_alignment[0], p_radius);
-		System.out.println("Alignment Mark found: " + l_foundmark.x + ", " +
-							l_foundmark.y);
-		l_foundmark = findAlignmentMark(p_img, l_alignment[1], p_radius);
-		System.out.println("Alignment Mark found: " + l_foundmark.x + ", " +
-							l_foundmark.y);
-		} catch(Exception e) {}
-		System.out.println(System.currentTimeMillis()-l_start + "ms");
 		
+			c_alignmentMark.setScale(l_scale);
+			l_foundMarks[0] = c_alignmentMark.findMark(p_img, l_alignment[0]);
+			System.out.println("Alignment Mark found: " + l_foundMarks[0].x + ", " +
+					l_foundMarks[0].y);
+			l_foundMarks[1] = c_alignmentMark.findMark(p_img, l_alignment[1]);
+			System.out.println("Alignment Mark found: " + l_foundMarks[1].x + ", " +
+					l_foundMarks[1].y);
+		} catch(Exception e) {}
+
+		System.out.println(System.currentTimeMillis()-l_start + "ms");
+		//TODO: Make sure the found alignment marks are unique!
+		
+		
+		//Using the alignment marks (hopefully found), try to translate the image
+		//properly and find the serial number
+		l_start = System.currentTimeMillis();
+		AffineTransformOp l_transform = compute2DTransform(l_alignment, l_foundMarks);
+		
+		Point l_tst = new Point();
+		l_transform.getPoint2D(l_foundMarks[0], l_tst);
+		System.out.println("Alignment Mark loc: " + l_foundMarks[0].x + ", " +
+				l_foundMarks[0].y);
+		System.out.println("Transformed:" + l_tst.x + "," + l_tst.y);
+		
+		l_transform.getPoint2D(l_foundMarks[1], l_tst);
+		System.out.println("Alignment Mark loc: " + l_foundMarks[1].x + ", " +
+				l_foundMarks[1].y);
+		System.out.println("Transformed:" + l_tst.x + "," + l_tst.y);		
+		System.out.println("Transformed in " + (System.currentTimeMillis()-l_start) + "ms");
+		
+		
+		/*
 		try
 		{
 			System.out.println("Serial Number!");
-			c_serial.getSerialNumber(p_img);
+			if (c_serial.getSerialNumber(p_img, l_transform) == null) {
+				Point l_backwards[] = new Point[2];
+				l_backwards[0] = l_foundMarks[1];
+				l_backwards[1] = l_foundMarks[0];				
+				l_transform = compute2DTransform(l_alignment, l_backwards);
+				l_transform.getPoint2D(l_foundMarks[0], l_tst);
+				System.out.println("Alignment Mark loc: " + l_foundMarks[0].x + ", " +
+						l_foundMarks[0].y);
+				System.out.println("Transformed:" + l_tst.x + "," + l_tst.y);
+				
+				l_transform.getPoint2D(l_foundMarks[1], l_tst);
+				System.out.println("Alignment Mark loc: " + l_foundMarks[1].x + ", " +
+						l_foundMarks[1].y);
+				System.out.println("Transformed:" + l_tst.x + "," + l_tst.y);		
+				System.out.println("Transformed in " + (System.currentTimeMillis()-l_start) + "ms");				
+				c_serial.getSerialNumber(p_img, l_transform);
+			}
 		}
 		catch (Exception e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		
 		
 		/* Stefan's Old Code
 		BufferedImage img = p_img;
@@ -241,206 +278,137 @@ public abstract class BallotReader
 		return p_img;
 	}
 	
-	/**
-	 * Returns the center of the circle given p_loc as the expected position.
-	 * Assumes circle is black. Won't exceed tolerance level in search. Uses
-	 * the radius defined globally.
-	 * @param p_img the Image to search
-	 * @param p_loc the starting location
-	 * @param p_radius radius of the circle
-	 * @return
-	 */
-	protected Point findAlignmentMark(BufferedImage p_img, Point p_loc, 
-			Integer p_radius) throws ArrayIndexOutOfBoundsException
-	{
-		//System.out.println("Black is: " + c_br + ", " + c_bg + ", " + c_bb);'
-		
-		Point l_cur = new Point(p_loc);
-		Point l_res = new Point(l_cur);
-		Point l_next;
-		//Search space is twice the tolerance on the width over the radius 
-		Integer l_search = (int)(c_tolerance*p_img.getWidth()*2/p_radius);
-		//..or at least 4 spots on each side of the starting point
-		l_search = Math.max(l_search, 8);
-		
-		try {
-			l_res = detectCircle(p_img, l_cur, p_radius);
-		} catch (ArrayIndexOutOfBoundsException l_e) {}
-		SquareSpiralPattern l_spiral = new SquareSpiralPattern(l_search);
-		while (l_res == null && !l_spiral.isEmpty())
-		{
-			//System.out.println("Did not find on first try, keep going...");
-			l_next = l_spiral.next();
-			
-			//Clip anything we know is out of bounds
-			if (l_next.x*p_radius+ l_cur.x > p_img.getWidth() 
-					|| l_next.x*p_radius+ l_cur.x < 0 
-					|| l_next.y*p_radius + l_cur.y > p_img.getHeight()
-					|| l_next.y*p_radius + l_cur.y < 0)
-			{
-			//	continue;
-			}
-
-			//NOTE: We might be able to jump by Diameter, that would speed up
-			//the process. A factor like 1.5 is more likely, because there is
-			//whitespace on each end and you don't want to accidentally jump
-			//a whole alignment mark! (consider a grid of circles, and you will
-			//be jumping between them into the whitespace of each).
-			//TODO: Needs grate math-fu behind it. 
-			l_cur.setLocation(l_next.x*p_radius+ l_cur.x, 
-								l_next.y*p_radius + l_cur.y);
-			
-			System.out.println("Trying: " + l_cur.x + ", " + l_cur.y);
-			try {
-				l_res = detectCircle(p_img, l_cur, p_radius);
-			} catch (ArrayIndexOutOfBoundsException l_e) {}
-		}
-		
-		return l_res;
-	}
 	
-	/**
-	 * Detects if the given point belongs to a circle.
-	 * @param p_img The current image.
-	 * @param p_point the location of the point.
-	 * @return the center of the circle or null if the point was not in a circle
-	 * @throws ArrayIndexOutOfBoundsException
+	/**	 
+	 * @param sul - scanned upper left
+	 * @param slr - scanned lower right
 	 */
-	protected Point detectCircle(BufferedImage p_img, Point p_point, 
-			Integer p_radius) throws ArrayIndexOutOfBoundsException
-	{
-		//Gratuitous Bounds Check
-		if (p_point.x < 0 || p_point.x > p_img.getWidth() 
-			|| p_point.y < 0 || p_point.y > p_img.getHeight())
-		{
-			//System.out.println("OOB!");
+	private AffineTransformOp compute2DTransform(Point[] p_expected, Point[] p_detected)
+	{	
+		if (p_expected.length != 2 || p_detected.length != 2) {
+			//Die
 			return null;
 		}
+		//We have to convert to double precision for this math.
+		Point2D.Double l_exp[] = new Point2D.Double[2];
+		l_exp[0] = new Point2D.Double(p_expected[0].x, p_expected[0].y);
+		l_exp[1] = new Point2D.Double(p_expected[1].x, p_expected[1].y);
+		Point2D.Double l_det[] = new Point2D.Double[2];
+		l_det[0] = new Point2D.Double(p_detected[0].x, p_detected[0].y);
+		l_det[1] = new Point2D.Double(p_detected[1].x, p_detected[1].y);
+		//The Transformations we will compute:
+		AffineTransform l_scaleTransform, l_rotTransform, l_tranTransform;
 		
-		Point l_c = null;		
-		Integer l_color = p_img.getRGB(p_point.x, p_point.y);
-		//If we hit, see where we are in relation to the center
-		if (isBlack(l_color)) {
-			Integer l_lx, l_rx, l_uy, l_dy;
-			l_lx = l_rx = p_point.x;
-			l_uy = l_dy = p_point.y;
-			for (int l_i = 0; l_i < p_radius*2; l_i++) {
-				//NOTE: These stop moving when they hit whitespace, if the 
-				//Alignment mark is not contiguouse, this can cause a problem!
-				//Left
-				if (l_lx-1 > 0 
-						&& isBlack(p_img.getRGB(l_lx-1, p_point.y))) {
-					l_lx--;
-				}
-				//Right
-				if (l_rx+1 < p_img.getWidth() 
-						&&isBlack(p_img.getRGB(l_rx+1, p_point.y))) {
-					l_rx++;
-				}
-				//Up
-				if (l_uy-1 > 0 
-						&& isBlack(p_img.getRGB(p_point.x, l_uy-1))) {
-					l_uy--;
-				}
-				//Down
-				if (l_dy+1 < p_img.getHeight()
-						&& isBlack(p_img.getRGB(p_point.x, l_dy+1))) {
-					l_dy++;
-				}
-			}
-			//a possible center point
-			Double l_cy = (l_dy - l_uy)/2.0 + l_uy;
-			Double l_cx = (l_rx - l_lx)/2.0 + l_lx;
-			l_c = new Point();
-			l_c.setLocation(l_cx, l_cy);
-			System.out.println("Center is :" + l_c.x +", " + l_c.y);
-			
-			//TODO: The following block might not really be necessary at all.
-			//Is the radius we think we know consistant and close enough?
-			Double l_d[] = new Double[4];
-			l_d[0] = l_c.distance(l_lx, p_point.y);
-			l_d[1] = l_c.distance(l_rx, p_point.y);
-			l_d[2] = l_c.distance(p_point.x, l_uy);
-			l_d[3] = l_c.distance(p_point.x, l_dy);
-			//Detect if it is probably not a circle
-			//double tolerance here, because the next routine will really
-			//determine if it's a circle! Could be up to 5 pixels off anyway!
-			for (int l_i = 0; l_i < 4; l_i++)
-			{
-				if (Math.abs(l_d[l_i] - p_radius) 
-						> Math.max(p_radius*c_tolerance, 5)) {
-					System.out.println("Probably not a circle");
-					return null;
-				}
-			}
-			
-			//probably a circle, but might not be 
-			int l_i;
-			Point l_tmp = new Point();
-			Double l_rad = 45.0; //Radians
-			Double l_ed = c_tolerance*p_radius*2; //Tolerable edge distance
-			Integer l_edx, l_edy;
-			for (l_i = 0; l_i < 360/l_rad; l_i++)
-			{			
-				//Check for a circle, x = r*cos(t), y = r*sin(t)
-				//45 is 360/8 Math.cos takes a radian, we do an 8 point check
-				double l_x = p_radius*Math.cos(l_i*l_rad)+l_c.x;
-				double l_y = p_radius*Math.sin(l_i*l_rad)+l_c.y;
-				l_tmp.setLocation(l_x, l_y);
-				
-				//Go out or in depending if we hit again.
-				l_edx = (int)Math.ceil(l_ed*Math.cos(l_i*l_rad));
-				l_edy = (int)Math.ceil(l_ed*Math.sin(l_i*l_rad));
-				if (!isBlack(p_img.getRGB(l_tmp.x, l_tmp.y))) {
-					//We didn't hit, check inward.
-					if (!isBlack(p_img.getRGB(l_tmp.x - l_edx, l_tmp.y - l_edy)))
-					{
-						return null;
-					}
-				} else {
-					//We did hit, make sure it's not just a giant blob of ink!
-					if (isBlack(p_img.getRGB(l_tmp.x + l_edx, l_tmp.y + l_edy)))
-					{
-						return null;
-					}
-				}
-			}
-		}
+		Point2D.Double l_expMid, l_detMid;
+		l_expMid = new Point2D.Double((l_exp[0].getX()+l_exp[1].getX())/2,
+										(l_exp[0].getY()+l_exp[1].getY())/2);
+		l_detMid = new Point2D.Double((l_det[0].getX()+l_det[1].getX())/2,
+										(l_det[0].getY()+l_det[1].getY())/2);
 		
-		return l_c;
-	}
-	
-	/**
-	 * Checks if a color is close enough to black to be black and not white.
-	 * @param p_color the color to check.
-	 * @return
-	 */
-	protected boolean isBlack(Color p_color) {
-		int l_cr, l_cg, l_cb;
-		l_cr = p_color.getRed();
-		l_cg = p_color.getGreen();
-		l_cb = p_color.getBlue();
-		//System.out.println("Black is:" + c_br + ", " + c_bg + ", " + c_bb);
-		//System.out.println("Color is:" + l_cr + ", " + l_cg + ", " + l_cb);
-		//This tolerance might be too high! 
-		//TODO: Might want to make it configurable.
-		if (Math.abs(l_cr - c_br) <= 100 
-				&& Math.abs(l_cg - c_bg) <= 100 
-				&& Math.abs(l_cb - c_bb) <=100) 
-		{
-			return true;
-		}
-		return false;
-	}
+		
+		Double l_tx, l_ty;
+		l_tx = l_expMid.x - l_detMid.x;
+		l_ty = l_expMid.y - l_detMid.y;
+		l_tranTransform = AffineTransform.getTranslateInstance(l_tx, l_ty);
 
-	/**
-	 * Convenience function for lazy programmers.
-	 * @see isBlack(Color p_color)
-	 * @param p_color
-	 * @return
-	 */
-	protected boolean isBlack(Integer p_color) {
-		return isBlack(new Color(p_color));
+		l_tranTransform.transform(l_det[0], l_det[0]);
+		l_tranTransform.transform(l_det[1], l_det[1]);
+		
+		System.out.println("Transform: ");
+		System.out.println(l_det[0].getX() + ", " + l_det[0].getY());
+		System.out.println(l_det[1].getX() + ", " + l_det[1].getY());
+		
+		
+		/*First, compute the true scale by dividing the distance of the expected
+		 * and the detected points. Everything gets converted to the expected
+		 * space, so we must divide by detected. 
+		 */
+		Double l_scale = l_exp[0].distance(l_exp[1])/l_det[0].distance(l_det[1]);
+		
+		//Now, convert det to exp's scaled space. This assumes a flat space,
+		//which is entirely expected here.
+		l_scaleTransform = AffineTransform.getScaleInstance(l_scale, l_scale);
+		l_scaleTransform.transform(l_det[0], l_det[0]);
+		l_scaleTransform.transform(l_det[1], l_det[1]);
+		
+		System.out.println("Scale: ");
+		System.out.println(l_det[0].getX() + ", " + l_det[0].getY());
+		System.out.println(l_det[1].getX() + ", " + l_det[1].getY());
+		
+				
+		/* Lines are now the same size, calculate the rotation of the lines 
+		 * assuming a flat 2D space treating the lines as a tan around an 
+		 * invisible circle.
+		 */
+		Double l_detAng, l_expAng, l_rotAng;
+
+		//l_detAng = Math.atan((l_det[0].x-l_expMid.x)/(l_expMid.y-l_det[0].y));
+		//l_expAng = Math.atan((l_exp[0].x-l_expMid.x)/(l_expMid.y-l_exp[0].y));
+		l_detAng = Math.atan((l_det[0].x-l_det[1].x)/(l_det[1].y-l_det[0].y));
+		l_expAng = Math.atan((l_exp[0].x-l_exp[1].x)/(l_exp[1].y-l_exp[0].y));
+		l_rotAng = l_expAng-l_detAng;
+
+		
+		System.out.println("Angles: " + l_detAng + ", " + l_expAng);
+		System.out.println(l_rotAng);
+		
+		if (l_det[0].distance(l_exp[0]) > c_dimension.getHeight()/3)
+		{
+			l_rotAng += Math.PI;
+		}
+		
+		l_rotTransform = AffineTransform.getRotateInstance(l_rotAng, 
+														l_expMid.getX(), l_expMid.getY());
+		l_rotTransform.transform(l_det[0], l_det[0]);
+		l_rotTransform.transform(l_det[1], l_det[1]);
+		
+		
+		System.out.println("Rot: ");
+		System.out.println(l_det[0].getX() + ", " + l_det[0].getY());
+		System.out.println(l_det[1].getX() + ", " + l_det[1].getY());		
+
+		/* Lines are now same size and rotation. Final step is to calc the
+		 * translation
+		 */
+		//Double l_tx, l_ty;
+		/*l_tx = l_exp[0].x - l_det[0].x;
+		l_ty = l_exp[0].y - l_det[0].y;
+		l_tranTransform = AffineTransform.getTranslateInstance(l_tx, l_ty);
+		
+		l_tranTransform.transform(l_det[0], l_det[0]);
+		l_tranTransform.transform(l_det[1], l_det[1]);
+		
+		if ((int)l_det[0].x != (int)l_exp[0].x || 
+				(int)l_det[0].y != (int)l_exp[0].y ||
+				(int)l_det[1].x != (int)l_exp[1].x ||
+				(int)l_det[1].y != (int)l_exp[1].y)
+		{
+				//l_detAng = Math.atan((l_det[1].y-l_det[0].y)/(l_det[0].x-l_det[1].x));
+				//l_rotAng = l_detAng - l_expAng;
+				//l_rotTransform = AffineTransform.getRotateInstance(l_rotAng); 
+		}*/
+
+		/* TODO: If they don't match at this point, we probably got the alignment
+		 * marks backwards, or detected the wrong marks.. not sure what to do.
+		 * l_det[0] will always match, l_det[1] will be the one off here.
+		 * Right now the plan is to see if we can find the serial number, then
+		 * retry, then try to find the serial again. If we get neg's on both,
+		 * we report an error.
+		 */	
+		
+		/*Combine the transforms 
+		 */
+		AffineTransform l_finalTransform = new AffineTransform();
+		l_finalTransform.concatenate(l_rotTransform);
+		l_finalTransform.concatenate(l_scaleTransform);
+		l_finalTransform.concatenate(l_tranTransform);
+
+		
+		AffineTransformOp l_ret = new AffineTransformOp(l_finalTransform, 
+				AffineTransformOp.TYPE_BILINEAR);
+		
+		return l_ret;
+		
 	}
 	
 	/**
@@ -473,22 +441,6 @@ public abstract class BallotReader
 	public void setDimension(Dimension p_dimension)
 	{
 		c_dimension = p_dimension;
-	}
-
-	/**
-	 * @return the radius
-	 */
-	public Integer getRadius()
-	{
-		return c_radius;
-	}
-
-	/**
-	 * @param p_radius the radius to set
-	 */
-	public void setRadius(Integer p_radius)
-	{
-		c_radius = p_radius;
 	}
 
 	/**
@@ -525,24 +477,7 @@ public abstract class BallotReader
 		c_serial = p_serial;
 	}	
 	
-	/**
-	 * @return the current black color
-	 */
-	public Color getBlack() 
-	{
-		return new Color(c_br, c_bg, c_bb);
-	}
-	
-	/**
-	 * Set the black (alignment mark) color.
-	 * @param p_black the alignment mark color.
-	 */
-	public void setBlack(Color p_black) 
-	{
-		c_br = p_black.getRed();
-		c_bg = p_black.getGreen();
-		c_bb = p_black.getBlue();
-	}
+
 
 	/**
 	 * @return the tolerance
@@ -558,6 +493,22 @@ public abstract class BallotReader
 	public void setTolerance(Double p_tolerance)
 	{
 		c_tolerance = p_tolerance;
+	}
+
+	/**
+	 * @param alignmentMark the alignmentMark to set
+	 */
+	public void setAlignmentMark(AlignmentMarkReader alignmentMark)
+	{
+		c_alignmentMark = alignmentMark;
+	}
+
+	/**
+	 * @return the alignmentMark
+	 */
+	public AlignmentMarkReader getAlignmentMark()
+	{
+		return c_alignmentMark;
 	}
 }	
 

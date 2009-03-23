@@ -20,14 +20,16 @@
 package org.scantegrity.scanner;
 
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageMonochromeBitmapSource;
-import com.google.zxing.client.result.ParsedResult;
-import com.google.zxing.client.result.ResultParser;
 
 /**
  * @author Richard Carback
@@ -35,8 +37,7 @@ import com.google.zxing.client.result.ResultParser;
  */
 public class QRCodeReader implements SerialNumberReader
 {
-	private Point c_topleft = new Point(144, 112);
-	private Point c_bottomright = new Point(278, 242);
+	private Rectangle c_boundingBox = new Rectangle(144, 112, 278, 242);
 
 	/* (non-Javadoc)
 	 * @see org.scantegrity.scanner.SerialNumberReader#getBallotStyle(java.awt.image.BufferedImage)
@@ -55,19 +56,31 @@ public class QRCodeReader implements SerialNumberReader
 	 * Since different barcode setups may require a whole ballot to process, it
 	 * probably shouldn't do that.
 	 */
-	public Integer getSerialNumber(BufferedImage p_ballot) throws Exception
+	public Integer getSerialNumber(BufferedImage p_img, AffineTransformOp p_op) 
+	throws Exception
 	{
 		BufferedImageMonochromeBitmapSource l_serial;
 		try {
 			int l_start = (int) System.currentTimeMillis();
 			System.out.println("Trying...");
-			l_serial = new BufferedImageMonochromeBitmapSource(p_ballot.getSubimage(144, 112, 278-144, 242-112));
+			Point2D l_tst = new Point(144, 112);
+			p_op.getPoint2D(l_tst, l_tst);
+			System.out.println(l_tst.getX() + ", " + l_tst.getY());
+			Rectangle2D l_tmp = p_op.getBounds2D(p_img.getSubimage(144, 112, 278-144, 242-112));
+			System.out.println("Bounding Box:" + l_tmp.getWidth() + ", " + l_tmp.getHeight() + " " + l_tmp.getX() + ", " + l_tmp.getY());
+			BufferedImage l_img = new BufferedImage((int)l_tmp.getWidth(), (int)l_tmp.getHeight(), p_img.getType());
+			p_op.filter(p_img.getSubimage((int)l_tmp.getX(), (int)l_tmp.getY(), (int)l_tmp.getWidth(), (int)l_tmp.getWidth()), l_img);
+			l_serial = new BufferedImageMonochromeBitmapSource(l_img);
 			Result result = new MultiFormatReader().decode(l_serial);
 			System.out.println("The Result: " + result.getText());
-			System.out.println("Time:" + (int)(System.currentTimeMillis()-l_start));
+			System.out.println("Time:" + (int)(System.currentTimeMillis()-l_start) + "ms");
 			return Integer.parseInt(result.getText());
 		} catch (ReaderException e) {
+			e.printStackTrace();
 			return null;			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 

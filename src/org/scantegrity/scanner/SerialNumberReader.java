@@ -42,6 +42,7 @@
 
 package org.scantegrity.scanner;
 
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 //public abstract class SerialNumberReader {
@@ -52,7 +53,8 @@ public interface SerialNumberReader {
 	 * @return an integer of the serial number.
 	 * @throws Exception if the serial number is unreadable.
 	 */
-	abstract Integer getSerialNumber(BufferedImage p_ballot) throws Exception;
+	abstract Integer getSerialNumber(BufferedImage p_img, AffineTransformOp p_op) 
+	throws Exception;
 	
 	/**
 	 * Get the ballot style for this ballot image.

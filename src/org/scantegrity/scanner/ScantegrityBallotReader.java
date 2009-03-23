@@ -45,6 +45,7 @@ public class ScantegrityBallotReader extends BallotReader
 	public Ballot scanBallot(BallotStyle[] p_styles, 
 								BufferedImage p_img)
 	{
+		
 		super.normalizeImage(p_img);
 		//Normalize the Ballot
 		
