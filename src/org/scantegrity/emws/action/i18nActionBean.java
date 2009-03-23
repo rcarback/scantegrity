@@ -30,7 +30,7 @@ public class i18nActionBean implements ActionBean{
     	if (c_name == null) {
         	c_name = (String) l_session.getAttribute("name");
         	if (c_name == null) {
-        		c_name = l_request.getHeader("User-Agent");
+        		c_name = (String)l_request.getHeader("User-Agent");
         	}
     	} 
     	//You generally DO NOT want to be setting a session attribute over and
@@ -43,7 +43,7 @@ public class i18nActionBean implements ActionBean{
     	if (c_locale == null) {
         	c_locale = (String) l_session.getAttribute("locale");
         	if (c_locale == null) {
-        		c_locale = l_request.getHeader("Accept-Language");
+        		c_locale = (String)l_request.getHeader("Accept-Language");
         	} 
     	}
     	l_session.setAttribute("locale", c_locale);    	
@@ -52,6 +52,7 @@ public class i18nActionBean implements ActionBean{
         return new ForwardResolution(VIEW);
     }
 
+    
     private ActionBeanContext c_ctx;
     public ActionBeanContext getContext() { 
     	return c_ctx; 

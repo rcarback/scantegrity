@@ -31,6 +31,10 @@
             <param-value>en,de,fr,es,en_CA,en_US</param-value>
         </init-param>    
         <init-param>
+            <param-name>MultipartWrapper.Class</param-name>
+            <param-value>net.sourceforge.stripes.controller.multipart.CommonsMultipartWrapper</param-value>
+        </init-param>
+        <init-param>
             <param-name>Extension.Packages</param-name>
             <param-value>stripes.ext</param-value>
         </init-param>        
@@ -65,14 +69,6 @@
         <dispatcher>INCLUDE</dispatcher>
     </filter-mapping>
     <!-- END Stripes Configuration -->
-
-    
-    <context-param>
-        <param-name>
-            javax.servlet.jsp.jstl.fmt.localizationContext
-        </param-name>
-        <param-value>StripesResources</param-value>
-    </context-param>
         
     <context-param>
         <param-name>
