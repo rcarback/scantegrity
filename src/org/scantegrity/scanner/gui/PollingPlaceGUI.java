@@ -21,31 +21,38 @@ package org.scantegrity.scanner.gui;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.HeadlessException;
 import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
+import org.scantegrity.scanner.test.GUITest;
+import org.scantegrity.scanner.test.TestKeyListener;
 
 /**
  * @author John Conway 
@@ -60,26 +67,24 @@ import org.scantegrity.common.gui.ScantegrityJFrame;
  *  The JFrame is set up with Card Layout to give the JFrame control 
  *  over the flow of the program. 
  */
-public class PollingPlaceGUI extends JFrame 
-			implements Runnable,ActionListener
+public class PollingPlaceGUI implements Runnable,ActionListener
 {
 	
 	/* 
 	 * Serial Version UID
 	 */ 
-	//TODO: Does this go here?
 	private static final long serialVersionUID = -1875275649149039514L;
 
 	/* ***********************************************
 	 * Class Variables 
 	 ************************************************/
 	private ScantegrityJFrame c_frame; 
-	private CardLayout c_scannerInfoCardLayout; 
-	private CardLayout c_electionInfoCardLayout;
+	private ScantegrityJFrame c_judgePassDialog;
+	private CardLayout c_scannerInfoCardLayout;
 	
 	//main panels
-	private JPanel c_topPanel; 
 	private JPanel c_electionInfoPanel; 
+	private JPanel c_compactElectionInfoPanel;
 	private JPanel c_scannerInfoPanel;
 	private JPanel c_infoBarPanel; 
 	
@@ -88,15 +93,22 @@ public class PollingPlaceGUI extends JFrame
 	private JPanel c_startElectionPanel;
 	private JPanel c_scanningBallotsPanel;
 	private JPanel c_waitingForBallotsPanel;
+	private JPanel c_thankYouPanel;
 	private JPanel c_ballotResultsPanel;
-	private JPanel c_electionInfoCardPanel;
 	
 	//Buttons
-	private JButton c_adminButton;
 	private JButton c_chiefLoginButton;
 	private JButton c_startElectionButton;
 	private JButton c_castBallotButton;
 	private JButton c_rejectBallotButton; 
+	
+	//Menu 
+	private JMenuBar c_menuBar;
+	private JMenu c_adminMenu; 
+	private JMenuItem c_adminItem; 
+	
+	//Labels
+	private JLabel c_ballotInfoLabel; 
 	
 	//Fields
 	private JTextField c_castField; 
@@ -105,17 +117,24 @@ public class PollingPlaceGUI extends JFrame
 	//password fields
 	private JPasswordField c_chiefPasswordField;
 	
+	//Font Style
+	private String c_fontStyle; 
+	
+	//TODO Temp INTs
+	private Integer c_numCastBallots;
+	private Integer c_numSpoiledBallots;
+	
 	/* ***********************************************
 	 * Constructors  
 	 ************************************************/
 	
 	/**
-	 * TODO: What to do with this constructor (PPGUI, NOTHING)
-	 * @throws HeadlessException
+	 * 
 	 */
 	public PollingPlaceGUI()
 	{
 		//TODO: get configuration info
+		c_fontStyle = ScannerUIConstants.FONT_STYLE_SERIF;
 		
 		guiInit(); 
 	}
@@ -142,16 +161,14 @@ public class PollingPlaceGUI extends JFrame
 		changeCard(ScannerUIConstants.SCANNING_BALLOT_CARD);
 	}
 	
-	public void displayScanResults(boolean p_badBallot)
+	public void setToWaiting()
 	{
-		if(!p_badBallot)
-		{
-			changeCard(ScannerUIConstants.BALLOT_INFO_CARD);
-		}
-		else
-		{
-			changeCard(ScannerUIConstants.BALLOT_INFO_WITH_REJECTED_CARD);
-		}
+		changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
+	}
+	
+	public void displayScanResults()
+	{
+		changeCard(ScannerUIConstants.BALLOT_INFO_CARD);
 	}
 	
 	/* ***********************************************
@@ -163,70 +180,65 @@ public class PollingPlaceGUI extends JFrame
 	private void guiInit()
 	{
 		c_frame = new ScantegrityJFrame("Polling Place");
-		c_frame.setFullScreen(); 
-		c_frame.setUndecorated(true);
-		c_frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		//c_frame.setFullScreen(); 
+		//c_frame.setUndecorated(true);
+		c_frame.setDefaultCloseOperation(ScantegrityJFrame.DO_NOTHING_ON_CLOSE);
 		//c_frame.setAlwaysOnTop(true);
+		c_frame.setPreferredSize(new Dimension(800,600));
 		
-		buildLayout(); 
+		//use the larger election info
+		buildLayout(false); 
 	}
 	
 	/**
 	 * Builds the panels that will be used and 
 	 * sets their layouts. 
 	 */
-	private void buildLayout()
+	private void buildLayout(boolean useCompactElecInfo)
 	{
 		//set up frame Layout 
 		c_frame.setLayout(new BorderLayout()); 
 		
 		//set up internal panels
-		buildTopPanel();
+		buildMenuBar();
 		buildElectionInfoPanel(); 
 		buildScannerPanel(); 
 		buildInfoBar(); 
 		
-		//put panels into the JFrame
-		JPanel l_tempPanel = new JPanel(); 
-		l_tempPanel.add(c_electionInfoCardPanel, BorderLayout.NORTH);
-		l_tempPanel.add(c_scannerInfoPanel, BorderLayout.CENTER);
+		if(useCompactElecInfo)
+		{
+			c_frame.add(c_compactElectionInfoPanel, BorderLayout.PAGE_START);
+		}
+		else
+		{
+			c_frame.add(c_electionInfoPanel, BorderLayout.PAGE_START);
+		}
 		
-		c_frame.add(c_topPanel, BorderLayout.NORTH);
-		c_frame.add(l_tempPanel, BorderLayout.CENTER);
-		c_frame.add(c_infoBarPanel, BorderLayout.SOUTH);
+		c_frame.add(c_scannerInfoPanel, BorderLayout.CENTER);
+		c_frame.add(c_infoBarPanel, BorderLayout.PAGE_END);
 		
 	}
 	
 	/* *************************************************
 	 * Panel Build Methods
-	 * TODO: Reorganize the normal and compact election info panels
 	 **************************************************/
 	
 	/**
 	 * This method builds the top panel 
 	 * that holds the admin buttons
 	 */
-	private void buildTopPanel()
+	private void buildMenuBar()
 	{
-		c_topPanel = new JPanel(new FlowLayout());
+		//This will now be a menu bar
+		c_menuBar = new JMenuBar(); 
+		c_adminMenu = new JMenu("Administration");
+		c_adminItem = new JMenuItem("Enter Administration");
+		c_adminItem.addActionListener(this);
 		
-		//create admin button
-		c_adminButton = new JButton(); 
-		c_adminButton.setText("Administration");
-		c_adminButton.setFocusable(false);
-		c_adminButton.setBorderPainted(false);
-		c_adminButton.setContentAreaFilled(false);
-		c_adminButton.addActionListener(this);
+		c_adminMenu.add(c_adminItem);
+		c_menuBar.add(c_adminMenu);
 		
-		//border 
-		Border l_border = BorderFactory.createLoweredBevelBorder(); 
-		c_topPanel.setBorder(l_border);
-		
-		JPanel l_tempPanel = new JPanel(); 
-		l_tempPanel.setPreferredSize(new Dimension(c_frame.getWidth() - c_adminButton.getWidth(), c_adminButton.getHeight()));
-		
-		c_topPanel.add(c_adminButton);
-		c_topPanel.add(l_tempPanel);
+		c_frame.setJMenuBar(c_menuBar);
 	}
 	
 	/**
@@ -236,44 +248,49 @@ public class PollingPlaceGUI extends JFrame
 	 */
 	private void buildElectionInfoPanel()
 	{
-		c_electionInfoCardPanel = new JPanel();
-		
-		//set layout manager
-		c_electionInfoCardLayout = new CardLayout();
-		
-		c_electionInfoCardPanel.setLayout(c_electionInfoCardLayout);
-		
 		//build the card panels
 		buildExtendedElectionInfoPanel();
 		buildCompactElectionInfoPanel();
-		
-		//set default card 
-		c_electionInfoCardLayout.show(c_electionInfoCardPanel,
-				ScannerUIConstants.EXTENDED_ELECTION_INFO_CARD);
 	}
 		
 	private void buildExtendedElectionInfoPanel()
 	{
-		JPanel l_electionInfoPanel = new JPanel(); 
-		l_electionInfoPanel.setLayout(new GridBagLayout());
+		c_electionInfoPanel = new JPanel(); 
+		c_electionInfoPanel.setLayout(new GridBagLayout());
 		
-		//TODO: Find a way around this font size
-		int l_fs = (int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 100); 
-		
-		JLabel l_ppIdLabel = new JLabel("<html><font size=\"" + l_fs + "\">Polling Place ID #: </font></html>");
-		JLabel l_ppNameLabel = new JLabel("<html><font size=\"" + l_fs + "\">Polling Place Name: </font></html>");
-		JLabel l_ppLocLabel = new JLabel("<html><font size=\"" + l_fs + "\">Polling Place Location: </font></html>");
-		JLabel l_elecDateLabel = new JLabel("<html><font size=\"" + l_fs + "\">Date of Election: </font></html>");
-		JLabel l_elecStartTimeLabel = new JLabel("<html><font size=\"" + l_fs + "\">Start Time of Election: </font></html>");
-		JLabel l_chiefJudgeLabel = new JLabel("<html><font size=\"" + l_fs + "\">Chief Judge: </font></html>");
+		JLabel l_ppIdLabel = new JLabel("Polling Place ID #: ");
+		JLabel l_ppNameLabel = new JLabel("Polling Place Name: ");
+		JLabel l_ppLocLabel = new JLabel("Polling Place Location: ");
+		JLabel l_elecDateLabel = new JLabel("Date of Election: ");
+		JLabel l_elecStartTimeLabel = new JLabel("Start Time of Election: ");
+		JLabel l_chiefJudgeLabel = new JLabel("Chief Judge: ");
 		
 		//TODO: These will be filled in by the configuration interface
-		JLabel l_ppId = new JLabel("<html><font size=\"" + l_fs + "\">0001</font></html>");
-		JLabel l_ppName = new JLabel("<html><font size=\"" + l_fs + "\">Polling Place</font></html>");
-		JLabel l_ppLoc = new JLabel("<html><font size=\"" + l_fs + "\">Catonsville, MD</font></html>");
-		JLabel l_elecDate = new JLabel("<html><font size=\"" + l_fs + "\">01/01/2009</font></html>");
-		JLabel l_elecStartTime = new JLabel("<html><font size=\"" + l_fs + "\">07:00</font></html>");
-		JLabel l_chiefJudge = new JLabel("<html><font size=\"" + l_fs + "\">John Smith</font></html>");
+		JLabel l_ppId = new JLabel("0001");
+		JLabel l_ppName = new JLabel("Polling Place");
+		JLabel l_ppLoc = new JLabel("Catonsville, MD");
+		JLabel l_elecDate = new JLabel("01/01/2009");
+		JLabel l_elecStartTime = new JLabel("07:00");
+		JLabel l_chiefJudge = new JLabel("John Smith");
+		
+		//Font
+		//TODO: Eventually I want to make the font size determined by the 
+		//screen resolution
+		Font l_font = new Font(c_fontStyle, Font.BOLD, 20);
+		
+		l_ppIdLabel.setFont(l_font);
+		l_ppNameLabel.setFont(l_font);
+		l_ppLocLabel.setFont(l_font);
+		l_elecDateLabel.setFont(l_font);
+		l_elecStartTimeLabel.setFont(l_font);
+		l_chiefJudgeLabel.setFont(l_font);
+		l_ppId.setFont(l_font);
+		l_ppName.setFont(l_font);
+		l_ppLoc.setFont(l_font);
+		l_elecDate.setFont(l_font);
+		l_elecStartTime.setFont(l_font);
+		l_chiefJudge.setFont(l_font);
+		
 
 		//Insets 
 		Insets l_insets = new Insets(0, 0, 10, 50);
@@ -287,26 +304,26 @@ public class PollingPlaceGUI extends JFrame
 		 l_c.gridy = 2; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppIdLabel, l_c);
+		 c_electionInfoPanel.add(l_ppIdLabel, l_c);
 		 
 		 l_c.gridx = 1;
 		 l_c.gridy = 2; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppId, l_c);
+		 c_electionInfoPanel.add(l_ppId, l_c);
 		
 		 //Row 2
 		 l_c.gridx = 0;
 		 l_c.gridy = 3; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppNameLabel, l_c);
+		 c_electionInfoPanel.add(l_ppNameLabel, l_c);
 		 
 		 l_c.gridx = 1;
 		 l_c.gridy = 3;
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppName, l_c);
+		 c_electionInfoPanel.add(l_ppName, l_c);
 		 
 		 //Row 3
 		 l_c = new GridBagConstraints();
@@ -314,13 +331,13 @@ public class PollingPlaceGUI extends JFrame
 		 l_c.gridy = 4; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppLocLabel, l_c);
+		 c_electionInfoPanel.add(l_ppLocLabel, l_c);
 		 
 		 l_c.gridx = 1;
 		 l_c.gridy = 4; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppLoc, l_c);
+		 c_electionInfoPanel.add(l_ppLoc, l_c);
 		
 		 //Row 4
 		 l_c = new GridBagConstraints();
@@ -328,26 +345,26 @@ public class PollingPlaceGUI extends JFrame
 		 l_c.gridy = 5; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_elecDateLabel, l_c);
+		 c_electionInfoPanel.add(l_elecDateLabel, l_c);
 		 
 		 l_c.gridx = 1;
 		 l_c.gridy = 5;
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_elecDate, l_c);
+		 c_electionInfoPanel.add(l_elecDate, l_c);
 		
 		 //Row 5
 		 l_c.gridx = 0;
 		 l_c.gridy = 6; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_elecStartTimeLabel, l_c);
+		 c_electionInfoPanel.add(l_elecStartTimeLabel, l_c);
 		 
 		 l_c.gridx = 1;
 		 l_c.gridy = 6; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_elecStartTime, l_c);
+		 c_electionInfoPanel.add(l_elecStartTime, l_c);
 		 
 		 //Row 6
 		 l_c = new GridBagConstraints();
@@ -355,19 +372,17 @@ public class PollingPlaceGUI extends JFrame
 		 l_c.gridy = 7; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_chiefJudgeLabel, l_c);
+		 c_electionInfoPanel.add(l_chiefJudgeLabel, l_c);
 		 
 		 l_c.gridx = 1;
 		 l_c.gridy = 7; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets;
-		 l_electionInfoPanel.add(l_chiefJudge, l_c);
+		 c_electionInfoPanel.add(l_chiefJudge, l_c);
 		 
-		//add the Border
-		Border l_border = BorderFactory.createLoweredBevelBorder(); 
-		l_electionInfoPanel.setBorder(l_border);
-		 
-		 c_electionInfoCardPanel.add(l_electionInfoPanel, ScannerUIConstants.EXTENDED_ELECTION_INFO_CARD);
+		 //add the Border
+		 Border l_border = BorderFactory.createLoweredBevelBorder(); 
+		 c_electionInfoPanel.setBorder(l_border);
 	}
 	
 	/**
@@ -376,29 +391,48 @@ public class PollingPlaceGUI extends JFrame
 	 */
 	private void buildCompactElectionInfoPanel()
 	{
-		JPanel l_electionInfoPanel = new JPanel(); 
-		l_electionInfoPanel.setLayout(new GridBagLayout());
+		c_compactElectionInfoPanel = new JPanel(); 
+		c_compactElectionInfoPanel.setLayout(new GridBagLayout());
 		
-		//TODO: Find a way around this font size
-		int l_fs = (int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 250 );  
-		
-		JLabel l_ppIdLabel = new JLabel("<html><font size=\"" + l_fs + "\">Polling Place ID #: </font></html>");
-		JLabel l_ppNameLabel = new JLabel("<html><font size=\"" + l_fs + "\">Polling Place Name: </font></html>");
-		JLabel l_ppLocLabel = new JLabel("<html><font size=\"" + l_fs + "\">Polling Place Location: </font></html>");
-		JLabel l_elecDateLabel = new JLabel("<html><font size=\"" + l_fs + "\">Date of Election: </font></html>");
-		JLabel l_elecStartTimeLabel = new JLabel("<html><font size=\"" + l_fs + "\">Start Time of Election: </font></html>");
-		JLabel l_chiefJudgeLabel = new JLabel("<html><font size=\"" + l_fs + "\">Chief Judge: </font></html>");
+		JLabel l_ppIdLabel = new JLabel("Polling Place ID #: ");
+		JLabel l_ppNameLabel = new JLabel("Polling Place Name: ");
+		JLabel l_ppLocLabel = new JLabel("Polling Place Location: ");
+		JLabel l_elecDateLabel = new JLabel("Date of Election: ");
+		JLabel l_elecStartTimeLabel = new JLabel("Start Time of Election: ");
+		JLabel l_chiefJudgeLabel = new JLabel("Chief Judge: ");
 		
 		//TODO: These will be filled in by the configuration interface
-		JLabel l_ppId = new JLabel("<html><font size=\"" + l_fs + "\">0001</font></html>");
-		JLabel l_ppName = new JLabel("<html><font size=\"" + l_fs + "\">Polling Place</font></html>");
-		JLabel l_ppLoc = new JLabel("<html><font size=\"" + l_fs + "\">Catonsville, MD</font></html>");
-		JLabel l_elecDate = new JLabel("<html><font size=\"" + l_fs + "\">01/01/2009</font></html>");
-		JLabel l_elecStartTime = new JLabel("<html><font size=\"" + l_fs + "\">07:00</font></html>");
-		JLabel l_chiefJudge = new JLabel("<html><font size=\"" + l_fs + "\">John Smith</font></html>");
+		JLabel l_ppId = new JLabel("0001");
+		JLabel l_ppName = new JLabel("Polling Place");
+		JLabel l_ppLoc = new JLabel("Catonsville, MD");
+		JLabel l_elecDate = new JLabel("01/01/2009");
+		JLabel l_elecStartTime = new JLabel("07:00");
+		JLabel l_chiefJudge = new JLabel("John Smith");
+		
+		
+		//Set fonts
+		//Font
+		Font l_font = new Font(c_fontStyle, Font.BOLD, 12);
+		
+		l_ppIdLabel.setFont(l_font);
+		l_ppNameLabel.setFont(l_font);
+		l_ppLocLabel.setFont(l_font);
+		l_elecDateLabel.setFont(l_font);
+		l_elecStartTimeLabel.setFont(l_font);
+		l_chiefJudgeLabel.setFont(l_font);
+		l_ppId.setFont(l_font);
+		l_ppName.setFont(l_font);
+		l_ppLoc.setFont(l_font);
+		l_elecDate.setFont(l_font);
+		l_elecStartTime.setFont(l_font);
+		l_chiefJudge.setFont(l_font);
+		
 		
 		//Insets 
+		//the first inset is for a larger horizontal gap in between 
+		//labels that are not connected
 		Insets l_insets = new Insets(0, 0, 10, 30);
+		Insets l_closerInsets = new Insets(0, 0, 10, 10);
 		
 		//add to layout
 		GridBagConstraints l_c;
@@ -408,85 +442,84 @@ public class PollingPlaceGUI extends JFrame
 		 l_c.gridx = 0; 
 		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
-		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppIdLabel, l_c);
+		 l_c.insets = l_closerInsets; 
+		 c_compactElectionInfoPanel.add(l_ppIdLabel, l_c);
 		 
 		 l_c.gridx = 1;
 		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppId, l_c);
+		 c_compactElectionInfoPanel.add(l_ppId, l_c);
 
 		 l_c.gridx = 2;
 		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
-		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppNameLabel, l_c);
+		 l_c.insets = l_closerInsets; 
+		 c_compactElectionInfoPanel.add(l_ppNameLabel, l_c);
 		 
 		 l_c.gridx = 3;
 		 l_c.gridy = 0;
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppName, l_c);
+		 c_compactElectionInfoPanel.add(l_ppName, l_c);
 		 
 		 l_c = new GridBagConstraints();
 		 l_c.gridx = 4; 
 		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
-		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppLocLabel, l_c);
+		 l_c.insets = l_closerInsets; 
+		 c_compactElectionInfoPanel.add(l_ppLocLabel, l_c);
 		 
 		 l_c.gridx = 5;
 		 l_c.gridy = 0; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_ppLoc, l_c);
+		 c_compactElectionInfoPanel.add(l_ppLoc, l_c);
 		
 		 //Row 2
 		 l_c = new GridBagConstraints();
 		 l_c.gridx = 0; 
 		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
-		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_elecDateLabel, l_c);
+		 l_c.insets = l_closerInsets; 
+		 c_compactElectionInfoPanel.add(l_elecDateLabel, l_c);
 		 
 		 l_c.gridx = 1;
 		 l_c.gridy = 1;
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_elecDate, l_c);
+		 c_compactElectionInfoPanel.add(l_elecDate, l_c);
 		
 		 l_c.gridx = 2;
 		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
-		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_elecStartTimeLabel, l_c);
+		 l_c.insets = l_closerInsets; 
+		 c_compactElectionInfoPanel.add(l_elecStartTimeLabel, l_c);
 		 
 		 l_c.gridx = 3;
 		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_elecStartTime, l_c);
+		 c_compactElectionInfoPanel.add(l_elecStartTime, l_c);
 
 		 l_c.gridx = 4; 
 		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
-		 l_c.insets = l_insets; 
-		 l_electionInfoPanel.add(l_chiefJudgeLabel, l_c);
+		 l_c.insets = l_closerInsets;
+		 c_compactElectionInfoPanel.add(l_chiefJudgeLabel, l_c);
 		 
 		 l_c.gridx = 5;
 		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets;
-		 l_electionInfoPanel.add(l_chiefJudge, l_c);
+		 c_compactElectionInfoPanel.add(l_chiefJudge, l_c);
 		 
 		//add the Border
 		Border l_border = BorderFactory.createLoweredBevelBorder(); 
-		l_electionInfoPanel.setBorder(l_border);
+		c_compactElectionInfoPanel.setBorder(l_border);
 		
-		l_electionInfoPanel.setPreferredSize(new Dimension((int)Toolkit.getDefaultToolkit().getScreenSize().getWidth(),100));
-		 
-		 c_electionInfoCardPanel.add(l_electionInfoPanel, ScannerUIConstants.COMPACT_ELECTION_INFO_CARD);
+		c_compactElectionInfoPanel.setForeground(Color.WHITE);
+		c_compactElectionInfoPanel.setBackground(null);
 	}
 	
 	private void buildScannerPanel()
@@ -499,7 +532,8 @@ public class PollingPlaceGUI extends JFrame
 		buildStartCardPanel();
 		buildScanningCardPanel();
 		buildWaitingCardPanel();
-		buildBallotResultsCards();
+		buildThankYouCardPanel();
+		buildBallotResultsCards("<html><p align=\"center\">No Ballot Results to Display</p></html>");
 		
 		c_scannerInfoCardLayout = new CardLayout();
 		c_scannerInfoPanel.setLayout(c_scannerInfoCardLayout);
@@ -508,7 +542,8 @@ public class PollingPlaceGUI extends JFrame
 		c_scannerInfoPanel.add(c_startElectionPanel, ScannerUIConstants.START_ELECTION_CARD);
 		c_scannerInfoPanel.add(c_scanningBallotsPanel, ScannerUIConstants.SCANNING_BALLOT_CARD);
 		c_scannerInfoPanel.add(c_waitingForBallotsPanel, ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
-		//c_scannerInfoPanel.add(c_ballotResultsPanel, ScannerUIConstants.BALLOT_INFO_CARD);
+		c_scannerInfoPanel.add(c_thankYouPanel, ScannerUIConstants.THANK_YOU_CARD);
+		c_scannerInfoPanel.add(c_ballotResultsPanel, ScannerUIConstants.BALLOT_INFO_CARD);
 		
 		//add border
 		//set borders 
@@ -538,11 +573,14 @@ public class PollingPlaceGUI extends JFrame
 		Border l_bf = BorderFactory.createLoweredBevelBorder(); 
 		c_infoBarPanel.setBorder(l_bf);
 		
-		c_castField = new JTextField("0");
+		c_numCastBallots = new Integer(0); 
+		c_numSpoiledBallots = new Integer(0);
+		
+		c_castField = new JTextField(c_numCastBallots.toString());
 		c_castField.setEditable(false);
 		c_castField.setFocusable(false);
 		
-		c_spoiledField = new JTextField("0"); 
+		c_spoiledField = new JTextField(c_numSpoiledBallots.toString()); 
 		c_spoiledField.setEditable(false);
 		c_spoiledField.setFocusable(false);
 		
@@ -581,9 +619,10 @@ public class PollingPlaceGUI extends JFrame
 		//put components into layout 
 		l_passwordPanel.add(l_passwordLabel);
 		l_passwordPanel.add(c_chiefPasswordField);
+		l_passwordPanel.add(c_chiefLoginButton);
 		
 		c_chiefJudgeLoginPanel.add(l_passwordPanel);
-		c_chiefJudgeLoginPanel.add(c_chiefLoginButton);
+		//c_chiefJudgeLoginPanel.add(c_chiefLoginButton);
 	}
 	
 	private void buildStartCardPanel()
@@ -594,7 +633,7 @@ public class PollingPlaceGUI extends JFrame
 		c_startElectionButton.setText("Start Election");
 		c_startElectionButton.setFocusable(false);
 		c_startElectionButton.addActionListener(this);
-		
+		c_startElectionButton.setFont(new Font(c_fontStyle, Font.BOLD, 24));	
 		c_startElectionPanel.add(c_startElectionButton);
 	}
 	
@@ -602,23 +641,68 @@ public class PollingPlaceGUI extends JFrame
 	{
 		c_scanningBallotsPanel = new JPanel(); 
 		
-		JLabel l_label = new JLabel("<html><font size=\"10\">Scanning Ballot...</font></html>");
+		JLabel l_label = new JLabel("Scanning Ballot...");
+		l_label.setFont(new Font(c_fontStyle, Font.BOLD, 24));
 		
 		c_scanningBallotsPanel.add(l_label);
+		
+		//colors
+		c_scanningBallotsPanel.setBackground(Color.WHITE);
+		c_scanningBallotsPanel.setForeground(Color.BLACK);
 	}
 	
 	private void buildWaitingCardPanel()
 	{
 		c_waitingForBallotsPanel = new JPanel(); 
 		
-		JLabel l_label = new JLabel("<html><font size=\"10\">Waiting for Ballot...</font></html>");
+		JLabel l_label = new JLabel("Waiting for Ballot...");
+		l_label.setFont(new Font(c_fontStyle, Font.BOLD, 24));
 		
 		c_waitingForBallotsPanel.add(l_label);
+		
+		//colors
+		c_waitingForBallotsPanel.setBackground(Color.WHITE);
+		c_waitingForBallotsPanel.setForeground(Color.BLACK);
 	}
 	
-	private void buildBallotResultsCards()
+	private void buildThankYouCardPanel()
 	{
+		c_thankYouPanel = new JPanel(); 
 		
+		JLabel l_label = new JLabel("Thank you for Voting.");
+		l_label.setFont(new Font(c_fontStyle, Font.BOLD, 24));
+		
+		c_thankYouPanel.add(l_label);
+		
+		//colors
+		c_thankYouPanel.setBackground(Color.WHITE);
+		c_thankYouPanel.setForeground(Color.BLACK);
+	}
+	
+	private void buildBallotResultsCards(String p_htmlBallotInfo)
+	{
+		c_ballotResultsPanel = new JPanel();
+		c_ballotInfoLabel = new JLabel(p_htmlBallotInfo);
+		c_ballotInfoLabel.setFont(new Font(c_fontStyle, Font.BOLD, 16));
+		
+		c_ballotResultsPanel.add(c_ballotInfoLabel, BorderLayout.CENTER);
+		
+		c_castBallotButton = new JButton();
+		c_castBallotButton.setText("Cast Ballot");
+		c_castBallotButton.setFocusable(false);
+		c_castBallotButton.addActionListener(this);
+		
+		c_rejectBallotButton = new JButton(); 
+		c_rejectBallotButton.setText("Reject Ballot");
+		c_rejectBallotButton.setFocusable(false);
+		c_rejectBallotButton.addActionListener(this);
+		
+		c_ballotResultsPanel.add(c_castBallotButton, BorderLayout.SOUTH);
+		c_ballotResultsPanel.add(c_rejectBallotButton, BorderLayout.SOUTH);
+		
+		//colors
+		c_ballotResultsPanel.setBackground(Color.WHITE);
+		c_ballotResultsPanel.setForeground(Color.BLACK);
 	}
 	
 	/* ***********************************************
@@ -643,6 +727,94 @@ public class PollingPlaceGUI extends JFrame
 		return l_choice;
 	}
 	
+	private char[] showJudgePasswordDialog()
+	{
+		JPanel l_panel = new JPanel();
+		l_panel.setLayout(new BoxLayout(l_panel, BoxLayout.Y_AXIS));
+	
+		JLabel l_label = new JLabel("Please enter Judge Pin");
+		l_panel.add(l_label);
+		JPasswordField l_passField = new JPasswordField(ScannerUIConstants.NUM_PASSWORD_PIN_COLUMNS);
+		l_panel.add(l_passField);
+		
+		int l_selected = JOptionPane.showConfirmDialog(c_frame, 
+				                                       l_panel, 
+				                                       "Enter Judge Pin", 
+				                                       JOptionPane.OK_CANCEL_OPTION);
+		
+		if(l_selected != JOptionPane.OK_OPTION)
+			return null;
+		
+		return l_passField.getPassword();
+	}
+	
+	private char[] showChiefJudgePasswordDialog()
+	{
+		JPanel l_panel = new JPanel();
+		l_panel.setLayout(new BoxLayout(l_panel, BoxLayout.Y_AXIS));
+	
+		JLabel l_label = new JLabel("Please enter Chief Judge Password");
+		l_panel.add(l_label);
+		JPasswordField l_passField = new JPasswordField(ScannerUIConstants.NUM_PASSWORD_COLUMNS);
+		l_panel.add(l_passField);
+		
+		int l_selected = JOptionPane.showConfirmDialog(c_frame, 
+													   l_panel, 
+													   "Enter Chief Judge Password", 
+													   JOptionPane.OK_CANCEL_OPTION);
+		
+		if(l_selected != JOptionPane.OK_OPTION)
+			return null;
+		
+		return l_passField.getPassword();
+	}
+	
+	private boolean getJudgeAuthorization()
+	{
+		char[] l_pass = showJudgePasswordDialog();
+		
+		if(l_pass == null)
+			return false;
+		
+		boolean l_validated = false; 
+		
+		if((new String(l_pass)).equals("1234"))
+			l_validated = true;
+		
+		if(l_validated)
+		{
+			return true;
+		}
+		else
+		{
+			Dialogs.displayWarningDialog("Incorrect Judge Pin");
+			return getJudgeAuthorization();  
+		}
+	}
+	
+	private boolean getChiefJudgeAuthorization()
+	{
+		char[] l_pass = showChiefJudgePasswordDialog();
+		
+		if(l_pass == null)
+			return false;
+		
+		boolean l_validated = false; 
+		
+		if((new String(l_pass)).equals("test"))
+				l_validated = true;
+		
+		if(l_validated)
+		{
+			return true;
+		}
+		else
+		{
+			Dialogs.displayWarningDialog("Incorrect Password");
+			return false; 
+		}
+	}
+	
 	/* ***********************************************
 	 * Card Layout Methods
 	 ************************************************/
@@ -656,30 +828,73 @@ public class PollingPlaceGUI extends JFrame
 	 * Action Listener Methods
 	 ************************************************/
 	
+	//TODO: this must be removed
+	private void showTesterPanel()
+	{
+		ScantegrityJFrame l_testDialog = new ScantegrityJFrame("Tester Dialog");
+		
+		l_testDialog.setPreferredSize(new Dimension(300,200));
+		
+		JLabel l_infoLabel = new JLabel("Press the Scan Button to Emulate Scanning.");
+		
+		l_testDialog.add(l_infoLabel, BorderLayout.PAGE_START);
+		
+		JButton l_scanButton = new JButton("Start Scan");
+		l_scanButton.addActionListener(this);
+		l_scanButton.setFocusable(false);
+
+		l_testDialog.add(l_scanButton, BorderLayout.CENTER);
+		
+		JButton l_fscanButton = new JButton("Finish Scan");
+		l_fscanButton.addActionListener(this);
+		l_fscanButton.setFocusable(false);
+		
+		l_testDialog.add(l_fscanButton, BorderLayout.LINE_END);
+		
+		JButton l_wButton = new JButton("Waiting");
+		l_wButton.addActionListener(this);
+		l_wButton.setFocusable(false);
+
+		l_testDialog.add(l_wButton, BorderLayout.PAGE_END);
+		
+		l_testDialog.display(true);
+	}
+	
 	/**
 	 * Actions to be taken when a button is activated. 
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
-		if(e.getActionCommand().equals(c_adminButton.getText()))
+		if(e.getActionCommand().equals(c_adminItem.getText()))
 		{
+			boolean l_isAuthorized = getChiefJudgeAuthorization();
+			
+			if(!l_isAuthorized)
+				return; 
+			
 			int l_choice = showAdminDialogBox();
 			
 			if(l_choice == 1)
 			{
 				c_frame.dispose();
+				System.exit(1);
 			}
 		}		
 		else if(e.getActionCommand().equals(c_startElectionButton.getText()))
 		{
-			//build compacted election info 
-			c_electionInfoCardLayout.show(c_electionInfoCardPanel, 
-					ScannerUIConstants.COMPACT_ELECTION_INFO_CARD);
-			c_electionInfoCardPanel.doLayout();
-	
-			c_frame.validate();
+			c_frame.setVisible(false);
+			
+			c_frame.remove(c_electionInfoPanel);
+			c_frame.remove(c_scannerInfoPanel);
+			c_frame.add(c_compactElectionInfoPanel, BorderLayout.PAGE_START);
+			c_frame.add(c_scannerInfoPanel, BorderLayout.CENTER);
+			
+			c_frame.setVisible(true);
 			
 			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
+			
+			//TODO: Delete
+			showTesterPanel();
 		}
 		else if(e.getActionCommand().equals(c_chiefLoginButton.getText()))
 		{
@@ -689,7 +904,50 @@ public class PollingPlaceGUI extends JFrame
 			if(l_validated)
 				changeCard(ScannerUIConstants.START_ELECTION_CARD);
 			else
+			{
 				changeCard(ScannerUIConstants.LOGIN_CARD);
+			
+				Dialogs.displayWarningDialog("Incorrect Password. Try again.");
+			}
+		}
+		else if(e.getActionCommand().equals(c_castBallotButton.getText()))
+		{
+			//cast the ballot
+			c_numCastBallots++;
+			c_castField.setText(c_numCastBallots.toString());
+			
+			//display thank you 
+			
+			//wait then display waiting for ballots
+			changeCard(ScannerUIConstants.THANK_YOU_CARD);
+		}
+		else if(e.getActionCommand().equals(c_rejectBallotButton.getText()))
+		{
+			//reject the ballot
+			//bring up judge authorization dialog
+			boolean l_isValidated = getJudgeAuthorization();
+			
+			if(l_isValidated)
+			{
+				c_numSpoiledBallots++;
+				c_spoiledField.setText(c_numSpoiledBallots.toString());
+			}
+			
+			//wait then display waiting for ballots
+			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
+		}
+		//TODO: these are only for test
+		else if(e.getActionCommand().equals("Start Scan"))
+		{
+			setToScanningBallot();
+		}
+		else if(e.getActionCommand().equals("Finish Scan"))
+		{
+			displayScanResults();
+		}
+		else if(e.getActionCommand().equals("Waiting"))
+		{
+			setToWaiting();
 		}
 	}
 }

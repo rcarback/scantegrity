@@ -57,7 +57,7 @@ public class ScantegrityBallotReader extends BallotReader
 		//Process each contest
 		
 		//Create a new Ballot object with the serial number, style, and contest
-		//data, reutnr that object.
+		//data, return that object.
 		
 		return new Ballot();
 	}
