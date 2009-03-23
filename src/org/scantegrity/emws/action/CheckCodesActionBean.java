@@ -25,7 +25,7 @@ public class CheckCodesActionBean implements ActionBean {
 	private static final String c_dbPass = "";
 	
 	@Validate(required=true) int c_serial;
-	ArrayList<String[]> c_codes = new ArrayList<String[]>();
+	ArrayList<ArrayList<String[]>> c_codes = new ArrayList<ArrayList<String[]>>();
 	String c_error = "";
 	
 	public String getResult()
@@ -33,15 +33,20 @@ public class CheckCodesActionBean implements ActionBean {
 		if( c_codes.size() == 0 )
 			return "";
 		
-		String l_result = "<table><tr><th>Contest</th><th>Code</th></tr>";
-		for( String[] code : c_codes )
+		String l_result = "<h4>Results:</h4>";
+		for(int x = 0; x < c_codes.size(); x++ )
 		{
-			l_result += "<tr>";
-			l_result += "<td>" + code[0] + "</td>";
-			l_result += "<td>" + code[1] + "</td>";
-			l_result += "</tr>";
+			l_result += "<h5>Question " + (x + 1) + ": </h5>";
+			l_result += "<table><tr><th>Symbol</th><th>Code</th></tr>";
+			for( String[] code : c_codes.get(x) )
+			{
+				l_result += "<tr>";
+				l_result += "<td>" + code[0] + "</td>";
+				l_result += "<td>" + code[1] + "</td>";
+				l_result += "</tr>";
+			}
+			l_result += "</table><br/>";
 		}
-		l_result += "</table>";
 		return l_result;
 	}
 	
@@ -84,17 +89,32 @@ public class CheckCodesActionBean implements ActionBean {
 			Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
 	
 			//Create SQL statement object
-			PreparedStatement l_query = l_conn.prepareStatement("SELECT contest,code FROM ContestResults WHERE serial=? ORDER BY contest");
+			PreparedStatement l_query = l_conn.prepareStatement("SELECT question,symbol,code FROM ContestResults WHERE serial=? ORDER BY question,symbol");
 			l_query.setInt(1, c_serial);
 			
 			ResultSet l_results = l_query.executeQuery();
+			int c_question = -1;
+			ArrayList<String[]> c_newCodes = new ArrayList<String[]>();
+			
 			while( l_results.next() )
 			{
+				int c_newQuestion = l_results.getInt("question");
+				if( c_question == -1 )
+					c_question = c_newQuestion;
+				else if( c_question != c_newQuestion )
+				{
+					c_codes.add(c_newCodes);
+					c_newCodes = new ArrayList<String[]>();
+				}
+				
 				String[] c_newCode = new String[2];
-				c_newCode[0] = Integer.toString(l_results.getInt("contest"));
+				c_newCode[0] = Integer.toString(l_results.getInt("symbol"));
 				c_newCode[1] = l_results.getString("code");
-				c_codes.add(c_newCode);
+				c_newCodes.add(c_newCode);
 			}
+			if( c_newCodes.size() != 0 )
+				c_codes.add(c_newCodes);
+			
 			
 			l_results.close();
 			

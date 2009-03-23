@@ -124,13 +124,13 @@ public class FileuploadActionBean implements ActionBean {
 					{
 						if( e.getMessage().contains("does not exist") )
 						{
-							l_query.execute("CREATE TABLE ContestResults ( serial integer, contest integer, code varchar(10) )");
+							l_query.execute("CREATE TABLE ContestResults ( serial integer, question integer, symbol integer, code varchar(10) )");
 						}
 					}
 
 
 					//Use prepared statement for queries with parameters
-					PreparedStatement l_sqlStatement = l_conn.prepareStatement("INSERT INTO ContestResults VALUES (?, ?, ?)");
+					PreparedStatement l_sqlStatement = l_conn.prepareStatement("INSERT INTO ContestResults VALUES (?, ?, ?, ?)");
 					PreparedStatement l_existsQuery = l_conn.prepareStatement("SELECT * FROM ContestResults WHERE serial=?");
 					
 					//Create documentbuilder and parse uploaded file
@@ -168,6 +168,8 @@ public class FileuploadActionBean implements ActionBean {
 							if( !l_questionNodes.item(y).getNodeName().equals("question") )
 								continue;
 							
+							int l_question = Integer.parseInt(l_questionNodes.item(y).getAttributes().getNamedItem("id").getNodeValue());
+							
 							NodeList l_symbolNodes = l_questionNodes.item(y).getChildNodes();
 							
 							//Loop over all <symbol> nodes
@@ -184,8 +186,9 @@ public class FileuploadActionBean implements ActionBean {
 
 								//Set SQL parameters and add to batch
 								l_sqlStatement.setInt(1, l_serial);
-								l_sqlStatement.setInt(2, l_id);
-								l_sqlStatement.setString(3, l_code);
+								l_sqlStatement.setInt(2, l_question);
+								l_sqlStatement.setInt(3, l_id);
+								l_sqlStatement.setString(4, l_code);
 								l_sqlStatement.addBatch();
 							}
 						}
