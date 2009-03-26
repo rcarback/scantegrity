@@ -99,11 +99,11 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 			//whitespace on each end and you don't want to accidentally jump
 			//a whole alignment mark! (consider a grid of circles, and you will
 			//be jumping between them into the whitespace of each).
-			//TODO: Needs greater math-fu behind it. 
-			l_cur.setLocation(l_next.x*l_radius+ l_cur.x, 
-								l_next.y*l_radius + l_cur.y);
-			l_inv.setLocation(l_next.x*l_radius+l_inv.x,
-								l_next.y*l_radius+l_inv.y);
+			//TODO: Needs greater math-fu behind it.
+			l_cur.setLocation(l_next.x*l_radius + p_loc.x, 
+								l_next.y*l_radius + p_loc.y);
+			l_inv.setLocation(p_img.getWidth() - (l_next.x*l_radius+p_loc.x),
+							   p_img.getHeight() - (l_next.y*l_radius+p_loc.y));
 
 			
 			//System.out.println("Trying: " + l_cur.x + ", " + l_cur.y);
@@ -117,8 +117,21 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 				try {
 					//System.out.println("Trying: " + l_inv.x + ", " + l_inv.y);					
 					l_res = detectCircle(p_img, l_inv, l_radius);
+					
+					
 				} catch (ArrayIndexOutOfBoundsException l_e) {}
 			}
+			/* BEGIN DEBUG
+			try {
+				Graphics2D l_out = p_img.createGraphics();
+				l_out.setColor(Color.green);
+				l_out.fillRect(l_inv.x, l_inv.y, 5, 5);
+				l_out.fillRect(l_cur.x, l_cur.y, 5, 5);
+				ImageIO.write(p_img,"png",new File("test.png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}						
+			END DEBUG */
 		}
 		return l_res;
 	}
@@ -137,7 +150,7 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 		if (p_point.x < 0 || p_point.x > p_img.getWidth() 
 			|| p_point.y < 0 || p_point.y > p_img.getHeight())
 		{
-			System.out.println("OOB!");
+			//System.out.println("OOB!");
 			return null;
 		}
 		

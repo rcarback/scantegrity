@@ -25,10 +25,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 /**
  * BallotReader is an interface for reading ballot data, normalizing the ballot
@@ -55,7 +51,7 @@ public abstract class BallotReader
 	private SerialNumberReader c_serial = null;
 	private BallotStyle[] c_styles = null;
 	private AlignmentMarkReader c_alignmentMark = null;
-	private boolean debug = true;
+
 	/**
 	 * Create a ballot from the ballot image. 
 	 * @param p_serial
@@ -110,6 +106,7 @@ public abstract class BallotReader
 					l_foundMarks[1].y);
 		} catch(Exception e) {}
 
+		System.out.print("Alignment Mark Time: ");
 		System.out.println(System.currentTimeMillis()-l_start + "ms");
 		//TODO: Make sure the found alignment marks are unique!
 		
@@ -132,27 +129,11 @@ public abstract class BallotReader
 		System.out.println("Transformed in " + (System.currentTimeMillis()-l_start) + "ms");
 		
 		
-		/*
+
 		try
 		{
-			System.out.println("Serial Number!");
-			if (c_serial.getSerialNumber(p_img, l_transform) == null) {
-				Point l_backwards[] = new Point[2];
-				l_backwards[0] = l_foundMarks[1];
-				l_backwards[1] = l_foundMarks[0];				
-				l_transform = compute2DTransform(l_alignment, l_backwards);
-				l_transform.getPoint2D(l_foundMarks[0], l_tst);
-				System.out.println("Alignment Mark loc: " + l_foundMarks[0].x + ", " +
-						l_foundMarks[0].y);
-				System.out.println("Transformed:" + l_tst.x + "," + l_tst.y);
-				
-				l_transform.getPoint2D(l_foundMarks[1], l_tst);
-				System.out.println("Alignment Mark loc: " + l_foundMarks[1].x + ", " +
-						l_foundMarks[1].y);
-				System.out.println("Transformed:" + l_tst.x + "," + l_tst.y);		
-				System.out.println("Transformed in " + (System.currentTimeMillis()-l_start) + "ms");				
-				c_serial.getSerialNumber(p_img, l_transform);
-			}
+			System.out.print("Serial Number: ");
+			c_serial.getSerialNumber(p_img, l_transform);
 		}
 		catch (Exception e)
 		{
@@ -296,30 +277,12 @@ public abstract class BallotReader
 		Point2D.Double l_det[] = new Point2D.Double[2];
 		l_det[0] = new Point2D.Double(p_detected[0].x, p_detected[0].y);
 		l_det[1] = new Point2D.Double(p_detected[1].x, p_detected[1].y);
+
+				
 		//The Transformations we will compute:
 		AffineTransform l_scaleTransform, l_rotTransform, l_tranTransform;
-		
-		Point2D.Double l_expMid, l_detMid;
-		l_expMid = new Point2D.Double((l_exp[0].getX()+l_exp[1].getX())/2,
-										(l_exp[0].getY()+l_exp[1].getY())/2);
-		l_detMid = new Point2D.Double((l_det[0].getX()+l_det[1].getX())/2,
-										(l_det[0].getY()+l_det[1].getY())/2);
-		
-		
-		Double l_tx, l_ty;
-		l_tx = l_expMid.x - l_detMid.x;
-		l_ty = l_expMid.y - l_detMid.y;
-		l_tranTransform = AffineTransform.getTranslateInstance(l_tx, l_ty);
 
-		l_tranTransform.transform(l_det[0], l_det[0]);
-		l_tranTransform.transform(l_det[1], l_det[1]);
-		
-		System.out.println("Transform: ");
-		System.out.println(l_det[0].getX() + ", " + l_det[0].getY());
-		System.out.println(l_det[1].getX() + ", " + l_det[1].getY());
-		
-		
-		/*First, compute the true scale by dividing the distance of the expected
+		/*Compute the true scale by dividing the distance of the expected
 		 * and the detected points. Everything gets converted to the expected
 		 * space, so we must divide by detected. 
 		 */
@@ -330,64 +293,48 @@ public abstract class BallotReader
 		l_scaleTransform = AffineTransform.getScaleInstance(l_scale, l_scale);
 		l_scaleTransform.transform(l_det[0], l_det[0]);
 		l_scaleTransform.transform(l_det[1], l_det[1]);
-		
-		System.out.println("Scale: ");
-		System.out.println(l_det[0].getX() + ", " + l_det[0].getY());
-		System.out.println(l_det[1].getX() + ", " + l_det[1].getY());
-		
 				
-		/* Lines are now the same size, calculate the rotation of the lines 
-		 * assuming a flat 2D space treating the lines as a tan around an 
-		 * invisible circle.
+		/* Determine the translation, or the distance the midpoint lines are
+		 * from each other. This gives us a common reference point that
+		 * should be in the same spot regardless of how messed up it is.
 		 */
-		Double l_detAng, l_expAng, l_rotAng;
+		Point2D.Double l_expMid, l_detMid;
+		l_expMid = new Point2D.Double((l_exp[0].getX()+l_exp[1].getX())/2,
+										(l_exp[0].getY()+l_exp[1].getY())/2);
+		l_detMid = new Point2D.Double((l_det[0].getX()+l_det[1].getX())/2,
+										(l_det[0].getY()+l_det[1].getY())/2);
 
-		//l_detAng = Math.atan((l_det[0].x-l_expMid.x)/(l_expMid.y-l_det[0].y));
-		//l_expAng = Math.atan((l_exp[0].x-l_expMid.x)/(l_expMid.y-l_exp[0].y));
-		l_detAng = Math.atan((l_det[0].x-l_det[1].x)/(l_det[1].y-l_det[0].y));
-		l_expAng = Math.atan((l_exp[0].x-l_exp[1].x)/(l_exp[1].y-l_exp[0].y));
-		l_rotAng = l_expAng-l_detAng;
-
-		
-		System.out.println("Angles: " + l_detAng + ", " + l_expAng);
-		System.out.println(l_rotAng);
-		
-		if (l_det[0].distance(l_exp[0]) > c_dimension.getHeight()/3)
-		{
-			l_rotAng += Math.PI;
-		}
-		
-		l_rotTransform = AffineTransform.getRotateInstance(l_rotAng, 
-														l_expMid.getX(), l_expMid.getY());
-		l_rotTransform.transform(l_det[0], l_det[0]);
-		l_rotTransform.transform(l_det[1], l_det[1]);
-		
-		
-		System.out.println("Rot: ");
-		System.out.println(l_det[0].getX() + ", " + l_det[0].getY());
-		System.out.println(l_det[1].getX() + ", " + l_det[1].getY());		
-
-		/* Lines are now same size and rotation. Final step is to calc the
-		 * translation
-		 */
-		//Double l_tx, l_ty;
-		/*l_tx = l_exp[0].x - l_det[0].x;
-		l_ty = l_exp[0].y - l_det[0].y;
+		Double l_tx, l_ty;
+		l_tx = l_expMid.x - l_detMid.x;
+		l_ty = l_expMid.y - l_detMid.y;
 		l_tranTransform = AffineTransform.getTranslateInstance(l_tx, l_ty);
-		
+
 		l_tranTransform.transform(l_det[0], l_det[0]);
 		l_tranTransform.transform(l_det[1], l_det[1]);
 		
-		if ((int)l_det[0].x != (int)l_exp[0].x || 
-				(int)l_det[0].y != (int)l_exp[0].y ||
-				(int)l_det[1].x != (int)l_exp[1].x ||
-				(int)l_det[1].y != (int)l_exp[1].y)
-		{
-				//l_detAng = Math.atan((l_det[1].y-l_det[0].y)/(l_det[0].x-l_det[1].x));
-				//l_rotAng = l_detAng - l_expAng;
-				//l_rotTransform = AffineTransform.getRotateInstance(l_rotAng); 
-		}*/
+		
+		/* Lines are the same size, calculate the rotation of the lines 
+		 * assuming a flat 2D space treating the lines as a tan around an 
+		 * invisible circle. Uses the dotproduct method.
+		 */
+		Point2D.Double l_v1, l_v2;
+		l_v1 = new Point2D.Double();
+		l_v2 = new Point2D.Double();
+		l_v1.x = l_det[0].x - l_expMid.x;
+		l_v1.y = l_det[0].y - l_expMid.y;
+		l_v2.x = l_exp[0].x - l_expMid.x;
+		l_v2.y = l_exp[0].y - l_expMid.y;
+		
+		Double l_theta = Math.acos((l_v1.x*l_v2.x + l_v1.y*l_v2.y)/(
+								Math.sqrt(l_v1.x*l_v1.x + l_v1.y*l_v1.y)
+								*Math.sqrt(l_v2.x*l_v2.x + l_v2.y*l_v2.y)));
 
+		l_rotTransform = AffineTransform.getRotateInstance(l_theta, 
+														l_expMid.getX(), 
+														l_expMid.getY());
+		l_rotTransform.transform(l_det[0], l_det[0]);
+		l_rotTransform.transform(l_det[1], l_det[1]);
+		
 		/* TODO: If they don't match at this point, we probably got the alignment
 		 * marks backwards, or detected the wrong marks.. not sure what to do.
 		 * l_det[0] will always match, l_det[1] will be the one off here.

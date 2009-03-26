@@ -85,11 +85,11 @@ public class ScantegrityBallotReaderTest
 		l_reader.setAlignment(l_marks);
 		l_reader.setDimension(l_d);
 		l_reader.setAlignmentMark(new CircleAlignmentMarkReader(36, .05));
-		long l_start = System.currentTimeMillis();
-		PlanarImage pi = JAI.create("fileload", "testing/scanner/sample-images/test1-inv.tiff");
+		PlanarImage pi = JAI.create("fileload", "testing/scanner/sample-images/test1-inv-rotr.tiff");
 		BufferedImage img = pi.getAsBufferedImage();
+		long l_start = System.currentTimeMillis();
 		l_reader.scanBallot(null, img);
-		System.out.println(System.currentTimeMillis() - l_start + "ms");
+		System.out.println("Time (sans Loading): " + (System.currentTimeMillis() - l_start) + "ms");
 	}
 
 }
