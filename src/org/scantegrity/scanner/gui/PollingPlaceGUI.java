@@ -34,6 +34,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -681,7 +682,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	
 	private void buildBallotResultsCards(String p_htmlBallotInfo)
 	{
-		c_ballotResultsPanel = new JPanel();
+		c_ballotResultsPanel = new JPanel(new BorderLayout());
 		c_ballotInfoLabel = new JLabel(p_htmlBallotInfo);
 		c_ballotInfoLabel.setFont(new Font(c_fontStyle, Font.BOLD, 16));
 		
@@ -695,14 +696,24 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_rejectBallotButton = new JButton(); 
 		c_rejectBallotButton.setText("Reject Ballot");
 		c_rejectBallotButton.setFocusable(false);
-		c_rejectBallotButton.addActionListener(this);
+		c_rejectBallotButton.addActionListener(this); 
 		
-		c_ballotResultsPanel.add(c_castBallotButton, BorderLayout.SOUTH);
-		c_ballotResultsPanel.add(c_rejectBallotButton, BorderLayout.SOUTH);
+		JPanel l_tmpPanel = new JPanel();
+		BoxLayout l_bl = new BoxLayout(l_tmpPanel, BoxLayout.X_AXIS);
+		l_tmpPanel.setLayout(l_bl);
+		
+		l_tmpPanel.add(c_castBallotButton);
+		l_tmpPanel.add(Box.createRigidArea(new Dimension(c_frame.getSize().width - (2 * c_castBallotButton.getSize().width) - 10,10)));
+		l_tmpPanel.add(c_rejectBallotButton);
+		
+		c_ballotResultsPanel.add(l_tmpPanel, BorderLayout.PAGE_END);
 		
 		//colors
 		c_ballotResultsPanel.setBackground(Color.WHITE);
 		c_ballotResultsPanel.setForeground(Color.BLACK);
+		
+		c_ballotResultsPanel.revalidate();
+		
 	}
 	
 	/* ***********************************************
