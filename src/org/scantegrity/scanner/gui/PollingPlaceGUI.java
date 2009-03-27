@@ -28,7 +28,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,14 +45,11 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
-import javax.swing.SpringLayout;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
-import org.scantegrity.scanner.test.GUITest;
-import org.scantegrity.scanner.test.TestKeyListener;
 
 /**
  * @author John Conway 
@@ -80,7 +76,6 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 * Class Variables 
 	 ************************************************/
 	private ScantegrityJFrame c_frame; 
-	private ScantegrityJFrame c_judgePassDialog;
 	private CardLayout c_scannerInfoCardLayout;
 	
 	//main panels

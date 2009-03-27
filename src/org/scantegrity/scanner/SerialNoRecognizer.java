@@ -169,7 +169,7 @@ if (ScannedBallot.debug) System.out.println("OCR found "+digit);
 				}
 			}
 		}
-		for (Iterator i = tm.values().iterator();i.hasNext();) {
+		for (Iterator<Character> i = tm.values().iterator();i.hasNext();) {
 			retVal+=((Character)i.next()).charValue();
 		}
 
