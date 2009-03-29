@@ -19,6 +19,8 @@
  */
 package org.scantegrity.scanner;
 
+import java.awt.Point;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 /**
@@ -45,11 +47,20 @@ public class ScantegrityBallotReader extends BallotReader
 	public Ballot scanBallot(BallotStyle[] p_styles, 
 								BufferedImage p_img)
 	{
-		
-		super.normalizeImage(p_img);
-		//Normalize the Ballot
+		Ballot l_res = new Ballot();
+		AffineTransformOp l_alignmentOp = super.getAlignmentOp(p_img);
 		
 		//Read in the Serial Number
+		try
+		{
+			l_res.setId(super.c_serial.getSerialNumber(p_img, l_alignmentOp));
+		}
+		catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}		
 		
 		//Read in the Ballot Style
 		
@@ -60,7 +71,7 @@ public class ScantegrityBallotReader extends BallotReader
 		//Create a new Ballot object with the serial number, style, and contest
 		//data, return that object.
 		
-		return new Ballot();
+		return l_res;
 	}
 
 }

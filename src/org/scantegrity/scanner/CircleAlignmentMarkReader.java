@@ -19,8 +19,14 @@
  */
 package org.scantegrity.scanner;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 /**
  * @author Richard Carback
@@ -66,6 +72,7 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 		Point l_next;
 		//Scale our parameters
 		Integer l_radius = (int)(c_radius*c_scale);
+		//System.out.println("Scaled Radius:" + l_radius);
 
 		//Search space is %tolerable/radius
 		Integer l_search = (int)(getTolerance()*p_img.getWidth()/l_radius);
@@ -121,7 +128,7 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 					
 				} catch (ArrayIndexOutOfBoundsException l_e) {}
 			}
-			/* BEGIN DEBUG
+			/* BEGIN DEBUG 
 			try {
 				Graphics2D l_out = p_img.createGraphics();
 				l_out.setColor(Color.green);
@@ -131,7 +138,7 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 			} catch (IOException e) {
 				e.printStackTrace();
 			}						
-			END DEBUG */
+			/* END DEBUG */
 		}
 		return l_res;
 	}
@@ -189,7 +196,7 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 			Double l_cx = (l_rx - l_lx)/2.0 + l_lx;
 			l_c = new Point();
 			l_c.setLocation(l_cx, l_cy);
-			//System.out.println("Center is :" + l_c.x +", " + l_c.y);
+			//System.out.println("Hit: possible center is :" + l_c.x +", " + l_c.y);
 			
 			//TODO: The following block might not really be necessary at all.
 			//Is the radius we think we know consistant and close enough?
@@ -215,7 +222,8 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 			int l_i;
 			Point l_tmp = new Point();
 			Double l_rad = 45.0; //Radians
-			Double l_ed = getTolerance()*p_radius*2; //Tolerable edge distance
+			Double l_ed = 5.0; //Tolerable edge distance
+			//System.out.println("l_ed: " + l_ed);
 			Integer l_edx, l_edy;
 			for (l_i = 0; l_i < 360/l_rad; l_i++)
 			{			
@@ -228,16 +236,20 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 				//Go out or in depending if we hit again.
 				l_edx = (int)Math.ceil(l_ed*Math.cos(l_i*l_rad));
 				l_edy = (int)Math.ceil(l_ed*Math.sin(l_i*l_rad));
+				//System.out.println("Checking for black: " + (l_tmp.x - l_edx) + ", " + (l_tmp.y - l_edy));
 				if (!DetectBlack.isBlack(l_tmp.x, l_tmp.y, p_img)) {
+					//System.out.println("No Black Out");
 					//We didn't hit, check inward.
 					if (!DetectBlack.isBlack(l_tmp.x - l_edx, l_tmp.y - l_edy, p_img))
 					{
+						//System.out.println("No Black Inward");
 						return null;
 					}
 				} else {
 					//We did hit, make sure it's not just a giant blob of ink!
 					if (DetectBlack.isBlack(l_tmp.x + l_edx, l_tmp.y + l_edy, p_img))
 					{
+						//System.out.println("Giant Blob!");
 						return null;
 					}
 				}

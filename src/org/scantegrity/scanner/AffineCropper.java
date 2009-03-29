@@ -23,6 +23,10 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 /**
  * Utility class for cropping into a new image using an Affine Transform.
@@ -32,6 +36,16 @@ import java.awt.image.BufferedImage;
  */
 public final class AffineCropper
 {
+	
+	/**
+	 * Takes a rectangle in the expected space and pulls it from a scanned
+	 * image given a specific AffineTransformOp. 
+	 * @param p_src
+	 * @param p_op
+	 * @param p_bounds
+	 * @return
+	 * @throws Exception
+	 */
 	public static BufferedImage crop(BufferedImage p_src, 
 			AffineTransformOp p_op, Rectangle p_bounds) throws Exception
 	{
@@ -58,13 +72,13 @@ public final class AffineCropper
 				} catch (ArrayIndexOutOfBoundsException e) {} 
 			}
 		}
-		/* BEGIN DEBUG
+		/* BEGIN DEBUG * /
 		try {
 			ImageIO.write(l_res,"png",new File("serial.png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
-		END DEBUG */
+		/* END DEBUG */
 		return l_res;
 	}
 	
