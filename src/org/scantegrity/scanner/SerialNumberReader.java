@@ -55,12 +55,5 @@ public interface SerialNumberReader {
 	 */
 	abstract Integer getSerialNumber(BufferedImage p_img, AffineTransformOp p_op) 
 	throws Exception;
-	
-	/**
-	 * Get the ballot style for this ballot image.
-	 * @param p_ballot A 2D normalized image of the ballot.
-	 * @return an integer indicating the ballot style.
-	 * @throws Exception if the serial number or style is unreadable.
-	 */	
-	abstract Integer getBallotStyle(BufferedImage p_ballot) throws Exception; 
+
 }

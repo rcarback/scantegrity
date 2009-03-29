@@ -37,15 +37,6 @@ public class QRCodeReader implements SerialNumberReader
 	private Rectangle c_boundingBox = new Rectangle(144, 112, 278-144, 242-112);
 
 	/* (non-Javadoc)
-	 * @see org.scantegrity.scanner.SerialNumberReader#getBallotStyle(java.awt.image.BufferedImage)
-	 */
-
-	public Integer getBallotStyle(BufferedImage p_ballot) throws Exception
-	{
-		return null;
-	}
-
-	/* (non-Javadoc)
 	 * @see org.scantegrity.scanner.SerialNumberReader#getSerialNumber(java.awt.image.BufferedImage)
 	 */
 	/**

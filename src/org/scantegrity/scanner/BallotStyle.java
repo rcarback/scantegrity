@@ -42,13 +42,14 @@ package org.scantegrity.scanner;
 
 import java.awt.Rectangle;
 import java.util.List;
+import java.util.Vector;
 
 public class BallotStyle {
 	private int c_id;
 	//An ordered list of contests on this ballot style
 	private List<Integer> c_contests;
 	//A list of the x,y locations and sizes of contests on the ballot image
-	private List<Rectangle> c_contestRects;
+	private Vector<Vector<Vector<Rectangle>>> c_contestRects;
 	//Should this ballot be counted at the scanner?
 	private boolean c_counted;
 	
@@ -73,16 +74,16 @@ public class BallotStyle {
 	 * 
 	 * @param p_id
 	 * @param p_contests
-	 * @param p_contestRects
+	 * @param p_l_rects
 	 * @param p_counted
 	 */
 	public BallotStyle(int p_id, List<Integer> p_contests,
-			List<Rectangle> p_contestRects, boolean p_counted)
+			Vector<Vector<Vector<Rectangle>>> p_l_rects, boolean p_counted)
 	{
 		super();
 		c_id = p_id;
 		c_contests = p_contests;
-		c_contestRects = p_contestRects;
+		c_contestRects = p_l_rects;
 		c_counted = p_counted;
 	}
 	
@@ -119,14 +120,14 @@ public class BallotStyle {
 	/**
 	 * @param contestRects the contestRects to set
 	 */
-	public void setContestRects(List<Rectangle> contestRects)
+	public void setContestRects(Vector<Vector<Vector<Rectangle>>> contestRects)
 	{
 		c_contestRects = contestRects;
 	}
 	/**
 	 * @return the contestRects
 	 */
-	public List<Rectangle> getContestRects()
+	public Vector<Vector<Vector<Rectangle>>> getContestRects()
 	{
 		return c_contestRects;
 	}
