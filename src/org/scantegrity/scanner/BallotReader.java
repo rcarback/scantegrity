@@ -49,7 +49,6 @@ public abstract class BallotReader
 	//Dimensions of the ballot
 	protected Dimension c_dimension;
 	protected SerialNumberReader c_serial = null;
-	protected BallotStyle[] c_styles = null;
 	protected AlignmentMarkReader c_alignmentMark = null;
 
 	/**
@@ -95,7 +94,6 @@ public abstract class BallotReader
 		c_alignmentMark.setTolerance(c_tolerance);
 		
 		//Find the alignment marks
-		long l_start = System.currentTimeMillis();
 		Point l_foundMarks[] = new Point[2];
 		try
 		{
@@ -107,9 +105,10 @@ public abstract class BallotReader
 			System.out.println("Unable to find alignment marks, aborting!");
 			return null;
 		}
-		System.out.println("Alignment Marks: (" + l_foundMarks[0].x + ", " + 
-							l_foundMarks[0].y + "), (" + l_foundMarks[1].x +
-							", " + l_foundMarks[1].y + ")");
+		
+		//System.out.println("Alignment Marks: (" + l_foundMarks[0].x + ", " + 
+		//					l_foundMarks[0].y + "), (" + l_foundMarks[1].x +
+		//					", " + l_foundMarks[1].y + ")");
 		
 		//TODO: Make sure the found alignment marks are unique!
 				
@@ -289,22 +288,6 @@ public abstract class BallotReader
 		c_dimension = p_dimension;
 	}
 
-	/**
-	 * @return the styles
-	 */
-	public BallotStyle[] getStyles()
-	{
-		return c_styles;
-	}
-
-
-	/**
-	 * @param p_styles the styles to set
-	 */
-	public void setStyles(BallotStyle[] p_styles)
-	{
-		c_styles = p_styles;
-	}
 	
 	/**
 	 * @return the serial

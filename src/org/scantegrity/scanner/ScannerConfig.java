@@ -55,6 +55,8 @@ public class ScannerConfig {
 	private String c_chiefJudge = "Unknown Chief Judge";
 	private BallotReader c_reader = null;
 	private Contest[] c_contests = null;
+	protected BallotStyle[] c_styles = null;
+	
 	
 	
 	public ScannerConfig() {
@@ -203,5 +205,23 @@ public class ScannerConfig {
 	{
 		c_contests = p_contests;
 	}
+	
+	/**
+	 * @return the styles
+	 */
+	public BallotStyle[] getStyles()
+	{
+		return c_styles;
+	}
+
+
+	/**
+	 * @param p_styles the styles to set
+	 */
+	public void setStyles(BallotStyle[] p_styles)
+	{
+		c_styles = p_styles;
+	}
+	
 }
 

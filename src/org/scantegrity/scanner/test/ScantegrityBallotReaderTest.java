@@ -23,6 +23,9 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.beans.XMLEncoder;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -30,6 +33,7 @@ import java.util.Vector;
 
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
+import javax.swing.JButton;
 
 import org.scantegrity.scanner.Ballot;
 import org.scantegrity.scanner.BallotStyle;
@@ -128,8 +132,8 @@ public class ScantegrityBallotReaderTest
 		l_styles[0] = l_style;
 		
 		
-		l_reader.setStyles(l_styles);
-		
+		//l_reader.setStyles(l_styles);
+		Vector<Ballot> l_ballots = new Vector<Ballot>();
 		for (String test: tests)
 		{
 			try {
@@ -138,7 +142,8 @@ public class ScantegrityBallotReaderTest
 				PlanarImage pi = JAI.create("fileload", basedir+test);
 				BufferedImage img = pi.getAsBufferedImage();
 				long l_load = System.currentTimeMillis();
-				Ballot l_b = l_reader.scanBallot(null, img);
+				Ballot l_b = l_reader.scanBallot(l_styles, img);
+				l_ballots.add(l_b);
 				long l_last = System.currentTimeMillis();
 				System.out.println("Serial #: " + l_b.getId());
 				System.out.println("\tResults:");
@@ -161,5 +166,8 @@ public class ScantegrityBallotReaderTest
 				return;
 			}
 		}
+		XMLEncoder e = new XMLEncoder(new BufferedOutputStream(new FileOutputStream("testing/scanner/ballots.xml")));
+		e.writeObject(l_ballots);
+		e.close();
 	}
 }

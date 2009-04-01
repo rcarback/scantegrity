@@ -47,7 +47,9 @@ import java.util.Vector;
 public class BallotStyle {
 	private int c_id;
 	//An ordered list of contests on this ballot style
-	private List<Integer> c_contests;
+	private Vector<Integer> c_contests;
+	//An array of contestandIds ordered as listed on the ballot.
+	private Vector<Vector<Integer>> c_contestantIds;
 	//A list of the x,y locations and sizes of contests on the ballot image
 	private Vector<Vector<Vector<Rectangle>>> c_contestRects;
 	//Should this ballot be counted at the scanner?
@@ -77,7 +79,7 @@ public class BallotStyle {
 	 * @param p_l_rects
 	 * @param p_counted
 	 */
-	public BallotStyle(int p_id, List<Integer> p_contests,
+	public BallotStyle(int p_id, Vector<Integer> p_contests,
 			Vector<Vector<Vector<Rectangle>>> p_l_rects, boolean p_counted)
 	{
 		super();
@@ -105,18 +107,47 @@ public class BallotStyle {
 	/**
 	 * @param contests the contests to set
 	 */
-	public void setContests(List<Integer> contests)
+	public void setContests(Vector<Integer> contests)
 	{
 		c_contests = contests;
 	}
 	/**
 	 * @return the contests
 	 */
-	public List<Integer> getContests()
+	public Vector<Integer> getContests()
 	{
 		return c_contests;
 	}
 	
+	/**
+	 * @return the contestantIds
+	 */
+	public Vector<Vector<Integer>> getContestantIds()
+	{
+		//The default is ordered.
+		if (c_contestantIds == null && c_contestRects != null) 
+		{
+			c_contestantIds = new Vector<Vector<Integer>>();
+			for (int l_i = 0; l_i < c_contestRects.size(); l_i++)
+			{
+				c_contestantIds.add(new Vector<Integer>());
+				for (int l_j = 0; l_j < c_contestRects.elementAt(l_i).size(); l_j++)
+				{
+					c_contestantIds.elementAt(l_i).add(l_j);
+				}
+			}
+		}
+		return c_contestantIds;
+	}
+
+	/**
+	 * @param p_contestantIds the contestantIds to set
+	 */
+	public void setContestantIds(Vector<Vector<Integer>> p_contestantIds)
+	{
+		c_contestantIds = p_contestantIds;
+	}
+
 	/**
 	 * @param contestRects the contestRects to set
 	 */

@@ -74,7 +74,7 @@ public class Ballot
 	 */
 	public boolean hasContest(Integer p_contestID) 
 	{
-		return (c_ballotData.containsKey(c_id) && c_counted);
+		return (c_ballotData.containsKey(p_contestID) && c_counted);
 	}
 	
 	/**
@@ -84,7 +84,7 @@ public class Ballot
 	 */
 	public Integer[][] getContestData(Integer p_contestID) 
 	{
-		if (c_counted) return c_ballotData.get(c_id);
+		if (c_counted) return c_ballotData.get(p_contestID);
 		else return null;
 	}
 	

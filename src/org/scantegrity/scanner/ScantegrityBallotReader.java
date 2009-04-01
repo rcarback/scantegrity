@@ -24,6 +24,7 @@ import java.awt.Rectangle;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Vector;
 
 /**
@@ -40,7 +41,7 @@ public class ScantegrityBallotReader extends BallotReader
 	 */
 	public ScantegrityBallotReader()
 	{
-		// TODO Auto-generated constructor stub
+		//Nothing to do here...Scantegrity ballots aren't special!
 	}
 
 	/* (non-Javadoc)
@@ -50,6 +51,11 @@ public class ScantegrityBallotReader extends BallotReader
 	public Ballot scanBallot(BallotStyle[] p_styles, 
 								BufferedImage p_img)
 	{
+		/*TODO: Need to return an "invalid" ballot instead of null, this ballot
+		 * does it's best to scan everything but when it messes up sets the
+		 * bad state on the ballot object so that the scanner can report it!
+		 */
+		
 		Ballot l_res = new Ballot();
 		AffineTransformOp l_alignmentOp = super.getAlignmentOp(p_img);
 		
@@ -70,7 +76,7 @@ public class ScantegrityBallotReader extends BallotReader
 
 		//Select the right Ballot Style, which gives a list of contest data		
 		BallotStyle l_style = null;
-		for (BallotStyle l_s : super.c_styles) {
+		for (BallotStyle l_s : p_styles) {
 			if (l_s.getId() == l_styleID) {
 				l_style = l_s;
 				break;
@@ -78,7 +84,6 @@ public class ScantegrityBallotReader extends BallotReader
 		}
 		
 		if (l_style == null) return null;
-		
 		//Process each contest
 		Vector<Vector<Vector<Rectangle>>> l_rects = l_style.getContestRects();
 		Integer l_r[][][] = new Integer[l_rects.size()][][];
@@ -116,11 +121,13 @@ public class ScantegrityBallotReader extends BallotReader
 		
 		//Create a new Ballot object with the serial number, style, and contest
 		//data, return that object.
-		HashMap<Integer, Integer[][]> l_bData = new HashMap<Integer, Integer[][]>();
+		TreeMap<Integer, Integer[][]> l_bData = new TreeMap<Integer, Integer[][]>();
 		for (int l_i = 0; l_i < l_r.length; l_i++) {
 			l_bData.put(l_style.getContests().get(l_i), l_r[l_i]);
 		}
 		l_res.setBallotData(l_bData);
+		l_res.setCounted(l_style.isCounted());
+		l_res.setBallotStyleID(l_style.getId());
 		
 		return l_res;
 	}

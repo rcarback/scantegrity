@@ -19,8 +19,10 @@
  */
 package org.scantegrity.scanner;
 
-import org.scantegrity.lib.methods.TallyMethod;
+import java.util.Vector;
 
+import org.scantegrity.lib.methods.TallyMethod;
+import org.scantegrity.lib.methods.Contestant;
 /**
  * Contest describes a race, question, or other contest that appears in an 
  * election. This description includes a list of options or names in the contest,
@@ -34,7 +36,7 @@ public class Contest
 {
 	private String c_contestName;
 	private Integer c_id;
-	private String[] c_options;
+	private Vector<Contestant> c_contestants;
 	//private MarkRules c_rules;
 	private TallyMethod c_method;
 	
@@ -69,16 +71,16 @@ public class Contest
 	/**
 	 * @return the options
 	 */
-	public String[] getOptions()
+	public Vector<Contestant> getContestants()
 	{
-		return c_options;
+		return c_contestants;
 	}
 	/**
 	 * @param p_options the options to set
 	 */
-	public void setOptions(String[] p_options)
+	public void setContestants(Vector<Contestant> p_options)
 	{
-		c_options = p_options;
+		c_contestants = p_options;
 	}
 	/**
 	 * @return the rules
