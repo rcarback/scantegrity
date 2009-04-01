@@ -47,23 +47,20 @@
 
 package org.scantegrity.lib.methods;
 
-import java.util.logging.Logger;
+import java.util.Vector;
+
+import org.scantegrity.scanner.BallotStyle;
+import org.scantegrity.scanner.Contest;
+
+import org.scantegrity.scanner.Ballot;
 
 public interface TallyMethod {
 	/* TODO: It might turn out that this is better done through abstract
 	 * classes, but that's indeterminate at this time.
 	 */
-	
+
 	/**
-	 * setLogger - sets the logging context for the Voting method using the
-	 * configuration passed to it.
-	 * 
-	 * @param p_logger the configured logger to use.
-	 */
-	void setLogger(Logger p_logger);
-	
-	/**
-	 * calculateResults - tells the method to take the current data set and
+	 * Tally - tells the method to take the current data set and
 	 * calculate results from it. This may throw exceptions if the format
 	 * of a ballot is invalid. It's assumed at this point in time that the
 	 * ballot data will be in darkmark logic (0 for unmarked, 1 for marked). 
@@ -71,52 +68,6 @@ public interface TallyMethod {
 	 * @param p_ballots an array of 2 dimensional darkmark logic contest 
 	 * results.  
 	 */
-	void tallyResults(Integer p_ballots[][][], MarkRules p_rules);
-	
-	/**
-	 * GetWinners - Return an array of the winners. The map should contain
-	 * an order number (starting at 0), the Candidate's name, and a string 
-	 * that represents the percentage of voters who chose the candidate or 
-	 * some other reasonable data element (e.g. how many candidates can be 
-	 * elected). The last piece could be an int or a double (or something else),
-	 * which is why it is represented as a string.
-	 * 
-	 * @param bp_ballotsMatrix a darkmark logic representation of each ballot
-	 * @return an array of the winning candidates
-	 */
-	CandidateResult[] getWinners();
-	
-	/**
-	 * GetRankings - Return an array of the full ranking of candidates, and not 
-	 * just the winners. The map should contain
-	 * an order number (starting at 0), the Candidate's name, and a string 
-	 * that represents the percentage of voters who chose the candidate or 
-	 * some other reasonable data element (e.g. how many candidates can be 
-	 * elected). The last piece could be an int or a double (or something else),
-	 * which is why it is represented as a string.
-	 * 
-	 * @return an array of the full ranking of candidates, and not 
-	 * just the winners.
-	 */
-	CandidateResult[] getRankings();
-	
-	/**
-	 * getDecisionLog - Report each decision made by the algorithm (including
-	 * deciding of the final result). Each decision should be a separate entry 
-	 * in the array.
-	 * 
-	 * @return An array of unformatted strings describing the decisions made.
-	 */
-	String[] getDecisionLog();
-	
-	
-	/**
-	 * getResults - Return a formatted summary of the election results.
-	 * 
-	 * @return An formatted string describing the tally results. This could be
-	 * a simple list, or it could be a string of decisions (as in IRV).
-	 */
-	String getResults();
-	
-	
+	ContestResult tally(Contest p_contest, BallotStyle p_styles[], 
+							Vector<Ballot> p_ballots);	
 }

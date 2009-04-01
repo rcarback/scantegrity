@@ -32,8 +32,13 @@
 package org.scantegrity.lib.methods;
 
 import java.util.TreeMap;
+import java.util.Vector;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
+
+import org.scantegrity.scanner.Ballot;
+import org.scantegrity.scanner.BallotStyle;
+import org.scantegrity.scanner.Contest;
 
 public class PluralityTally implements TallyMethod {
 	/**
@@ -104,7 +109,7 @@ public class PluralityTally implements TallyMethod {
 		l_log[0] = c_names[0] + " wins with " + c_totals[0] + "votes.";
 		return l_log;
 	}
-
+/*
 	public CandidateResult[] getRankings() {
 		CandidateResult l_res[] = new CandidateResult[c_names.length];
 		for (int l_i = 0; l_i < c_names.length; l_i++) {
@@ -128,7 +133,7 @@ public class PluralityTally implements TallyMethod {
 			                                 "" + c_totals[0]);
 		return l_res;
 	}
-
+*/
 	public void setLogger(Logger p_logger) {
 		c_logger = p_logger;
 	}
@@ -147,5 +152,16 @@ public class PluralityTally implements TallyMethod {
 				l_sum += p_ballot[l_i][0];
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.scantegrity.lib.methods.TallyMethod#tally(org.scantegrity.scanner.Contest, org.scantegrity.scanner.BallotStyle[], java.util.Vector)
+	 */
+	@Override
+	public ContestResult tally(Contest p_contest, BallotStyle[] p_styles,
+			Vector<Ballot> p_ballots)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
