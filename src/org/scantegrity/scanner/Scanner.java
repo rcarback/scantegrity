@@ -21,6 +21,8 @@ package org.scantegrity.scanner;
 
 import java.awt.HeadlessException;
 
+import org.scantegrity.common.DirectoryWatcher;
+import org.scantegrity.common.ImageLoader;
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.scanner.gui.PollingPlaceGUI;
 
@@ -32,18 +34,40 @@ import org.scantegrity.scanner.gui.PollingPlaceGUI;
  * scanner on election day. 
  */
 public class Scanner
-{
-
+{	
+	private PollingPlaceGUI c_guiRef;
+	
+	public Scanner(PollingPlaceGUI p_guiRef)
+	{
+		c_guiRef = p_guiRef; 
+	}
+	
+	public void startElection()
+	{
+		String c_srcDir = "/mnt/scantegritytmpfs/images";
+		String c_destDir = "/mnt/scantegritytmpfs/backup";
+		
+		//Create Ballot Handler
+		BallotImageHandler l_bih = new BallotImageHandler(c_guiRef);
+		
+		//initialize the ImageLoader
+		ImageLoader l_il = new ImageLoader(l_bih);
+		
+		//initialize and start the directory watcher thread
+		Runnable l_dirWatch = new DirectoryWatcher(c_srcDir, c_destDir, l_il);
+		Thread l_dirWatchThread = new Thread(l_dirWatch);
+		l_dirWatchThread.start();
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args)
 	{
 		//Get the config file
+		//Things here will come from config
 		
-		
-		//start the gui
-		Runnable l_gui = null;
+		Runnable l_gui = new PollingPlaceGUI();
 		
 		try
 		{
@@ -54,8 +78,11 @@ public class Scanner
 			//eventually send this to dialogs?
 			Dialogs.displayErrorDialog("Headless Exception in Scanneer when creating PollingPlaceGUI.");
 		}
-
+		
+		
+		//start gui thread
 		Thread l_guiThread = new Thread(l_gui); 
 		l_guiThread.start();
+
 	}
 }

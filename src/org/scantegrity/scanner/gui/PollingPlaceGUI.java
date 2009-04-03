@@ -48,8 +48,12 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import org.scantegrity.common.DirectoryWatcher;
+import org.scantegrity.common.ImageLoader;
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
+import org.scantegrity.scanner.BallotImageHandler;
+import org.scantegrity.scanner.Scanner;
 
 /**
  * @author John Conway 
@@ -66,7 +70,6 @@ import org.scantegrity.common.gui.ScantegrityJFrame;
  */
 public class PollingPlaceGUI implements Runnable,ActionListener
 {
-	
 	/* 
 	 * Serial Version UID
 	 */ 
@@ -75,6 +78,8 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	/* ***********************************************
 	 * Class Variables 
 	 ************************************************/
+	private Scanner c_scannerRef; 
+	
 	private ScantegrityJFrame c_frame; 
 	private CardLayout c_scannerInfoCardLayout;
 	
@@ -129,10 +134,13 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 */
 	public PollingPlaceGUI()
 	{
+		//initalize scanner ref
+		c_scannerRef = new Scanner(this);
+		
 		//TODO: get configuration info
 		c_fontStyle = ScannerUIConstants.FONT_STYLE_SERIF;
 		
-		guiInit(); 
+		guiInit();
 	}
 
 	/* ***********************************************
@@ -162,8 +170,9 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
 	}
 	
-	public void displayScanResults()
+	public void displayScanResults(String p_scanResults)
 	{
+		c_ballotInfoLabel.setText(p_scanResults);
 		changeCard(ScannerUIConstants.BALLOT_INFO_CARD);
 	}
 	
@@ -834,38 +843,6 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 * Action Listener Methods
 	 ************************************************/
 	
-	//TODO: this must be removed
-	private void showTesterPanel()
-	{
-		ScantegrityJFrame l_testDialog = new ScantegrityJFrame("Tester Dialog");
-		
-		l_testDialog.setPreferredSize(new Dimension(300,200));
-		
-		JLabel l_infoLabel = new JLabel("Press the Scan Button to Emulate Scanning.");
-		
-		l_testDialog.add(l_infoLabel, BorderLayout.PAGE_START);
-		
-		JButton l_scanButton = new JButton("Start Scan");
-		l_scanButton.addActionListener(this);
-		l_scanButton.setFocusable(false);
-
-		l_testDialog.add(l_scanButton, BorderLayout.CENTER);
-		
-		JButton l_fscanButton = new JButton("Finish Scan");
-		l_fscanButton.addActionListener(this);
-		l_fscanButton.setFocusable(false);
-		
-		l_testDialog.add(l_fscanButton, BorderLayout.LINE_END);
-		
-		JButton l_wButton = new JButton("Waiting");
-		l_wButton.addActionListener(this);
-		l_wButton.setFocusable(false);
-
-		l_testDialog.add(l_wButton, BorderLayout.PAGE_END);
-		
-		l_testDialog.display(true);
-	}
-	
 	/**
 	 * Actions to be taken when a button is activated. 
 	 */
@@ -888,6 +865,8 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		}		
 		else if(e.getActionCommand().equals(c_startElectionButton.getText()))
 		{
+			c_scannerRef.startElection();
+			
 			c_frame.setVisible(false);
 			
 			c_frame.remove(c_electionInfoPanel);
@@ -898,9 +877,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			c_frame.setVisible(true);
 			
 			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
-			
-			//TODO: Delete
-			showTesterPanel();
+
 		}
 		else if(e.getActionCommand().equals(c_chiefLoginButton.getText()))
 		{
@@ -908,7 +885,10 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			boolean l_validated = true; 
 			
 			if(l_validated)
+			{
+				
 				changeCard(ScannerUIConstants.START_ELECTION_CARD);
+			}
 			else
 			{
 				changeCard(ScannerUIConstants.LOGIN_CARD);
@@ -941,19 +921,6 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			
 			//wait then display waiting for ballots
 			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
-		}
-		//TODO: these are only for test
-		else if(e.getActionCommand().equals("Start Scan"))
-		{
-			setToScanningBallot();
-		}
-		else if(e.getActionCommand().equals("Finish Scan"))
-		{
-			displayScanResults();
-		}
-		else if(e.getActionCommand().equals("Waiting"))
-		{
-			setToWaiting();
 		}
 	}
 }

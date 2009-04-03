@@ -32,12 +32,12 @@ public class ImageLoader {
 		c_handler = p_handler;
 	}
 	
-	/*
+	/**
 	 * setHandler - Sets the callback handler object
 	 * 
 	 * @param p_handler - New callback object to use
 	 */
-	public void setHandler(ImageHandler p_handler)
+	public void setHandler(ImageHandler p_handler) throws IllegalArgumentException
 	{
 		if( p_handler == null )
 			throw new IllegalArgumentException();
@@ -45,7 +45,7 @@ public class ImageLoader {
 		c_handler = p_handler;
 	}
 	
-	/*
+	/**
 	 * loadImage - Loads the image specified into a BufferedImage, moves the
 	 * file to the destination folder specified, and calls the callback object
 	 * with the newly created BufferedImage
@@ -78,13 +78,15 @@ public class ImageLoader {
 		if( l_image == null )
 			return false;
 		
+		
 		//Move file to destination directory
 		if( !p_inputFile.renameTo( new File( p_destFolder, p_inputFile.getName() ) ) )
 		{
 			throw new IOException("Could not move file");
 		}
-		
+
 		c_handler.handleImage(l_image);
+		
 		return true;
 	}
 }

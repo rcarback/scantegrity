@@ -1,8 +1,11 @@
-package org.scantegrity.common;
+package org.scantegrity.testing;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
+import org.scantegrity.common.ImageHandler;
+import org.scantegrity.common.ImageLoader;
 
 /*
  * Test the ImageLoader class.  Provides an implementation of ImageHandler that simply

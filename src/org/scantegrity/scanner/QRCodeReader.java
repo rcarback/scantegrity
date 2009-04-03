@@ -19,10 +19,15 @@
  */
 package org.scantegrity.scanner;
 
+import java.util.Vector;
+import java.util.Hashtable;
+
 import java.awt.Rectangle;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.DecodeHintType;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
@@ -53,8 +58,19 @@ public class QRCodeReader implements SerialNumberReader
 			//System.out.println("Trying...");
 			
 			l_serial = new BufferedImageMonochromeBitmapSource(AffineCropper.crop(p_img, p_op, c_boundingBox));
-			Result result = new MultiFormatReader().decode(l_serial);
-			//System.out.println("The Result: " + result.getText());
+			
+			Vector<BarcodeFormat> l_formats = new Vector<BarcodeFormat>();
+			l_formats.add(BarcodeFormat.QR_CODE);
+			Hashtable<DecodeHintType, Object> hints = null;
+			hints = new Hashtable<DecodeHintType, Object>(3);
+			hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+			//hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
+			hints.put(DecodeHintType.POSSIBLE_FORMATS, l_formats);
+
+			Result result = new MultiFormatReader().decode(l_serial, hints);
+			
+			
+			System.out.println("The Result: " + result.getText());
 			//System.out.println("Serial Scan Time:" + (int)(System.currentTimeMillis()-l_start) + "ms");
 			return Integer.parseInt(result.getText());
 		} catch (ReaderException e) {
@@ -64,6 +80,16 @@ public class QRCodeReader implements SerialNumberReader
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public void setSerialBoundingBox(Rectangle p_boundingBox)
+	{
+		c_boundingBox = p_boundingBox;
+	}
+	
+	public Rectangle getSerialBoundingBox()
+	{
+		return c_boundingBox;
 	}
 
 }

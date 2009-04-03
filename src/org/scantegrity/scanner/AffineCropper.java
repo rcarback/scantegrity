@@ -49,6 +49,8 @@ public final class AffineCropper
 	public static BufferedImage crop(BufferedImage p_src, 
 			AffineTransformOp p_op, Rectangle p_bounds) throws Exception
 	{
+		int i = 0; 
+		
 		//p_bounds = new Rectangle(0, 0, 2550, 3300);
 		BufferedImage l_res = new BufferedImage(p_bounds.width,
 												p_bounds.height,
@@ -72,12 +74,14 @@ public final class AffineCropper
 				} catch (ArrayIndexOutOfBoundsException e) {} 
 			}
 		}
-		/* BEGIN DEBUG * /
+		/* BEGIN DEBUG */
 		try {
-			ImageIO.write(l_res,"png",new File("serial.png"));
+			ImageIO.write(l_res,"png",new File("serial" + i + ".png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
+		
+		i++; 
 		/* END DEBUG */
 		return l_res;
 	}

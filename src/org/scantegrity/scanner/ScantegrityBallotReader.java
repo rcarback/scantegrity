@@ -59,6 +59,9 @@ public class ScantegrityBallotReader extends BallotReader
 		Ballot l_res = new Ballot();
 		AffineTransformOp l_alignmentOp = super.getAlignmentOp(p_img);
 		
+		if(l_alignmentOp == null)
+			return null; 
+		
 		//Read in the Serial Number
 		try
 		{
