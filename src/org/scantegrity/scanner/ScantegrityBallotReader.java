@@ -137,19 +137,32 @@ public class ScantegrityBallotReader extends BallotReader
 	
 	private boolean isMarked(BufferedImage p_img)
 	{
+		int l_cw = (int) Math.round(p_img.getWidth()/2.0);
+		int l_ch = (int) Math.round(p_img.getHeight()/2.0);
+		
+		Point l_c = new Point(l_cw, l_ch), l_p = new Point(), l_cent = new Point(0,0); 
+		
 		//If more than 30% black, return true
 		int l_total = p_img.getHeight()*p_img.getWidth();
 		int l_det = 0;
 		for (int l_i = 0; l_i < p_img.getWidth(); l_i++)
 		{
 			for (int l_j = 0; l_j < p_img.getHeight(); l_j++) {
-				if (DetectBlack.isBlack(l_i, l_j, p_img)) l_det++;
+				if (DetectBlack.isBlack(l_i, l_j, p_img)) {
+					l_p.setLocation(l_i, l_j); 
+					double l_dist = l_c.distance(l_p);
+					double l_cDist = l_c.distance(l_cent); 
+					
+					//Gravity!!!!
+					l_det += Math.round(3*(1 - (l_dist/l_cDist)));
+					//System.out.print(Math.round(1*(1 - (l_dist/l_cDist))) + ","); 
+				}
 			}
 		}
 		
 		double l_res = (double)l_det/(double)l_total;
 		
-		//System.out.println("% Black: " + l_res);
+		System.out.println("\n% Black: " + l_res);
 		
 		if (l_res > .3) return true;
 		return false;

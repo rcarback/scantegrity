@@ -34,9 +34,9 @@ import javax.imageio.ImageIO;
  * @author Richard Carback
  *
  */
-public final class AffineCropper
+public class AffineCropper
 {
-	
+	static int i = 0; 
 	/**
 	 * Takes a rectangle in the expected space and pulls it from a scanned
 	 * image given a specific AffineTransformOp. 
@@ -49,7 +49,6 @@ public final class AffineCropper
 	public static BufferedImage crop(BufferedImage p_src, 
 			AffineTransformOp p_op, Rectangle p_bounds) throws Exception
 	{
-		int i = 0; 
 		
 		//p_bounds = new Rectangle(0, 0, 2550, 3300);
 		BufferedImage l_res = new BufferedImage(p_bounds.width,

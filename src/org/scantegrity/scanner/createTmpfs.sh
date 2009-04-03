@@ -12,7 +12,8 @@ cd /mnt/scantegritytmpfs/images
 
 NUM=0
 while true; do
-     ../scanimage --batch="scan-$NUM-%d.tiff" --mode Lineart --format=tiff --resolution 150
+	# brightness must be around 55 for scan to work properly
+     ../scanimage --batch="scan-$NUM-%d.tiff" --mode Lineart --format=tiff  --brightness 55 --resolution 150
      #$./scanimage --mode Lineart --format=tiff --source "ADF Duplex" --resolution 150 > out.tiff
 
     NUM=$((NUM+1))

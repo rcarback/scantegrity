@@ -47,12 +47,12 @@ public class BallotImageHandler implements ImageHandler
 		c_guiRef = p_guiRef;
 		
 		c_reader = new ScantegrityBallotReader();
-		Dimension l_d = new Dimension(2550, 3300);
+		Dimension l_d = new Dimension(2550, 4200);
 		Point[] l_marks = new Point[2];
-		l_marks[0] = new Point(2299, 209);
-		l_marks[1] = new Point(2288, 2964);
+		l_marks[0] = new Point(2352, 232);
+		l_marks[1] = new Point(2328, 3152);
 		QRCodeReader l_code = new QRCodeReader();
-		l_code.setSerialBoundingBox(new Rectangle(154, 60, 240, 240));
+		l_code.setSerialBoundingBox(new Rectangle(112, 32, 290, 290));
 		c_reader.setSerial(l_code);
 		c_reader.setAlignment(l_marks);
 		c_reader.setDimension(l_d);
@@ -62,30 +62,39 @@ public class BallotImageHandler implements ImageHandler
 		Vector<Integer> l_contests = new Vector<Integer>();
 		l_contests.add(0);
 		l_contests.add(1);
+		l_contests.add(2);
 
 		Vector<Vector<Vector<Rectangle>>> l_rects = new Vector<Vector<Vector<Rectangle>>>();
 		//Contest 0
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1520, 795, 100, 40));
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1655, 795, 100, 40));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1204, 725, 160, 80));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1367, 725, 160, 80));
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1521, 920, 100, 40));
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1655, 920, 100, 40));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1204, 866, 160, 80));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1367, 866, 160, 80));
+		l_rects.elementAt(0).add(new Vector<Rectangle>());
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1204, 1016, 160, 80));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1367, 1016, 160, 80));
 
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1525, 1200, 100, 40));
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1660, 1200, 100, 40));
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1800, 1200, 100, 40));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1204, 1655, 160, 80));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1367, 1655, 160, 80));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1527, 1655, 160, 80));
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1525, 1300, 100, 40));
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1660, 1300, 100, 40));
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1800, 1300, 100, 40));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1204, 1805, 160, 80));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1367, 1805, 160, 80));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1527, 1805, 160, 80));
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1525, 1445, 100, 40));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1660, 1445, 100, 40));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1800, 1445, 100, 40));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1204, 1948, 160, 80));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1367, 1948, 160, 80));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1527, 1948, 160, 80));
+		
+		l_rects.add(new Vector<Vector<Rectangle>>());
+		l_rects.elementAt(2).add(new Vector<Rectangle>());
+		l_rects.elementAt(2).elementAt(0).add(new Rectangle(2073, 725, 160, 80));
+		l_rects.elementAt(2).elementAt(0).add(new Rectangle(2233, 725, 160, 80));
 		
 		
 		BallotStyle l_style = new BallotStyle(0, l_contests, l_rects, true);
@@ -135,6 +144,8 @@ public class BallotImageHandler implements ImageHandler
 		}
 		
 		c_results +="</html>";
+		
+		//Send the results to the gui
 		c_guiRef.displayScanResults(c_results);
 	}
 

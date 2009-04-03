@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
+import org.scantegrity.common.gui.Dialogs;
+
 /************************************************************************
  * Loads in image from the filesystem, moves it to the directory specified
  * and calls a function specified by the callback object.
@@ -73,6 +75,29 @@ public class ImageLoader {
 	}
 
 	public boolean loadImage(File p_inputFile, File p_destFolder) throws IOException {
+		long l_fileLength = p_inputFile.length();
+		long l_control = 0; 
+		
+		while(l_control > l_fileLength || l_control == 0)
+		{
+			try
+			{
+				Thread.sleep(200);
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			l_fileLength = l_control; 
+			l_control = p_inputFile.length();
+			
+			//Dialogs.displayDialogBox(new Long(l_control).toString());
+			//System.out.println(l_control); 
+		}
+			
+		
 		
 		BufferedImage l_image = ImageIO.read( p_inputFile );
 		if( l_image == null )

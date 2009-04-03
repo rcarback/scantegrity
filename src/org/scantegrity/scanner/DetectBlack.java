@@ -52,9 +52,9 @@ public final class DetectBlack
 		//System.out.println("Color is:" + l_cr + ", " + l_cg + ", " + l_cb);
 		//This tolerance might be too high! 
 		//TODO: Might want to make it configurable.
-		if (Math.abs(l_cr - c_br) <= 100 
-				&& Math.abs(l_cg - c_bg) <= 100 
-				&& Math.abs(l_cb - c_bb) <=100) 
+		if (Math.abs(l_cr - c_br) <= 200 
+				&& Math.abs(l_cg - c_bg) <= 200 
+				&& Math.abs(l_cb - c_bb) <=200) 
 		{
 			return true;
 		}

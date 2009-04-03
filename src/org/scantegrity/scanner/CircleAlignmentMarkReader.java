@@ -128,10 +128,10 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 					
 				} catch (ArrayIndexOutOfBoundsException l_e) {}
 			}
-			/* BEGIN DEBUG 
+			/* BEGIN DEBUG * /
 			try {
 				Graphics2D l_out = p_img.createGraphics();
-				l_out.setColor(Color.green);
+				l_out.setColor(Color.black);
 				l_out.fillRect(l_inv.x, l_inv.y, 5, 5);
 				l_out.fillRect(l_cur.x, l_cur.y, 5, 5);
 				ImageIO.write(p_img,"png",new File("test.png"));
