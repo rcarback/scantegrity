@@ -38,6 +38,7 @@ public class BallotImageHandler implements ImageHandler
 {
 	private ScantegrityBallotReader c_reader;
 	private PollingPlaceGUI c_guiRef; 
+	private BallotStyle c_styles[] = null;
 	
 	private String c_results; 
 	
@@ -61,7 +62,6 @@ public class BallotImageHandler implements ImageHandler
 		Vector<Integer> l_contests = new Vector<Integer>();
 		l_contests.add(0);
 		l_contests.add(1);
-		l_contests.add(2);
 
 		Vector<Vector<Vector<Rectangle>>> l_rects = new Vector<Vector<Vector<Rectangle>>>();
 		//Contest 0
@@ -89,11 +89,10 @@ public class BallotImageHandler implements ImageHandler
 		
 		
 		BallotStyle l_style = new BallotStyle(0, l_contests, l_rects, true);
-		BallotStyle l_styles[] = new BallotStyle[1];
-		l_styles[0] = l_style;
+		c_styles = new BallotStyle[1];
+		c_styles[0] = l_style;
 		
-		
-		c_reader.setStyles(l_styles);
+		//c_reader.setStyles(l_styles);
 	}
 	
 	/* (non-Javadoc)
@@ -103,7 +102,7 @@ public class BallotImageHandler implements ImageHandler
 	{
 		
 		try {
-			Ballot l_b = c_reader.scanBallot(null, p_image);
+			Ballot l_b = c_reader.scanBallot(c_styles, p_image);
 			
 			//couldn't find alignment marks 
 			if(l_b == null)
