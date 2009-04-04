@@ -162,7 +162,10 @@ public class InstantRunoffTally implements TallyMethod {
 
 		//Stack's for resolving ties.
 		Vector<TreeMap<Contestant, Vector<BallotIterator>>> l_tieStack;
+		l_tieStack = new Vector<TreeMap<Contestant, Vector<BallotIterator>>>();
 		Vector<IRVContestResult.Round> l_roundStack;
+		l_roundStack = new Vector<IRVContestResult.Round>();
+		Vector<Contestant> l_canStack = new Vector<Contestant>();
 		
 		
 		//Process each round, create a round result for each iteration.
@@ -220,6 +223,29 @@ public class InstantRunoffTally implements TallyMethod {
 					 * is detected. Pick one state, push the other possibilities
 					 * onto the stack, then continue this chain.
 					 */
+					l_curRound.addNote("Tie is Unbreakable, computing all"
+										+ " possibilities...");
+					
+					for (int l_i = 1; l_i < l_tied.size(); l_i++)
+					{
+						TreeMap<Contestant, Vector<BallotIterator>> l_tmpStack;
+						IRVContestResult.Round l_tmpRnd;
+						Contestant l_tmpCan; 
+						l_tmpStack = 
+							new TreeMap<Contestant, Vector<BallotIterator>>(
+									l_stacks);
+						l_tmpRnd = l_curRound.clone();
+						l_tmpCan = l_tied.get(l_i);
+						l_canStack.add(l_tmpCan);
+						l_roundStack.add(l_tmpRnd);
+						l_tieStack.add(l_tmpStack);
+					}
+					
+					//Chosen state is 0
+					l_curRound.c_desc += ", Dropped " + l_tied.get(0).toString()
+										+ " in Round " + l_curRound.c_id;
+					l_defeated = new Vector<Contestant>();
+					l_defeated.add(l_tied.get(0));
 					
 					
 				}
@@ -245,20 +271,51 @@ public class InstantRunoffTally implements TallyMethod {
 				return null;
 			}
 
-			System.out.println(l_curRound.toString());
 			//Detect a winner
 			//Is there a winner with 50%+1 vote majority? End now.
 			Vector<Contestant> l_top = l_curRank.get(l_curRank.firstKey());
 			if (l_top.size() == 1 
 					&& l_numBallots/l_stacks.get(l_top.get(0)).size() < 2.0)
 			{
-				System.out.println("END, winner is " + l_top.get(0));
+				l_curRound.addNote("END, Majority winner is " + l_top.get(0));
 				l_curRound.c_state.set(l_contestants.indexOf(l_top.get(0)), 
 										"WINNER, Round " + l_curRound.getId());
-			}			
+				//Need something here to end counting.. but not a big problem..
+			}
+			else if (l_stacks.size() <= 2)
+			{
+				//Nothing left to count
+				l_curRound.addNote("END, winner is " + l_top.get(0));
+				l_curRound.c_state.set(l_contestants.indexOf(l_top.get(0)), 
+										"WINNER, Round " + l_curRound.getId());
+			}
 			
-			//Set up next round.
+			//Save round and report results
 			l_res.addRound(l_curRound);
+			System.out.println(l_curRound.toString());						
+			
+			//Continue execution if there are remaining ties that need to 
+			//be computed.
+			if (l_stacks.size() <= 2 && l_tieStack.size() > 0)
+			{
+				l_stacks = l_tieStack.get(0);
+				l_curRound = l_roundStack.get(0);
+				Contestant l_dropCan = l_canStack.get(0);
+				l_curRound.c_desc += ", Dropped " + l_dropCan.toString()
+				+ " in Round " + l_curRound.c_id;
+				l_countMe = new Vector<BallotIterator>();
+				l_countMe.addAll(l_stacks.get(l_dropCan));
+				l_stacks.remove(l_dropCan);
+				l_curRound.addNote(l_dropCan.getName() + " DEFEATED (TIE)");
+				l_curRound.c_state.set(l_contestants.indexOf(l_dropCan), 
+									"DEFEATED (TIE), Round " + l_curRound.getId());
+				l_tieStack.remove(0);
+				l_roundStack.remove(0);
+				l_canStack.remove(0);
+			}
+
+
+			//Set up next round.
 			l_prevRound = l_curRound;
 			l_curRound = l_res.new Round(l_prevRound);
 		} while (l_stacks.size() > 2); // There can be only one (and Exhaust..)!

@@ -155,11 +155,21 @@ public class PluralityTally implements TallyMethod {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.scantegrity.lib.methods.TallyMethod#tally(org.scantegrity.scanner.Contest, org.scantegrity.scanner.BallotStyle[], java.util.Vector)
+	 * @see org.scantegrity.lib.methods.TallyMethod#tally(org.scantegrity.scanner.Contest, java.util.Vector)
 	 */
 	@Override
-	public ContestResult tally(Contest p_contest, BallotStyle[] p_styles,
-			Vector<Ballot> p_ballots)
+	public ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.scantegrity.lib.methods.TallyMethod#validateContest(int, org.scantegrity.scanner.Ballot)
+	 */
+	@Override
+	public TreeMap<String, String> validateContest(int p_contestId,
+			Ballot p_ballot)
 	{
 		// TODO Auto-generated method stub
 		return null;

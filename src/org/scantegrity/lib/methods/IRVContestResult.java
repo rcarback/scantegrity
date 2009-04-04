@@ -170,7 +170,20 @@ public class IRVContestResult extends ContestResult
 			c_state = p_state;
 			c_desc = "";			
 			c_roundNotes = p_roundNotes;
-		}		
+		}	
+		
+		public Round clone()
+		{
+			Round l_new = new Round(c_id);
+			l_new.setDelta(new Vector<Integer>(c_delta));
+			l_new.setDesc(new String(c_desc));
+			l_new.setId(c_id);
+			l_new.setRoundNotes(new Vector<String>(c_roundNotes));
+			l_new.setState(new Vector<String>(c_state));
+			l_new.setTotals(new Vector<Integer>(c_totals));		
+			return l_new;
+		}
+		
 		/**
 		 * @return the id
 		 */
