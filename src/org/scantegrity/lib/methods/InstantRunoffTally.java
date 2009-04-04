@@ -91,9 +91,41 @@ import org.scantegrity.scanner.Contest;
  */
 
 public class InstantRunoffTally implements TallyMethod {	
-	/** TODO: This entire thing would benefit from a call back to ask 
+	/** TODO: This entire thing might benefit from a call back to ask 
 	 * the user to make certain decisions.
 	 */
+	
+
+	/* (non-Javadoc)
+	 * @see org.scantegrity.lib.methods.TallyMethod#validateBallot(org.scantegrity.scanner.Contest, org.scantegrity.scanner.Ballot)
+	 */
+	@Override
+	public TreeMap<String, String> validateContest(int p_contestId,
+													Ballot p_ballot)
+	{
+		if (!p_ballot.hasContest(p_contestId)) return null;
+		TreeMap<String, String> l_res = new TreeMap<String, String>();
+		//This models some of the iterator functionality, but since counting
+		//and validation are different beasts, we can't really use it.
+		//if ()
+		Integer l_bData[][] = p_ballot.getContestData(p_contestId);
+		if (l_bData.length == 0 || l_bData[0].length == 0) return null;
+		for (int l_i = 0; l_i < l_bData[0].length; l_i++)
+		{
+			int l_rankCnt = 0;
+			for (int l_j = 0; l_j < l_bData.length; l_j++)
+			{
+				if (l_bData[l_j][l_i] == 1) l_rankCnt++;
+			}
+			String l_rankName = "Rank " + (l_i+1); 
+			if (l_rankCnt == 1)	l_res.put(l_rankName, "Mark Recorded");
+			else if (l_rankCnt == 0) l_res.put(l_rankName, "No Vote");
+			else l_res.put(l_rankName, "Overvote");
+		}
+		
+		return l_res;
+	}	
+	
 	
 	/* (non-Javadoc)
 	 * @see org.scantegrity.lib.methods.TallyMethod#tally(int, java.util.Vector)
@@ -575,5 +607,4 @@ public class InstantRunoffTally implements TallyMethod {
 			return l_res;
 		}
 	}
-	
 }

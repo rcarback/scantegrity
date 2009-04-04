@@ -47,6 +47,7 @@
 
 package org.scantegrity.lib.methods;
 
+import java.util.TreeMap;
 import java.util.Vector;
 
 import org.scantegrity.scanner.BallotStyle;
@@ -63,7 +64,7 @@ public interface TallyMethod {
 	 * validateBallot checks a ballot and returns a map of possible
 	 * choices and if those choices were read.
 	 */
-	//TreeMap<String, String> validateBallot(Contest p_contest, Ballot )
+	TreeMap<String, String> validateContest(int p_contestId, Ballot p_ballot);
 	
 	/**
 	 * Tally - tells the method to take the current data set and
