@@ -28,20 +28,16 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
-import javax.swing.JButton;
 
 import org.scantegrity.scanner.Ballot;
 import org.scantegrity.scanner.BallotStyle;
 import org.scantegrity.scanner.CircleAlignmentMarkReader;
 import org.scantegrity.scanner.QRCodeReader;
 import org.scantegrity.scanner.ScantegrityBallotReader;
-
-import com.lowagie.text.pdf.hyphenation.TernaryTree.Iterator;
 
 /**
  * Tests the scantegrityBallotReader object methods.
@@ -79,7 +75,12 @@ public class ScantegrityBallotReaderTest
 									 	"wacky3.tiff"/**/
 									};
 	
-	
+/*	private static String basedir = "testing/scanner/sample-images/Alignment/Bad Scans/";
+	private static String tests[] = { /** /"scan-151-1.tiff",
+										"scan-196-1.tiff", 
+										"scan-206-1.tiff",
+										"scan-226-1.tiff"/** /
+									};*/
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -87,6 +88,7 @@ public class ScantegrityBallotReaderTest
 	public static void main(String[] args) throws IOException
 	{
 		ScantegrityBallotReader l_reader = new ScantegrityBallotReader();
+		
 		Dimension l_d = new Dimension(2550, 3300);
 		Point[] l_marks = new Point[2];
 		l_marks[0] = new Point(2341, 478);
@@ -126,12 +128,73 @@ public class ScantegrityBallotReaderTest
 		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1660, 1445, 100, 40));
 		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1800, 1445, 100, 40));
 		
+		Vector<Vector<Integer>> l_contestantIds = new Vector<Vector<Integer>>();
+		l_contestantIds.add(new Vector<Integer>());
+		l_contestantIds.get(0).add(0);
+		l_contestantIds.get(0).add(1);
+		l_contestantIds.add(new Vector<Integer>());
+		l_contestantIds.get(1).add(0);
+		l_contestantIds.get(1).add(1);
+		l_contestantIds.get(1).add(2);
+		
 		
 		BallotStyle l_style = new BallotStyle(0, l_contests, l_rects, true);
+		l_style.setContestantIds(l_contestantIds);
 		BallotStyle l_styles[] = new BallotStyle[1];
 		l_styles[0] = l_style;
+		/*
+		BallotStyle l_styles[] = new BallotStyle[1];				
+		l_reader = new ScantegrityBallotReader();
+		Dimension l_d = new Dimension(2550, 3300);
+		Point[] l_marks = new Point[2];
+		l_marks[0] = new Point(2299, 209);
+		l_marks[1] = new Point(2288, 2964);
+		QRCodeReader l_code = new QRCodeReader();
+		l_code.setSerialBoundingBox(new Rectangle(158, 60, 250, 250));
+		l_reader.setSerial(l_code);
+		l_reader.setAlignment(l_marks);
+		l_reader.setDimension(l_d);
+		l_reader.setAlignmentMark(new CircleAlignmentMarkReader(36, .05));
+		l_reader.setTolerance(.4);
+		
+		Vector<Integer> l_contests = new Vector<Integer>();
+		l_contests.add(0);
+		l_contests.add(1);
+
+		Vector<Vector<Vector<Rectangle>>> l_rects = new Vector<Vector<Vector<Rectangle>>>();
+				BallotStyle l_style = new BallotStyle(0, l_contests, l_rects, true);
+		l_styles = new BallotStyle[1];
+		l_styles[0] = l_style;
+
+		l_rects.add(new Vector<Vector<Rectangle>>());
+		l_rects.elementAt(0).add(new Vector<Rectangle>());
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1520, 795, 100, 40));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1655, 795, 100, 40));
+		l_rects.elementAt(0).add(new Vector<Rectangle>());
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1521, 920, 100, 40));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1655, 920, 100, 40));
+
+		l_rects.add(new Vector<Vector<Rectangle>>());
+		l_rects.elementAt(1).add(new Vector<Rectangle>());
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1525, 1200, 100, 40));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1660, 1200, 100, 40));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1800, 1200, 100, 40));
+		l_rects.elementAt(1).add(new Vector<Rectangle>());
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1525, 1300, 100, 40));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1660, 1300, 100, 40));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1800, 1300, 100, 40));
+		l_rects.elementAt(1).add(new Vector<Rectangle>());
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1525, 1445, 100, 40));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1660, 1445, 100, 40));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1800, 1445, 100, 40));		
+
+
+		*/
+		//Contest 0
 		
 		
+		
+				
 		//l_reader.setStyles(l_styles);
 		Vector<Ballot> l_ballots = new Vector<Ballot>();
 		for (String test: tests)

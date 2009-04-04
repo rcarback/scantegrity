@@ -19,9 +19,7 @@
  */
 package org.scantegrity.scanner.test;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -160,7 +158,7 @@ public class InstantRunOffTallyTest
 		InstantRunoffTally l_tally = new InstantRunoffTally();
 		BallotStyle l_styles[] = new BallotStyle[1];
 		l_styles[0] = l_style;
-		l_tally.tally(l_contest, l_styles, l_ballots);
+		l_tally.tally(l_contest, l_ballots);
 	}
 
 }

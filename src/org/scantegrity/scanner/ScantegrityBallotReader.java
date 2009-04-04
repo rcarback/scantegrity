@@ -99,16 +99,19 @@ public class ScantegrityBallotReader extends BallotReader
 				l_r[l_i][l_j] = new Integer[l_rects.elementAt(l_i).elementAt(l_j).size()];
 				for (int l_k = 0; l_k < l_rects.elementAt(l_i).elementAt(l_j).size(); l_k++)
 				{
+					//Using the style mapping, find what the normal contestant
+					//id is and use that instead here.
+					int l_cid = l_style.getContestantIds().get(l_i).get(l_j);
 					try
 					{
 						l_tmp = AffineCropper.crop(p_img, l_alignmentOp, 
 								l_rects.elementAt(l_i).elementAt(l_j).elementAt(l_k));
 						if (isMarked(l_tmp)) {
-							l_r[l_i][l_j][l_k] = 1;
+							l_r[l_i][l_cid][l_k] = 1;
 						} 
 						else
 						{
-							l_r[l_i][l_j][l_k] = 0;
+							l_r[l_i][l_cid][l_k] = 0;
 						}
 							
 					}
@@ -116,7 +119,7 @@ public class ScantegrityBallotReader extends BallotReader
 					{
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						l_r[l_i][l_j][l_k] = 0;
+						l_r[l_i][l_cid][l_k] = 0;
 					}
 				}
 			}

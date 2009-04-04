@@ -60,14 +60,26 @@ public interface TallyMethod {
 	 */
 
 	/**
+	 * validateBallot checks a ballot and returns a map of possible
+	 * choices and if those choices were read.
+	 */
+	//TreeMap<String, String> validateBallot(Contest p_contest, Ballot )
+	
+	/**
 	 * Tally - tells the method to take the current data set and
 	 * calculate results from it. This may throw exceptions if the format
 	 * of a ballot is invalid. It's assumed at this point in time that the
-	 * ballot data will be in darkmark logic (0 for unmarked, 1 for marked). 
+	 * ballot data will be in darkmark logic (0 for unmarked, 1 for marked).
+	 * 
+	 * One key fact to note: Every ballot is assumed to be normalized, and this 
+	 * gets rid of the need for the style mapping of contestantIDs. In other
+	 * words, contestant 0 in one ballot is the same contestant in all
+	 * ballots!
 	 * 
 	 * @param p_ballots an array of 2 dimensional darkmark logic contest 
 	 * results.  
 	 */
-	ContestResult tally(Contest p_contest, BallotStyle p_styles[], 
-							Vector<Ballot> p_ballots);	
+	ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots);	
+	
+	
 }

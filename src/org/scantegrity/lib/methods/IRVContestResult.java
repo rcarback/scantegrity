@@ -104,6 +104,7 @@ public class IRVContestResult extends ContestResult
 
 	public class Round {
 		protected int c_id;
+		protected String c_desc;
 		protected Vector<Integer> c_totals;
 		protected Vector<Integer> c_delta;
 		protected Vector<String> c_state;
@@ -126,6 +127,7 @@ public class IRVContestResult extends ContestResult
 			c_delta = new Vector<Integer>();
 			c_state = new Vector<String>();
 			c_roundNotes = new Vector<String>();
+			c_desc = "";
 			
 			c_totals.setSize(c_contestants.size());
 			c_delta.setSize(c_contestants.size());
@@ -146,7 +148,8 @@ public class IRVContestResult extends ContestResult
 			c_delta = new Vector<Integer>();
 			c_state = new Vector<String>(p_prev.getState());
 			c_roundNotes = new Vector<String>();
-			
+			c_desc = new String(p_prev.c_desc);
+
 			c_delta.setSize(c_contestants.size());
 		}
 
@@ -165,6 +168,7 @@ public class IRVContestResult extends ContestResult
 			c_totals = p_totals;
 			c_delta = p_delta;
 			c_state = p_state;
+			c_desc = "";			
 			c_roundNotes = p_roundNotes;
 		}		
 		/**
@@ -244,6 +248,25 @@ public class IRVContestResult extends ContestResult
 			c_roundNotes.add(p_note);
 		}
 		
+		/**
+		 * @return the desc
+		 */
+		public String getDesc()
+		{
+			return c_desc;
+		}
+
+		/**
+		 * Desc is a description parameter, which is used to delineate different
+		 * paths of execution during an irreconcilable tie.
+		 *
+		 * @param p_desc the desc to set
+		 */
+		public void setDesc(String p_desc)
+		{
+			c_desc = p_desc;
+		}
+
 		public String toString()
 		{
 			StringWriter l_out = new StringWriter();
