@@ -285,8 +285,8 @@ public class IRVContestResult extends ContestResult
 			StringWriter l_out = new StringWriter();
 			int l_change = 0, l_tot = 0;
 			//ROUND\t\tCONTESTANTS\t\tCHANGE\t\tTOTALS
-			String l_fmt = "\t\t\t\t\t\t  RESULTS FOR ROUND %s \n\n";
-			l_out.write(String.format(l_fmt, c_id));
+			String l_fmt = "RESULTS FOR ROUND %s%s \n\n";
+			l_out.write(String.format(l_fmt, c_id, c_desc));
 			l_out.write("\t\tCONTESTANT\t\t      CHANGE\t\t\tTOTALS\t\t\t   STATE\n");
 			l_fmt = "%26s";
 			for(int l_i = 0; l_i < c_contestants.size(); l_i++)

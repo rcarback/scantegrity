@@ -40,31 +40,52 @@ import org.scantegrity.scanner.Ballot;
  */
 public class InstantRunOffTallyTest
 {
+	static String tests[] = { "testing/scanner/edata/cpp/cpp",
+						"testing/scanner/edata/misc/tied" 
+					};
+	
+	public static Contest getContestInfo(String l_fname)
+	{
+		Contest l_contest = new Contest();
+		try
+		{
+			FileInputStream l_fread = new FileInputStream(l_fname);
+			
+			l_contest.setContestName(l_fname);
+			l_contest.setId(0);
+			l_contest.setMethod(new InstantRunoffTally());
+			Vector<Contestant> l_contestants = new Vector<Contestant>();
+			int l_i = 0;
+			BufferedReader l_reader;
+			l_reader = new BufferedReader(new InputStreamReader(l_fread));
+			String l_str;
+			while ((l_str = l_reader.readLine()) != null)
+			{
+				l_contestants.add(new Contestant(l_i, l_str));
+				l_i++;
+			}
+			l_contest.setContestants(l_contestants);
+		}
+		catch (FileNotFoundException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args)
+		return l_contest;
+	}
+	
+	public static Vector<Ballot> getData(String l_fname)
 	{
 		FileInputStream l_fread;
 		Vector<Ballot> l_ballots = new Vector<Ballot>();
+		/*
 		BallotStyle l_style = new BallotStyle(0, true);
-		Contest l_contest = new Contest();
-		
-		l_contest.setContestName("Choice Plus Pro Test Data");
-		l_contest.setId(0);
-		l_contest.setMethod(new InstantRunoffTally());
-		Vector<Contestant> l_contestants = new Vector<Contestant>();
-		l_contestants.add(new Contestant(0, "Anastasia"));
-		l_contestants.add(new Contestant(1, "Bonnie"));
-		l_contestants.add(new Contestant(2, "Chad"));
-		l_contestants.add(new Contestant(3, "Davis"));
-		l_contestants.add(new Contestant(4, "Emilia"));
-		l_contestants.add(new Contestant(5, "Friedrich"));
-		l_contestants.add(new Contestant(6, "Gwendolyn"));
-		l_contestants.add(new Contestant(7, "Humberto"));
-		l_contestants.add(new Contestant(8, "Iago"));
-		l_contestants.add(new Contestant(9, "WRITE-IN"));
 		Vector<Vector<Integer>> l_contestantMap = new Vector<Vector<Integer>>();
 		l_contestantMap.add(new Vector<Integer>());
 		l_contestantMap.elementAt(0).add(0);
@@ -78,15 +99,14 @@ public class InstantRunOffTallyTest
 		l_contestantMap.elementAt(0).add(8);
 		l_contestantMap.elementAt(0).add(9);
 		l_style.setContestantIds(l_contestantMap);
-		l_contest.setContestants(l_contestants);
 		Vector<Integer> l_cids = new Vector<Integer>();
 		
 		l_cids.add(0);
-		l_style.setContests(l_cids);
+		l_style.setContests(l_cids);*/
 		
 		try
 		{
-			l_fread = new FileInputStream("testing/scanner/cppirvdata.txt");
+			l_fread = new FileInputStream(l_fname);
 			BufferedReader l_reader;
 			l_reader = new BufferedReader(new InputStreamReader(l_fread));
 			//Throw away top line
@@ -155,10 +175,22 @@ public class InstantRunOffTallyTest
 			e.printStackTrace();
 		}
 		
-		InstantRunoffTally l_tally = new InstantRunoffTally();
-		BallotStyle l_styles[] = new BallotStyle[1];
-		l_styles[0] = l_style;
-		l_tally.tally(l_contest, l_ballots);
+		return l_ballots;
 	}
-
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args)
+	{
+		Vector<Ballot> l_ballots;
+		Contest l_contest;
+		for (int l_i = 0; l_i < tests.length; l_i++)
+		{
+			l_ballots = getData(tests[l_i] + ".data");
+			l_contest = getContestInfo(tests[l_i] + ".info");
+			
+			InstantRunoffTally l_tally = new InstantRunoffTally();
+			l_tally.tally(l_contest, l_ballots);
+		}
+	}
 }

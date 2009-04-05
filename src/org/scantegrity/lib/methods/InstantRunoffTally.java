@@ -201,7 +201,7 @@ public class InstantRunoffTally implements TallyMethod {
 			 */
 			Vector<Contestant> l_defeated = getDefeated(l_curRank, l_stacks);
 			
-			if (l_defeated.size() == 0)
+			if (l_defeated == null || l_defeated.size() == 0)
 			{
 				//A Tie!
 				Vector<Contestant> l_tied = l_curRank.get(l_curRank.lastKey());
@@ -212,44 +212,70 @@ public class InstantRunoffTally implements TallyMethod {
 				l_curRound.addNote(l_tieNote);
 				
 				//Try to break the tie
-				TreeMap<Integer, Vector<Contestant>> l_tieRank;
-				l_tieRank = breakTie(l_tied, l_res.c_rounds);
-				
-				if (l_tieRank == null)
+				Contestant l_tieCan;
+				l_tieCan = breakTie(l_tied, l_curRound, l_res.c_rounds);
+				if (l_tieCan == null)
 				{
-					//Tie could not be broken
-					/**
-					 * We now save the "state" which get's popped when a winner
-					 * is detected. Pick one state, push the other possibilities
-					 * onto the stack, then continue this chain.
-					 */
-					l_curRound.addNote("Tie is Unbreakable, computing all"
-										+ " possibilities...");
-					
-					for (int l_i = 1; l_i < l_tied.size(); l_i++)
+					//Tie could not be broken, is this the last possible round?
+					if (l_stacks.size() == 3)
 					{
-						TreeMap<Contestant, Vector<BallotIterator>> l_tmpStack;
-						IRVContestResult.Round l_tmpRnd;
-						Contestant l_tmpCan; 
-						l_tmpStack = 
-							new TreeMap<Contestant, Vector<BallotIterator>>(
-									l_stacks);
-						l_tmpRnd = l_curRound.clone();
-						l_tmpCan = l_tied.get(l_i);
-						l_canStack.add(l_tmpCan);
-						l_roundStack.add(l_tmpRnd);
-						l_tieStack.add(l_tmpStack);
+						l_curRound.addNote("Tie between last 2 candidates " 
+											+ "cannot be broken. No Winner!");
+						
 					}
-					
-					//Chosen state is 0
-					l_curRound.c_desc += ", Dropped " + l_tied.get(0).toString()
-										+ " in Round " + l_curRound.c_id;
-					l_defeated = new Vector<Contestant>();
-					l_defeated.add(l_tied.get(0));
-					
-					
+					else
+					{
+						/**
+						 * We now save the "state" which get's popped when a winner
+						 * is detected. Pick one state, push the other possibilities
+						 * onto the stack, then continue this chain.
+						 */
+						l_curRound.addNote("Tie is Unbreakable, computing all"
+											+ " possibilities...");
+						int l_i;
+						for (l_i = 0; l_i < l_tied.size()-1; l_i++)
+						{
+							//System.out.println("Adding alternate exec: " + l_i);
+							TreeMap<Contestant, Vector<BallotIterator>> l_tmpStack;
+							IRVContestResult.Round l_tmpRnd;
+							Contestant l_tmpCan; 
+							l_tmpStack = copyStack(l_stacks);
+							l_tmpRnd = l_curRound.clone();
+							l_tmpCan = l_tied.get(l_i);
+							
+							l_tmpRnd.c_desc += ", Dropped " + l_tmpCan.toString()
+												+ " in Round " + l_curRound.c_id;
+							l_tmpRnd.addNote(l_tmpCan.getName() 
+												+ " DEFEATED (TIE)");
+							l_tmpRnd.c_state.set(l_contestants.indexOf(l_tmpCan), 
+									"DEFEATED (TIE), Round " + l_curRound.getId());
+							
+							l_canStack.add(l_tmpCan);
+							l_roundStack.add(l_tmpRnd);
+							l_tieStack.add(l_tmpStack);
+						}
+						
+						//Chosen state is always 0
+						l_curRound.c_desc += ", Dropped " + l_tied.get(l_i).toString()
+											+ " in Round " + l_curRound.c_id;
+						l_curRound.addNote(l_tied.get(l_i).getName() 
+											+ " DEFEATED (TIE)");
+						l_curRound.c_state.set(l_contestants.indexOf(l_tied.get(l_i)), 
+									"DEFEATED (TIE), Round " + l_curRound.getId());
+						l_countMe = new Vector<BallotIterator>();
+						l_countMe.addAll(l_stacks.get(l_tied.get(l_i)));
+						l_stacks.remove(l_tied.get(l_i));
+					}
+					l_defeated = null;
 				}
-				
+				else
+				{
+					l_defeated = new Vector<Contestant>();
+					l_curRound.addNote(l_tieCan.toString() 
+									+ " had fewer votes than " 
+									+ "other candidates in a previous round.");
+					l_defeated.add(l_tieCan);
+				}	
 			}
 			
 			if (l_defeated != null)
@@ -264,11 +290,6 @@ public class InstantRunoffTally implements TallyMethod {
 									"DEFEATED, Round " + l_curRound.getId());
 					//System.out.println(l_c.getName() + " DEFEATED");
 				}
-			}
-			else
-			{
-				//Whoa, error that shouldn't happen!
-				return null;
 			}
 
 			//Detect a winner
@@ -285,8 +306,8 @@ public class InstantRunoffTally implements TallyMethod {
 			else if (l_stacks.size() <= 2)
 			{
 				//Nothing left to count
-				l_curRound.addNote("END, winner is " + l_top.get(0));
-				l_curRound.c_state.set(l_contestants.indexOf(l_top.get(0)), 
+				l_curRound.addNote("END, winner is " + l_stacks.lastKey());
+				l_curRound.c_state.set(l_contestants.indexOf(l_stacks.lastKey()), 
 										"WINNER, Round " + l_curRound.getId());
 			}
 			
@@ -296,29 +317,30 @@ public class InstantRunoffTally implements TallyMethod {
 			
 			//Continue execution if there are remaining ties that need to 
 			//be computed.
-			if (l_stacks.size() <= 2 && l_tieStack.size() > 0)
+			if ((l_stacks.size() <= 2 && l_tieStack.size() > 0) 
+					|| (l_stacks.size() == 3 && l_tieStack.size() > 0 
+							&& l_curRank.size() == 1 
+							&& l_curRank.get(0).size() == 2))
 			{
-				l_stacks = l_tieStack.get(0);
-				l_curRound = l_roundStack.get(0);
-				Contestant l_dropCan = l_canStack.get(0);
-				l_curRound.c_desc += ", Dropped " + l_dropCan.toString()
-				+ " in Round " + l_curRound.c_id;
+				int l_index = l_tieStack.size()-1;
+				l_stacks = l_tieStack.get(l_index);
+				l_curRound = l_roundStack.get(l_index);
+				Contestant l_dropCan = l_canStack.get(l_index);
 				l_countMe = new Vector<BallotIterator>();
 				l_countMe.addAll(l_stacks.get(l_dropCan));
 				l_stacks.remove(l_dropCan);
-				l_curRound.addNote(l_dropCan.getName() + " DEFEATED (TIE)");
-				l_curRound.c_state.set(l_contestants.indexOf(l_dropCan), 
-									"DEFEATED (TIE), Round " + l_curRound.getId());
-				l_tieStack.remove(0);
-				l_roundStack.remove(0);
-				l_canStack.remove(0);
+				l_tieStack.remove(l_index);
+				l_roundStack.remove(l_index);
+				l_canStack.remove(l_index);
 			}
 
-
+			//System.out.println("Alt Size: " + l_tieStack.size());
+			//System.out.println("Stack Size: " + l_stacks.size());
 			//Set up next round.
 			l_prevRound = l_curRound;
 			l_curRound = l_res.new Round(l_prevRound);
-		} while (l_stacks.size() > 2); // There can be only one (and Exhaust..)!
+		} while (l_stacks.size() > 2 //End, or tied ending
+					|| l_tieStack.size() > 0); 
 
 		return l_res;
 	}
@@ -525,30 +547,22 @@ public class InstantRunoffTally implements TallyMethod {
 	 * @param p_rounds
 	 * @return
 	 */
-	private TreeMap<Integer, Vector<Contestant>> breakTie(
-										Vector<Contestant> p_tied,
-										Vector<IRVContestResult.Round> p_rounds)
+	private Contestant breakTie(Vector<Contestant> p_tied,
+								IRVContestResult.Round p_curRound,
+								Vector<IRVContestResult.Round> p_rounds)
 	{
-		TreeMap<Integer, Vector<Contestant>> l_newRanks;
-		l_newRanks = new TreeMap<Integer, Vector<Contestant>>();
-		
 		//Sanity check
-		if (p_tied.size() <= 1)
-		{
-			l_newRanks.put(0, p_tied);
-			return l_newRanks;
-		}
+		if (p_tied.size() <= 1)	return null;
 		
-		IRVContestResult.Round l_tieRound = p_rounds.lastElement(); 
 		//Tree Travel!
 		Contestant l_lowest, l_nextLowest;
-		for (int l_i = p_rounds.size()-2; l_i >= 0; l_i--)
+		for (int l_i = p_rounds.size()-1; l_i >= 0; l_i--)
 		{
-			IRVContestResult.Round l_curRound = p_rounds.get(l_i);
-			if (l_tieRound.getDesc().equals(l_curRound.getDesc())
-					&& l_tieRound.getId() > l_curRound.getId())
+			IRVContestResult.Round l_tieRound = p_rounds.get(l_i);
+			if (p_curRound.getDesc().startsWith(l_tieRound.getDesc())
+					&& p_curRound.getId() > l_tieRound.getId())
 			{				
-				Vector<Integer> l_curTotals = l_curRound.getTotals(); 
+				Vector<Integer> l_curTotals = l_tieRound.getTotals(); 
 				//Compare each candidate, see if there is a lowest.
 				l_lowest = p_tied.firstElement();
 				l_nextLowest = p_tied.get(1); 
@@ -566,18 +580,34 @@ public class InstantRunoffTally implements TallyMethod {
 				if (l_curTotals.get(l_lowest.getId()) 
 						< l_curTotals.get(l_nextLowest.getId()))
 				{
-					p_tied.remove(l_lowest);
-					Vector<Contestant> l_l = new Vector<Contestant>();
-					l_l.add(l_lowest);
-					l_newRanks.put(0, p_tied);
-					l_newRanks.put(1, l_l);
-					return l_newRanks;
+					return l_lowest;
 				}
 				//Else try again.
 			}	
 		}
 		
 		return null;
+	}
+	
+	private TreeMap<Contestant, Vector<BallotIterator>> copyStack(
+					TreeMap<Contestant, Vector<BallotIterator>> l_stack)
+	{
+		TreeMap<Contestant, Vector<BallotIterator>> l_new;
+		l_new = new TreeMap<Contestant, Vector<BallotIterator>>();
+		Contestant l_c = l_stack.firstKey();
+		do
+		{
+			Vector<BallotIterator> l_bi;
+			l_bi = new Vector<BallotIterator>();
+			for (BallotIterator l_b : l_stack.get(l_c))
+			{
+				l_bi.add(new BallotIterator(l_b));
+			}
+			l_new.put(l_c, l_bi);
+			
+		} while ((l_c = l_stack.higherKey(l_c)) != null);
+		
+		return l_new;
 	}
 
 	/**
@@ -609,6 +639,16 @@ public class InstantRunoffTally implements TallyMethod {
 			c_contestId = p_contestId;
 		}		
 		
+		/**
+		 * @param p_b
+		 */
+		public BallotIterator(BallotIterator p_b)
+		{
+			this(p_b.c_ballot, p_b.c_contestId);
+			c_curPos = p_b.c_curPos;
+			c_nextCan = p_b.c_nextCan;			
+		}
+
 		/**
 		 * @return true if there are more (valid) ranks to count.
 		 */
