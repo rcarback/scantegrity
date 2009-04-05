@@ -132,6 +132,7 @@ public class CreateScannerConfig
 		l_x.setContestants(l_can);
 		l_x.setContestName("Council Member Ward 3");
 		l_x.setMethod(new InstantRunoffTally());
+		l_c.add(l_x);		
 		
 		Vector<String> l_locs = new Vector<String>();
 		l_locs.add("/home/");

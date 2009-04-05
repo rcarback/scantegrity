@@ -57,6 +57,15 @@ public class ScannerConfig {
 	private BallotReader c_reader = null;
 	private Vector<Contest> c_contests = null;
 	protected Vector<BallotStyle> c_styles = null;
+	/**
+	 * @return the styles
+	 */
+	public Vector<BallotStyle> getStyles()
+	{
+		return c_styles;
+	}
+
+
 	private Vector<String> c_outputLocs = null;
 	
 	
