@@ -29,7 +29,17 @@ public class Contestant implements Comparable
 {
 	protected String c_name = null;
 	protected Integer c_id = -1;
-		
+	
+	/** 
+	 * Creates a bad contestant.
+	 */
+	public Contestant()
+	{
+		super();
+		c_name = "No Name";
+		c_id = -1;
+	}
+	
 	/**
 	 * @param p_id
 	 * @param p_name

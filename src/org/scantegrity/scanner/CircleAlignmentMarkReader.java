@@ -36,6 +36,12 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 {
 	private Integer c_radius = 25;
 	
+	public CircleAlignmentMarkReader()
+	{
+		super();
+		c_radius = 25;
+	}
+	
 	/**
 	 * @param c_radius the radius of the circle
 	 */

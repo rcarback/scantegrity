@@ -22,6 +22,7 @@
 package org.scantegrity.scanner;
 
 import java.util.Date;
+import java.util.Vector;
 
 /**
  * ScannerConfig represents the configuration needed for the scanner in an 
@@ -54,13 +55,23 @@ public class ScannerConfig {
 	private Date c_date = new Date(); //Date and time are stored here.
 	private String c_chiefJudge = "Unknown Chief Judge";
 	private BallotReader c_reader = null;
-	private Contest[] c_contests = null;
-	protected BallotStyle[] c_styles = null;
+	private Vector<Contest> c_contests = null;
+	protected Vector<BallotStyle> c_styles = null;
+	private Vector<String> c_outputLocs = null;
 	
 	
 	
 	public ScannerConfig() {
-		//TODO
+		c_pollID = -1;
+		c_scannerID = -1;
+		c_name = "Unknown Name";
+		c_location = "Unknown Location";
+		c_date = new Date(); //Date and time are stored here.
+		c_chiefJudge = "Unknown Chief Judge";
+		c_reader = new ScantegrityBallotReader();
+		c_contests = new Vector<Contest>();
+		c_styles = new Vector<BallotStyle>();	
+		c_outputLocs = new Vector<String>();
 	}
 
 
@@ -190,38 +201,51 @@ public class ScannerConfig {
 	}
 	
 	/**
-	 * @return the contests
+	 * @return the outputLocs
 	 */
-	public Contest[] getContests()
+	public Vector<String> getOutputLocs()
 	{
-		return c_contests;
+		return c_outputLocs;
+	}
+
+
+	/**
+	 * @param p_outputLocs the outputLocs to set
+	 */
+	public void setOutputLocs(Vector<String> p_outputLocs)
+	{
+		c_outputLocs = p_outputLocs;
 	}
 
 
 	/**
 	 * @param p_contests the contests to set
 	 */
-	public void setContests(Contest[] p_contests)
+	public void setContests(Vector<Contest> p_contests)
 	{
 		c_contests = p_contests;
-	}
-	
-	/**
-	 * @return the styles
-	 */
-	public BallotStyle[] getStyles()
-	{
-		return c_styles;
 	}
 
 
 	/**
 	 * @param p_styles the styles to set
 	 */
-	public void setStyles(BallotStyle[] p_styles)
+	public void setStyles(Vector<BallotStyle> p_styles)
 	{
 		c_styles = p_styles;
 	}
+
+
+	/**
+	 * @return the contests
+	 */
+	public Vector<Contest> getContests()
+	{
+		return c_contests;
+	}
+
+
+
 	
 }
 
