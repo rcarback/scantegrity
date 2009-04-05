@@ -59,7 +59,7 @@ public class ScannerConfigReader
 			if (l_config != null)
 			{
 				System.out.println("Name: " + l_config.getName());
-				System.out.println("Chief Judge: " + l_config.getChiefJudge());
+				System.out.println("Chief Judges: " + l_config.getChiefJudges().toString());
 				System.out.println("Date: " + l_config.getDate().toString());
 				System.out.println("Poll ID: " + l_config.getPollID());
 				System.out.println("Scanner ID: " + l_config.getScannerID());

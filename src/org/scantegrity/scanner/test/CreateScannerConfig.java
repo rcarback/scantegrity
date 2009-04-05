@@ -141,7 +141,9 @@ public class CreateScannerConfig
 		Vector<BallotStyle> l_s = new Vector<BallotStyle>();
 		l_s.add(l_style);
 		
-		l_config.setChiefJudge("Richard Carback");
+		Vector<String> l_j = new Vector<String>();
+		l_j.add("Richard Carback");
+		l_config.setChiefJudges(l_j);
 		l_config.setLocation("1000 Hilltop Circle, Baltimore MD 21250");
 		l_config.setName("ScannerConfig XML Test");
 		l_config.setOutputLocs(l_locs);

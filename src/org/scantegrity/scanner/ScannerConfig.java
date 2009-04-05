@@ -53,7 +53,8 @@ public class ScannerConfig {
 	private String c_name = "Unknown Name";
 	private String c_location = "Unknown Location";
 	private Date c_date = new Date(); //Date and time are stored here.
-	private String c_chiefJudge = "Unknown Chief Judge";
+	private Vector<String> c_chiefJudges = null;
+	private Vector<String> c_judgePassHash = null;
 	private BallotReader c_reader = null;
 	private Vector<Contest> c_contests = null;
 	protected Vector<BallotStyle> c_styles = null;
@@ -76,7 +77,10 @@ public class ScannerConfig {
 		c_name = "Unknown Name";
 		c_location = "Unknown Location";
 		c_date = new Date(); //Date and time are stored here.
-		c_chiefJudge = "Unknown Chief Judge";
+		c_chiefJudges = new Vector<String>();
+		c_chiefJudges.add("Unknown Chief Judge");
+		c_judgePassHash = new Vector<String>();
+		c_judgePassHash.add("");
 		c_reader = new ScantegrityBallotReader();
 		c_contests = new Vector<Contest>();
 		c_styles = new Vector<BallotStyle>();	
@@ -175,22 +179,39 @@ public class ScannerConfig {
 
 
 	/**
-	 * @return the chiefJudge
+	 * @return the chiefJudges
 	 */
-	public String getChiefJudge()
+	public Vector<String> getChiefJudges()
 	{
-		return c_chiefJudge;
+		return c_chiefJudges;
 	}
 
 
 	/**
-	 * @param p_chiefJudge the chiefJudge to set
+	 * @param p_chiefJudges the chiefJudges to set
 	 */
-	public void setChiefJudge(String p_chiefJudge)
+	public void setChiefJudges(Vector<String> p_chiefJudges)
 	{
-		c_chiefJudge = p_chiefJudge;
+		c_chiefJudges = p_chiefJudges;
 	}
 
+
+	/**
+	 * @return the judgePassHash
+	 */
+	public Vector<String> getJudgePassHash()
+	{
+		return c_judgePassHash;
+	}
+
+
+	/**
+	 * @param p_judgePassHash the judgePassHash to set
+	 */
+	public void setJudgePassHash(Vector<String> p_judgePassHash)
+	{
+		c_judgePassHash = p_judgePassHash;
+	}
 
 	/**
 	 * @return the reader
