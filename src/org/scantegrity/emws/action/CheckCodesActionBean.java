@@ -131,7 +131,7 @@ public class CheckCodesActionBean implements ActionBean {
 			c_error = "Could not locate ballot with given serial. Please try again.";
 		}
 		
-		return new ForwardResolution("/WEB-INF/jsp/checkcodes.jsp");
+		return new ForwardResolution("/WEB-INF/pages/checkcodes.jsp");
 	}
 	
 	
