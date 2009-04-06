@@ -8,7 +8,7 @@
      </p> 
    <p>Resources and other Information:</p>
         <ul>
-            <li><a href=""></li>
+            <li><a href=""> </li>
         </ul>
 
     </stripes:layout-component>

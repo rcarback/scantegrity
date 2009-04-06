@@ -14,7 +14,7 @@
         </init-param>
         <init-param>
             <param-name>LocalePicker.Locales</param-name>
-            <param-value>en,de,fr,es,en_CA,en_US</param-value>
+            <param-value>en_US</param-value>
         </init-param>    
         <init-param>
             <param-name>MultipartWrapper.Class</param-name>
