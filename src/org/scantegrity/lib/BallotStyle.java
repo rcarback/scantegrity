@@ -38,7 +38,7 @@
  * @version 0.0.1 
  * @date 11/03/09
  */
-package org.scantegrity.scanner;
+package org.scantegrity.lib;
 
 import java.awt.Rectangle;
 import java.util.Vector;

@@ -24,6 +24,9 @@ package org.scantegrity.scanner;
 import java.util.Date;
 import java.util.Vector;
 
+import org.scantegrity.lib.BallotStyle;
+import org.scantegrity.lib.Contest;
+
 /**
  * ScannerConfig represents the configuration needed for the scanner in an 
  * election. This information is read from an XML file and this class is used

@@ -27,10 +27,10 @@ import java.io.InputStreamReader;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.scantegrity.lib.methods.Contestant;
+import org.scantegrity.lib.Ballot;
+import org.scantegrity.lib.Contest;
+import org.scantegrity.lib.Contestant;
 import org.scantegrity.lib.methods.InstantRunoffTally;
-import org.scantegrity.scanner.Ballot;
-import org.scantegrity.scanner.Contest;
 
 /**
  * Uses IRV test data from Choice Plus on the tally system.

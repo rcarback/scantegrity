@@ -2,7 +2,7 @@ package org.scantegrity.scanner.test;
 import java.awt.Point;
 import java.io.IOException;
 
-import org.scantegrity.scanner.SquareSpiralPattern;
+import org.scantegrity.util.SquareSpiralPattern;
 
 /**
  * 

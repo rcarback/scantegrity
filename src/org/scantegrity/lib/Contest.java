@@ -17,12 +17,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.scantegrity.scanner;
+package org.scantegrity.lib;
 
 import java.util.Vector;
 
 import org.scantegrity.lib.methods.TallyMethod;
-import org.scantegrity.lib.methods.Contestant;
 /**
  * Contest describes a race, question, or other contest that appears in an 
  * election. This description includes a list of options or names in the contest,

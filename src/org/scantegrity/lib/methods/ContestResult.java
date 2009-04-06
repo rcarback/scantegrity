@@ -21,6 +21,8 @@ package org.scantegrity.lib.methods;
 
 import java.util.TreeMap;
 import java.util.Vector;
+
+import org.scantegrity.lib.Contestant;
 /**
  * ContestResults represents the results of a Contest. This is, at the basic
  * level, simply a mapping of candidates to their final rankings. Extending 

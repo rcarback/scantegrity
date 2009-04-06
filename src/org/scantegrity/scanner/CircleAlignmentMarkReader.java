@@ -22,6 +22,9 @@ package org.scantegrity.scanner;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
+import org.scantegrity.util.DetectBlack;
+import org.scantegrity.util.SquareSpiralPattern;
+
 /**
  * @author Richard Carback
  *

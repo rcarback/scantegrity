@@ -29,11 +29,11 @@ import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.Vector;
 
-import org.scantegrity.lib.methods.Contestant;
+import org.scantegrity.lib.BallotStyle;
+import org.scantegrity.lib.Contest;
+import org.scantegrity.lib.Contestant;
 import org.scantegrity.lib.methods.InstantRunoffTally;
-import org.scantegrity.scanner.BallotStyle;
 import org.scantegrity.scanner.CircleAlignmentMarkReader;
-import org.scantegrity.scanner.Contest;
 import org.scantegrity.scanner.QRCodeReader;
 import org.scantegrity.scanner.ScannerConfig;
 import org.scantegrity.scanner.ScantegrityBallotReader;

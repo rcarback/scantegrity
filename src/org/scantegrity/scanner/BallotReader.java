@@ -26,6 +26,9 @@ import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
+import org.scantegrity.lib.Ballot;
+import org.scantegrity.lib.BallotStyle;
+
 /**
  * BallotReader is an interface for reading ballot data, normalizing the ballot
  * and other tasks. It abstracts scanner functionality away from the Scanning

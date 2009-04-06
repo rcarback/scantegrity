@@ -28,6 +28,8 @@ import java.util.Vector;
 
 import org.scantegrity.common.*;
 import org.scantegrity.common.gui.Dialogs;
+import org.scantegrity.lib.Ballot;
+import org.scantegrity.lib.BallotStyle;
 import org.scantegrity.scanner.gui.PollingPlaceGUI;
 
 /**

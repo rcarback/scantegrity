@@ -22,6 +22,8 @@ package org.scantegrity.lib.methods;
 import java.io.StringWriter;
 import java.util.Vector;
 
+import org.scantegrity.lib.Contestant;
+
 /**
  * 
  * @author Richard Carback
@@ -146,7 +148,7 @@ public class IRVContestResult extends ContestResult
 			c_state.setSize(c_contestants.size());
 			for (int l_i = 0; l_i < c_state.size(); l_i++)
 			{
-				if (c_contestants.get(l_i).c_id >= 0)
+				if (c_contestants.get(l_i).getId() >= 0)
 					c_state.set(l_i, "CONTINUES");
 				else
 					c_state.set(l_i, "EXHAUST");

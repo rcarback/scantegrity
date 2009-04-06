@@ -26,6 +26,11 @@ import java.awt.image.BufferedImage;
 import java.util.TreeMap;
 import java.util.Vector;
 
+import org.scantegrity.lib.Ballot;
+import org.scantegrity.lib.BallotStyle;
+import org.scantegrity.util.AffineCropper;
+import org.scantegrity.util.DetectBlack;
+
 /**
  * Reads scantegrity ballots.
  * 
