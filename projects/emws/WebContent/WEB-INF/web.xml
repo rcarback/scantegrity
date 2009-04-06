@@ -65,11 +65,11 @@
     
     
     <welcome-file-list>
-        <welcome-file>/index</welcome-file>        
+        <welcome-file>/WEB-INF/pages/index.jsp</welcome-file>        
     </welcome-file-list>
     
-    <error-page>
+    <!--<error-page>
         <error-code>404</error-code>
         <location>/WEB-INF/pages/notfound.jsp</location>
-    </error-page>    
+    </error-page>//-->    
 </web-app>
