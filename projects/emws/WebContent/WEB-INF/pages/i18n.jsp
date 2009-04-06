@@ -1,9 +1,6 @@
 
 <%@taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld"%>
 
-<tiles:insertDefinition name="emws">
-	<tiles:putAttribute name="title">Internationalization Test</tiles:putAttribute>
-	<tiles:putAttribute name="body">
 
 <h1>Scantegrity Internationalization Test</h1>
 The selected name and language, or your Browser's name and default language, 
