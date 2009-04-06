@@ -8,7 +8,7 @@
 <stripes:form beanclass="action.CheckCodesActionBean">
 
 	<label for="name">Serial:</label>
-	<input type="text" id="serial" name="serial" value="${acionBean.serial}" />
+	<input type="text" id="serial" name="serial" value="${actionBean.serial}" />
 	<stripes:submit name="submit" value="Submit" />
 	<br /><br />
 	

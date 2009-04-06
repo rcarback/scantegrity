@@ -3,7 +3,7 @@
     <stripes:layout-component name="contents">
 
 
-<h1>File Upload Test</h1>
+<h1>File Upload</h1>
 
 <stripes:form beanclass="action.FileuploadActionBean">
 
