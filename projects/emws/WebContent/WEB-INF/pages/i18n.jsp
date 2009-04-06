@@ -1,4 +1,4 @@
-<%@ include file="/WEB-INF/jsp/resources/page.jsp" %>
+
 <%@taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld"%>
 
 <tiles:insertDefinition name="emws">
@@ -46,8 +46,3 @@ should appear in the text below:
 <p>Your browser's detected name was: ${header['User-Agent']}
 <p>The current set locale is: ${actionBean.locale}
 <br /><br />
-
-	</tiles:putAttribute>
-</tiles:insertDefinition>
-
-
