@@ -79,7 +79,7 @@ public class FileuploadActionBean implements ActionBean {
 		this.c_ctx = p_ctx; 
 	}
 
-	@ValidationMethod(on="submit")
+	//@ValidationMethod(on="submit")
 	public void checkFile(ValidationErrors errors)
 	{
 		if( c_file != null )

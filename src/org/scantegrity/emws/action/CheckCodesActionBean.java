@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.validation.Validate;
@@ -72,10 +73,11 @@ public class CheckCodesActionBean implements ActionBean {
 		c_serial = p_serial;
 	}
 	
+	@DefaultHandler
 	public Resolution submit()
 	{
 		if( c_serial == 0 )
-			return new ForwardResolution("/WEB-INF/jsp/checkcodes.jsp");
+			return new ForwardResolution("/WEB-INF/pages/checkcodes.jsp");
 		try
 		{
 			c_codes.clear();

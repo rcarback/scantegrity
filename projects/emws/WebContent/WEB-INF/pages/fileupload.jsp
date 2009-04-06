@@ -1,22 +1,26 @@
-<%@taglib prefix="s" uri="http://stripes.sourceforge.net/stripes.tld"%>
-
+<%@taglib prefix="stripes" uri="http://stripes.sourceforge.net/stripes.tld"%>
+<stripes:layout-render name="/WEB-INF/layout/default.jsp">
+    <stripes:layout-component name="contents">
 
 
 <h1>File Upload Test</h1>
 
-<s:form beanclass="action.FileuploadActionBean">
+<stripes:form beanclass="action.FileuploadActionBean">
 
-	<s:file name="file" />
-	<s:submit name="submit" value="Upload" />
+	<stripes:file name="file" />
+	<stripes:submit name="submit" value="Upload" />
 	<br /><br />
 	
 	<br />
 	
-	<s:errors/>
+	<stripes:errors/>
 	
 	<br/><br/>
 	${actionBean.result}
 	<br/><br/>
 	${actionBean.errors}
 	    
-</s:form> 
+</stripes:form> 
+
+    </stripes:layout-component>
+</stripes:layout-render>
