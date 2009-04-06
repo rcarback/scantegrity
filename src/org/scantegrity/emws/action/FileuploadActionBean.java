@@ -1,5 +1,10 @@
 package action;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -7,6 +12,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -79,21 +86,47 @@ public class FileuploadActionBean implements ActionBean {
 		this.c_ctx = p_ctx; 
 	}
 
-	//@ValidationMethod(on="submit")
-	public void checkFile(ValidationErrors errors)
+	@DefaultHandler
+	public Resolution submit()
 	{
 		if( c_file != null )
 		{
-			if( !c_file.getContentType().equals("application/xml")  )
+			if( c_file.getFileName().contains(".xml") )
 			{
-				errors.add("file", new SimpleError("Please select an xml file"));
+				parseXML();
+			}
+			
+			saveFile();
+		}
 
+		return new ForwardResolution("/WEB-INF/pages/fileupload.jsp");
+	}
+	
+	public void saveFile()
+	{
+		try
+		{
+			File c_docsDir = new File(c_ctx.getServletContext().getRealPath("/docs/"));
+			if( !c_docsDir.exists() )
+			{
+				throw new FileNotFoundException("Docs folder could not be found");
+			}
+			File c_saveFile = new File(c_docsDir.getPath() + File.separator + c_file.getFileName());
+			c_file.save(c_saveFile);
+			
+			if( c_file.getFileName().contains(".xml") )
+			{
+				ZipThread c_zip = new ZipThread(c_docsDir);
+				c_zip.start();
 			}
 		}
+		catch(IOException e)
+		{
+			c_error += e.getMessage() + "\n";
+		}
 	}
-
-	@DefaultHandler
-	public Resolution submit()
+	
+	public void parseXML()
 	{
 		if( c_file != null )
 		{
@@ -215,15 +248,66 @@ public class FileuploadActionBean implements ActionBean {
 				}
 
 				l_istream.close();
-				c_file.delete();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				c_error = e.getMessage();
+			}
+
+		}
+	}
+	
+	class ZipThread extends Thread
+	{
+		File c_dir;
+		
+		public ZipThread(File p_dir)
+		{
+			c_dir = p_dir;
+		}
+		
+		public void run()
+		{
+			try
+			{
+				File l_zipFile = new File(c_dir, ".ElectionFiles.zip");
+				System.err.println("Zipping to " + l_zipFile.getPath());
+				FileOutputStream l_fo = new FileOutputStream(l_zipFile);
+				ZipOutputStream l_zipOutput = new ZipOutputStream(l_fo);
+		
+				File[] l_xmlFiles = c_dir.listFiles(new XmlFileFilter());
+				
+				for(File l_newFile : l_xmlFiles )
+				{
+					l_zipOutput.putNextEntry(new ZipEntry(l_newFile.getName()));
+					FileInputStream l_fi = new FileInputStream(l_newFile);
+					byte[] l_bytes = new byte[1024];
+					int l_read;
+				
+					while(-1 != (l_read = l_fi.read(l_bytes)) )
+					{
+						l_zipOutput.write(l_bytes, 0, l_read);
+					}
+					
+					l_zipOutput.flush();
+				}
+				
+				l_zipOutput.close();
+				
+				l_zipFile.renameTo(new File(c_dir, "ElectionFiles.zip"));
+			}
+			catch(IOException e)
+			{
+				System.err.println(e.getStackTrace());
 			}
 		}
 
-
-		return new ForwardResolution("/WEB-INF/pages/fileupload.jsp");
+	}
+	
+	class XmlFileFilter implements FilenameFilter
+	{
+		public boolean accept(File dir, String name) {
+			return name.contains(".xml");
+		}
+		
 	}
 
 }
