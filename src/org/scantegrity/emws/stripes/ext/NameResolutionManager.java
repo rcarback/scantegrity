@@ -6,8 +6,12 @@ package stripes.ext;
 
 import java.util.List;
 
+import action.DefaultActionBean;
+
 import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.controller.NameBasedActionResolver;
+import net.sourceforge.stripes.exception.StripesServletException;
 
 
 /**
@@ -36,10 +40,13 @@ public class NameResolutionManager extends NameBasedActionResolver {
      */
     @Override
     public Class<? extends ActionBean> getActionBeanType(String p_path) {
+    	//System.err.println(p_path);
+    	p_path = p_path.toLowerCase();
     	Class<? extends ActionBean> l_cls = super.getActionBeanType(p_path);
     	if (l_cls == null) {
 			ActionBean l_bean = handleActionBeanNotFound(null, p_path);
 			if (l_bean != null) {
+				//l_bean = new DefaultActionBean(); 
 				return l_bean.getClass();
 			}
     	}
