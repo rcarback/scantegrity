@@ -7,7 +7,7 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 
 public class HelloActionBean implements ActionBean {
-    private static final String VIEW = "/WEB-INF/jsp/hello.jsp";
+    private static final String VIEW = "/WEB-INF/pages/hello.jsp";
 	
     private String hello;
     public String getHello() {
