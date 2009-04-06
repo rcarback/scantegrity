@@ -27,7 +27,7 @@ public class CheckCodesActionBean implements ActionBean {
 	
 	public String getResult()
 	{
-		if( c_codes.size() == 0 )1
+		if( c_codes.size() == 0 )
 			return "";
 		
 		String l_result = "<h4>Results:</h4>";

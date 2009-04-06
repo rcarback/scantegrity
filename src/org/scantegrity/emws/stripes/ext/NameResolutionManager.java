@@ -51,7 +51,7 @@ public class NameResolutionManager extends NameBasedActionResolver {
     protected List<String> getFindViewAttempts(String p_url) {
     	List<String> l_view = super.getFindViewAttempts(p_url);
     	for (int l_i = 0; l_i < l_view.size(); l_i++) {
-    		l_view.set(l_i, "/WEB-INF/jsp" + l_view.get(l_i));
+    		l_view.set(l_i, "/WEB-INF/pages" + l_view.get(l_i));
     	}
     	return l_view;
     }    

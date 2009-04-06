@@ -223,7 +223,7 @@ public class FileuploadActionBean implements ActionBean {
 		}
 
 
-		return new ForwardResolution("/WEB-INF/jsp/fileupload.jsp");
+		return new ForwardResolution("/WEB-INF/pages/fileupload.jsp");
 	}
 
 }
