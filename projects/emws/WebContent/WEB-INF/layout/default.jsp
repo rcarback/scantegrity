@@ -31,19 +31,19 @@
 	            <div id="middle">
 	                <div id="content">
 					<ul id="languageLinks">
-					   <li><a href="">Espa&#241;ol</a></li>
+					   <li><a href="${pageContext.request.contextPath}/espanol">Espa&#241;ol</a></li>
 					
-					   <li><a href="">English</a></li>
+					   <li><a href="${pageContext.request.contextPath}/index">English</a></li>
 					</ul>
 
                     <stripes:layout-component name="contents"/>
 		            <ul id="navigation">
 		
-		               <li><a href="">Home</a></li>
-		               <li><a href="">Ballot Check</a></li>
-		               <li><a href="">Results</a></li>
-		               <li><a href="">More Information</a></li>
-		               <li><a href="">Takoma Park Website</a></li>
+		               <li><a href="${pageContext.request.contextPath}/index">Home</a></li>
+		               <li><a href="${pageContext.request.contextPath}/ballotcheck">Ballot Check</a></li>
+		               <li><a href="${pageContext.request.contextPath}/results">Results</a></li>
+		               <li><a href="${pageContext.request.contextPath}/faq">FAQ</a></li>
+		               <li><a href="http://takomaparkmd.gov/">Takoma Park Website</a></li>
 		            </ul>
 		            </div>
 		         </div>
