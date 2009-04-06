@@ -55,7 +55,7 @@ import org.scantegrity.authoring.ContestSymbols;
 import org.scantegrity.authoring.Drills;
 import org.scantegrity.authoring.FillInPdfForm;
 import org.scantegrity.authoring.FormMaker;
-import org.scantegrity.authoring.invisibleink.PrintableBallotMaker;
+import org.scantegrity.authoring.PrintableBallotMaker;
 import org.scantegrity.common.BallotGeometry;
 import org.scantegrity.common.Cluster;
 import org.scantegrity.common.ImagePanel;

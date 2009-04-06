@@ -1,18 +1,15 @@
 package action;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
-import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.validation.Validate;
@@ -30,7 +27,7 @@ public class CheckCodesActionBean implements ActionBean {
 	
 	public String getResult()
 	{
-		if( c_codes.size() == 0 )
+		if( c_codes.size() == 0 )1
 			return "";
 		
 		String l_result = "<h4>Results:</h4>";
