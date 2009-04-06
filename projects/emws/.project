@@ -35,9 +35,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>src</name>
+			<name>emws</name>
 			<type>2</type>
-			<locationURI>WORKSPACE/Scantegrity/src/org/scantegrity/emws</locationURI>
+			<location>/Users/carback1/Dropbox/workspace/Scantegrity/src/org/scantegrity/emws</location>
 		</link>
 	</linkedResources>
 </projectDescription>
