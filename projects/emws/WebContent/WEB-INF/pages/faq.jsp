@@ -3,6 +3,8 @@
     <stripes:layout-component name="contents">
     <h1>Frequently Asked Questions</h1>
 
+    <p>Visitors may also be interested in the <a href="http://scantegrity.org/wiki/index.php/Frequently_Asked_Questions">Scantegrity FAQ</a>.</p>
+
     <ol>
         <li><a href="#q1">When do I check my confirmation numbers?</a></li>
         <li><a href="#q2">How will/do I mark the ballot?</a></li>

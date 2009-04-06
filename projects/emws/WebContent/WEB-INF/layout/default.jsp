@@ -40,9 +40,10 @@
 		            <ul id="navigation">
 		
 		               <li><a href="${pageContext.request.contextPath}/index">Home</a></li>
-		               <li><a href="${pageContext.request.contextPath}/ballotcheck">Ballot Check</a></li>
+		               <li><a href="${pageContext.request.contextPath}/checkcodes">Ballot Check</a></li>
 		               <li><a href="${pageContext.request.contextPath}/results">Results</a></li>
 		               <li><a href="${pageContext.request.contextPath}/faq">FAQ</a></li>
+                       <li><a href="${pageContext.request.contextPath}/contact">Contact Us</a></li>
 		               <li><a href="http://takomaparkmd.gov/">Takoma Park Website</a></li>
 		            </ul>
 		            </div>
