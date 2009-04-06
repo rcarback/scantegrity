@@ -2,9 +2,9 @@ package action;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -25,10 +25,7 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.Validate;
-import net.sourceforge.stripes.validation.ValidationErrors;
-import net.sourceforge.stripes.validation.ValidationMethod;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -106,17 +103,17 @@ public class FileuploadActionBean implements ActionBean {
 	{
 		try
 		{
-			File c_docsDir = new File(c_ctx.getServletContext().getRealPath("/docs/"));
-			if( !c_docsDir.exists() )
+			File l_docsDir = new File(c_ctx.getServletContext().getRealPath("/docs/"));
+			if( !l_docsDir.exists() )
 			{
 				throw new FileNotFoundException("Docs folder could not be found");
 			}
-			File c_saveFile = new File(c_docsDir.getPath() + File.separator + c_file.getFileName());
-			c_file.save(c_saveFile);
+			File l_saveFile = new File(l_docsDir.getPath() + File.separator + c_file.getFileName());
+			c_file.save(l_saveFile);
 			
 			if( c_file.getFileName().contains(".xml") )
 			{
-				ZipThread c_zip = new ZipThread(c_docsDir);
+				ZipThread c_zip = new ZipThread(l_docsDir);
 				c_zip.start();
 			}
 		}
@@ -269,7 +266,6 @@ public class FileuploadActionBean implements ActionBean {
 			try
 			{
 				File l_zipFile = new File(c_dir, ".ElectionFiles.zip");
-				System.err.println("Zipping to " + l_zipFile.getPath());
 				FileOutputStream l_fo = new FileOutputStream(l_zipFile);
 				ZipOutputStream l_zipOutput = new ZipOutputStream(l_fo);
 		
