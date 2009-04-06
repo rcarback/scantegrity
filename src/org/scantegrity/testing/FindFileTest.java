@@ -19,17 +19,15 @@
  */
 package org.scantegrity.testing;
 
-import java.awt.HeadlessException;
 import java.io.File;
 
-import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.lib.FindFile;
 
 /**
  * @author John Conway
  *
  */
-public class FineFileTest
+public class FindFileTest
 {
 
 	/**

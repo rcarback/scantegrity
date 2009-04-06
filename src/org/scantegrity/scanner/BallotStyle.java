@@ -41,7 +41,6 @@
 package org.scantegrity.scanner;
 
 import java.awt.Rectangle;
-import java.util.List;
 import java.util.Vector;
 
 public class BallotStyle {

@@ -50,10 +50,8 @@ package org.scantegrity.lib.methods;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import org.scantegrity.scanner.BallotStyle;
-import org.scantegrity.scanner.Contest;
-
 import org.scantegrity.scanner.Ballot;
+import org.scantegrity.scanner.Contest;
 
 public interface TallyMethod {
 	/* TODO: It might turn out that this is better done through abstract

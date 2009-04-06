@@ -1,7 +1,6 @@
 package org.scantegrity.lib.methods;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import org.scantegrity.scanner.Ballot;
 import org.scantegrity.scanner.Contest;

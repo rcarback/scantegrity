@@ -29,9 +29,8 @@ import java.util.Vector;
 
 import org.scantegrity.lib.methods.Contestant;
 import org.scantegrity.lib.methods.InstantRunoffTally;
-import org.scantegrity.scanner.BallotStyle;
-import org.scantegrity.scanner.Contest;
 import org.scantegrity.scanner.Ballot;
+import org.scantegrity.scanner.Contest;
 
 /**
  * Uses IRV test data from Choice Plus on the tally system.

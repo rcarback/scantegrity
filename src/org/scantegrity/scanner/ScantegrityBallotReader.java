@@ -23,7 +23,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
 
