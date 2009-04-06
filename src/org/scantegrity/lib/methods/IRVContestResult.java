@@ -102,6 +102,18 @@ public class IRVContestResult extends ContestResult
 		c_contestId = p_contestId;
 	}
 
+	public String toString()
+	{
+		StringWriter l_res = new StringWriter();
+		
+		for (Round l_r : c_rounds)
+		{
+			l_res.write(l_r.toString());
+		}
+		
+		return l_res.toString();
+	}
+	
 	public class Round {
 		protected int c_id;
 		protected String c_desc;

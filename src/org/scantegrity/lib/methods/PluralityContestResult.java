@@ -1,5 +1,5 @@
 /*
- * @(#)ContestResult.java.java
+ * @(#)PluralityContestResult.java.java
  *  
  * Copyright (C) 2008-2009 Scantegrity Project
  * 
@@ -19,60 +19,59 @@
  */
 package org.scantegrity.lib.methods;
 
-import java.util.TreeMap;
 import java.util.Vector;
+
 /**
- * ContestResults represents the results of a Contest. This is, at the basic
- * level, simply a mapping of candidates to their final rankings. Extending 
- * classes store 
- * 
- * @author Rick Carback
- * @param <TreeMap>
+ * @author John Conway
  *
  */
-public class ContestResult
+public class PluralityContestResult extends ContestResult
 {
-	protected TreeMap<Integer, Vector<Contestant>> c_ranking;
-
-	/**
-	 * Create a basic (invalid) ContestResult.
-	 */
-	public ContestResult() 
-	{
-		c_ranking = null;
-	}
+	Vector<Integer> c_totals;
 	
 	/**
-	 * @return the ranking
+	 *  Create a new plurality contest result
 	 */
-	public TreeMap<Integer, Vector<Contestant>> getRanking()
+	public PluralityContestResult()
 	{
-		return c_ranking;
+		super();
+		c_totals = null;
+	}
+	
+	
+	
+	/**
+	 * @return the totals
+	 */
+	public Vector<Integer> getTotals()
+	{
+		return c_totals;
 	}
 
 	/**
-	 * @param p_ranking the ranking to set
+	 * @param p_totals the totals to set
 	 */
-	public void setRanking(TreeMap<Integer, Vector<Contestant>> p_ranking)
+	public void setTotals(Vector<Integer> p_totals)
 	{
-		c_ranking = p_ranking;
+		c_totals = p_totals;
 	}
-	
-	/**
-	 * This is intended to be overwritten!
-	 */
+
 	public String toString()
 	{
 		String l_res = "";
 		l_res += "Ranking\n";
-		Integer l_key = c_ranking.firstKey();
+		Integer l_key = super.c_ranking.firstKey();
+		int l_i = 0;
 		while (l_key != null)
 		{
-			l_res += l_key + ". " + c_ranking.get(l_key).toString();
-			l_key = c_ranking.higherKey(l_key);
+			l_res += l_key + ". " + super.c_ranking.get(l_key).toString();
+			l_res += " with " + c_totals.get(l_i) + " votes";
+			l_key = super.c_ranking.higherKey(l_key);
+			l_i++;
 		}
 		
 		return l_res;
 	}
+	
 	
 }

@@ -33,135 +33,19 @@ package org.scantegrity.lib.methods;
 
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 import org.scantegrity.scanner.Ballot;
-import org.scantegrity.scanner.BallotStyle;
 import org.scantegrity.scanner.Contest;
 
 public class PluralityTally implements TallyMethod {
-	/**
-	 * TODO: Should be tracking number of busted ballots, make better use of 
-	 * logging facility, use more specific exceptions, preserve candidate ids. 
-	 * Also could use localization of reporting strings, better decision log to 
-	 * reflect bad ballots, and other things..
-	 */
-	private static Logger c_logger = Logger.getLogger("PluralityVotingMethod");
-	private Integer c_numCandidates = 0;
-	private String c_names[] = null;
-	private Integer c_totals[] = null;
 	
 	/**
-	 * Constructor - plurality has few options that need to be 
-	 * set. The only is the list of candidate names. 
+	 * Constructor - plurality has no options that need to be 
+	 * set.
 	 * 
 	 * @param p_names
 	 */
-	public PluralityTally(String p_names[]) {
-		c_names = p_names;
-		c_totals = new Integer[p_names.length];
-		
-		for (int l_i = 0; l_i < p_names.length; l_i++) {
-			if (p_names[l_i].isEmpty()) {
-				p_names[l_i] = "Candidate" + (l_i+1);
-			} 
-			c_totals[l_i] = 0;
-		}
-		
-		c_numCandidates = c_names.length;
-	}
-	
-	public void tallyResults(Integer p_ballots[][][], MarkRules p_rules) {
-		c_logger.finest("Entering calculateResults");
-		
-		//Sum up the ballots
-		for (int l_i = 0; l_i < p_ballots.length; l_i++) {
-			try 
-			{
-				validate(p_ballots[l_i]);
-				for (int l_j = 0; l_j < p_ballots[l_i].length; l_j++) {
-					c_totals[l_j] += p_ballots[l_i][l_j][0]; 
-				}
-			} catch (Exception e) {
-				c_logger.warning("Ballot " + l_i + " is malformed. Not Counted.");
-			}
-		}
-		
-		//Reorder the candidates according to rank.
-		TreeMap<Integer, String> l_map = new TreeMap<Integer, String>();
-		for (int l_i = 0; l_i < c_names.length; l_i++) {
-			l_map.put(c_totals[l_i], c_names[l_i]);
-		}
-		//Save in sorted order
-		Entry<Integer, String> l_entry = l_map.lastEntry(); 
-		for (int l_i = 0; l_i < c_names.length; l_i++) {
-			c_names[l_i] = l_entry.getValue();
-			c_totals[l_i] = l_entry.getKey();
-			l_entry = l_map.lowerEntry(c_totals[l_i]);
-		}
-		
-		c_logger.finest("Leaving calculateResults");
-	}
-
-	public String[] getDecisionLog() {
-		String l_log[] = new String[1];
-		l_log[0] = c_names[0] + " wins with " + c_totals[0] + "votes.";
-		return l_log;
-	}
-/*
-	public CandidateResult[] getRankings() {
-		CandidateResult l_res[] = new CandidateResult[c_names.length];
-		for (int l_i = 0; l_i < c_names.length; l_i++) {
-			l_res[l_i] = new CandidateResult(l_i+1, -1, c_names[l_i],
-			                                 "" + c_totals[l_i]);
-		}
-		return l_res;
-	}
-
-	public String getResults() {
-		String l_res = "";
-		for (int l_i = 0; l_i < c_names.length; l_i++) {
-			l_res += c_names[l_i] + ": " + c_totals[l_i];
-		}
-		return l_res;
-	}
-
-	public CandidateResult[] getWinners() {
-		CandidateResult l_res[] = new CandidateResult[1];
-		l_res[0] = new CandidateResult(1, -1, c_names[0],
-			                                 "" + c_totals[0]);
-		return l_res;
-	}
-*/
-	public void setLogger(Logger p_logger) {
-		c_logger = p_logger;
-	}
-
-	private void validate(Integer p_ballot[][]) throws Exception {
-		int l_sum = 0;
-		if (p_ballot.length != c_numCandidates) {
-			throw new Exception("Wrong number of Candidates!");
-		}
-		for (int l_i = 0; l_i < p_ballot.length; l_i++) {
-			if (p_ballot[l_i].length != 1) {
-				throw new Exception("Wrong number of positions Candidates!");
-			} else if (p_ballot[l_i][0] != 0 || p_ballot[l_i][0] != 1) {
-				throw new Exception("Bad ballot format!");	
-			} else {
-				l_sum += p_ballot[l_i][0];
-			}
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see org.scantegrity.lib.methods.TallyMethod#tally(org.scantegrity.scanner.Contest, java.util.Vector)
-	 */
-	@Override
-	public ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots)
-	{
-		// TODO Auto-generated method stub
-		return null;
+	public PluralityTally() {
 	}
 
 	/* (non-Javadoc)
@@ -171,7 +55,127 @@ public class PluralityTally implements TallyMethod {
 	public TreeMap<String, String> validateContest(int p_contestId,
 			Ballot p_ballot)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		TreeMap<String, String> l_res = new TreeMap<String, String>();
+		
+		int l_sum = 0;
+		Integer l_bData[][] = p_ballot.getContestData(p_contestId);
+		if (l_bData.length == 0 || l_bData[0].length == 0) return null;
+		for (int l_i = 0; l_i < l_bData[0].length; l_i++)
+		{
+			if (l_bData[0][l_i] == 1) l_sum++;
+		}
+		if (l_sum == 0) l_res.put("", "No Vote");
+		else if (l_sum == 1) l_res.put("", "Vote Recorded");
+		else l_res.put("", "Overvote");
+		return l_res;
 	}
+	
+	
+	/* (non-Javadoc)
+	 * @see org.scantegrity.lib.methods.TallyMethod#tally(org.scantegrity.scanner.Contest, java.util.Vector)
+	 */
+	@Override
+	public ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots)
+	{
+		PluralityContestResult l_res = new PluralityContestResult();
+		TreeMap<Contestant, Vector<Ballot>> l_stacks;
+		Vector<Contestant> l_contestants;		
+		l_contestants = new Vector<Contestant>(p_contest.getContestants());
+		l_contestants.add(new Contestant(-2, "Invalid Ballots"));
+		
+		l_stacks = new TreeMap<Contestant, Vector<Ballot>>();
+		Vector<Integer> l_conIds = new Vector<Integer>();
+		for (Contestant l_c: l_contestants)
+		{
+			l_stacks.put(l_c, new Vector<Ballot>());	
+			l_conIds.add(l_c.getId());
+		}
+
+		for (Ballot l_b : p_ballots)
+		{
+			if (l_b.hasContest(p_contest.getId()))
+			{
+				Integer l_bData[][] = l_b.getContestData(p_contest.getId());
+				int l_c = -1;
+				for (int l_i = 0; l_i < l_bData[0].length; l_i++)
+				{
+					if (l_bData[0][l_i] == 1)
+					{
+						if (l_c == -1)
+						{ 
+							//Record Vote
+							l_c = l_i;
+						}
+						else 
+						{
+							//OverVote
+							l_c = -2;
+							break;
+						}
+					}
+				}
+				//No Vote
+				if (l_c == -1) l_c = -2;
+				
+				l_stacks.get(l_contestants.get(l_conIds.indexOf(l_c))).add(l_b);
+			}
+		}
+
+		TreeMap<Integer, Vector<Contestant>> l_rank = getRankOrder(l_stacks);
+		Vector<Integer> l_totals = new Vector<Integer>();
+		Integer l_key = l_rank.firstKey();
+		while (l_key != null)
+		{
+			l_totals.add(l_stacks.get(l_rank.get(l_key).get(0)).size());
+			l_key = l_rank.higherKey(l_key);
+		}
+		
+		l_res.setRanking(l_rank);
+		l_res.setTotals(l_totals);
+		
+		return l_res;
+	}
+
+	
+	/**
+	 * This is a c/p from the Runoff with 2 minor changes.. probably should 
+	 * join this together or make it "better", not sure how.
+	 * 
+	 * @param p_stacks
+	 * @return
+	 */
+	private TreeMap<Integer, Vector<Contestant>> getRankOrder(
+			TreeMap<Contestant, Vector<Ballot>> p_stacks)
+	{
+		Object l_keys[] = p_stacks.keySet().toArray();
+		TreeMap<Integer, Vector<Contestant>> l_tmp, l_final;
+		l_tmp = new TreeMap<Integer, Vector<Contestant>>();
+		l_final = new TreeMap<Integer, Vector<Contestant>>();
+
+		// Each key becomes the target, the new keys are the size, order is
+		// automagically computed via treemap.
+		for (Object l_k : l_keys)
+		{
+			Contestant l_key = (Contestant) l_k;
+			if (l_key.getId() == -2)
+				continue; // Skip the exhausted pile
+				// System.out.print(l_key.toString() + ":");
+				// System.out.println(", Size: " + p_stacks.get(l_key).size());
+			if (!l_tmp.containsKey(p_stacks.get(l_key).size()))
+			{
+				l_tmp.put(p_stacks.get(l_key).size(), new Vector<Contestant>());
+			}
+			l_tmp.get(p_stacks.get(l_key).size()).add(l_key);
+		}
+
+		// Change each key to equivalent rank.
+		l_keys = l_tmp.keySet().toArray();
+		for (int l_i = 0; l_i < l_keys.length; l_i++)
+		{
+			l_final.put(l_i, l_tmp.get(l_tmp.lastKey()));
+			l_tmp.remove(l_tmp.lastKey());
+		}
+
+		return l_final;
+	}		
 }

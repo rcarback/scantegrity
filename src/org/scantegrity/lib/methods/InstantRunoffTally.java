@@ -118,7 +118,7 @@ public class InstantRunoffTally implements TallyMethod {
 				if (l_bData[l_j][l_i] == 1) l_rankCnt++;
 			}
 			String l_rankName = "Rank " + (l_i+1); 
-			if (l_rankCnt == 1)	l_res.put(l_rankName, "Mark Recorded");
+			if (l_rankCnt == 1)	l_res.put(l_rankName, "Vote Recorded");
 			else if (l_rankCnt == 0) l_res.put(l_rankName, "No Vote");
 			else l_res.put(l_rankName, "Overvote");
 		}
@@ -341,7 +341,9 @@ public class InstantRunoffTally implements TallyMethod {
 			l_curRound = l_res.new Round(l_prevRound);
 		} while (l_stacks.size() > 2 //End, or tied ending
 					|| l_tieStack.size() > 0); 
-
+		
+		l_res.setRanking(l_curRank);
+		
 		return l_res;
 	}
 
