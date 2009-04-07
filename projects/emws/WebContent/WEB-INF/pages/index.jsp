@@ -5,7 +5,7 @@
    <p>The Mock Election Details are:</p>
     <p>
         <b>When:</b> 10am to 2pm on April 11th, 2009<br />
-        <b>Where:</b> Takom Park Community Center Azalea Room<br /> 
+        <b>Where:</b> Takoma Park Community Center Azalea Room<br /> 
         <b>What:</b> City residents and their families and friends are invited to 
         participate in a mock election administered by the City and its Board 
         of Elections. The point of this mock election is to give voters an 

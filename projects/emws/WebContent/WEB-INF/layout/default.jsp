@@ -30,17 +30,18 @@
 	            </stripes:layout-component>
 	            <div id="middle">
 	                <div id="content">
+	                <!-- Hidden for now!
 					<ul id="languageLinks">
 					   <li><a href="${pageContext.request.contextPath}/espanol">Espa&#241;ol</a></li>
 					
 					   <li><a href="${pageContext.request.contextPath}/index">English</a></li>
 					</ul>
-
+                    // -->
                     <stripes:layout-component name="contents"/>
 		            <ul id="navigation">
 		
 		               <li><a href="${pageContext.request.contextPath}/index">Home</a></li>
-		               <li><a href="${pageContext.request.contextPath}/checkcodes">Ballot Check</a></li>
+		               <li><a href="${pageContext.request.contextPath}/ballotcheck">Ballot Check</a></li>
 		               <li><a href="${pageContext.request.contextPath}/results">Results</a></li>
 		               <li><a href="${pageContext.request.contextPath}/faq">FAQ</a></li>
                        <li><a href="${pageContext.request.contextPath}/contact">Contact Us</a></li>
