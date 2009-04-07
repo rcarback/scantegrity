@@ -150,7 +150,7 @@ public class ScantegrityBallotReaderTest
 		l_marks[0] = new Point(2299, 209);
 		l_marks[1] = new Point(2288, 2964);
 		QRCodeReader l_code = new QRCodeReader();
-		l_code.setSerialBoundingBox(new Rectangle(158, 60, 250, 250));
+		l_code.setSerialBoundingBox(new Rectangle(148, 48, 270, 270));
 		l_reader.setSerial(l_code);
 		l_reader.setAlignment(l_marks);
 		l_reader.setDimension(l_d);

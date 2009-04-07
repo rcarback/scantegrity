@@ -169,7 +169,7 @@ public class ScantegrityBallotReader extends BallotReader
 		
 		double l_res = (double)l_det/(double)l_total;
 		
-		System.out.println("\n% Black: " + l_res);
+		//System.out.println("\n% Black: " + l_res);
 		
 		if (l_res > .3) return true;
 		return false;

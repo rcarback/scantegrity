@@ -20,6 +20,7 @@
 package org.scantegrity.util;
 
 import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -73,7 +74,7 @@ public class AffineCropper
 				} catch (ArrayIndexOutOfBoundsException e) {} 
 			}
 		}
-		/* BEGIN DEBUG */
+		/* BEGIN DEBUG * /
 		try {
 			ImageIO.write(l_res,"png",new File("serial" + i + ".png"));
 		} catch (IOException e) {
@@ -85,5 +86,73 @@ public class AffineCropper
 		return l_res;
 	}
 	
+	
+	/**
+	 * Does the same thing as crop, but leaves it in the scaled of the src
+	 * image instead of scaling up or down to meet a desired size.
+	 * 
+	 * @param p_src
+	 * @param p_op
+	 * @param p_bounds
+	 * @return
+	 * @throws Exception
+	 */
+	public static BufferedImage cropUnscaled(BufferedImage p_src, 
+			AffineTransformOp p_op, Rectangle p_bounds) throws Exception
+	{
+		AffineTransform l_tran, l_inv;
+		l_tran = p_op.getTransform(); 	//Detected -> Ideal
+		l_inv = l_tran.createInverse(); //Ideal -> Detected
+		AffineTransformOp l_invOp;
+		l_invOp = new AffineTransformOp(l_inv, AffineTransformOp.TYPE_BILINEAR);
+		
+		//p_bounds is in the ideal space, we need it in the ideal space, BUT,
+		//at the detected scale -- weird. 
+		Rectangle l_bounds = new Rectangle(p_bounds);
+		//Scale height and width down
+		l_bounds.width *= Math.abs(l_inv.getScaleX());
+		l_bounds.height *= Math.abs(l_inv.getScaleY());
+		
+		BufferedImage l_res;
+		l_res = new BufferedImage(l_bounds.width,
+				l_bounds.height,
+				p_src.getType());		
+		
+		Point2D.Double l_idealPt = new Point2D.Double();
+		Point2D.Double l_detPt = new Point2D.Double();
+		int l_rgb;
+		for (int l_i = 0; l_i < l_bounds.width; l_i++) 
+		{
+			for (int l_j = 0; l_j < l_bounds.height; l_j++)
+			{
+				try {
+					//Scale the ideal points to get the next point at the 
+					//detected scale. Scale sample up
+					l_idealPt.setLocation(l_i*Math.abs(l_tran.getScaleX()), 
+										l_j*Math.abs(l_tran.getScaleY()));
+					//Use ideal offset
+					l_idealPt.x += l_bounds.getX();
+					l_idealPt.y += l_bounds.getY();
+					
+					l_invOp.getPoint2D(l_idealPt, l_detPt);
+					//System.out.print(l_srcPt.x + ", " + l_srcPt.y + " to ");
+					//System.out.println(l_dstPt.x + ", " + l_dstPt.y);
+					l_rgb = p_src.getRGB((int)Math.round(l_detPt.x), 
+										(int)Math.round(l_detPt.y));
+					l_res.setRGB(l_i, l_j, l_rgb);
+				} catch (ArrayIndexOutOfBoundsException e) {} 
+			}
+		}
+		/* BEGIN DEBUG */
+		try {
+			ImageIO.write(l_res,"png",new File("serial" + i + ".png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+		
+		i++; 
+		/* END DEBUG */
+		return l_res;
+	}	
 
 }

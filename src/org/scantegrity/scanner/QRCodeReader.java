@@ -59,7 +59,9 @@ public class QRCodeReader implements SerialNumberReader
 			//int l_start = (int) System.currentTimeMillis();
 			//System.out.println("Trying...");
 			
-			l_serial = new BufferedImageMonochromeBitmapSource(AffineCropper.crop(p_img, p_op, c_boundingBox));
+			l_serial = new BufferedImageMonochromeBitmapSource(
+						AffineCropper.cropUnscaled(p_img, p_op, c_boundingBox));
+			//l_serial = new BufferedImageMonochromeBitmapSource(AffineCropper.crop(p_img, p_op, c_boundingBox));
 			
 			Vector<BarcodeFormat> l_formats = new Vector<BarcodeFormat>();
 			l_formats.add(BarcodeFormat.QR_CODE);
@@ -72,7 +74,7 @@ public class QRCodeReader implements SerialNumberReader
 			Result result = new MultiFormatReader().decode(l_serial, hints);
 			
 			
-			System.out.println("The Result: " + result.getText());
+			//System.out.println("The Result: " + result.getText());
 			//System.out.println("Serial Scan Time:" + (int)(System.currentTimeMillis()-l_start) + "ms");
 			return Integer.parseInt(result.getText());
 		} catch (ReaderException e) {
