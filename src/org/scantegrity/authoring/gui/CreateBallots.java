@@ -557,14 +557,14 @@ public class CreateBallots extends javax.swing.JFrame {
 
 		try {
 	    	PrintableBallotMaker pbm=new PrintableBallotMaker(this.electionSpec,this.geometry);
-	    	pbm.init(background,this.printsFilePath);
+	    	//pbm.init(background,this.printsFilePath);
 	
 			Vector<Point> range=getBallotsToBePrinted();
 	    	//Ask for directory
 	    	outputFolder=getOutPutFolder();
 	    	
-	    	for (Point p:range)
-	    		pbm.makePrintableBallots(outputFolder, p.x,p.y);
+	    	//for (Point p:range)
+	    	//	pbm.makePrintableBallots(outputFolder, p.x,p.y);
 		} catch (Exception e) {
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(this,"Error creating ballots \n"+e.getMessage());

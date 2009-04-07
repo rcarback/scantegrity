@@ -80,6 +80,16 @@ public class PrintableBallotMaker {
 		geometry = new BallotGeometry(pathToBallotMap);
 	}
 		
+	/**
+	 * @param p_electionSpec
+	 * @param p_geometry
+	 */
+	public PrintableBallotMaker(ElectionSpecification p_electionSpec,
+			BallotGeometry p_geometry)
+	{
+		// TODO Auto-generated constructor stub
+	}
+
 	private void createBlankBackgroundPage(float w,float h) {
 		com.lowagie.text.Document document = new com.lowagie.text.Document(new Rectangle(w,h));
 		pdfPageheight=h;
