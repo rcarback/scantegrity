@@ -22,16 +22,19 @@ public class DefaultActionBean implements ActionBean {
     	//If there is at least 1 char
     	if (l_i > 0) l_name = l_name.substring(0, l_i);
     	else l_name = "index";
-    	
+    	l_name = l_name.toLowerCase();
         return new ForwardResolution(VIEW + l_name + ".jsp");
     }
 
+    protected void initialize() {}
+    
     private ActionBeanContext c_ctx;
     public ActionBeanContext getContext() { 
     	return c_ctx; 
     }
     public void setContext(ActionBeanContext p_ctx) { 
     	this.c_ctx = p_ctx; 
+    	initialize();
 	}
 
 }
