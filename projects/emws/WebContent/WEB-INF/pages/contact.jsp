@@ -10,7 +10,7 @@
 		<p>Please fill out the following form, and we will get back to you
 		as soon as possible.</p>
 
-		<stripes:form beanclass="action.ContactActionBean" class="stylishform">
+		<stripes:form beanclass="org.scantegrity.emws.action.ContactActionBean" class="stylishform">
 		<fieldset><legend>Contact Form</legend>
             <span style="color:red;"><stripes:errors/></span>		
 		<ol>
