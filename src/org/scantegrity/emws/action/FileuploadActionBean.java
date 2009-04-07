@@ -1,5 +1,6 @@
 package org.scantegrity.emws.action;
 
+import java.beans.XMLDecoder;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +15,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -280,8 +280,8 @@ public class FileuploadActionBean implements ActionBean {
 			Document l_doc = l_builder.parse(l_istream);
 			
 			NodeList l_partitions = l_doc.getElementsByTagName("partition");
-			ArrayList<Contest> l_contests = GetContests();
-			ArrayList<Vector<Ballot>> l_ballots = GetData(l_partitions, l_contests);
+			Vector<Contest> l_contests = GetContests();
+			Vector<Vector<Ballot>> l_ballots = GetData(l_partitions, l_contests);
 		
 			for( int x = 0; x < l_contests.size(); x++ )
 			{
@@ -306,11 +306,29 @@ public class FileuploadActionBean implements ActionBean {
 		
 	}
 	
-	private ArrayList<Contest> GetContests()
+	@SuppressWarnings("unchecked")
+	private Vector<Contest> GetContests()
 	{
-		ArrayList<Contest> l_contests = new ArrayList<Contest>();
+		Vector<Contest> l_contests = null;
+		try
+		{
+			File l_docsDir = new File(c_ctx.getServletContext().getRealPath("/docs/"));
+			File l_contestFile = new File(l_docsDir, "ContestInformation.xml");
+			FileInputStream l_input = new FileInputStream(l_contestFile);
+			
+			XMLDecoder l_dec = new XMLDecoder(l_input);
+			Object l_decodedObject = l_dec.readObject();
+			
+			if( l_decodedObject instanceof Vector )
+				l_contests = (Vector<Contest>)l_dec.readObject();
+		}
+		catch(IOException e)
+		{
+			c_error += "Could not open contest information file. Please make sure that it has been uploaded.\n";
+			return null;
+		}
 		
-		Contest l_contestOne = new Contest();
+		/*Contest l_contestOne = new Contest();
 		l_contestOne.setId(0);
 		l_contestOne.setContestName("Favorite Tree");
 		Vector<Contestant> l_contestantsOne = new Vector<Contestant>();
@@ -357,16 +375,16 @@ public class FileuploadActionBean implements ActionBean {
 		l_contests.add(l_contestOne);
 		l_contests.add(l_contestTwo);
 		l_contests.add(l_contestThree);
-		l_contests.add(l_contestFour);
+		l_contests.add(l_contestFour); */
 		
 		return l_contests;
 	}
 	
-	private ArrayList<Vector<Ballot>> GetData(NodeList p_partitions, ArrayList<Contest> p_contests)
+	private Vector<Vector<Ballot>> GetData(NodeList p_partitions, Vector<Contest> l_contests)
 	{
-		ArrayList<Vector<Ballot>> l_data = new ArrayList<Vector<Ballot>>();
+		Vector<Vector<Ballot>> l_data = new Vector<Vector<Ballot>>();
 		
-		System.err.println("Partitions: " + p_partitions.getLength());
+		//System.err.println("Partitions: " + p_partitions.getLength());
 
 		for( int x = 0; x < p_partitions.getLength(); x++ )
 		{	
@@ -381,7 +399,7 @@ public class FileuploadActionBean implements ActionBean {
 			
 			NodeList l_rows = l_results.getChildNodes();
 			
-			System.err.println("Rows: " + l_rows.getLength());
+			//System.err.println("Rows: " + l_rows.getLength());
 
 			int l_length = 0;
 			
@@ -399,11 +417,11 @@ public class FileuploadActionBean implements ActionBean {
 					}
 				
 					Map<Integer, Integer[][]> l_ballotData = new TreeMap<Integer, Integer[][]>();
-					Integer[][] l_values = new Integer[p_contests.get(x).getContestants().size()][l_length];
+					Integer[][] l_values = new Integer[l_contests.get(x).getContestants().size()][l_length];
 					
 					String[] l_splits = l_rows.item(y).getAttributes().getNamedItem("r").getNodeValue().split(" ");
-					System.err.println("Length: " + l_splits.length);
-					System.err.println(l_rows.item(y).getAttributes().getNamedItem("r").getNodeValue());
+					//System.err.println("Length: " + l_splits.length);
+					//System.err.println(l_rows.item(y).getAttributes().getNamedItem("r").getNodeValue());
 					
 					for( int i = 0; i < l_values.length; i++ )
 					{
@@ -418,7 +436,7 @@ public class FileuploadActionBean implements ActionBean {
 						l_values[Integer.parseInt(l_splits[z])][z] = 1;
 					}
 					
-					System.err.println("--------");
+					/*System.err.println("--------");
 					for( int i = 0; i < l_values.length; i++ )
 					{
 						for( int k = 0; k < l_values[i].length; k++ )
@@ -427,7 +445,7 @@ public class FileuploadActionBean implements ActionBean {
 						}
 						System.err.println();
 					}
-					System.err.println("--------");
+					System.err.println("--------");*/
 					
 					l_ballotData.put(0, l_values);
 					
