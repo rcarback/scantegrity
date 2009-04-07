@@ -1,4 +1,4 @@
-package action;
+package org.scantegrity.emws.action;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;

@@ -1,5 +1,5 @@
 /*
- * @(#)CreateScannerConfig.java.java
+ * @(#)ContactActionBean.java
  *  
  * Copyright (C) 2008-2009 Scantegrity Project
  * 
@@ -24,7 +24,7 @@
  * @author Richard Carback
  */
 
-package action;
+package org.scantegrity.emws.action;
 
 import java.util.Properties;
 import java.util.ResourceBundle;
@@ -66,7 +66,7 @@ public class ContactActionBean extends DefaultActionBean{
 	protected void initialize()
 	{
 		c_ReCaptcha = new ReCaptchaImpl();
-		c_bundle = ResourceBundle.getBundle("Contact");
+		c_bundle = ResourceBundle.getBundle("org.scantegrity.emws.Contact");
 		c_ReCaptcha.setPrivateKey(c_bundle.getString("ReCaptchaPriv"));
 		c_ReCaptcha.setPublicKey(c_bundle.getString("ReCaptchaPub"));
 		c_ReCaptcha.setRecaptchaServer(ReCaptchaImpl.HTTPS_SERVER);
@@ -144,7 +144,7 @@ public class ContactActionBean extends DefaultActionBean{
 			else
 			{
 				SimpleError l_e = new SimpleError("ReCaptcha Failed. "
-						+ "Your message was incorrect, please try again.");
+						+ "Your answer was incorrect, please try again.");
 				
 				getContext().getValidationErrors().add("ReCaptcha", l_e);
 			}

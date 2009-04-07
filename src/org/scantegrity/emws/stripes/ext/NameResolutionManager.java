@@ -2,16 +2,12 @@
  * 
  */
 
-package stripes.ext;
+package org.scantegrity.emws.stripes.ext;
 
 import java.util.List;
 
-import action.DefaultActionBean;
-
 import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.controller.NameBasedActionResolver;
-import net.sourceforge.stripes.exception.StripesServletException;
 
 
 /**

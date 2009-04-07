@@ -1,4 +1,4 @@
-package action;
+package org.scantegrity.emws.action;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;

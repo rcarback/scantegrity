@@ -1,6 +1,6 @@
 
 
-package stripes.ext;
+package org.scantegrity.emws.stripes.ext;
 
 
 import java.util.Locale;

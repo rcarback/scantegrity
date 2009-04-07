@@ -1,4 +1,4 @@
-package action;
+package org.scantegrity.emws.action;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
