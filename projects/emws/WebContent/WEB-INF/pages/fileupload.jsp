@@ -5,7 +5,7 @@
 
 <h1>File Upload</h1>
 
-<stripes:form beanclass="action.FileuploadActionBean">
+<stripes:form beanclass="org.scantegrity.emws.action.FileuploadActionBean">
 
 	<stripes:file name="file" />
 	<stripes:submit name="submit" value="Upload" />

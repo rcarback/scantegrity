@@ -5,7 +5,7 @@
 <h1>Check Codes</h1>
 
 <p>Please input your ballot serial below:</p>
-<stripes:form beanclass="action.CheckCodesActionBean">
+<stripes:form beanclass="org.scantegrity.emws.action.CheckCodesActionBean">
 
 	<label for="name">Serial:</label>
 	<input type="text" id="serial" name="serial" value="${actionBean.serial}" />

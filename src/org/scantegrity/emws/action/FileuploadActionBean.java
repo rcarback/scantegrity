@@ -19,8 +19,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -33,7 +31,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class FileuploadActionBean implements ActionBean {
+public class FileuploadActionBean extends RestrictedActionBean {
 
 	//Parameters for database connection
 	private static final String c_dbAddress = "jdbc:derby:";
@@ -73,14 +71,6 @@ public class FileuploadActionBean implements ActionBean {
 	public void setErrors(String p_error)
 	{
 		c_error = p_error;
-	}
-
-	private ActionBeanContext c_ctx;
-	public ActionBeanContext getContext() { 
-		return c_ctx; 
-	}
-	public void setContext(ActionBeanContext p_ctx) { 
-		this.c_ctx = p_ctx; 
 	}
 
 	@DefaultHandler

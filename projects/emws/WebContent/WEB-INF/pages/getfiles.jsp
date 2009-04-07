@@ -5,7 +5,7 @@
     
     <h1>Election Files</h1>
     
-    <stripes:form beanclass="action.GetFilesActionBean">
+    <stripes:form beanclass="org.scantegrity.emws.action.GetFilesActionBean">
     
     
     	${actionBean.htmlFiles}

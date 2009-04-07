@@ -33,7 +33,7 @@ public class UserManage {
 			l_md.update(p_password.getBytes());
 		
 			SecureRandom l_random = new SecureRandom();
-			l_seed = new byte[512];
+			l_seed = new byte[256];
 			l_random.nextBytes(l_seed);
 			l_md.update(l_seed);
 			
@@ -66,7 +66,7 @@ public class UserManage {
 		{
 			if( e.getMessage().contains("does not exist") )
 			{
-				l_query.execute("CREATE TABLE Users ( username varchar(50), password varchar(15), salt varchar(10) )");
+				l_query.execute("CREATE TABLE Users ( username varchar(50), password varchar(150), salt varchar(350) )");
 			}
 		}
 		
@@ -137,6 +137,29 @@ public class UserManage {
 		//Create connection to database.  Create database if it doesn't exist.
 		Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
 
+		//Create SQL statement object
+		Statement l_tableQuery = l_conn.createStatement();
+		
+		//Test to see if the table exists, create it if it doesn't
+		/* Now, we just try to select something from the table and if an error is thrown
+		 * that contains "does not exist" then we try and create it.  Could be done
+		 * better with T-SQL, doesn't handle the case where the table exists but 
+		 * doesn't have the columns we are expecting.
+		 */
+		try
+		{
+			l_tableQuery.execute("SELECT COUNT(*) FROM Users");
+		}
+		catch( SQLException e )
+		{
+			if( e.getMessage().contains("does not exist") )
+			{
+				l_tableQuery.execute("CREATE TABLE Users ( username varchar(50), password varchar(100), salt varchar(350) )");
+				addUser("default", "scantegrity");
+			}
+		}
+		
+		
 		PreparedStatement l_query = l_conn.prepareStatement("SELECT * FROM Users WHERE username=?");
 		l_query.setString(1, p_userName);
 		
@@ -154,7 +177,7 @@ public class UserManage {
 
 			l_md.update(p_pass.getBytes());	
 			
-			l_seed = l_dec.decodeBufferToByteBuffer(l_results.getString("seed")).array();
+			l_seed = l_dec.decodeBufferToByteBuffer(l_results.getString("salt")).array();
 			l_md.update(l_seed);
 			
 			l_digest = l_md.digest();
