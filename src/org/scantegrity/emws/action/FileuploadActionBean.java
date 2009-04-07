@@ -1,5 +1,6 @@
 package org.scantegrity.emws.action;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,11 +8,16 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -19,19 +25,28 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sourceforge.stripes.action.ActionBean;
+import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.validation.Validate;
 
+import org.scantegrity.lib.Ballot;
+import org.scantegrity.lib.Contest;
+import org.scantegrity.lib.Contestant;
+import org.scantegrity.lib.methods.ContestResult;
+import org.scantegrity.lib.methods.InstantRunoffTally;
+import org.scantegrity.lib.methods.PluralityTally;
+import org.scantegrity.lib.methods.TallyMethod;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class FileuploadActionBean extends RestrictedActionBean {
+public class FileuploadActionBean implements ActionBean {
 
 	//Parameters for database connection
 	private static final String c_dbAddress = "jdbc:derby:";
@@ -78,9 +93,13 @@ public class FileuploadActionBean extends RestrictedActionBean {
 	{
 		if( c_file != null )
 		{
-			if( c_file.getFileName().contains(".xml") )
+			if( c_file.getFileName().equals("MeetingThreeOutCodes.xml") )
 			{
-				parseXML();
+				parseCodes();
+			}
+			else if( c_file.getFileName().equals("MeetingThreeOut.xml") )
+			{
+				parseResults();
 			}
 			
 			saveFile();
@@ -113,7 +132,7 @@ public class FileuploadActionBean extends RestrictedActionBean {
 		}
 	}
 	
-	public void parseXML()
+	public void parseCodes()
 	{
 		if( c_file != null )
 		{
@@ -169,7 +188,7 @@ public class FileuploadActionBean extends RestrictedActionBean {
 						if( !l_node.getNodeName().equals("ballot") )
 							continue;
 						
-						int l_serial = Integer.parseInt(l_node.getAttributes().getNamedItem("printedSerial").getNodeValue());
+						int l_serial = Integer.parseInt(l_node.getAttributes().getNamedItem("chitSerial").getNodeValue());
 						
 						//Check to see if this ID is already in the database
 						l_existsQuery.setInt(1, l_serial);
@@ -242,6 +261,185 @@ public class FileuploadActionBean extends RestrictedActionBean {
 		}
 	}
 	
+	private void parseResults()
+	{
+		try {
+			File l_docsDir = new File(c_ctx.getServletContext().getRealPath("/docs/"));
+			if( !l_docsDir.exists() )
+			{
+				throw new FileNotFoundException("Docs folder could not be found");
+			}
+			BufferedWriter l_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(l_docsDir, "Results.txt"))));
+			
+			//Get stream from uploaded file
+			InputStream l_istream = c_file.getInputStream();
+			
+			//Create documentbuilder and parse uploaded file
+			DocumentBuilderFactory l_factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder l_builder = l_factory.newDocumentBuilder();
+			Document l_doc = l_builder.parse(l_istream);
+			
+			NodeList l_partitions = l_doc.getElementsByTagName("partition");
+			ArrayList<Contest> l_contests = GetContests();
+			ArrayList<Vector<Ballot>> l_ballots = GetData(l_partitions, l_contests);
+		
+			for( int x = 0; x < l_contests.size(); x++ )
+			{
+				TallyMethod l_tally = l_contests.get(x).getMethod();
+				ContestResult l_res = l_tally.tally(l_contests.get(x), l_ballots.get(x));
+				l_writer.write(l_res.toString());
+			}
+			
+			l_writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally
+		{	}
+		
+	}
+	
+	private ArrayList<Contest> GetContests()
+	{
+		ArrayList<Contest> l_contests = new ArrayList<Contest>();
+		
+		Contest l_contestOne = new Contest();
+		l_contestOne.setId(0);
+		l_contestOne.setContestName("Favorite Tree");
+		Vector<Contestant> l_contestantsOne = new Vector<Contestant>();
+		l_contestantsOne.add(new Contestant(1, "Cherry"));
+		l_contestantsOne.add(new Contestant(2, "Elm"));
+		l_contestantsOne.add(new Contestant(3, "Maple"));
+		l_contestantsOne.add(new Contestant(4, "Oak"));
+		l_contestantsOne.add(new Contestant(5, "Write-in"));
+		l_contestOne.setContestants(l_contestantsOne);
+		l_contestOne.setMethod(new InstantRunoffTally());
+		
+		Contest l_contestTwo = new Contest();
+		l_contestTwo.setId(0);
+		l_contestTwo.setContestName("Favorite Animal");
+		Vector<Contestant> l_contestantsTwo = new Vector<Contestant>();
+		l_contestantsTwo.add(new Contestant(1, "Owl"));
+		l_contestantsTwo.add(new Contestant(2, "Rabbit"));
+		l_contestantsTwo.add(new Contestant(3, "Squirrel"));
+		l_contestantsTwo.add(new Contestant(4, "Write-in"));
+		l_contestTwo.setContestants(l_contestantsTwo);
+		l_contestTwo.setMethod(new InstantRunoffTally());
+		
+		Contest l_contestThree = new Contest();
+		l_contestThree.setId(0);
+		l_contestThree.setContestName("Number of Trees");
+		Vector<Contestant> l_contestantsThree = new Vector<Contestant>();
+		l_contestantsThree.add(new Contestant(1, "0"));
+		l_contestantsThree.add(new Contestant(2, "1-2"));
+		l_contestantsThree.add(new Contestant(3, "3-5"));
+		l_contestantsThree.add(new Contestant(4, "5-10"));
+		l_contestantsThree.add(new Contestant(5, "10+"));
+		l_contestThree.setContestants(l_contestantsThree);
+		l_contestThree.setMethod(new PluralityTally());
+		
+		Contest l_contestFour = new Contest();
+		l_contestFour.setId(0);
+		l_contestFour.setContestName("Less paper products");
+		Vector<Contestant> l_contestantsFour = new Vector<Contestant>();
+		l_contestantsFour.add(new Contestant(1, "Yes"));
+		l_contestantsFour.add(new Contestant(2, "No"));
+		l_contestFour.setContestants(l_contestantsThree);
+		l_contestFour.setMethod(new PluralityTally());
+		
+		l_contests.add(l_contestOne);
+		l_contests.add(l_contestTwo);
+		l_contests.add(l_contestThree);
+		l_contests.add(l_contestFour);
+		
+		return l_contests;
+	}
+	
+	private ArrayList<Vector<Ballot>> GetData(NodeList p_partitions, ArrayList<Contest> p_contests)
+	{
+		ArrayList<Vector<Ballot>> l_data = new ArrayList<Vector<Ballot>>();
+		
+		System.err.println("Partitions: " + p_partitions.getLength());
+
+		for( int x = 0; x < p_partitions.getLength(); x++ )
+		{	
+			Node l_contest = p_partitions.item(x);
+			Node l_results = null;
+			for( int y = 0; y < l_contest.getChildNodes().getLength(); y++ )
+			{
+				Node l_child = l_contest.getChildNodes().item(y);
+				if( l_child.getNodeName() == "results" )
+					l_results = l_child;
+			}
+			
+			NodeList l_rows = l_results.getChildNodes();
+			
+			System.err.println("Rows: " + l_rows.getLength());
+
+			int l_length = 0;
+			
+			Vector<Ballot> l_ballots = new Vector<Ballot>();
+			
+			for( int y = 0; y < l_rows.getLength(); y++ )
+			{
+				if( l_rows.item(y).getNodeName() == "row" )
+				{
+					Integer l_id = Integer.parseInt(l_rows.item(y).getAttributes().getNamedItem("id").getNodeValue());
+					
+					if( l_length == 0 )
+					{
+						l_length = l_rows.item(y).getAttributes().getNamedItem("r").getNodeValue().split(" ").length;
+					}
+				
+					Map<Integer, Integer[][]> l_ballotData = new TreeMap<Integer, Integer[][]>();
+					Integer[][] l_values = new Integer[p_contests.get(x).getContestants().size()][l_length];
+					
+					String[] l_splits = l_rows.item(y).getAttributes().getNamedItem("r").getNodeValue().split(" ");
+					System.err.println("Length: " + l_splits.length);
+					System.err.println(l_rows.item(y).getAttributes().getNamedItem("r").getNodeValue());
+					
+					for( int i = 0; i < l_values.length; i++ )
+					{
+						for( int k = 0; k < l_values[i].length; k++ )
+						{
+							l_values[i][k] = 0;
+						}
+					}
+					
+					for( int z = 0; z < l_splits.length; z++ )
+					{
+						l_values[Integer.parseInt(l_splits[z])][z] = 1;
+					}
+					
+					System.err.println("--------");
+					for( int i = 0; i < l_values.length; i++ )
+					{
+						for( int k = 0; k < l_values[i].length; k++ )
+						{
+							System.err.print(l_values[i][k] + " ");
+						}
+						System.err.println();
+					}
+					System.err.println("--------");
+					
+					l_ballotData.put(0, l_values);
+					
+					l_ballots.add(new Ballot(l_id, 0, l_ballotData));
+				}
+			}
+			
+			l_data.add(l_ballots);
+		}
+		return l_data;
+	}
+	
 	class ZipThread extends Thread
 	{
 		File c_dir;
@@ -294,6 +492,20 @@ public class FileuploadActionBean extends RestrictedActionBean {
 			return name.contains(".xml");
 		}
 		
+	}
+	
+	ActionBeanContext c_ctx;
+
+	@Override
+	public ActionBeanContext getContext() {
+		// TODO Auto-generated method stub
+		return c_ctx;
+	}
+
+	@Override
+	public void setContext(ActionBeanContext arg0) {
+		// TODO Auto-generated method stub
+		c_ctx = arg0;
 	}
 
 }

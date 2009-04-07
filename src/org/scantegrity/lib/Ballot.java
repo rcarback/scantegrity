@@ -65,6 +65,7 @@ public class Ballot
 		c_ballotStyleID = p_styleID;
 		c_ballotData = p_contestData;
 		c_notes = new Vector<String>();
+		c_counted = true;
 	}
 
 	/**
