@@ -19,8 +19,14 @@
  */
 package org.scantegrity.scanner;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import org.scantegrity.util.DetectBlack;
 import org.scantegrity.util.SquareSpiralPattern;
@@ -131,7 +137,7 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 					
 				} catch (ArrayIndexOutOfBoundsException l_e) {}
 			}
-			/* BEGIN DEBUG * /
+			/* BEGIN DEBUG * / 
 			try {
 				Graphics2D l_out = p_img.createGraphics();
 				l_out.setColor(Color.black);

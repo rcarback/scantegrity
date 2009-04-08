@@ -21,6 +21,8 @@
 
 package org.scantegrity.scanner;
 
+import java.sql.Time;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.Vector;
 
@@ -55,7 +57,8 @@ public class ScannerConfig {
 	private int c_scannerID = -1;
 	private String c_name = "Unknown Name";
 	private String c_location = "Unknown Location";
-	private Date c_date = new Date(); //Date and time are stored here.
+	private String c_date = "Unknown Date"; //Date and time are stored here.
+	private String c_time = "Unknown Time";
 	private Vector<String> c_chiefJudges = null;
 	private Vector<String> c_judgePassHash = null;
 	private BallotReader c_reader = null;
@@ -79,7 +82,8 @@ public class ScannerConfig {
 		c_scannerID = -1;
 		c_name = "Unknown Name";
 		c_location = "Unknown Location";
-		c_date = new Date(); //Date and time are stored here.
+		c_date = "Unknown Date"; //Date and time are stored here.
+		c_time = "Unknown Time";
 		c_chiefJudges = new Vector<String>();
 		c_chiefJudges.add("Unknown Chief Judge");
 		c_judgePassHash = new Vector<String>();
@@ -166,21 +170,37 @@ public class ScannerConfig {
 	/**
 	 * @return the date
 	 */
-	public Date getDate()
+	public String getDate()
 	{
 		return c_date;
 	}
-
+	
 
 	/**
 	 * @param p_date the date to set
 	 */
-	public void setDate(Date p_date)
+	public void setDate(String p_date)
 	{
 		c_date = p_date;
 	}
-
-
+	
+	/**
+	 * @return the time
+	 */
+	public String getTime()
+	{
+		return c_time;
+	}
+	
+	/**
+	 * @param p_time
+	 */
+	public void setTime(String p_time)
+	{
+		c_time = p_time;
+	}
+	
+	
 	/**
 	 * @return the chiefJudges
 	 */
@@ -277,8 +297,5 @@ public class ScannerConfig {
 		return c_contests;
 	}
 
-
-
-	
 }
 

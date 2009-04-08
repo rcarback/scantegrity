@@ -38,6 +38,7 @@ import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.lib.Ballot;
 import org.scantegrity.lib.BallotStyle;
 import org.scantegrity.scanner.gui.PollingPlaceGUI;
+import org.scantegrity.util.DrunkDriver;
 
 /**
  * @author John Conway
@@ -45,19 +46,26 @@ import org.scantegrity.scanner.gui.PollingPlaceGUI;
  */
 public class BallotImageHandler implements ImageHandler
 {
-	private ScantegrityBallotReader c_reader;
+	private BallotReader c_reader;
 	private PollingPlaceGUI c_guiRef; 
-	private BallotStyle c_styles[] = null;
+	private Vector<BallotStyle> c_styles = null;
 	private int i = 0; 
 	private String c_errDir;
+	private ScannerConfig c_config;
 	
 	private String c_results; 
 	
-	public BallotImageHandler(PollingPlaceGUI p_guiRef, String p_errDir)
+	public BallotImageHandler(PollingPlaceGUI p_guiRef, String p_errDir, ScannerConfig p_config)
 	{
 		c_guiRef = p_guiRef; 
 		c_errDir = p_errDir;
 		
+		c_config = p_config;
+		
+		c_reader = c_config.getReader();
+		c_styles = c_config.getStyles();
+		
+		/*OLD* /
 		c_reader = new ScantegrityBallotReader();
 		Dimension l_d = new Dimension(2550, 4200);
 		Point[] l_marks = new Point[2];
@@ -110,10 +118,12 @@ public class BallotImageHandler implements ImageHandler
 		
 		
 		BallotStyle l_style = new BallotStyle(0, l_contests, l_rects, true);
+		
 		c_styles = new BallotStyle[1];
 		c_styles[0] = l_style;
 		
 		//c_reader.setStyles(l_styles);
+		/*END OLD*/
 	}
 	
 	/* (non-Javadoc)
@@ -122,9 +132,15 @@ public class BallotImageHandler implements ImageHandler
 	public void handleImage(BufferedImage p_image)
 	{
 		
+		//long l_start = System.currentTimeMillis(); 
 		try {
+			//Give me your keys
+			if(DrunkDriver.isDrunk(p_image, 10))
+				return;
+		
 			Ballot l_b = c_reader.scanBallot(c_styles, p_image);
 			
+			//System.out.println(System.currentTimeMillis() - l_start);
 			//couldn't find alignment marks 
 			if(l_b == null || l_b.getId() == null)
 			{
@@ -156,24 +172,16 @@ public class BallotImageHandler implements ImageHandler
 				}
 			}
 		} catch (Exception l_e) {
-			//Move file to destination directory
-			try
-			{
-				c_results = "Unable to Scan Ballot. Please Try Again";
-				Dialogs.displayInfoDialog(c_results, "Unable to Read Ballot!");
-				ImageIO.write(p_image, "tiff", new File(c_errDir + "/error" + i + ".tiff"));
-			}
-			catch (IOException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			c_results = "Unable to Scan Ballot. Please Try Again";
+			Dialogs.displayInfoDialog(c_results, "Unable to Read Ballot!");
+			//ImageIO.write(p_image, "tiff", new File(c_errDir + "/error" + i + ".tiff"));
 			i++;
+			l_e.printStackTrace();
 			return;
 		}
 		
 		//Send the results to the gui
-		c_guiRef.displayScanResults(c_results);
+		c_guiRef.addBallotResults(c_results);
 	}
 
 }

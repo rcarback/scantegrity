@@ -98,6 +98,11 @@ public class FindFile implements Runnable
 		c_fileFound = null;
 	}
 	
+	public File find()
+	{
+		return find(c_filename);
+	}
+	
 	/*
 	 * finds the file
 	 */

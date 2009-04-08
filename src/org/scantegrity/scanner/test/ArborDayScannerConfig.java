@@ -28,8 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Vector;
 
 import org.scantegrity.lib.BallotStyle;
@@ -72,7 +70,7 @@ public class ArborDayScannerConfig
 		l_reader.setSerial(l_code);
 		l_reader.setAlignment(l_marks);
 		l_reader.setDimension(l_d);
-		l_reader.setAlignmentMark(new CircleAlignmentMarkReader(75, .05));
+		l_reader.setAlignmentMark(new CircleAlignmentMarkReader(75/2, .05));
 		l_reader.setTolerance(.4);
 		
 		Vector<Integer> l_contests = new Vector<Integer>();
@@ -164,6 +162,7 @@ public class ArborDayScannerConfig
 		l_contestantIds.get(2).add(1);
 		l_contestantIds.get(2).add(2);
 		l_contestantIds.get(2).add(3);
+		l_contestantIds.get(2).add(4);
 		l_contestantIds.add(new Vector<Integer>());
 		l_contestantIds.get(3).add(0);
 		l_contestantIds.get(3).add(1);		
@@ -176,7 +175,7 @@ public class ArborDayScannerConfig
 		Vector<Contest> l_c = new Vector<Contest>();
 		Contest l_x = new Contest();
 		l_x.setId(0);
-		l_x.setContestName("Favorite Tree / Ërbol Favorito");
+		l_x.setContestName("Favorite Tree / ï¿½rbol Favorito");
 		Vector<Contestant> l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Cherry / el cerezo"));
 		l_can.add(new Contestant(1, "Elm / el olmo"));
@@ -191,10 +190,10 @@ public class ArborDayScannerConfig
 		l_x.setId(1);
 		l_x.setContestName("Favorite Forest Animal / Animal Arbolado Favorito");
 		l_can = new Vector<Contestant>();
-		l_can.add(new Contestant(0, "Owl / Bœho"));
+		l_can.add(new Contestant(0, "Owl / Bï¿½ho"));
 		l_can.add(new Contestant(1, "Rabbit / Conejo"));
-		l_can.add(new Contestant(1, "Squirrel / Ardilla"));
-		l_can.add(new Contestant(2, "Write-In / o por escrito"));
+		l_can.add(new Contestant(2, "Squirrel / Ardilla"));
+		l_can.add(new Contestant(3, "Write-In / o por escrito"));
 		l_x.setContestants(l_can);
 		l_x.setMethod(new InstantRunoffTally());
 		l_c.add(l_x);		
@@ -202,12 +201,12 @@ public class ArborDayScannerConfig
 		l_x = new Contest();
 		l_x.setId(2);
 		l_x.setContestName("How many trees are on your property?" 
-				+ " / ÀCuanto ‡rboles estan en su propiedad?");
+				+ " / ï¿½Cuanto ï¿½rboles estan en su propiedad?");
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "0"));
 		l_can.add(new Contestant(1, "1-2"));
-		l_can.add(new Contestant(1, "2-5"));
-		l_can.add(new Contestant(2, "More than 10 / M‡s de 10"));
+		l_can.add(new Contestant(2, "2-5"));
+		l_can.add(new Contestant(3, "More than 10 / Mï¿½s de 10"));
 		l_x.setContestants(l_can);
 		l_x.setMethod(new PluralityTally());
 		l_c.add(l_x);		
@@ -215,8 +214,8 @@ public class ArborDayScannerConfig
 		l_x = new Contest();
 		l_x.setId(3);
 		l_x.setContestName("Do you use less paper products than you did ten "
-						+ "years ago? / ÀUtiliza menos producto de papel que" +
-						" hace 10 a–os?");
+						+ "years ago? / ï¿½Utiliza menos producto de papel que" +
+						" hace 10 aï¿½os?");
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Yes / Si"));
 		l_can.add(new Contestant(1, "No / No"));
@@ -241,15 +240,8 @@ public class ArborDayScannerConfig
 		l_config.setReader(l_reader);
 		l_config.setContests(l_c);
 		
-		try
-		{
-			l_config.setDate(DateFormat.getDateInstance(DateFormat.MEDIUM).parse("April 11, 2009"));
-		}
-		catch (ParseException e2)
-		{
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
+		l_config.setDate("April 11, 2009");
+		l_config.setTime("10:00 am");
 		
 		l_config.setScannerID(0);
 		l_config.setStyles(l_s);

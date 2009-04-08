@@ -74,7 +74,7 @@ public class DirectoryWatcher implements Runnable
 			
 			try
 			{
-				Thread.sleep(1000);
+				Thread.sleep(50);
 			}
 			catch (InterruptedException e)
 			{

@@ -52,7 +52,7 @@ public class ScantegrityBallotReader extends BallotReader
 	 * @see org.scantegrity.scanner.BallotReader#scanBallot(org.scantegrity.scanner.SerialNumberReader, org.scantegrity.scanner.BallotStyle[], java.awt.image.BufferedImage)
 	 */
 	@Override
-	public Ballot scanBallot(BallotStyle[] p_styles, 
+	public Ballot scanBallot(Vector<BallotStyle> p_styles, 
 								BufferedImage p_img)
 	{
 		/*TODO: Need to return an "invalid" ballot instead of null, this ballot
@@ -83,16 +83,20 @@ public class ScantegrityBallotReader extends BallotReader
 		}		
 		
 		//Read in the Ballot Style, which is left most digit on 5 digit serial
-		int l_styleID = l_res.getId()/10000;
+		//int l_styleID = l_res.getId()/10000;
+		int l_styleID = 0;
 
 		//Select the right Ballot Style, which gives a list of contest data		
 		BallotStyle l_style = null;
+	
 		for (BallotStyle l_s : p_styles) {
 			if (l_s.getId() == l_styleID) {
 				l_style = l_s;
 				break;
 			}
 		}
+		
+		//System.out.println(l_style.getId());
 		
 		if (l_style == null) return null;
 		//Process each contest

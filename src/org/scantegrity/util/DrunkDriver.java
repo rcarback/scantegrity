@@ -35,14 +35,14 @@ public class DrunkDriver
 {
 	private static Random c_prng = null;
 	
-	public static boolean isBlank(BufferedImage p_img, int p_flips)
+	public static boolean isDrunk(BufferedImage p_img, int p_flips)
 	{
 		if (c_prng == null)
 		{
 			c_prng = new Random(System.currentTimeMillis());
 		}
 		
-		System.out.println(p_img.getHeight() + ", " + p_img.getWidth());
+		//System.out.println(p_img.getHeight() + ", " + p_img.getWidth());
 		Point l_pnt[] = new Point[6];
 		l_pnt[0] = new Point(p_img.getWidth()/4, 0);
 		l_pnt[1] = new Point(p_img.getWidth()/2, 0);

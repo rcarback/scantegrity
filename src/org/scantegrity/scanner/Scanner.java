@@ -20,10 +20,17 @@
 package org.scantegrity.scanner;
 
 import java.awt.HeadlessException;
+import java.beans.XMLDecoder;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import org.scantegrity.common.DirectoryWatcher;
 import org.scantegrity.common.ImageLoader;
 import org.scantegrity.common.gui.Dialogs;
+import org.scantegrity.lib.FindFile;
+import org.scantegrity.scanner.ScannerConfig;
 import org.scantegrity.scanner.gui.PollingPlaceGUI;
 
 /**
@@ -36,20 +43,22 @@ import org.scantegrity.scanner.gui.PollingPlaceGUI;
 public class Scanner
 {	
 	private PollingPlaceGUI c_guiRef;
+
+	private static String c_name = "ScannerConfig.xml";
 	
 	public Scanner(PollingPlaceGUI p_guiRef)
 	{
 		c_guiRef = p_guiRef; 
 	}
 	
-	public void startElection()
+	public void startElection(ScannerConfig p_config)
 	{
 		String c_srcDir = "/mnt/scantegritytmpfs/images";
 		String c_destDir = "/mnt/scantegritytmpfs/backup";
 		String c_errDir = "/mnt/scantegritytmpfs/error";
 		
 		//Create Ballot Handler
-		BallotImageHandler l_bih = new BallotImageHandler(c_guiRef, c_errDir);
+		BallotImageHandler l_bih = new BallotImageHandler(c_guiRef, c_errDir, p_config);
 		
 		//initialize the ImageLoader
 		ImageLoader l_il = new ImageLoader(l_bih);
@@ -60,19 +69,54 @@ public class Scanner
 		l_dirWatchThread.start();
 	}
 	
+	public static ScannerConfig getConfigurationFile()
+	{
+		ScannerConfig l_config = new ScannerConfig();
+		
+		File c_loc = new FindFile(c_name).find();
+		
+		XMLDecoder e;
+		try
+		{
+			e = new XMLDecoder(new BufferedInputStream(new FileInputStream(c_loc)));
+			l_config = (ScannerConfig)e.readObject();
+			e.close();	
+		}
+		catch(FileNotFoundException e_fnf)
+		{
+			Dialogs.displayErrorDialog("Could not open Configuration File. File not Found!");
+		}
+		
+		return l_config;
+	}
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args)
 	{
+		boolean l_fullscreen = false;
+		
+		for(int i = 0; i < args.length; i++)
+		{
+			String temp = args[i]; 
+			if(temp.equals("-f"))
+				l_fullscreen = true;
+		}
+ 
 		//Get the config file
+		ScannerConfig l_config = getConfigurationFile();
+		
+		if(l_config == null)
+			return;
+		
 		//Things here will come from config
 		
-		Runnable l_gui = new PollingPlaceGUI();
+		Runnable l_gui = null;
 		
 		try
 		{
-			l_gui = new PollingPlaceGUI();
+			l_gui = new PollingPlaceGUI(l_config, l_fullscreen);
 		}
 		catch(HeadlessException headEx)
 		{

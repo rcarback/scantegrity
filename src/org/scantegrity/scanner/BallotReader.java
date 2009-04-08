@@ -27,6 +27,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
@@ -65,7 +66,7 @@ public abstract class BallotReader
 	 * @param p_styles
 	 * @return
 	 */
-	abstract public Ballot scanBallot(BallotStyle[] p_styles, 
+	abstract public Ballot scanBallot(Vector<BallotStyle> p_styles, 
 										BufferedImage p_img);
 	
 	/**
@@ -105,6 +106,8 @@ public abstract class BallotReader
 		Point l_foundMarks[] = new Point[2];
 		try
 		{
+			//System.out.println(l_alignment[0]);
+			//System.out.println(l_alignment[1]);
 			l_foundMarks[0] = c_alignmentMark.findMark(p_img, l_alignment[0]);
 			l_foundMarks[1] = c_alignmentMark.findMark(p_img, l_alignment[1]);
 		} catch(Exception e) {}

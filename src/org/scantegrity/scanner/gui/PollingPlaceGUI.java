@@ -31,9 +31,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -43,21 +43,17 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
-import org.scantegrity.common.DirectoryWatcher;
-import org.scantegrity.common.ImageLoader;
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
-import org.scantegrity.scanner.BallotImageHandler;
 import org.scantegrity.scanner.Scanner;
+import org.scantegrity.scanner.ScannerConfig;
 
 /**
  * @author John Conway 
@@ -83,6 +79,10 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 * Class Variables 
 	 ************************************************/
 	private Scanner c_scannerRef; 
+	
+	private ScannerConfig c_config;
+	
+	private boolean c_fullscreen;
 	
 	private ScantegrityJFrame c_frame; 
 	private CardLayout c_scannerInfoCardLayout;
@@ -128,6 +128,9 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	//Font Style
 	private String c_fontStyle; 
 	
+	//Scanned Ballots Queue
+	private Vector<String> c_ballotQueue;
+	
 	//TODO Temp INTs
 	private Integer c_numCastBallots;
 	private Integer c_numSpoiledBallots;
@@ -139,10 +142,18 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	/**
 	 * 
 	 */
-	public PollingPlaceGUI()
+	public PollingPlaceGUI(ScannerConfig p_config, boolean p_fullscreen)
 	{
+		c_fullscreen = p_fullscreen;
+		
+		//set config reference
+		c_config = p_config;
+		
 		//initalize scanner ref
 		c_scannerRef = new Scanner(this);
+		
+		//initialize scanned ballot queue
+		c_ballotQueue = new Vector<String>();
 		
 		//TODO: get configuration info
 		c_fontStyle = ScannerUIConstants.FONT_STYLE_SERIF;
@@ -177,7 +188,15 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
 	}
 	
-	public void displayScanResults(String p_scanResults)
+	public void addBallotResults(String p_results)
+	{
+		c_ballotQueue.add(p_results);
+		
+		if(c_ballotQueue.size() == 1)
+			displayScanResults(c_ballotQueue.get(0));
+	}
+	
+	private void displayScanResults(String p_scanResults)
 	{
 		c_ballotInfoLabel.setText(p_scanResults);
 		changeCard(ScannerUIConstants.BALLOT_INFO_CARD);
@@ -196,7 +215,10 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		//c_frame.setUndecorated(true);
 		c_frame.setDefaultCloseOperation(ScantegrityJFrame.DO_NOTHING_ON_CLOSE);
 		//c_frame.setAlwaysOnTop(true);
-		c_frame.setPreferredSize(new Dimension(800,600));
+		c_frame.setPreferredSize(new Dimension(1024,768));
+		
+		if(c_fullscreen)
+			c_frame.setFullScreen();
 		
 		//use the larger election info
 		buildLayout(false); 
@@ -277,18 +299,17 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		JLabel l_elecStartTimeLabel = new JLabel("Start Time of Election: ");
 		JLabel l_chiefJudgeLabel = new JLabel("Chief Judge: ");
 		
-		//TODO: These will be filled in by the configuration interface
-		JLabel l_ppId = new JLabel("0001");
-		JLabel l_ppName = new JLabel("Polling Place");
-		JLabel l_ppLoc = new JLabel("Catonsville, MD");
-		JLabel l_elecDate = new JLabel("01/01/2009");
-		JLabel l_elecStartTime = new JLabel("07:00");
-		JLabel l_chiefJudge = new JLabel("John Smith");
+		JLabel l_ppId = new JLabel(new Integer(c_config.getPollID()).toString());
+		JLabel l_ppName = new JLabel(c_config.getName());
+		JLabel l_ppLoc = new JLabel(c_config.getLocation());
+		JLabel l_elecDate = new JLabel(c_config.getDate());
+		JLabel l_elecStartTime = new JLabel(c_config.getTime());
+		JLabel l_chiefJudge = new JLabel(c_config.getChiefJudges().firstElement());
 		
 		//Font
 		//TODO: Eventually I want to make the font size determined by the 
 		//screen resolution
-		Font l_font = new Font(c_fontStyle, Font.BOLD, 20);
+		Font l_font = new Font(c_fontStyle, Font.BOLD, 16);
 		
 		l_ppIdLabel.setFont(l_font);
 		l_ppNameLabel.setFont(l_font);
@@ -413,13 +434,12 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		JLabel l_elecStartTimeLabel = new JLabel("Start Time of Election: ");
 		JLabel l_chiefJudgeLabel = new JLabel("Chief Judge: ");
 		
-		//TODO: These will be filled in by the configuration interface
-		JLabel l_ppId = new JLabel("0001");
-		JLabel l_ppName = new JLabel("Polling Place");
-		JLabel l_ppLoc = new JLabel("Catonsville, MD");
-		JLabel l_elecDate = new JLabel("01/01/2009");
-		JLabel l_elecStartTime = new JLabel("07:00");
-		JLabel l_chiefJudge = new JLabel("John Smith");
+		JLabel l_ppId = new JLabel(new Integer(c_config.getPollID()).toString());
+		JLabel l_ppName = new JLabel(c_config.getName());
+		JLabel l_ppLoc = new JLabel(c_config.getLocation());
+		JLabel l_elecDate = new JLabel(c_config.getDate());
+		JLabel l_elecStartTime = new JLabel(c_config.getTime());
+		JLabel l_chiefJudge = new JLabel(c_config.getChiefJudges().firstElement());
 		
 		
 		//Set fonts
@@ -698,7 +718,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_ballotInfoLabel.setFont(new Font(c_fontStyle, Font.BOLD, 16));
 		c_ballotInfo = new JScrollPane(c_ballotInfoLabel);
 		
-		c_ballotResultsPanel.add(c_ballotInfoLabel, BorderLayout.CENTER);
+		c_ballotResultsPanel.add(c_ballotInfo, BorderLayout.CENTER);
 		
 		c_castBallotButton = new JButton();
 		c_castBallotButton.setText("Cast Ballot");
@@ -711,12 +731,10 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_rejectBallotButton.addActionListener(this); 
 		
 		JPanel l_tmpPanel = new JPanel();
-		BoxLayout l_bl = new BoxLayout(l_tmpPanel, BoxLayout.X_AXIS);
-		l_tmpPanel.setLayout(l_bl);
+		l_tmpPanel.setLayout(new BorderLayout());
 		
-		l_tmpPanel.add(c_castBallotButton);
-		l_tmpPanel.add(Box.createRigidArea(new Dimension(c_frame.getSize().width - (2 * c_castBallotButton.getSize().width) - 10,10)));
-		l_tmpPanel.add(c_rejectBallotButton);
+		l_tmpPanel.add(c_castBallotButton, BorderLayout.LINE_START);
+		l_tmpPanel.add(c_rejectBallotButton, BorderLayout.LINE_END);
 		
 		c_ballotResultsPanel.add(l_tmpPanel, BorderLayout.PAGE_END);
 		
@@ -873,7 +891,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		}		
 		else if(e.getActionCommand().equals(c_startElectionButton.getText()))
 		{
-			c_scannerRef.startElection();
+			c_scannerRef.startElection(c_config);
 			
 			c_frame.setVisible(false);
 			
@@ -911,9 +929,13 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			c_castField.setText(c_numCastBallots.toString());
 			
 			//display thank you 
-			
-			//wait then display waiting for ballots
 			changeCard(ScannerUIConstants.THANK_YOU_CARD);
+			
+			c_ballotQueue.remove(0);
+			
+			if(c_ballotQueue.size() > 0)
+				displayScanResults(c_ballotQueue.get(0));
+			
 		}
 		else if(e.getActionCommand().equals(c_rejectBallotButton.getText()))
 		{
@@ -929,6 +951,11 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			
 			//wait then display waiting for ballots
 			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
+			
+			c_ballotQueue.remove(0);
+			
+			if(c_ballotQueue.size() > 0)
+				displayScanResults(c_ballotQueue.get(0));
 		}
 	}
 }
