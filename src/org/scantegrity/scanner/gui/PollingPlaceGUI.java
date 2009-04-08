@@ -50,10 +50,13 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import org.apache.derby.impl.store.access.sort.Scan;
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
 import org.scantegrity.scanner.Scanner;
 import org.scantegrity.scanner.ScannerConfig;
+
+import com.jhlabs.math.SCNoise;
 
 /**
  * @author John Conway 
@@ -155,7 +158,6 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		//initialize scanned ballot queue
 		c_ballotQueue = new Vector<String>();
 		
-		//TODO: get configuration info
 		c_fontStyle = ScannerUIConstants.FONT_STYLE_SERIF;
 		
 		guiInit();
@@ -218,7 +220,10 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_frame.setPreferredSize(new Dimension(1024,768));
 		
 		if(c_fullscreen)
+		{
 			c_frame.setFullScreen();
+			c_frame.setAlwaysOnTop(true);
+		}
 		
 		//use the larger election info
 		buildLayout(false); 
@@ -494,19 +499,6 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 c_compactElectionInfoPanel.add(l_ppName, l_c);
-		 
-		 l_c = new GridBagConstraints();
-		 l_c.gridx = 4; 
-		 l_c.gridy = 0; 
-		 l_c.anchor = GridBagConstraints.LINE_START;
-		 l_c.insets = l_closerInsets; 
-		 c_compactElectionInfoPanel.add(l_ppLocLabel, l_c);
-		 
-		 l_c.gridx = 5;
-		 l_c.gridy = 0; 
-		 l_c.anchor = GridBagConstraints.LINE_START;
-		 l_c.insets = l_insets; 
-		 c_compactElectionInfoPanel.add(l_ppLoc, l_c);
 		
 		 //Row 2
 		 l_c = new GridBagConstraints();
@@ -514,34 +506,48 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		 l_c.gridy = 1; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_closerInsets; 
-		 c_compactElectionInfoPanel.add(l_elecDateLabel, l_c);
+		 c_compactElectionInfoPanel.add(l_ppLocLabel, l_c);
 		 
 		 l_c.gridx = 1;
+		 l_c.gridy = 1; 
+		 l_c.anchor = GridBagConstraints.LINE_START;
+		 l_c.insets = l_insets; 
+		 c_compactElectionInfoPanel.add(l_ppLoc, l_c);
+		
+		 l_c = new GridBagConstraints();
+		 l_c.gridx = 2; 
+		 l_c.gridy = 1; 
+		 l_c.anchor = GridBagConstraints.LINE_START;
+		 l_c.insets = l_closerInsets; 
+		 c_compactElectionInfoPanel.add(l_elecDateLabel, l_c);
+		 
+		 l_c.gridx = 3;
 		 l_c.gridy = 1;
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 c_compactElectionInfoPanel.add(l_elecDate, l_c);
 		
-		 l_c.gridx = 2;
-		 l_c.gridy = 1; 
+		 //Row 3
+		 l_c.gridx = 0;
+		 l_c.gridy = 2; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_closerInsets; 
 		 c_compactElectionInfoPanel.add(l_elecStartTimeLabel, l_c);
 		 
-		 l_c.gridx = 3;
-		 l_c.gridy = 1; 
+		 l_c.gridx = 1;
+		 l_c.gridy = 2; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets; 
 		 c_compactElectionInfoPanel.add(l_elecStartTime, l_c);
 
-		 l_c.gridx = 4; 
-		 l_c.gridy = 1; 
+		 l_c.gridx = 2; 
+		 l_c.gridy = 2; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_closerInsets;
 		 c_compactElectionInfoPanel.add(l_chiefJudgeLabel, l_c);
 		 
-		 l_c.gridx = 5;
-		 l_c.gridy = 1; 
+		 l_c.gridx = 3;
+		 l_c.gridy = 2; 
 		 l_c.anchor = GridBagConstraints.LINE_START;
 		 l_c.insets = l_insets;
 		 c_compactElectionInfoPanel.add(l_chiefJudge, l_c);
@@ -890,7 +896,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			}
 		}		
 		else if(e.getActionCommand().equals(c_startElectionButton.getText()))
-		{
+		{	
 			c_scannerRef.startElection(c_config);
 			
 			c_frame.setVisible(false);
@@ -901,7 +907,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			c_frame.add(c_scannerInfoPanel, BorderLayout.CENTER);
 			
 			c_frame.setVisible(true);
-			
+
 			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
 
 		}

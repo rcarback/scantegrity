@@ -19,9 +19,6 @@
  */
 package org.scantegrity.scanner;
 
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -31,7 +28,7 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
-import javax.media.jai.RenderableGraphics;
+//import javax.media.jai.RenderableGraphics;
 
 import org.scantegrity.common.*;
 import org.scantegrity.common.gui.Dialogs;

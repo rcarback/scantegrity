@@ -21,8 +21,11 @@ package org.scantegrity.common.gui;
 
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Toolkit;
+import java.awt.Window;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -44,7 +47,6 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class ScantegrityJFrame extends JFrame
 {
-
 	/* 
 	 * Serial Version UID
 	 */ 
@@ -55,6 +57,9 @@ public class ScantegrityJFrame extends JFrame
 	 * Class Variables 
 	 ************************************************/
 	private Dimension c_screenSize;
+	
+	private GraphicsDevice c_gd; 
+	private GraphicsConfiguration c_gc;
 	
 	/* ***********************************************
 	 * Constructors  
@@ -76,6 +81,7 @@ public class ScantegrityJFrame extends JFrame
 	public ScantegrityJFrame(GraphicsConfiguration p_gc) 
 	{
 		super(p_gc);
+		c_gc = p_gc;
 		initializeDimensions();
 	}
 
@@ -97,6 +103,7 @@ public class ScantegrityJFrame extends JFrame
 	public ScantegrityJFrame(String p_title, GraphicsConfiguration p_gc) 
 	{
 		super("Scantegrity: " + p_title, p_gc);
+		c_gc = p_gc;
 		initializeDimensions();
 	}
 
@@ -116,11 +123,39 @@ public class ScantegrityJFrame extends JFrame
 	
 	public void setFullScreen()
 	{
-		setPreferredSize(c_screenSize);
+		if(c_gd.isFullScreenSupported() && c_gd.isDisplayChangeSupported())
+		{
+			try
+			{
+				c_gd.setFullScreenWindow(this);
+			}
+			finally
+			{
+				c_gd.setFullScreenWindow(null);
+			}
+		}
+		else
+		{
+			c_screenSize = new Dimension((int)c_gc.getBounds().getWidth(), (int)c_gc.getBounds().getHeight());
+			this.setUndecorated(true);
+			setPreferredSize(c_screenSize);
+			this.setState(JFrame.MAXIMIZED_BOTH);
+			this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		}
+			
 	}
 	
 	private void initializeDimensions()
 	{
+		GraphicsEnvironment l_ge = null;
+		
+		if(c_gc == null)
+		{
+			l_ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			c_gd = l_ge.getDefaultScreenDevice();
+			c_gc = c_gd.getDefaultConfiguration();
+		}
+		
 		c_screenSize = new Dimension(Toolkit.getDefaultToolkit().getScreenSize());
 	}
 	
