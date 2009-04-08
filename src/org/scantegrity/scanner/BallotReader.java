@@ -268,11 +268,9 @@ public abstract class BallotReader
 	{
 		Point2D.Double l_p = new Point2D.Double(p_img.getWidth()/2, p_img.getHeight() - 20);
 		
-		System.out.println(l_p.getX() + " " + l_p.getY());
-		
 		while(DetectBlack.isBlack((int)l_p.getX(), (int)l_p.getY(), p_img))
 		{
-			System.out.println(l_p.getX() + " " + l_p.getY());
+			//System.out.println(l_p.getX() + " " + l_p.getY());
 			l_p.setLocation(l_p.getX(), l_p.getY() - 5);
 		}
 		
