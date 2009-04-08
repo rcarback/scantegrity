@@ -35,6 +35,7 @@ import javax.imageio.ImageIO;
  * @author Richard Carback
  *
  */
+@SuppressWarnings("unused")
 public class AffineCropper
 {
 	static int i = 0; 
@@ -143,7 +144,7 @@ public class AffineCropper
 				} catch (ArrayIndexOutOfBoundsException e) {} 
 			}
 		}
-		/* BEGIN DEBUG */
+		/* BEGIN DEBUG * /
 		try {
 			ImageIO.write(l_res,"png",new File("serial" + i + ".png"));
 		} catch (IOException e) {
