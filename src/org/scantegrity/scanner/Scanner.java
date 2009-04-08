@@ -46,9 +46,10 @@ public class Scanner
 	{
 		String c_srcDir = "/mnt/scantegritytmpfs/images";
 		String c_destDir = "/mnt/scantegritytmpfs/backup";
+		String c_errDir = "/mnt/scantegritytmpfs/error";
 		
 		//Create Ballot Handler
-		BallotImageHandler l_bih = new BallotImageHandler(c_guiRef);
+		BallotImageHandler l_bih = new BallotImageHandler(c_guiRef, c_errDir);
 		
 		//initialize the ImageLoader
 		ImageLoader l_il = new ImageLoader(l_bih);

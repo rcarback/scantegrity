@@ -25,9 +25,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import org.scantegrity.lib.Ballot;
 import org.scantegrity.lib.BallotStyle;
+import org.scantegrity.util.DetectBlack; 
 
 /**
  * BallotReader is an interface for reading ballot data, normalizing the ballot
@@ -257,6 +262,36 @@ public abstract class BallotReader
 		
 		return l_ret;
 		
+	}
+	
+	protected BufferedImage cutEmptySpace(BufferedImage p_img)
+	{
+		Point2D.Double l_p = new Point2D.Double(p_img.getWidth()/2, p_img.getHeight() - 20);
+		
+		System.out.println(l_p.getX() + " " + l_p.getY());
+		
+		while(DetectBlack.isBlack((int)l_p.getX(), (int)l_p.getY(), p_img))
+		{
+			System.out.println(l_p.getX() + " " + l_p.getY());
+			l_p.setLocation(l_p.getX(), l_p.getY() - 5);
+		}
+		
+		p_img = p_img.getSubimage(0, 0, p_img.getWidth(),(int)l_p.getY());
+		
+		/*Debug* /
+		try
+		{
+			System.out.println("Writing Image");
+			ImageIO.write(p_img, "tiff", new File("test.tiff"));
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		/*END DEBUG*/
+		
+		return p_img;
 	}
 	
 	/**

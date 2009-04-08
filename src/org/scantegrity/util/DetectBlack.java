@@ -20,6 +20,7 @@
 package org.scantegrity.util;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 /**
@@ -60,4 +61,9 @@ public final class DetectBlack
 		}
 		return false;
 	}	
+	
+	public static boolean isBlack(Point2D.Double p_p, BufferedImage p_img)
+	{
+		return isBlack((int)p_p.getX(), (int)p_p.getY(), p_img);
+	}
 }

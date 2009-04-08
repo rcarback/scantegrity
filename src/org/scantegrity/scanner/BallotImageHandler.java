@@ -23,8 +23,15 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Vector;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
+import javax.media.jai.RenderableGraphics;
 
 import org.scantegrity.common.*;
 import org.scantegrity.common.gui.Dialogs;
@@ -41,12 +48,15 @@ public class BallotImageHandler implements ImageHandler
 	private ScantegrityBallotReader c_reader;
 	private PollingPlaceGUI c_guiRef; 
 	private BallotStyle c_styles[] = null;
+	private int i = 0; 
+	private String c_errDir;
 	
 	private String c_results; 
 	
-	public BallotImageHandler(PollingPlaceGUI p_guiRef)
+	public BallotImageHandler(PollingPlaceGUI p_guiRef, String p_errDir)
 	{
-		c_guiRef = p_guiRef;
+		c_guiRef = p_guiRef; 
+		c_errDir = p_errDir;
 		
 		c_reader = new ScantegrityBallotReader();
 		Dimension l_d = new Dimension(2550, 4200);
@@ -54,7 +64,7 @@ public class BallotImageHandler implements ImageHandler
 		l_marks[0] = new Point(2352, 232);
 		l_marks[1] = new Point(2328, 3152);
 		QRCodeReader l_code = new QRCodeReader();
-		l_code.setSerialBoundingBox(new Rectangle(112, 32, 290, 290));
+		l_code.setSerialBoundingBox(new Rectangle(125, 20, 310, 310));
 		c_reader.setSerial(l_code);
 		c_reader.setAlignment(l_marks);
 		c_reader.setDimension(l_d);
@@ -116,36 +126,51 @@ public class BallotImageHandler implements ImageHandler
 			Ballot l_b = c_reader.scanBallot(c_styles, p_image);
 			
 			//couldn't find alignment marks 
-			if(l_b == null)
+			if(l_b == null || l_b.getId() == null)
 			{
 				//c_guiRef.setToWaiting();
 				c_results = "Unable to Scan Ballot. Please Try Again";
 				Dialogs.displayInfoDialog(c_results, "Unable to Read Ballot!");
+				
+				//Move file to destination directory
+				ImageIO.write(p_image, "tiff", new File(c_errDir + "/error" + i + ".tiff"));
+				i++;
+				
 				//TODO: Remove
 				//c_guiRef.displayScanResults(c_results);
 				return;
 			}
 			//c_guiRef.setToScanningBallot();
 			
-			c_results = "<html><p>Serial #: " + l_b.getId() + "<br/>";
+			c_results = "Serial #: " + l_b.getId() + "\n";
 			c_results += "Results:";
 			Map<Integer, Integer[][]> l_res = l_b.getBallotData();
 			Integer l_it[] = new Integer[l_res.size()];
 			l_res.keySet().toArray(l_it);
 			for (int l_key : l_it)
 			{
-				c_results += "Contest #" + l_key + "<br/>";
+				c_results += "\n\tContest #" + l_key + "\n";
 				for (Integer[] l_cres: l_res.get(l_key))
 				{
-					c_results += java.util.Arrays.toString(l_cres) + "<br/>";
+					c_results += "\t\t" + java.util.Arrays.toString(l_cres) + "\n";
 				}
 			}
 		} catch (Exception l_e) {
-			l_e.printStackTrace();
+			//Move file to destination directory
+			try
+			{
+				c_results = "Unable to Scan Ballot. Please Try Again";
+				Dialogs.displayInfoDialog(c_results, "Unable to Read Ballot!");
+				ImageIO.write(p_image, "tiff", new File(c_errDir + "/error" + i + ".tiff"));
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			i++;
 			return;
 		}
-		
-		c_results +="</html>";
 		
 		//Send the results to the gui
 		c_guiRef.displayScanResults(c_results);

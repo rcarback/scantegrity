@@ -61,6 +61,10 @@ public class ScantegrityBallotReader extends BallotReader
 		 */
 		
 		Ballot l_res = new Ballot();
+		
+		//cut empty space on the bottom of an image 
+		p_img = cutEmptySpace(p_img);
+		
 		AffineTransformOp l_alignmentOp = super.getAlignmentOp(p_img);
 		
 		if(l_alignmentOp == null)

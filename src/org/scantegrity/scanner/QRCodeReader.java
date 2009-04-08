@@ -63,15 +63,15 @@ public class QRCodeReader implements SerialNumberReader
 						AffineCropper.cropUnscaled(p_img, p_op, c_boundingBox));
 			//l_serial = new BufferedImageMonochromeBitmapSource(AffineCropper.crop(p_img, p_op, c_boundingBox));
 			
-			Vector<BarcodeFormat> l_formats = new Vector<BarcodeFormat>();
+			/*Vector<BarcodeFormat> l_formats = new Vector<BarcodeFormat>();
 			l_formats.add(BarcodeFormat.QR_CODE);
 			Hashtable<DecodeHintType, Object> hints = null;
 			hints = new Hashtable<DecodeHintType, Object>(3);
 			hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
 			//hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
-			hints.put(DecodeHintType.POSSIBLE_FORMATS, l_formats);
+			hints.put(DecodeHintType.POSSIBLE_FORMATS, l_formats);*/
 
-			Result result = new MultiFormatReader().decode(l_serial, hints);
+			Result result = new MultiFormatReader().decode(l_serial, null);
 			
 			
 			//System.out.println("The Result: " + result.getText());

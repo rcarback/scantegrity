@@ -43,8 +43,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
@@ -108,8 +112,11 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	private JMenu c_adminMenu; 
 	private JMenuItem c_adminItem; 
 	
-	//Labels
-	private JLabel c_ballotInfoLabel; 
+	//Text Areas
+	private JTextArea c_ballotInfoLabel; 
+	
+	//JScrollPanes 
+	private JScrollPane c_ballotInfo;
 	
 	//Fields
 	private JTextField c_castField; 
@@ -687,8 +694,9 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	private void buildBallotResultsCards(String p_htmlBallotInfo)
 	{
 		c_ballotResultsPanel = new JPanel(new BorderLayout());
-		c_ballotInfoLabel = new JLabel(p_htmlBallotInfo);
+		c_ballotInfoLabel = new JTextArea(p_htmlBallotInfo);
 		c_ballotInfoLabel.setFont(new Font(c_fontStyle, Font.BOLD, 16));
+		c_ballotInfo = new JScrollPane(c_ballotInfoLabel);
 		
 		c_ballotResultsPanel.add(c_ballotInfoLabel, BorderLayout.CENTER);
 		
