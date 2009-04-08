@@ -51,11 +51,11 @@ public final class DetectBlack
 		l_cb = l_color.getBlue();
 		//System.out.println("Black is:" + c_br + ", " + c_bg + ", " + c_bb);
 		//System.out.println("Color is:" + l_cr + ", " + l_cg + ", " + l_cb);
-		//This tolerance might be too high! 
-		//TODO: Might want to make it configurable.
-		if (Math.abs(l_cr - c_br) <= 200 
-				&& Math.abs(l_cg - c_bg) <= 200 
-				&& Math.abs(l_cb - c_bb) <=200) 
+		//This tolerancel_t to make it configurable.
+		int l_t = 200;
+		if (Math.abs(l_cr - c_br) <= l_t 
+				&& Math.abs(l_cg - c_bg) <= l_t 
+				&& Math.abs(l_cb - c_bb) <=l_t) 
 		{
 			return true;
 		}

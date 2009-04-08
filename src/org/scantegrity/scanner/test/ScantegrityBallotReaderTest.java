@@ -38,6 +38,7 @@ import org.scantegrity.lib.BallotStyle;
 import org.scantegrity.scanner.CircleAlignmentMarkReader;
 import org.scantegrity.scanner.QRCodeReader;
 import org.scantegrity.scanner.ScantegrityBallotReader;
+import org.scantegrity.util.DrunkDriver;
 
 /**
  * Tests the scantegrityBallotReader object methods.
@@ -205,6 +206,7 @@ public class ScantegrityBallotReaderTest
 				PlanarImage pi = JAI.create("fileload", basedir+test);
 				BufferedImage img = pi.getAsBufferedImage();
 				long l_load = System.currentTimeMillis();
+				if (DrunkDriver.isBlank(img, 4)) System.out.println("blank!!!");
 				Ballot l_b = l_reader.scanBallot(l_styles, img);
 				l_ballots.add(l_b);
 				long l_last = System.currentTimeMillis();
