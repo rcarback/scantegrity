@@ -252,6 +252,9 @@ public class ArborDayScannerConfig
 			e = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(c_loc + c_name)));
 			e.writeObject(l_config);
 			e.close();		
+			e = new XMLEncoder(new BufferedOutputStream(new FileOutputStream(c_loc + "ContestInformation.xml")));
+			e.writeObject(l_c);
+			e.close();
 		}
 		catch (FileNotFoundException e1)
 		{

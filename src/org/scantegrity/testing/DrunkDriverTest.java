@@ -46,7 +46,7 @@ public class DrunkDriverTest
 			PlanarImage l_pn = JAI.create("fileload", "testing/scanner/sample-images/Basic/blank4.tiff");
 			BufferedImage l_img = l_pn.getAsBufferedImage();
 			long l_start = System.currentTimeMillis();
-			if (DrunkDriver.isBlank(l_img, 10)) System.out.println("Blank");
+			if (DrunkDriver.isDrunk(l_img, 10)) System.out.println("Blank");
 			else System.out.println("Not Blank");
 			System.out.println("Time: " + (System.currentTimeMillis()-l_start));
 			

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_07" class="java.beans.XMLDecoder"> 
+ <object class="java.util.Vector"> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Contest"> 
+    <void property="contestName"> 
+     <string>Favorite Tree / ÔøΩrbol Favorito</string> 
+    </void> 
+    <void property="contestants"> 
+     <object class="java.util.Vector"> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>0</int> 
+        </void> 
+        <void property="name"> 
+         <string>Cherry / el cerezo</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>1</int> 
+        </void> 
+        <void property="name"> 
+         <string>Elm / el olmo</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>2</int> 
+        </void> 
+        <void property="name"> 
+         <string>Maple / el arce</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>3</int> 
+        </void> 
+        <void property="name"> 
+         <string>Oak / el roble</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>4</int> 
+        </void> 
+        <void property="name"> 
+         <string>Write-In / o por escrito</string> 
+        </void> 
+       </object> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="id"> 
+     <int>0</int> 
+    </void> 
+    <void property="method"> 
+     <object class="org.scantegrity.lib.methods.InstantRunoffTally"/> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Contest"> 
+    <void property="contestName"> 
+     <string>Favorite Forest Animal / Animal Arbolado Favorito</string> 
+    </void> 
+    <void property="contestants"> 
+     <object class="java.util.Vector"> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>0</int> 
+        </void> 
+        <void property="name"> 
+         <string>Owl / BÔøΩho</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>1</int> 
+        </void> 
+        <void property="name"> 
+         <string>Rabbit / Conejo</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>2</int> 
+        </void> 
+        <void property="name"> 
+         <string>Squirrel / Ardilla</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>3</int> 
+        </void> 
+        <void property="name"> 
+         <string>Write-In / o por escrito</string> 
+        </void> 
+       </object> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="id"> 
+     <int>1</int> 
+    </void> 
+    <void property="method"> 
+     <object class="org.scantegrity.lib.methods.InstantRunoffTally"/> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Contest"> 
+    <void property="contestName"> 
+     <string>How many trees are on your property? / ÔøΩCuanto ÔøΩrboles estan en su propiedad?</string> 
+    </void> 
+    <void property="contestants"> 
+     <object class="java.util.Vector"> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>0</int> 
+        </void> 
+        <void property="name"> 
+         <string>0</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>1</int> 
+        </void> 
+        <void property="name"> 
+         <string>1-2</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>2</int> 
+        </void> 
+        <void property="name"> 
+         <string>2-5</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>3</int> 
+        </void> 
+        <void property="name"> 
+         <string>More than 10 / MÔøΩs de 10</string> 
+        </void> 
+       </object> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="id"> 
+     <int>2</int> 
+    </void> 
+    <void property="method"> 
+     <object class="org.scantegrity.lib.methods.PluralityTally"/> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Contest"> 
+    <void property="contestName"> 
+     <string>Do you use less paper products than you did ten years ago? / ÔøΩUtiliza menos producto de papel que hace 10 aÔøΩos?</string> 
+    </void> 
+    <void property="contestants"> 
+     <object class="java.util.Vector"> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>0</int> 
+        </void> 
+        <void property="name"> 
+         <string>Yes / Si</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>1</int> 
+        </void> 
+        <void property="name"> 
+         <string>No / No</string> 
+        </void> 
+       </object> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="id"> 
+     <int>3</int> 
+    </void> 
+    <void property="method"> 
+     <object class="org.scantegrity.lib.methods.PluralityTally"/> 
+    </void> 
+   </object> 
+  </void> 
+ </object> 
+</java> 
