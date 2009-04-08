@@ -77,4 +77,14 @@ public class ContestResult
 		return l_res;
 	}
 	
+	public String abbreviatedResults()
+	{
+		return toString();
+	}
+	
+	public String getHtmlResults()
+	{
+		return "<pre>" + toString() + "</pre>";
+	}
+	
 }

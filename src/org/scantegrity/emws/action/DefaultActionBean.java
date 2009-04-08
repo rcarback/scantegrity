@@ -28,7 +28,7 @@ public class DefaultActionBean implements ActionBean {
 
     protected void initialize() {}
     
-    private ActionBeanContext c_ctx;
+    protected ActionBeanContext c_ctx;
     public ActionBeanContext getContext() { 
     	return c_ctx; 
     }

@@ -91,6 +91,7 @@ public class FileuploadActionBean implements ActionBean {
 	@DefaultHandler
 	public Resolution submit()
 	{
+		//System.setProperty("derby.system.home", "/opt/db-derby");
 		if( c_file != null )
 		{
 			if( c_file.getFileName().equals("MeetingThreeOutCodes.xml") )
@@ -211,6 +212,7 @@ public class FileuploadActionBean implements ActionBean {
 							
 							NodeList l_symbolNodes = l_questionNodes.item(y).getChildNodes();
 							
+							int l_id = 1;
 							//Loop over all <symbol> nodes
 							for( int z = 0; z < l_symbolNodes.getLength(); z++ )
 							{
@@ -220,7 +222,6 @@ public class FileuploadActionBean implements ActionBean {
 								
 								//Read node attributes to get id and code
 								NamedNodeMap l_symbolAttributes = l_symbolNodes.item(z).getAttributes();
-								int l_id = Integer.parseInt(l_symbolAttributes.getNamedItem("id").getNodeValue());
 								String l_code = l_symbolAttributes.getNamedItem("code").getNodeValue();
 
 								//Set SQL parameters and add to batch
@@ -229,6 +230,8 @@ public class FileuploadActionBean implements ActionBean {
 								l_sqlStatement.setInt(3, l_id);
 								l_sqlStatement.setString(4, l_code);
 								l_sqlStatement.addBatch();
+								
+								l_id++;
 							}
 						}
 					}
@@ -239,8 +242,14 @@ public class FileuploadActionBean implements ActionBean {
 					l_sqlStatement.close();
 					l_conn.close();
 					c_result = "File added successfully";
+					
 				} catch (SQLException e) {
-					c_error = "Could not execute SQL: " + e.getMessage();
+					//c_error = "Could not execute SQL: " + e.getMessage();
+					while( e != null )
+					{
+						c_error += e.getMessage();
+						e = e.getNextException();
+					}
 				} catch (InstantiationException e) {
 					c_error = "Could not load derby driver: instantiation exception";
 				} catch (IllegalAccessException e) {
@@ -287,7 +296,8 @@ public class FileuploadActionBean implements ActionBean {
 			{
 				TallyMethod l_tally = l_contests.get(x).getMethod();
 				ContestResult l_res = l_tally.tally(l_contests.get(x), l_ballots.get(x));
-				l_writer.write(l_res.toString());
+				l_writer.write("<h3>Contest " + l_contests.get(x).getId() + ": " + l_contests.get(x).getContestName() + "</h3>");
+				l_writer.write(l_res.getHtmlResults());
 			}
 			
 			l_writer.close();
@@ -309,8 +319,8 @@ public class FileuploadActionBean implements ActionBean {
 	@SuppressWarnings("unchecked")
 	private Vector<Contest> GetContests()
 	{
-		Vector<Contest> l_contests = null;
-		try
+		Vector<Contest> l_contests = new Vector<Contest>();
+		/*try
 		{
 			File l_docsDir = new File(c_ctx.getServletContext().getRealPath("/docs/"));
 			File l_contestFile = new File(l_docsDir, "ContestInformation.xml");
@@ -326,17 +336,17 @@ public class FileuploadActionBean implements ActionBean {
 		{
 			c_error += "Could not open contest information file. Please make sure that it has been uploaded.\n";
 			return null;
-		}
+		}*/
 		
-		/*Contest l_contestOne = new Contest();
+		Contest l_contestOne = new Contest();
 		l_contestOne.setId(0);
 		l_contestOne.setContestName("Favorite Tree");
 		Vector<Contestant> l_contestantsOne = new Vector<Contestant>();
-		l_contestantsOne.add(new Contestant(1, "Cherry"));
-		l_contestantsOne.add(new Contestant(2, "Elm"));
-		l_contestantsOne.add(new Contestant(3, "Maple"));
-		l_contestantsOne.add(new Contestant(4, "Oak"));
-		l_contestantsOne.add(new Contestant(5, "Write-in"));
+		l_contestantsOne.add(new Contestant(0, "Cherry"));
+		l_contestantsOne.add(new Contestant(1, "Elm"));
+		l_contestantsOne.add(new Contestant(2, "Maple"));
+		l_contestantsOne.add(new Contestant(3, "Oak"));
+		l_contestantsOne.add(new Contestant(4, "Write-in"));
 		l_contestOne.setContestants(l_contestantsOne);
 		l_contestOne.setMethod(new InstantRunoffTally());
 		
@@ -344,10 +354,10 @@ public class FileuploadActionBean implements ActionBean {
 		l_contestTwo.setId(0);
 		l_contestTwo.setContestName("Favorite Animal");
 		Vector<Contestant> l_contestantsTwo = new Vector<Contestant>();
-		l_contestantsTwo.add(new Contestant(1, "Owl"));
-		l_contestantsTwo.add(new Contestant(2, "Rabbit"));
-		l_contestantsTwo.add(new Contestant(3, "Squirrel"));
-		l_contestantsTwo.add(new Contestant(4, "Write-in"));
+		l_contestantsTwo.add(new Contestant(0, "Owl"));
+		l_contestantsTwo.add(new Contestant(1, "Rabbit"));
+		l_contestantsTwo.add(new Contestant(2, "Squirrel"));
+		l_contestantsTwo.add(new Contestant(3, "Write-in"));
 		l_contestTwo.setContestants(l_contestantsTwo);
 		l_contestTwo.setMethod(new InstantRunoffTally());
 		
@@ -355,11 +365,11 @@ public class FileuploadActionBean implements ActionBean {
 		l_contestThree.setId(0);
 		l_contestThree.setContestName("Number of Trees");
 		Vector<Contestant> l_contestantsThree = new Vector<Contestant>();
-		l_contestantsThree.add(new Contestant(1, "0"));
-		l_contestantsThree.add(new Contestant(2, "1-2"));
-		l_contestantsThree.add(new Contestant(3, "3-5"));
-		l_contestantsThree.add(new Contestant(4, "5-10"));
-		l_contestantsThree.add(new Contestant(5, "10+"));
+		l_contestantsThree.add(new Contestant(0, "0"));
+		l_contestantsThree.add(new Contestant(1, "1-2"));
+		l_contestantsThree.add(new Contestant(2, "3-5"));
+		l_contestantsThree.add(new Contestant(3, "5-10"));
+		l_contestantsThree.add(new Contestant(4, "10+"));
 		l_contestThree.setContestants(l_contestantsThree);
 		l_contestThree.setMethod(new PluralityTally());
 		
@@ -367,15 +377,15 @@ public class FileuploadActionBean implements ActionBean {
 		l_contestFour.setId(0);
 		l_contestFour.setContestName("Less paper products");
 		Vector<Contestant> l_contestantsFour = new Vector<Contestant>();
-		l_contestantsFour.add(new Contestant(1, "Yes"));
-		l_contestantsFour.add(new Contestant(2, "No"));
-		l_contestFour.setContestants(l_contestantsThree);
+		l_contestantsFour.add(new Contestant(0, "Yes"));
+		l_contestantsFour.add(new Contestant(1, "No"));
+		l_contestFour.setContestants(l_contestantsFour);
 		l_contestFour.setMethod(new PluralityTally());
 		
 		l_contests.add(l_contestOne);
 		l_contests.add(l_contestTwo);
 		l_contests.add(l_contestThree);
-		l_contests.add(l_contestFour); */
+		l_contests.add(l_contestFour); 
 		
 		return l_contests;
 	}

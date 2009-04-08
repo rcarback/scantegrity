@@ -116,6 +116,13 @@ public class IRVContestResult extends ContestResult
 		return l_res.toString();
 	}
 	
+	@Override
+	public String getHtmlResults()
+	{
+		return c_rounds.get(c_rounds.size() - 1).getHtmlRound();
+	}
+	
+	
 	public class Round {
 		protected int c_id;
 		protected String c_desc;
@@ -320,6 +327,38 @@ public class IRVContestResult extends ContestResult
 			l_out.write(String.format(l_fmt, l_tot));
 			l_out.write("\n\n");
 			for (String note : c_roundNotes) l_out.write(note + "\n");
+			
+			return l_out.toString();
+		}
+
+		public String getHtmlRound()
+		{
+			StringWriter l_out = new StringWriter();
+			int l_change = 0, l_tot = 0;
+			//ROUND\t\tCONTESTANTS\t\tCHANGE\t\tTOTALS
+			l_out.write("<table style=\"width:100%; text-alignment: left; \">");
+			l_out.write("<tr><th>Contestant</th><th>Change</th><th>Total</th> <th>State</th></tr>");
+			for(int l_i = 0; l_i < c_contestants.size(); l_i++)
+			{
+				l_out.write("<tr>");
+				l_out.write("<td>" +  c_contestants.get(l_i) + "</td>");
+				l_out.write("<td>" + String.format("%+d", c_delta.get(l_i)) + "</td>");
+				l_out.write("<td>" +  c_totals.get(l_i) + "</td>");
+				l_out.write("<td>" +  c_state.get(l_i) + "</td>");
+				l_out.write("</tr>");
+				
+				l_change += c_delta.get(l_i);
+				l_tot += c_totals.get(l_i);
+			}
+			l_out.write("<tr>");
+			l_out.write("<td>Totals:</td>");
+			l_out.write("<td>" + l_change + "</td>");
+			l_out.write("<td>" + l_tot + "</td><td/>");
+			l_out.write("</tr>");
+			l_out.write("</table>");
+			l_out.write("<p>");
+			for (String note : c_roundNotes) l_out.write(note + "<br/>");
+			l_out.write("</p>");
 			
 			return l_out.toString();
 		}

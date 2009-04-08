@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -31,11 +32,13 @@ public class CheckCodesActionBean implements ActionBean {
 		if( c_codes.size() == 0 )
 			return "";
 		
-		String l_result = "<h4>Results:</h4>";
+		String l_result = "";
+		
 		for(int x = 0; x < c_codes.size(); x++ )
 		{
-			l_result += "<h5>Question " + (x + 1) + ": </h5>";
-			l_result += "<table><tr><th>Symbol</th><th>Code</th></tr>";
+			l_result += "<div";
+			l_result += "<h4>Contest " + (x + 1) + ": </h4>";
+			l_result += "<table style=\"width:60%;\"><tr><th style=\"text-align:left;\">Symbol</th><th style=\"text-align:left;\">Code</th></tr>";
 			for( String[] code : c_codes.get(x) )
 			{
 				l_result += "<tr>";
@@ -44,6 +47,7 @@ public class CheckCodesActionBean implements ActionBean {
 				l_result += "</tr>";
 			}
 			l_result += "</table><br/>";
+			l_result += "</div>";
 		}
 		return l_result;
 	}
@@ -76,6 +80,7 @@ public class CheckCodesActionBean implements ActionBean {
 	@DefaultHandler
 	public Resolution submit()
 	{
+		//System.setProperty("derby.system.home", "/opt/db-derby");
 		if( c_serial == 0 )
 			return new ForwardResolution("/WEB-INF/pages/checkcodes.jsp");
 		try
@@ -104,6 +109,7 @@ public class CheckCodesActionBean implements ActionBean {
 				{
 					c_codes.add(c_newCodes);
 					c_newCodes = new ArrayList<String[]>();
+					c_question = c_newQuestion;
 				}
 				
 				String[] c_newCode = new String[2];
@@ -114,11 +120,40 @@ public class CheckCodesActionBean implements ActionBean {
 			if( c_newCodes.size() != 0 )
 				c_codes.add(c_newCodes);
 			
-			
 			l_results.close();
 			
 			if( c_codes.size() == 0 )
 				throw new NoSuchElementException();
+			
+			//Create SQL statement object
+			Statement l_existQuery = l_conn.createStatement();
+			
+			//Test to see if the table exists, create it if it doesn't
+			/* Now, we just try to select something from the table and if an error is thrown
+			 * that contains "does not exist" then we try and create it.  Could be done
+			 * better with T-SQL, doesn't handle the case where the table exists but 
+			 * doesn't have the columns we are expecting.
+			 */
+			try
+			{
+				l_existQuery.execute("SELECT COUNT(*) FROM UserTracking");
+			}
+			catch( SQLException e )
+			{
+				if( e.getMessage().contains("does not exist") )
+				{
+					l_existQuery.execute("CREATE TABLE UserTracking ( ipaddress varchar(20), ballotserial integer )");
+				}
+			}
+			
+			PreparedStatement l_trackingQuery = l_conn.prepareStatement("INSERT INTO UserTracking VALUES (?,?)");
+			
+			String l_ipaddress = c_ctx.getRequest().getRemoteAddr();
+			
+			l_trackingQuery.setString(1, l_ipaddress);
+			l_trackingQuery.setInt(2, c_serial);
+			
+			l_trackingQuery.executeUpdate();
 			
 		} catch (SQLException e) {
 			c_error = "Could not execute SQL: " + e.getMessage();
