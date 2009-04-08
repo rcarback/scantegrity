@@ -141,8 +141,8 @@ public class ScantegrityBallotReaderTest
 		
 		BallotStyle l_style = new BallotStyle(0, l_contests, l_rects, true);
 		l_style.setContestantIds(l_contestantIds);
-		BallotStyle l_styles[] = new BallotStyle[1];
-		l_styles[0] = l_style;
+		Vector<BallotStyle> l_styles = new Vector<BallotStyle>();
+		l_styles.add(l_style);
 		/*
 		BallotStyle l_styles[] = new BallotStyle[1];				
 		l_reader = new ScantegrityBallotReader();
@@ -206,7 +206,7 @@ public class ScantegrityBallotReaderTest
 				PlanarImage pi = JAI.create("fileload", basedir+test);
 				BufferedImage img = pi.getAsBufferedImage();
 				long l_load = System.currentTimeMillis();
-				if (DrunkDriver.isBlank(img, 4)) System.out.println("blank!!!");
+				if (DrunkDriver.isDrunk(img, 4)) System.out.println("blank!!!");
 				Ballot l_b = l_reader.scanBallot(l_styles, img);
 				l_ballots.add(l_b);
 				long l_last = System.currentTimeMillis();

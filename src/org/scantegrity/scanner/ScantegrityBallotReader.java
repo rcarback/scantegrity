@@ -113,7 +113,14 @@ public class ScantegrityBallotReader extends BallotReader
 				{
 					//Using the style mapping, find what the normal contestant
 					//id is and use that instead here.
-					int l_cid = l_style.getContestantIds().get(l_i).get(l_j);
+					int l_cid = l_j;
+					try //Ignore OOB here
+					{
+						l_cid = l_style.getContestantIds().get(l_i).get(l_j);
+					} catch(Exception e) {
+						System.err.println("Warning: Contestant ID could not " +
+								"be found for rect " + l_i + ", " + l_j);
+					}
 					try
 					{
 						l_tmp = AffineCropper.crop(p_img, l_alignmentOp, 
