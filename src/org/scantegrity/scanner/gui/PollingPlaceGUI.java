@@ -31,6 +31,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -187,7 +189,10 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	
 	public void setToWaiting()
 	{
-		changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
+		if(c_ballotQueue.size() > 0)
+			displayScanResults(c_ballotQueue.get(0));
+		else
+			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
 	}
 	
 	public void addBallotResults(String p_results)
@@ -296,6 +301,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	{
 		c_electionInfoPanel = new JPanel(); 
 		c_electionInfoPanel.setLayout(new GridBagLayout());
+		c_electionInfoPanel.addMouseListener(new mouseListener());
 		
 		JLabel l_ppIdLabel = new JLabel("Polling Place ID #: ");
 		JLabel l_ppNameLabel = new JLabel("Polling Place Name: ");
@@ -314,7 +320,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		//Font
 		//TODO: Eventually I want to make the font size determined by the 
 		//screen resolution
-		Font l_font = new Font(c_fontStyle, Font.BOLD, 16);
+		Font l_font = new Font(c_fontStyle, Font.BOLD, 20);
 		
 		l_ppIdLabel.setFont(l_font);
 		l_ppNameLabel.setFont(l_font);
@@ -431,6 +437,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	{
 		c_compactElectionInfoPanel = new JPanel(); 
 		c_compactElectionInfoPanel.setLayout(new GridBagLayout());
+		c_compactElectionInfoPanel.addMouseListener(new mouseListener());
 		
 		JLabel l_ppIdLabel = new JLabel("Polling Place ID #: ");
 		JLabel l_ppNameLabel = new JLabel("Polling Place Name: ");
@@ -646,13 +653,16 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		
 		//build components 
 		JLabel l_passwordLabel = new JLabel("Chief Judge Password: ");
+		l_passwordLabel.setFont(new Font(c_fontStyle, Font.PLAIN,  ScannerUIConstants.BIG_BUTTON_FONT_SIZE));
 		c_chiefPasswordField = new JPasswordField(
 				ScannerUIConstants.NUM_PASSWORD_COLUMNS);
+		c_chiefPasswordField.setFont(new Font(c_fontStyle, Font.PLAIN,  ScannerUIConstants.BIG_BUTTON_FONT_SIZE));
 		
 		c_chiefLoginButton = new JButton(); 
 		c_chiefLoginButton.setText("Login");
 		c_chiefLoginButton.setFocusable(false);
 		c_chiefLoginButton.addActionListener(this);
+		c_chiefLoginButton.setFont(new Font(c_fontStyle, Font.BOLD,  ScannerUIConstants.BIG_BUTTON_FONT_SIZE));
 		
 		//put components into layout 
 		l_passwordPanel.add(l_passwordLabel);
@@ -671,7 +681,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_startElectionButton.setText("Start Election");
 		c_startElectionButton.setFocusable(false);
 		c_startElectionButton.addActionListener(this);
-		c_startElectionButton.setFont(new Font(c_fontStyle, Font.BOLD, 24));	
+		c_startElectionButton.setFont(new Font(c_fontStyle, Font.BOLD, 30));	
 		c_startElectionPanel.add(c_startElectionButton);
 	}
 	
@@ -680,7 +690,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_scanningBallotsPanel = new JPanel(); 
 		
 		JLabel l_label = new JLabel("Scanning Ballot...");
-		l_label.setFont(new Font(c_fontStyle, Font.BOLD, 24));
+		l_label.setFont(new Font(c_fontStyle, Font.BOLD, ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
 		
 		c_scanningBallotsPanel.add(l_label);
 		
@@ -694,7 +704,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_waitingForBallotsPanel = new JPanel(); 
 		
 		JLabel l_label = new JLabel("Waiting for Ballot...");
-		l_label.setFont(new Font(c_fontStyle, Font.BOLD, 24));
+		l_label.setFont(new Font(c_fontStyle, Font.BOLD, ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
 		
 		c_waitingForBallotsPanel.add(l_label);
 		
@@ -708,7 +718,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_thankYouPanel = new JPanel(); 
 		
 		JLabel l_label = new JLabel("Thank you for Voting.");
-		l_label.setFont(new Font(c_fontStyle, Font.BOLD, 24));
+		l_label.setFont(new Font(c_fontStyle, Font.BOLD, ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
 		
 		c_thankYouPanel.add(l_label);
 		
@@ -721,7 +731,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	{
 		c_ballotResultsPanel = new JPanel(new BorderLayout());
 		c_ballotInfoLabel = new JTextArea(p_htmlBallotInfo);
-		c_ballotInfoLabel.setFont(new Font(c_fontStyle, Font.BOLD, 16));
+		c_ballotInfoLabel.setFont(new Font(c_fontStyle, Font.BOLD, 24));
 		c_ballotInfo = new JScrollPane(c_ballotInfoLabel);
 		
 		c_ballotResultsPanel.add(c_ballotInfo, BorderLayout.CENTER);
@@ -730,11 +740,13 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_castBallotButton.setText("Cast Ballot");
 		c_castBallotButton.setFocusable(false);
 		c_castBallotButton.addActionListener(this);
+		c_castBallotButton.setFont(new Font(c_fontStyle, Font.BOLD,  ScannerUIConstants.BIG_BUTTON_FONT_SIZE));
 		
 		c_rejectBallotButton = new JButton(); 
 		c_rejectBallotButton.setText("Reject Ballot");
 		c_rejectBallotButton.setFocusable(false);
 		c_rejectBallotButton.addActionListener(this); 
+		c_rejectBallotButton.setFont(new Font(c_fontStyle, Font.BOLD,  ScannerUIConstants.BIG_BUTTON_FONT_SIZE));
 		
 		JPanel l_tmpPanel = new JPanel();
 		l_tmpPanel.setLayout(new BorderLayout());
@@ -939,8 +951,9 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			
 			c_ballotQueue.remove(0);
 			
-			if(c_ballotQueue.size() > 0)
-				displayScanResults(c_ballotQueue.get(0));
+			Runnable l_guiThread = new GUIThread(this); 
+			Thread l_thread = new Thread(l_guiThread);
+			l_thread.start();
 			
 		}
 		else if(e.getActionCommand().equals(c_rejectBallotButton.getText()))
@@ -960,8 +973,65 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			
 			c_ballotQueue.remove(0);
 			
-			if(c_ballotQueue.size() > 0)
-				displayScanResults(c_ballotQueue.get(0));
+			setToWaiting();
 		}
+	}
+	
+	private class mouseListener implements MouseListener
+	{
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+		 */
+		@Override
+		public void mouseClicked(MouseEvent p_e)
+		{
+			if(p_e.getClickCount() == 2)
+			{
+				c_adminItem.doClick();
+			}
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+		 */
+		@Override
+		public void mouseEntered(MouseEvent p_e)
+		{
+			// TODO Auto-generated method stub
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+		 */
+		@Override
+		public void mouseExited(MouseEvent p_e)
+		{
+			// TODO Auto-generated method stub
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+		 */
+		@Override
+		public void mousePressed(MouseEvent p_e)
+		{
+			// TODO Auto-generated method stub
+			
+		}
+
+		/* (non-Javadoc)
+		 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+		 */
+		@Override
+		public void mouseReleased(MouseEvent p_e)
+		{
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 }

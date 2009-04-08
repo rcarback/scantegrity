@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 Sealed: true
-Main-Class: org.scantegrity.scanner.test.GUITest
+Main-Class: org.scantegrity.scanner.Scanner
 SplashScreen-Image: images/LoadingScreen.png
-
+Class-Path: zing-core-1.3.jar
+Class-Path: zing-javase-1.3.jar

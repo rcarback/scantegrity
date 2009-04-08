@@ -50,6 +50,11 @@ public final class ScannerUIConstants extends Constants
 	 *****************************/
 	public static final int MEDIUM_BUTTON_WIDTH = 200; 
 	public static final int MEDIUM_BUTTON_HEIGHT = 75;
+	public static final int BIG_BUTTON_FONT_SIZE = 24;
+	public static final int GIANT_TEXT_FONT_SIZE = 40;
+	public static final int LARGE_TEXT_FONT_SIZE = 30;
+	public static final int MEDIUM_TEXT_FONT_SIZE = 20;
+	public static final int SMALL_TEXT_FONT_SIZE = 16;
 	
 	/* ***************************
 	 * Font Constants
