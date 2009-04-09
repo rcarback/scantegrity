@@ -24,6 +24,8 @@ import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
@@ -34,8 +36,12 @@ import org.scantegrity.common.*;
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.lib.Ballot;
 import org.scantegrity.lib.BallotStyle;
+import org.scantegrity.lib.Contest;
+import org.scantegrity.lib.methods.TallyMethod;
 import org.scantegrity.scanner.gui.PollingPlaceGUI;
 import org.scantegrity.util.DrunkDriver;
+
+import com.sun.xml.internal.bind.v2.runtime.reflect.ListIterator;
 
 /**
  * @author John Conway
@@ -44,6 +50,7 @@ import org.scantegrity.util.DrunkDriver;
 public class BallotImageHandler implements ImageHandler
 {
 	private BallotReader c_reader;
+	private TallyMethod c_tm; 
 	private PollingPlaceGUI c_guiRef; 
 	private Vector<BallotStyle> c_styles = null;
 	private int i = 0; 
@@ -61,66 +68,6 @@ public class BallotImageHandler implements ImageHandler
 		
 		c_reader = c_config.getReader();
 		c_styles = c_config.getStyles();
-		
-		/*OLD* /
-		c_reader = new ScantegrityBallotReader();
-		Dimension l_d = new Dimension(2550, 4200);
-		Point[] l_marks = new Point[2];
-		l_marks[0] = new Point(2352, 232);
-		l_marks[1] = new Point(2328, 3152);
-		QRCodeReader l_code = new QRCodeReader();
-		l_code.setSerialBoundingBox(new Rectangle(125, 20, 310, 310));
-		c_reader.setSerial(l_code);
-		c_reader.setAlignment(l_marks);
-		c_reader.setDimension(l_d);
-		c_reader.setAlignmentMark(new CircleAlignmentMarkReader(36, .05));
-		c_reader.setTolerance(.4);
-		
-		Vector<Integer> l_contests = new Vector<Integer>();
-		l_contests.add(0);
-		l_contests.add(1);
-		l_contests.add(2);
-
-		Vector<Vector<Vector<Rectangle>>> l_rects = new Vector<Vector<Vector<Rectangle>>>();
-		//Contest 0
-		l_rects.add(new Vector<Vector<Rectangle>>());
-		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1204, 725, 160, 80));
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1367, 725, 160, 80));
-		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1204, 866, 160, 80));
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1367, 866, 160, 80));
-		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1204, 1016, 160, 80));
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1367, 1016, 160, 80));
-
-		l_rects.add(new Vector<Vector<Rectangle>>());
-		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1204, 1655, 160, 80));
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1367, 1655, 160, 80));
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1527, 1655, 160, 80));
-		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1204, 1805, 160, 80));
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1367, 1805, 160, 80));
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1527, 1805, 160, 80));
-		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1204, 1948, 160, 80));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1367, 1948, 160, 80));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1527, 1948, 160, 80));
-		
-		l_rects.add(new Vector<Vector<Rectangle>>());
-		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(0).add(new Rectangle(2073, 725, 160, 80));
-		l_rects.elementAt(2).elementAt(0).add(new Rectangle(2233, 725, 160, 80));
-		
-		
-		BallotStyle l_style = new BallotStyle(0, l_contests, l_rects, true);
-		
-		c_styles = new BallotStyle[1];
-		c_styles[0] = l_style;
-		
-		//c_reader.setStyles(l_styles);
-		/*END OLD*/
 	}
 	
 	/* (non-Javadoc)
@@ -129,46 +76,60 @@ public class BallotImageHandler implements ImageHandler
 	public void handleImage(BufferedImage p_image)
 	{
 		
+		
+		//Start running the tests to confirm the ballot is valid
+		
 		//long l_start = System.currentTimeMillis(); 
-		try {
+		try 
+		{
 			//Give me your keys
 			if(DrunkDriver.isDrunk(p_image, 10))
 				return;
 		
 			Ballot l_b = c_reader.scanBallot(c_styles, p_image);
 			
-			//System.out.println(System.currentTimeMillis() - l_start);
-			//couldn't find alignment marks 
+			//couldn't find alignment marks or couldnt read serial number 
 			if(l_b == null || l_b.getId() == null)
 			{
 				//c_guiRef.setToWaiting();
 				c_results = "Unable to Scan Ballot. Please Try Again";
-				Dialogs.displayInfoDialog(c_results, "Unable to Read Ballot!");
+				Dialogs.displayInfoDialog(c_results, "Unable to Read Ballot! \n Please try scanning again.");
 				
 				//Move file to destination directory
 				ImageIO.write(p_image, "tiff", new File(c_errDir + "/error" + i + ".tiff"));
 				i++;
 				
-				//TODO: Remove
-				//c_guiRef.displayScanResults(c_results);
 				return;
 			}
-			//c_guiRef.setToScanningBallot();
 			
-			c_results = "Serial #: " + l_b.getId() + "\n";
-			c_results += "Results:";
-			Map<Integer, Integer[][]> l_res = l_b.getBallotData();
-			Integer l_it[] = new Integer[l_res.size()];
-			l_res.keySet().toArray(l_it);
-			for (int l_key : l_it)
-			{
-				c_results += "\n\tContest #" + l_key + "\n";
-				for (Integer[] l_cres: l_res.get(l_key))
+			
+			//Validate the Results
+			
+			Vector<Contest> l_cv = c_config.getContests();
+			
+			c_results = "";
+			
+			for (Contest l_c: l_cv)
+			{ 				
+				c_tm = l_c.getMethod();
+				int l_id = l_c.getId();  
+				
+				c_results += "Contest: " + (l_id + 1) + "\n";
+				
+				TreeMap<String, String> l_tm = c_tm.validateContest(l_id, l_b);
+				
+				Set<String> l_set = l_tm.keySet();
+				
+				for(String s: l_set)
 				{
-					c_results += "\t\t" + java.util.Arrays.toString(l_cres) + "\n";
+					c_results += "\t" + s + " : " + l_tm.get(s) + "\n";
 				}
+				
+				c_results += "\n";
 			}
-		} catch (Exception l_e) {
+		} 
+		catch (Exception l_e) 
+		{
 			c_results = "Unable to Scan Ballot. Please Try Again";
 			Dialogs.displayInfoDialog(c_results, "Unable to Read Ballot!");
 			//ImageIO.write(p_image, "tiff", new File(c_errDir + "/error" + i + ".tiff"));

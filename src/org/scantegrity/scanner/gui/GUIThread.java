@@ -46,9 +46,8 @@ public class GUIThread implements Runnable
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		c_guiRef.setToWaiting();
-		// TODO Auto-generated method stub
-
 	}
 
 }

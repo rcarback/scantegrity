@@ -17,6 +17,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
 package org.scantegrity.scanner.gui;
 
 import java.awt.BorderLayout;
@@ -39,9 +40,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -52,13 +50,10 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
-import org.apache.derby.impl.store.access.sort.Scan;
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
 import org.scantegrity.scanner.Scanner;
 import org.scantegrity.scanner.ScannerConfig;
-
-import com.jhlabs.math.SCNoise;
 
 /**
  * @author John Conway 
@@ -89,6 +84,8 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	
 	private boolean c_fullscreen;
 	
+	private Thread c_thread;
+	
 	private ScantegrityJFrame c_frame; 
 	private CardLayout c_scannerInfoCardLayout;
 	
@@ -111,11 +108,6 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	private JButton c_startElectionButton;
 	private JButton c_castBallotButton;
 	private JButton c_rejectBallotButton; 
-	
-	//Menu 
-	private JMenuBar c_menuBar;
-	private JMenu c_adminMenu; 
-	private JMenuItem c_adminItem; 
 	
 	//Text Areas
 	private JTextArea c_ballotInfoLabel; 
@@ -244,7 +236,6 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_frame.setLayout(new BorderLayout()); 
 		
 		//set up internal panels
-		buildMenuBar();
 		buildElectionInfoPanel(); 
 		buildScannerPanel(); 
 		buildInfoBar(); 
@@ -266,24 +257,6 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	/* *************************************************
 	 * Panel Build Methods
 	 **************************************************/
-	
-	/**
-	 * This method builds the top panel 
-	 * that holds the admin buttons
-	 */
-	private void buildMenuBar()
-	{
-		//This will now be a menu bar
-		c_menuBar = new JMenuBar(); 
-		c_adminMenu = new JMenu("Administration");
-		c_adminItem = new JMenuItem("Enter Administration");
-		c_adminItem.addActionListener(this);
-		
-		c_adminMenu.add(c_adminItem);
-		c_menuBar.add(c_adminMenu);
-		
-		c_frame.setJMenuBar(c_menuBar);
-	}
 	
 	/**
 	 * This builds the Election info panel that will 
@@ -892,22 +865,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 */
 	public void actionPerformed(ActionEvent e)
 	{
-		if(e.getActionCommand().equals(c_adminItem.getText()))
-		{
-			boolean l_isAuthorized = getChiefJudgeAuthorization();
-			
-			if(!l_isAuthorized)
-				return; 
-			
-			int l_choice = showAdminDialogBox();
-			
-			if(l_choice == 1)
-			{
-				c_frame.dispose();
-				System.exit(1);
-			}
-		}		
-		else if(e.getActionCommand().equals(c_startElectionButton.getText()))
+		if(e.getActionCommand().equals(c_startElectionButton.getText()))
 		{	
 			c_scannerRef.startElection(c_config);
 			
@@ -952,8 +910,8 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			c_ballotQueue.remove(0);
 			
 			Runnable l_guiThread = new GUIThread(this); 
-			Thread l_thread = new Thread(l_guiThread);
-			l_thread.start();
+			c_thread = new Thread(l_guiThread);
+			c_thread.start();
 			
 		}
 		else if(e.getActionCommand().equals(c_rejectBallotButton.getText()))
@@ -979,18 +937,14 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	
 	private class mouseListener implements MouseListener
 	{
-
+		private long c_firstClick = 0; 
 		/* (non-Javadoc)
 		 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
 		 */
 		@Override
 		public void mouseClicked(MouseEvent p_e)
 		{
-			if(p_e.getClickCount() == 2)
-			{
-				c_adminItem.doClick();
-			}
-			
+
 		}
 
 		/* (non-Javadoc)
@@ -1019,8 +973,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		@Override
 		public void mousePressed(MouseEvent p_e)
 		{
-			// TODO Auto-generated method stub
-			
+			c_firstClick = p_e.getWhen();
 		}
 
 		/* (non-Javadoc)
@@ -1029,9 +982,21 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		@Override
 		public void mouseReleased(MouseEvent p_e)
 		{
-			// TODO Auto-generated method stub
-			
+			if(p_e.getWhen() - c_firstClick > 1000)
+			{
+				boolean l_isAuthorized = getChiefJudgeAuthorization();
+				
+				if(!l_isAuthorized)
+					return; 
+				
+				int l_choice = showAdminDialogBox();
+				
+				if(l_choice == 1)
+				{
+					c_frame.dispose();
+					System.exit(1);
+				}
+			}
 		}
-		
 	}
 }
