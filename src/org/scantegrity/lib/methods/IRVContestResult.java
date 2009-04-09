@@ -120,7 +120,7 @@ public class IRVContestResult extends ContestResult
 	}
 	
 	@Override
-	public String getHtmlResults()
+	public String getHtmlResults(boolean p_includeWebResources)
 	{
 		String l_results = "";
 		
@@ -131,10 +131,11 @@ public class IRVContestResult extends ContestResult
 				l_results += "</div>";
 			
 			l_results += c_rounds.get(x).getHtmlRound();
-			l_results += getChart(c_rounds.get(x));
+			if( p_includeWebResources )
+				l_results += getChart(c_rounds.get(x));
 		}
 		
-		l_results += "<br/><a id='viewLink" + c_contestId + "' href=\"javascript:divAllRounds" + c_contestId + ".style.display='';viewLink" + c_contestId + ".style.display='none';\">Click here to view intermediate rounds</a><br/>";
+		if( p_includeWebResources ) l_results += "<br/><a id='viewLink" + c_contestId + "' href='#' onclick=\"javascript:document.getElementById('divAllRounds" + c_contestId + "').style.display='';document.getElementById('viewLink" + c_contestId + "').style.display='none';\">Click here to view intermediate rounds</a><br/>";
 		return l_results;
 	}
 	

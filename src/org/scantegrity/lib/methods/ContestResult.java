@@ -82,9 +82,14 @@ public class ContestResult
 		return toString();
 	}
 	
-	public String getHtmlResults()
+	public String getHtmlResults(boolean p_includeWebResources)
 	{
 		return "<pre>" + toString() + "</pre>";
+	}
+	
+	public String getHtmlResults()
+	{
+		return getHtmlResults(true);
 	}
 	
 }

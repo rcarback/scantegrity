@@ -67,7 +67,7 @@ public class PluralityContestResult extends ContestResult
 		String l_res = "";
 		l_res += String.format("%26s", "CANDIDATE");
 		l_res += String.format("%26s", "VOTES");
-		l_res += "\n--------------------------------------------------";
+		l_res += "\n----------------------------------------------------\n\n";
 		
 		Integer l_key = super.c_ranking.firstKey();
 		int l_i = 0;
@@ -88,7 +88,7 @@ public class PluralityContestResult extends ContestResult
 	}
 
 	@Override
-	public String getHtmlResults()
+	public String getHtmlResults(boolean p_includeWebResources)
 	{
 		ArrayList<Integer> l_graphVotes = new ArrayList<Integer>();
 		ArrayList<String> l_graphLabels = new ArrayList<String>();
@@ -114,33 +114,36 @@ public class PluralityContestResult extends ContestResult
 		}
 		l_res += "</table>";
 		
-		DecimalFormat onePlace = new DecimalFormat("0.0");
-		String l_chart = "http://chart.apis.google.com/chart?";
-		String l_chartOpts = "chs=600x200&cht=p3&chd=t:";
-
-		for( Integer l_data : l_graphVotes )
+		if( p_includeWebResources )
 		{
-			l_chartOpts += onePlace.format(l_data / ((float)l_total));
-			l_chartOpts += ",";
-		}
-		l_chartOpts = l_chartOpts.substring(0, l_chartOpts.length() - 1); //Trim last comma
-		l_chartOpts += "&amp;chl=";
-		
-		for( String l_label : l_graphLabels )
-		{
-			try {
-				l_chartOpts += URLEncoder.encode(l_label, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			DecimalFormat onePlace = new DecimalFormat("0.0");
+			String l_chart = "http://chart.apis.google.com/chart?";
+			String l_chartOpts = "chs=600x200&cht=p3&chd=t:";
+	
+			for( Integer l_data : l_graphVotes )
+			{
+				l_chartOpts += onePlace.format(l_data / ((float)l_total));
+				l_chartOpts += ",";
 			}
-			l_chartOpts += "|";
+			l_chartOpts = l_chartOpts.substring(0, l_chartOpts.length() - 1); //Trim last comma
+			l_chartOpts += "&amp;chl=";
+			
+			for( String l_label : l_graphLabels )
+			{
+				try {
+					l_chartOpts += URLEncoder.encode(l_label, "UTF-8");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				l_chartOpts += "|";
+			}
+			l_chartOpts = l_chartOpts.substring(0, l_chartOpts.length() - 1); //Trim last pipe
+			
+			l_chart += l_chartOpts;
+			
+			l_res += "<img src=\"" + l_chart + "\" />";
 		}
-		l_chartOpts = l_chartOpts.substring(0, l_chartOpts.length() - 1); //Trim last pipe
-		
-		l_chart += l_chartOpts;
-		
-		l_res += "<img src=\"" + l_chart + "\" />";
 		
 		return l_res;
 	}
