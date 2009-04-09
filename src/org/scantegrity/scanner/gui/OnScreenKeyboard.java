@@ -31,6 +31,7 @@ import java.util.Arrays;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -69,27 +70,39 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 	private JButton c_shift = null;
 	private JButton c_buttons[][] = null;
 	private boolean c_shifted = false;
+	private boolean c_secure = false;
 	
-	public OnScreenKeyboard(JFrame parent, String title, int height, int width) {
-		super(parent, title, true);
+	public OnScreenKeyboard(JFrame p_parent, String p_title)
+	{
+		this(p_parent, p_title, false);
+	}
+	
+	
+	public OnScreenKeyboard(JFrame p_parent, String p_title, boolean p_secure) {
+		super(p_parent, p_title, true);
 				
-	    if (parent != null) {
-	        Dimension parentSize = parent.getSize(); 
-	        Point p = parent.getLocation(); 
+	    if (p_parent != null) {
+	        Dimension parentSize = p_parent.getSize(); 
+	        Point p = p_parent.getLocation(); 
 	        setLocation(p.x + 2*parentSize.width / 10, p.y + 3*parentSize.height / 10);
 	    }			
+	    
+	    c_secure = p_secure;
 	    	    
-		c_font = new Font("Dialog", 1, 48) ;				
+		c_font = new Font("Courier", 1, 48) ;				
 		
+		JLabel l_title = new JLabel(p_title);
+		l_title.setFont(c_font);
 		c_textField = new JTextField("");
 		c_textField.setFont(c_font);
 		c_textField.setHorizontalAlignment(JTextField.CENTER);
 		//Each row get's it's own JPanel row.
-		c_panel = new JPanel(new GridLayout(c_rows.length+1, 0));
+		c_panel = new JPanel(new GridLayout(c_rows.length+2, 0));
+		c_panel.add(l_title);
 		c_panel.add(c_textField);
 		//c_panel.
 		int l_minx = c_textField.getPreferredSize().width;
-		int l_miny = c_textField.getPreferredSize().height;
+		int l_miny = c_textField.getPreferredSize().height*2;
 		int l_x = 0, l_y = 0;
 		c_buttons = new JButton[c_rows.length][];
 		for (int l_i = 0; l_i < c_rows.length; l_i++)
@@ -100,7 +113,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 			for (int l_j = 0; l_j < c_rows[l_i].length; l_j++)
 			{
 				JButton l_tmp = createButton(c_rows[l_i][l_j]);
-				l_x += l_tmp.getPreferredSize().width;
+				l_x += l_tmp.getPreferredSize().width+15;
 				l_y = Math.max(l_tmp.getPreferredSize().height, l_y);
 				l_panel.add(l_tmp);
 				c_buttons[l_i][l_j] = l_tmp;
@@ -114,9 +127,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		setSize(l_minx, l_miny);
 		getContentPane().add(c_panel);
 		setVisible(true);
-		
-	    
-	}
+	}	
 	
 	private JButton createButton(String p_msg)
 	{
@@ -138,6 +149,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		}
 		else if (p_msg.equals("Backspace"))
 		{
+			p_msg = "Back";
 			l_button.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					Backspace();
@@ -146,7 +158,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		}
 		else if (p_msg.equals("Space"))
 		{
-			p_msg = "        " + p_msg + "        ";
+			p_msg = "    " + p_msg + "    ";
 			l_button.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					Append(" ");
@@ -170,6 +182,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		
 		l_button.setText(p_msg);		
 		l_button.setEnabled(true);
+		l_button.setFocusable(false);
 		return l_button;
 	}
 	
@@ -181,6 +194,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		// TODO Auto-generated method stub
 		c_shifted = (c_shifted) ? false:true;
 		c_shift.setSelected(c_shifted);
+		c_shift.repaint();
 		for (int l_i = 0; l_i < c_rows.length; l_i++)
 		{
 			for (int l_j = 0; l_j < c_rows[l_i].length; l_j++)
@@ -204,13 +218,11 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		{
 			c_buf = c_buf.substring(0, c_buf.length()-1) ;
 		}
-		if ( secure )
+		if ( c_secure )
 		{
-			char[] ch = new char[c_buf.length()];
-			 
-	        // fill each element of chars array with 'x'
-	        Arrays.fill(ch, blankChar) ;
-	        c_textField.setText(String.valueOf(ch)) ;
+			char[] l_c = new char[c_buf.length()];
+	        Arrays.fill(l_c, '*') ;
+	        c_textField.setText(String.valueOf(l_c)) ;
 		} else {
 			c_textField.setText(c_buf) ;
 		}		
@@ -220,7 +232,16 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 	{
 		if (c_shifted) p_msg = p_msg.toUpperCase();
 		c_buf += p_msg;
-		c_textField.setText(c_buf);
+		if (c_secure)
+		{
+			char[] l_c = new char[c_buf.length()-1];
+			Arrays.fill(l_c, '*');
+			c_textField.setText(new String(l_c) + p_msg);
+		}
+		else
+		{
+			c_textField.setText(c_buf);			
+		}
 	}
 
 	public String getBuffer()
