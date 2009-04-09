@@ -81,7 +81,7 @@ public class OnScreenKeyboard extends SwingWorker<String, Object> {
 			sync.wait() ;
 		}
 
-		return buffer ;
+		return getJTextField().getText() ;
 	}
 	
 	public OnScreenKeyboard(int height, int width, char blankChar) {
@@ -417,7 +417,7 @@ public class OnScreenKeyboard extends SwingWorker<String, Object> {
 			jTextField = new JTextField();
 			jTextField.setBounds(new Rectangle(0, 0, 3*buttonWidth, buttonHeight));
 			jTextField.setHorizontalAlignment(JTextField.CENTER) ;
-			jTextField.setFocusable(false) ;
+			jTextField.setFocusable(true) ;
 			jTextField.setEnabled(true) ;
 			jTextField.setFont(defaultFont) ;
 		}
@@ -454,6 +454,7 @@ public class OnScreenKeyboard extends SwingWorker<String, Object> {
 	 * This method appends text to the JTextField
 	 */
 	public void jTextAppend(String str) {
+		buffer = getJTextField().getText() ;
 		buffer = buffer + str ;
 		if ( secure )
 		{
@@ -471,6 +472,7 @@ public class OnScreenKeyboard extends SwingWorker<String, Object> {
 	 * This method deletes text from the JTextField
 	 */
 	public void jTextDelete() {
+		buffer = getJTextField().getText() ;
 		if ( buffer.length() > 0 )
 		{
 			buffer = buffer.substring(0, buffer.length()-1) ;
