@@ -59,11 +59,6 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 	private Font c_font = null;
 	private boolean secure = false;
 	
-	private int numRows = 0;
-	private int numCols = 0;
-	private int c_buttonHeight = 0;
-	private int c_buttonWidth = 0;
-	
 	private String c_buf = "";  //  @jve:decl-index=0:
 	private char blankChar = '*';
 	
@@ -81,19 +76,14 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 	    if (parent != null) {
 	        Dimension parentSize = parent.getSize(); 
 	        Point p = parent.getLocation(); 
-	        setLocation(p.x + parentSize.width / 4, p.y + parentSize.height / 4);
+	        setLocation(p.x + 2*parentSize.width / 10, p.y + 3*parentSize.height / 10);
 	    }			
 	    	    
-		c_font = new Font("Dialog", 1, 32) ;
-		
-		
-		this.numRows = 6 ;
-		this.numCols = 3 ;
-		c_buttonHeight = height / numRows ;
-		c_buttonWidth = width / numCols ;
-				
+		c_font = new Font("Dialog", 1, 48) ;				
 		
 		c_textField = new JTextField("");
+		c_textField.setFont(c_font);
+		c_textField.setHorizontalAlignment(JTextField.CENTER);
 		//Each row get's it's own JPanel row.
 		c_panel = new JPanel(new GridLayout(c_rows.length+1, 0));
 		c_panel.add(c_textField);
@@ -116,10 +106,10 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 				c_buttons[l_i][l_j] = l_tmp;
 			}
 			l_minx = Math.max(l_x, l_minx);
-			l_miny += l_y+20;
+			l_miny += l_y+15;
 			c_panel.add(l_panel);
 		}
-	    setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
+	    setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		c_enter.addActionListener(this);	    
 		setSize(l_minx, l_miny);
 		getContentPane().add(c_panel);
@@ -156,7 +146,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		}
 		else if (p_msg.equals("Space"))
 		{
-			l_button.setSize(new Dimension(200, c_buttonHeight));
+			p_msg = "        " + p_msg + "        ";
 			l_button.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					Append(" ");
@@ -169,7 +159,6 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		}
 		else
 		{
-			l_button.setSize(new Dimension(c_buttonWidth, c_buttonHeight));
 			p_msg = p_msg.toLowerCase();
 			final String l_msg = new String(p_msg.toLowerCase());
 			l_button.addActionListener(new java.awt.event.ActionListener() {
