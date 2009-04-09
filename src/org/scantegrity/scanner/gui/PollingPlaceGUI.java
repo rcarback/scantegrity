@@ -34,15 +34,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextPane;
@@ -52,6 +51,8 @@ import javax.swing.border.Border;
 
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
+import org.scantegrity.lib.Ballot;
+import org.scantegrity.scanner.BallotHandler;
 import org.scantegrity.scanner.Scanner;
 import org.scantegrity.scanner.ScannerConfig;
 
@@ -90,9 +91,14 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	//Class References
 	private Scanner c_scannerRef; 
 	private ScannerConfig c_config;
+	private BallotHandler c_bhRef;
 	
 	//command line flags the gui uses
 	private boolean c_fullscreen;
+	
+	//require pin flag
+	private Vector<Boolean> c_reqPin;
+	private Vector<Boolean> c_reqPinOnReject;
 	
 	//The thread that controls the Thank You card wait time
 	private Thread c_thread;
@@ -110,21 +116,23 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	private JPanel c_infoBarPanel; 
 	
 	//card panels
-	private JPanel c_chiefJudgeLoginPanel;
 	private JPanel c_startElectionPanel;
-	private JPanel c_scanningBallotsPanel;
-	private JPanel c_waitingForBallotsPanel;
-	private JPanel c_thankYouPanel;
+	//private JPanel c_scanningBallotsPanel;
+	//private JPanel c_waitingForBallotsPanel;
+	//private JPanel c_thankYouPanel;
+	//private JPanel c_rejectedPanel;
 	private JPanel c_ballotResultsPanel;
 	
 	//Buttons
-	private JButton c_chiefLoginButton;
 	private JButton c_startElectionButton;
 	private JButton c_castBallotButton;
 	private JButton c_rejectBallotButton; 
+	private JButton c_closeButton;
+	private JButton c_printButton;
 	
 	//Text Areas
 	private JTextPane c_ballotResultsTextPane; 
+	private JTextPane c_ballotSummaryTextPane;
 	
 	//JScrollPanes 
 	private JScrollPane c_ballotResultsScrollPanel;
@@ -132,15 +140,13 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	//Fields
 	private JTextField c_castField; 
 	private JTextField c_spoiledField;
-
-	//password fields
-	private JPasswordField c_chiefPasswordField;
 	
 	//Font Style
 	private String c_fontStyle; 
 	
 	//Scanned Ballots Queue
-	private Vector<String> c_ballotQueue;
+	private Vector<String> c_ballotResultsQueue;
+	private Vector<Ballot> c_ballotQueue;
 	
 	//TODO Temp INTs
 	private Integer c_numCastBallots;
@@ -171,7 +177,10 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_scannerRef = new Scanner(this);
 		
 		//initialize scanned ballot queue
-		c_ballotQueue = new Vector<String>();
+		c_ballotResultsQueue = new Vector<String>();
+		c_ballotQueue = new Vector<Ballot>();
+		c_reqPin = new Vector<Boolean>();
+		c_reqPinOnReject = new Vector<Boolean>(); 
 		
 		//set the font style
 		c_fontStyle = ScannerUIConstants.FONT_STYLE_SERIF;
@@ -190,16 +199,16 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 */
 	public void run()
 	{
-		changeCard(ScannerUIConstants.LOGIN_CARD);
+		changeCard(ScannerUIConstants.START_ELECTION_CARD);
 		
 		//display the frame
 		c_frame.display(true);
 	}
 	
+	
 	/* ***********************************************
 	 * Public Methods to change status
 	 ************************************************/
-	
 	
 	/**
 	 * Sets the ballot information panel to show "Scanning Ballot"
@@ -215,8 +224,8 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 */
 	public void setToWaiting()
 	{
-		if(c_ballotQueue.size() > 0)
-			displayScanResults(c_ballotQueue.get(0));
+		if(c_ballotResultsQueue.size() > 0)
+			displayScanResults(c_ballotResultsQueue.get(0));
 		else
 			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
 	}
@@ -226,17 +235,29 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 * Adds the ballot results string to the queue to display to the user
 	 * 
 	 * @param p_results The html formatted results string
+	 * @param p_ballot the ballot object
 	 */
-	public void addBallotResults(String p_results)
+	public void addBallotResults(String p_results, Ballot p_ballot, boolean p_reqPin)
 	{
-		c_ballotQueue.add(p_results);
+		c_reqPin.add(p_reqPin); 
+		c_reqPinOnReject.add(true);
+		
+		c_ballotResultsQueue.add(p_results);
+		c_ballotQueue.add(p_ballot);
 		
 		if(c_ballotQueue.size() == 1)
-			displayScanResults(c_ballotQueue.get(0));
+			displayScanResults(c_ballotResultsQueue.get(0));
+	}
+	
+	public void displaySummaryInfo(String p_htmlSummary)
+	{
+		c_ballotSummaryTextPane.setText(p_htmlSummary);
+		changeCard(ScannerUIConstants.ELECTION_SUMMARY_CARD);
 	}
 	
 	/**
 	 * Sets the ballot information panel to display the scan results
+	 * was public but now isn't, cause I said so
 	 * 
 	 * @param p_scanResults The HTML formatted results string
 	 */
@@ -244,6 +265,11 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	{
 		c_ballotResultsTextPane.setText(p_scanResults);
 		changeCard(ScannerUIConstants.BALLOT_INFO_CARD);
+	}
+
+	public void setBallotHandlerRef(BallotHandler p_bhRef)
+	{
+		c_bhRef = p_bhRef;
 	}
 	
 	
@@ -624,11 +650,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_scannerInfoPanel = new JPanel(); 
 		
 		//build the panels
-		buildLoginCardPanel();
 		buildStartCardPanel();
-		buildScanningCardPanel();
-		buildWaitingCardPanel();
-		buildThankYouCardPanel();
 		buildBallotResultsCards("<html><p align=\"center\">No Ballot Results to Display</p></html>");
 		
 		//set up the card layout
@@ -636,12 +658,13 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_scannerInfoPanel.setLayout(c_scannerInfoCardLayout);
 		
 		//add the panels to the card layout
-		c_scannerInfoPanel.add(c_chiefJudgeLoginPanel, ScannerUIConstants.LOGIN_CARD);
 		c_scannerInfoPanel.add(c_startElectionPanel, ScannerUIConstants.START_ELECTION_CARD);
-		c_scannerInfoPanel.add(c_scanningBallotsPanel, ScannerUIConstants.SCANNING_BALLOT_CARD);
-		c_scannerInfoPanel.add(c_waitingForBallotsPanel, ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
-		c_scannerInfoPanel.add(c_thankYouPanel, ScannerUIConstants.THANK_YOU_CARD);
 		c_scannerInfoPanel.add(c_ballotResultsPanel, ScannerUIConstants.BALLOT_INFO_CARD);
+		buildCardPanels(ScannerUIConstants.SCANNING_BALLOT_CARD);
+		buildCardPanels(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
+		buildCardPanels(ScannerUIConstants.THANK_YOU_CARD);
+		buildCardPanels(ScannerUIConstants.REJECT_CARD);
+		buildSummaryScreens();
 		
 		//Borders
 		Border l_border = BorderFactory.createLoweredBevelBorder();
@@ -695,43 +718,25 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 * Card Panel Build Methods
 	 ************************************************/
 	
-	
-	/**
-	 * Builds the Chief Judge Login panel that 
-	 * is initially displayed on startup
-	 */
-	private void buildLoginCardPanel()
+	private void buildCardPanels(String p_cardName)
 	{
-		//Create th panels
-		c_chiefJudgeLoginPanel = new JPanel(); 
-		JPanel l_passwordPanel = new JPanel(); 
+		//create panel
+		JPanel l_tmp = new JPanel(); 
 		
-		//set the layouts
-		c_chiefJudgeLoginPanel.setLayout(new BoxLayout(c_chiefJudgeLoginPanel, BoxLayout.Y_AXIS));
-		l_passwordPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		//create label and set font
+		JLabel l_label = new JLabel(p_cardName);
+		l_label.setFont(new Font(c_fontStyle, Font.BOLD, ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
+		l_label.setVerticalAlignment(JLabel.CENTER);
 		
-		//build components 
-		JLabel l_passwordLabel = new JLabel("Chief Judge Password: ");
-		l_passwordLabel.setFont(new Font(c_fontStyle, Font.PLAIN,  ScannerUIConstants.BIG_BUTTON_FONT_SIZE));
-		c_chiefPasswordField = new JPasswordField(
-				ScannerUIConstants.NUM_PASSWORD_COLUMNS);
-		c_chiefPasswordField.setFont(new Font(c_fontStyle, Font.PLAIN,  ScannerUIConstants.BIG_BUTTON_FONT_SIZE));
+		//add to panel
+		l_tmp.add(l_label);
 		
-		//build the login button
-		c_chiefLoginButton = new JButton(); 
-		c_chiefLoginButton.setText("Login");
-		c_chiefLoginButton.setFocusable(false);
-		c_chiefLoginButton.addActionListener(this);
-		c_chiefLoginButton.setFont(new Font(c_fontStyle, Font.BOLD,  ScannerUIConstants.BIG_BUTTON_FONT_SIZE));
+		//set background and foreground colors
+		l_tmp.setBackground(Color.WHITE);
+		l_tmp.setForeground(Color.BLACK);
 		
-		//put components into layout 
-		l_passwordPanel.add(l_passwordLabel);
-		l_passwordPanel.add(c_chiefPasswordField);
-		l_passwordPanel.add(c_chiefLoginButton);
-		
-		c_chiefJudgeLoginPanel.add(l_passwordPanel);
+		c_scannerInfoPanel.add(l_tmp, p_cardName);
 	}
-	
 	
 	/**
 	 * Builds the Start Election button panel
@@ -750,69 +755,6 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		
 		//Add button to panel
 		c_startElectionPanel.add(c_startElectionButton);
-	}
-	
-	
-	/**
-	 * Builds the "Scanning Ballot" Panel
-	 */
-	private void buildScanningCardPanel()
-	{
-		//create panel
-		c_scanningBallotsPanel = new JPanel(); 
-		
-		//create label and set font
-		JLabel l_label = new JLabel("Scanning Ballot...");
-		l_label.setFont(new Font(c_fontStyle, Font.BOLD, ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
-		
-		//add to panel
-		c_scanningBallotsPanel.add(l_label);
-		
-		//set background and foreground colors
-		c_scanningBallotsPanel.setBackground(Color.WHITE);
-		c_scanningBallotsPanel.setForeground(Color.BLACK);
-	}
-	
-	
-	/**
-	 * Builds the "Waiting for Ballot" panel
-	 */
-	private void buildWaitingCardPanel()
-	{
-		//create panel
-		c_waitingForBallotsPanel = new JPanel(); 
-		
-		//create label and set font
-		JLabel l_label = new JLabel("Waiting for Ballot...");
-		l_label.setFont(new Font(c_fontStyle, Font.BOLD, ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
-		
-		//add to panel
-		c_waitingForBallotsPanel.add(l_label);
-		
-		//set background and foreground colors
-		c_waitingForBallotsPanel.setBackground(Color.WHITE);
-		c_waitingForBallotsPanel.setForeground(Color.BLACK);
-	}
-	
-	
-	/**
-	 * Builds the "Thank You For Voting" panel
-	 */
-	private void buildThankYouCardPanel()
-	{
-		//create panel
-		c_thankYouPanel = new JPanel(); 
-		
-		//create label and set font
-		JLabel l_label = new JLabel("Thank you for Voting.");
-		l_label.setFont(new Font(c_fontStyle, Font.BOLD, ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
-		
-		//add to panel
-		c_thankYouPanel.add(l_label);
-		
-		//set background and foreground colors
-		c_thankYouPanel.setBackground(Color.WHITE);
-		c_thankYouPanel.setForeground(Color.BLACK);
 	}
 	
 	
@@ -870,6 +812,37 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_ballotResultsPanel.add(l_tmpPanel, BorderLayout.PAGE_END);
 	}
 	
+	/**
+	 * Builds the Start and End Election Summary Screens
+	 */
+	private void buildSummaryScreens()
+	{
+		JScrollPane l_sp = new JScrollPane();
+		c_ballotSummaryTextPane = new JTextPane();
+		c_ballotSummaryTextPane.setEditable(false);
+		c_ballotSummaryTextPane.setFont(new Font(c_fontStyle, Font.PLAIN, ScannerUIConstants.MEDIUM_TEXT_FONT_SIZE));
+		c_ballotSummaryTextPane.setBackground(Color.WHITE);
+		c_ballotSummaryTextPane.setContentType("text/html; charset=EUC-JP"); //set to allow html
+		c_ballotSummaryTextPane.setText("");
+		l_sp.add(c_ballotSummaryTextPane);
+		
+		//create cast ballot button
+		c_closeButton = new JButton();
+		c_closeButton.setText("Exit");
+		c_closeButton.setFocusable(false);
+		c_closeButton.addActionListener(this);
+		c_closeButton.setFont(new Font(c_fontStyle, Font.BOLD,  ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
+		
+		//create reject ballot button
+		c_printButton = new JButton(); 
+		c_printButton.setText("Print Summary");
+		c_printButton.setFocusable(false);
+		c_printButton.addActionListener(this); 
+		c_printButton.setFont(new Font(c_fontStyle, Font.BOLD,  ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
+		
+		c_scannerInfoPanel.add(l_sp, ScannerUIConstants.ELECTION_SUMMARY_CARD);
+	}
+	
 	/* ***********************************************
 	 * Dialog Boxes
 	 * 
@@ -915,10 +888,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 * @return String the pin entered
 	 */
 	private String showJudgePasswordDialog()
-	{
-		//create the label 
-		JLabel l_label = new JLabel("Please enter Judge Pin");
-		
+	{		
 		//create the keypad
 		OnScreenKeypad pad = new OnScreenKeypad(c_frame, "Judge Authorization", 480, 480, '*');
 
@@ -934,16 +904,12 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 * @return String the chief judge password
 	 */
 	private String showChiefJudgePasswordDialog()
-	{
-		//create the label 
-		JLabel l_label = new JLabel("Please enter Chief Judge Password");
-		
-		//create the keypad
-		//TODO: make this the keyboard
-		OnScreenKeypad pad = new OnScreenKeypad(c_frame, "Chief Judge Authorization", 480, 480, '*');
+	{		
+		//create the keyboard
+		OnScreenKeyboard l_board = new OnScreenKeyboard(c_frame, "Chief Judge Authorization", true);
 
 		//get the pin from the keypad
-		String l_pass = pad.getBuffer();
+		String l_pass = l_board.getBuffer();
 		
 		return l_pass;
 	}
@@ -971,7 +937,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		else
 		{
 			Dialogs.displayWarningDialog("Incorrect Judge Pin", c_frame);
-			return getJudgeAuthorization();  
+			return false; 
 		}
 	}
 	
@@ -988,7 +954,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		
 		boolean l_validated = false; 
 		
-		if(l_pass.equals("1234"))
+		if(l_pass.equals("test"))
 				l_validated = true;
 		
 		if(l_validated)
@@ -1028,43 +994,44 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 * This will reset the frame to use the compact election info
 	 */
 	private void startElection()
-	{
-		c_frame.setVisible(false);
-		
-		c_frame.remove(c_electionInfoPanel);
-		c_frame.remove(c_scannerInfoPanel);
-		c_frame.add(c_compactElectionInfoPanel, BorderLayout.PAGE_START);
-		c_frame.add(c_scannerInfoPanel, BorderLayout.CENTER);
-		
-		c_frame.setVisible(true);
-
-		changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
+	{ 	
+		if(getChiefJudgeAuthorization())
+		{
+			c_frame.setVisible(false);
+			
+			c_frame.remove(c_electionInfoPanel);
+			c_frame.remove(c_scannerInfoPanel);
+			c_frame.add(c_compactElectionInfoPanel, BorderLayout.PAGE_START);
+			c_frame.add(c_scannerInfoPanel, BorderLayout.CENTER);
+			
+			c_frame.setVisible(true);
+	
+			changeCard(ScannerUIConstants.WAITING_FOR_BALLOT_CARD);
+			
+			//tell scanner to start all election threads
+			//and run all necessary election startup procedures
+			c_scannerRef.startElection(c_config);
+		}
 	}
 	
 	
 	/**
-	 * Validate the chief judge login and set correct 
-	 * GUI panels
+	 * Ends the election
 	 */
-	private void initialChiefJudgeLogin()
+	private void endElection()
 	{
-		//check for login based on boolean 
-		boolean l_validated = true; 
-		
-		if(l_validated)
+		try
 		{
-			//authorization successful
-			//allow the election to be started
-			changeCard(ScannerUIConstants.START_ELECTION_CARD);
+			c_bhRef.endElection();
 		}
-		else
+		catch (IOException e)
 		{
-			//authorization unsuccessful - reset to login card
-			changeCard(ScannerUIConstants.LOGIN_CARD);
-		
-			//display warning that password was incorrect
-			Dialogs.displayWarningDialog("Incorrect Password. Try again.");
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		c_frame.dispose();
+		System.exit(1);
 	}
 	
 	
@@ -1073,20 +1040,33 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 */
 	private void castBallot()
 	{
-		//cast the ballot
-		c_numCastBallots++;
-		c_castField.setText(c_numCastBallots.toString());
+		boolean l_isValidated = true;
 		
-		//display thank you 
-		changeCard(ScannerUIConstants.THANK_YOU_CARD);
+		if(c_reqPin.get(0))
+			l_isValidated = getJudgeAuthorization();
 		
-		//remove ballot results from queue
-		c_ballotQueue.remove(0);
-		
-		//create a thread to wait while thank you is displayed
-		Runnable l_guiThread = new GUIThread(this); 
-		c_thread = new Thread(l_guiThread);
-		c_thread.start();
+		if(l_isValidated)
+		{
+			//update cast count
+			c_numCastBallots++;
+			c_castField.setText(c_numCastBallots.toString());
+			
+			//display thank you 
+			changeCard(ScannerUIConstants.THANK_YOU_CARD);
+			
+			//cast the ballot
+			c_bhRef.castBallot(c_ballotQueue.remove(0));
+			
+			//remove ballot results from queue
+			c_ballotResultsQueue.remove(0);
+			c_reqPin.remove(0);
+			c_reqPinOnReject.remove(0);
+			
+			//create a thread to wait while thank you is displayed
+			Runnable l_guiThread = new GUIThread(this); 
+			c_thread = new Thread(l_guiThread);
+			c_thread.start();
+		}
 	}
 	
 	
@@ -1095,20 +1075,33 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 */
 	private void rejectBallot()
 	{
-		//bring up judge authorization dialog and validate
-		boolean l_isValidated = getJudgeAuthorization();
+		boolean l_isValidated = true;
+		
+		if(c_reqPinOnReject.get(0))
+			l_isValidated = getJudgeAuthorization();
 		
 		if(l_isValidated)
 		{
+			//update spoil count
 			c_numSpoiledBallots++;
 			c_spoiledField.setText(c_numSpoiledBallots.toString());
 		
-			//remove ballot results from queue
-			c_ballotQueue.remove(0);
+			changeCard(ScannerUIConstants.REJECT_CARD);
 			
-			setToWaiting();
+			//cast the ballot
+			c_bhRef.rejectBallot(c_ballotQueue.remove(0));
+			
+			//remove ballot results from queue
+			c_ballotResultsQueue.remove(0);
+			c_reqPin.remove(0);
+			c_reqPinOnReject.remove(0);
+			
+			//create a thread to wait while thank you is displayed
+			Runnable l_guiThread = new GUIThread(this); 
+			c_thread = new Thread(l_guiThread);
+			c_thread.start();
 		}
-		
+
 		//else do nothing, validation unsucessful
 	}
 	
@@ -1128,18 +1121,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		if(e.getActionCommand().equals(c_startElectionButton.getText()))
 		{
 			//Start Election Button Pressed
-			
-			//tell scanner to start all election threads
-			//and run all necessary election startup procedures
-			c_scannerRef.startElection(c_config);
-			
-			//reset the gui to show compact election info
 			startElection(); 
-		}
-		else if(e.getActionCommand().equals(c_chiefLoginButton.getText()))
-		{
-			//chief judge has tried to login
-			initialChiefJudgeLogin();
 		}
 		else if(e.getActionCommand().equals(c_castBallotButton.getText()))
 		{
@@ -1221,11 +1203,9 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 				
 				int l_choice = showAdminDialogBox();
 				
-				//TODO: this should actually call exit functions
 				if(l_choice == 1)
 				{
-					c_frame.dispose();
-					System.exit(1);
+					endElection();
 				}
 			}
 		}

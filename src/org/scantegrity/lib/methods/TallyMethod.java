@@ -80,5 +80,9 @@ public interface TallyMethod {
 	 */
 	ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots);	
 	
+	String getHtmlResults();
+	
+	String toString();
+	
 	
 }

@@ -245,6 +245,11 @@
   <void property="name"> 
    <string>Arbor Day Mock Election at Takoma Park</string> 
   </void> 
+  <void property="outputFileNames"> 
+   <void method="add"> 
+    <string>ballots.jar</string> 
+   </void> 
+  </void> 
   <void property="outputLocs"> 
    <void method="add"> 
     <string>/home/</string> 

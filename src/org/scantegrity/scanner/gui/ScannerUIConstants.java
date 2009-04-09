@@ -33,11 +33,13 @@ public final class ScannerUIConstants extends Constants
 	public static final String LOGIN_CARD = "Chief Judge Login";
 	public static final String START_ELECTION_CARD = "Start Election";
 	public static final String SCANNING_BALLOT_CARD = "Scanning Ballot";
-	public static final String WAITING_FOR_BALLOT_CARD = "Waiting for Ballots";
-	public static final String THANK_YOU_CARD = "Thank You";
+	public static final String WAITING_FOR_BALLOT_CARD = "Waiting for Ballots...";
+	public static final String THANK_YOU_CARD = "Thank You For Voting";
+	public static final String REJECT_CARD = "Ballot Rejected";
 	public static final String BALLOT_INFO_CARD = "Ballot Information";
 	public static final String EXTENDED_ELECTION_INFO_CARD = "Extended Elec Info";
 	public static final String COMPACT_ELECTION_INFO_CARD = "Compact Elec. Info";
+	public static final String ELECTION_SUMMARY_CARD = "Elec. Summary Card";
 	
 	/* ****************************
 	 * Field Constants

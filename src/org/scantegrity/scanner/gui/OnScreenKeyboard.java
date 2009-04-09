@@ -84,7 +84,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 	    if (p_parent != null) {
 	        Dimension parentSize = p_parent.getSize(); 
 	        Point p = p_parent.getLocation(); 
-	        setLocation(p.x + 2*parentSize.width / 10, p.y + 3*parentSize.height / 10);
+	        setLocation(p.x + parentSize.width / 20, p.y + parentSize.height / 10);
 	    }			
 	    
 	    c_secure = p_secure;
@@ -108,7 +108,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		for (int l_i = 0; l_i < c_rows.length; l_i++)
 		{
 			c_buttons[l_i] = new JButton[c_rows[l_i].length];
-			JPanel l_panel = new JPanel(new FlowLayout());
+			JPanel l_panel = new JPanel();
 			l_x = 0;
 			for (int l_j = 0; l_j < c_rows[l_i].length; l_j++)
 			{
@@ -139,6 +139,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		//Is this a special button?
 		if (p_msg.equals("Shift"))
 		{
+			l_button.setPreferredSize(new Dimension(200,75));
 			l_button.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					Shift();
@@ -149,6 +150,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		}
 		else if (p_msg.equals("Backspace"))
 		{
+			l_button.setPreferredSize(new Dimension(200,75));
 			p_msg = "Back";
 			l_button.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -158,6 +160,7 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		}
 		else if (p_msg.equals("Space"))
 		{
+			l_button.setPreferredSize(new Dimension(400,75));
 			p_msg = "    " + p_msg + "    ";
 			l_button.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -167,10 +170,12 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 		}
 		else if (p_msg.equals("Enter"))
 		{
+			l_button.setPreferredSize(new Dimension(200,75));
 			c_enter = l_button;
 		}
 		else
 		{
+			l_button.setPreferredSize(new Dimension(75,75));
 			p_msg = p_msg.toLowerCase();
 			final String l_msg = new String(p_msg.toLowerCase());
 			l_button.addActionListener(new java.awt.event.ActionListener() {
@@ -180,7 +185,9 @@ public class OnScreenKeyboard extends JDialog implements ActionListener
 			});			
 		}
 		
-		l_button.setText(p_msg);		
+		l_button.setText(p_msg);
+		//l_button.setMinimumSize(new Dimension(36,50));
+		//l_button.setSize(new Dimension(36,50));
 		l_button.setEnabled(true);
 		l_button.setFocusable(false);
 		return l_button;

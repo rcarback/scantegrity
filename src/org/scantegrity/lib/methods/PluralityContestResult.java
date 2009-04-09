@@ -55,6 +55,11 @@ public class PluralityContestResult extends ContestResult
 	{
 		c_totals = p_totals;
 	}
+	
+	public String getHtmlResults()
+	{
+		return toString();
+	}
 
 	public String toString()
 	{

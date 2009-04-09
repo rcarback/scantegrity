@@ -23,9 +23,11 @@ import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Enumeration;
@@ -33,6 +35,7 @@ import java.util.Vector;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 import org.scantegrity.lib.Ballot;
 
@@ -90,7 +93,17 @@ public class BallotStore
 		c_store = new Vector<JarFile>();
 		for (String l_s : p_names)
 		{
-			c_store.add(new JarFile(l_s));			
+			File l_f = new File(l_s);
+			
+			if(!l_f.exists())
+			{
+				System.out.println("HERE");
+				l_f.createNewFile();
+				JarOutputStream l_j = new JarOutputStream(new FileOutputStream(l_f), new Manifest());
+				l_j.close(); 
+			}
+			
+			c_store.add(new JarFile(l_f));			
 		}			
 		if (p_csprng == null)
 		{
@@ -115,18 +128,20 @@ public class BallotStore
 		} while (c_store.get(0).getEntry(l_eName) != null); 
 		
 		JarEntry l_e = new JarEntry(l_eName);
+		l_e.setTime(0);
 		Enumeration<JarEntry> l_entries = c_store.get(0).entries();
 		Vector<JarEntry> l_newEntries = new Vector<JarEntry>();
 		Vector<ByteArrayOutputStream> l_out = new Vector<ByteArrayOutputStream>();
 		while (l_entries.hasMoreElements())
 		{
 			JarEntry l_tmp = l_entries.nextElement();
+			l_tmp.setTime(0);
 			ByteArrayOutputStream l_s = new ByteArrayOutputStream();
 			if (l_e != null && l_e.getName().compareTo(l_tmp.getName()) < 0)
 			{
-				
 				XMLEncoder l_enc = new XMLEncoder(l_s);
 				l_enc.writeObject(p_ballot);
+				l_enc.close();
 				l_newEntries.add(l_e);
 				l_out.add(l_s);
 				l_e = null;
@@ -134,8 +149,11 @@ public class BallotStore
 			}
 			int l_bread;
 			byte l_buf[] = new byte[1024];
-	        while ((l_bread = c_store.get(0).getInputStream(l_tmp).read(l_buf)) != -1) {
+			InputStream l_stream = c_store.get(0).getInputStream(l_tmp);
+	        while ((l_bread = l_stream.read(l_buf)) != -1) {
                 l_s.write(l_buf, 0, l_bread);
+                if(l_bread == 0)
+                	break;
            }
 	       l_newEntries.add(l_tmp);
 	       l_out.add(l_s);
@@ -184,7 +202,7 @@ public class BallotStore
 		File l_new =  new File(l_name + ".tmp");
 		l_new.renameTo(l_f);
 		
-		c_store.set(p_id, new JarFile(l_new));
+		c_store.set(p_id, new JarFile(l_name));
 	}
 
 	/**

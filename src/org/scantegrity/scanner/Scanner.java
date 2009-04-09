@@ -53,12 +53,13 @@ public class Scanner
 	
 	public void startElection(ScannerConfig p_config)
 	{
+		//current directories for scanning images, error folder, and backup
 		String c_srcDir = "/mnt/scantegritytmpfs/images";
 		String c_destDir = "/mnt/scantegritytmpfs/backup";
 		String c_errDir = "/mnt/scantegritytmpfs/error";
 		
 		//Create Ballot Handler
-		BallotImageHandler l_bih = new BallotImageHandler(c_guiRef, c_errDir, p_config);
+		BallotHandler l_bih = new BallotHandler(c_guiRef, c_errDir, p_config);
 		
 		//initialize the ImageLoader
 		ImageLoader l_il = new ImageLoader(l_bih);
@@ -91,7 +92,14 @@ public class Scanner
 	}
 	
 	/**
-	 * @param args
+	 * This is the main to start the entire Scanner. Main sets up the GUI, grabs the config
+	 * and runs the GUI. 
+	 * 
+	 * Flags: 
+	 * 	1. -f --fullscreen
+	 * 		sets the gui to fullscreen mode
+	 * 
+	 * @param args CLI flags
 	 */
 	public static void main(String[] args)
 	{
@@ -99,19 +107,20 @@ public class Scanner
 		
 		for(int i = 0; i < args.length; i++)
 		{
-			String temp = args[i]; 
-			if(temp.equals("-f"))
+			String l_temp = args[i]; 
+			if(l_temp.equals("-f") || l_temp.equals("--fullscreen"))
 				l_fullscreen = true;
 		}
  
 		//Get the config file
 		ScannerConfig l_config = getConfigurationFile();
 		
+		//no configuration, quit
+		//TODO: if the filefinder doesnt work, ask for it before quitting
 		if(l_config == null)
 			return;
 		
-		//Things here will come from config
-		
+		//set up the gui
 		Runnable l_gui = null;
 		
 		try
@@ -120,8 +129,7 @@ public class Scanner
 		}
 		catch(HeadlessException headEx)
 		{
-			//eventually send this to dialogs?
-			Dialogs.displayErrorDialog("Headless Exception in Scanneer when creating PollingPlaceGUI.");
+			Dialogs.displayErrorDialog("Sorry! Problem with starting the Scanner.");
 		}
 		
 		

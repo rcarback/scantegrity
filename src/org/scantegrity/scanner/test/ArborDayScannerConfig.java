@@ -228,6 +228,9 @@ public class ArborDayScannerConfig
 		l_locs.add("/home/");
 		l_locs.add("/media/*/");
 		
+		Vector<String> l_outFileName = new Vector<String>();
+		l_outFileName.add("ballots.jar");
+		
 		Vector<BallotStyle> l_s = new Vector<BallotStyle>();
 		l_s.add(l_style);
 		
@@ -237,6 +240,7 @@ public class ArborDayScannerConfig
 		l_config.setLocation("Takoma Park Community Center Azalea Room");
 		l_config.setName("Arbor Day Mock Election at Takoma Park");
 		l_config.setOutputLocs(l_locs);
+		l_config.setOutputFileNames(l_outFileName);
 		l_config.setPollID(10);
 		l_config.setReader(l_reader);
 		l_config.setContests(l_c);

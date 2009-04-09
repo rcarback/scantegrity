@@ -61,6 +61,7 @@ public class ScannerConfig {
 	private BallotReader c_reader = null;
 	private Vector<Contest> c_contests = null;
 	protected Vector<BallotStyle> c_styles = null;
+	private Vector<String> c_outputFileNames = null;
 	/**
 	 * @return the styles
 	 */
@@ -89,6 +90,7 @@ public class ScannerConfig {
 		c_contests = new Vector<Contest>();
 		c_styles = new Vector<BallotStyle>();	
 		c_outputLocs = new Vector<String>();
+		c_outputFileNames = new Vector<String>();
 	}
 
 
@@ -265,6 +267,23 @@ public class ScannerConfig {
 	public void setOutputLocs(Vector<String> p_outputLocs)
 	{
 		c_outputLocs = p_outputLocs;
+	}
+	
+	/**
+	 * @return the output Jar File 
+	 */
+	public Vector<String> getOutputFileNames()
+	{
+		return c_outputFileNames;
+	}
+
+
+	/**
+	 * @param p_outputLocs the outputLocs to set
+	 */
+	public void setOutputFileNames(Vector<String> p_outputFileNames)
+	{
+		c_outputFileNames = p_outputFileNames;
 	}
 
 

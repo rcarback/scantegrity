@@ -82,7 +82,7 @@ public class ImageLoader {
 		{
 			try
 			{
-				Thread.sleep(150);
+				Thread.sleep(200);
 			}
 			catch (InterruptedException e)
 			{
