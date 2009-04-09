@@ -90,8 +90,8 @@ public class FileuploadActionBean extends RestrictedActionBean {
 	{
 		if(! super.checkUser() )
 		{
-			c_ctx.getRequest().getSession(true).setAttribute("redir", c_ctx.getRequest().getRequestURL().toString());
-			String l_url = "https://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
+			c_ctx.getRequest().getSession(true).setAttribute("redir", c_ctx.getRequest().getRequestURL().toString().replace("http://", "http://"));
+			String l_url = "http://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
 			return new RedirectResolution(l_url,false);
 		}
 		
@@ -337,6 +337,9 @@ public class FileuploadActionBean extends RestrictedActionBean {
 			
 			if( l_decodedObject instanceof Vector )
 				l_contests = (Vector<Contest>)l_decodedObject;
+			
+			if( l_contests == null )
+				throw new IOException();
 		}
 		catch(IOException e)
 		{
@@ -417,6 +420,7 @@ public class FileuploadActionBean extends RestrictedActionBean {
 
 		for( int x = 0; x < p_partitions.getLength(); x++ )
 		{	
+			
 			Node l_contest = p_partitions.item(x);
 			int l_contestId = Integer.parseInt(l_contest.getAttributes().getNamedItem("id").getNodeValue());
 			
@@ -448,6 +452,8 @@ public class FileuploadActionBean extends RestrictedActionBean {
 					}
 				
 					Map<Integer, Integer[][]> l_ballotData = new TreeMap<Integer, Integer[][]>();
+					if(l_contests == null || l_contests.get(x) == null)
+						continue;
 					Integer[][] l_values = new Integer[l_contests.get(x).getContestants().size()][l_length];
 					
 					String[] l_splits = l_rows.item(y).getAttributes().getNamedItem("r").getNodeValue().split(" ");
@@ -464,7 +470,9 @@ public class FileuploadActionBean extends RestrictedActionBean {
 					
 					for( int z = 0; z < l_splits.length; z++ )
 					{
-						l_values[Integer.parseInt(l_splits[z])][z] = 1;
+						int l_index = Integer.parseInt(l_splits[z]);
+						if( l_index >= 0)
+							l_values[Integer.parseInt(l_splits[z])][z] = 1;
 					}
 					
 					l_ballotData.put(l_contestId, l_values);

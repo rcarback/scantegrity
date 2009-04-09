@@ -123,7 +123,11 @@ public class CheckCodesActionBean implements ActionBean {
 			l_results.close();
 			
 			if( c_codes.size() == 0 )
+			{
+				l_conn.close();
 				throw new NoSuchElementException();
+			}
+
 			
 			//Create SQL statement object
 			Statement l_existQuery = l_conn.createStatement();
@@ -154,6 +158,7 @@ public class CheckCodesActionBean implements ActionBean {
 			l_trackingQuery.setInt(2, c_serial);
 			
 			l_trackingQuery.executeUpdate();
+			l_conn.close();
 			
 		} catch (SQLException e) {
 			c_error = "Could not execute SQL: " + e.getMessage();

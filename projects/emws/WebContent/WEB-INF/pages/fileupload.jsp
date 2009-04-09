@@ -5,18 +5,8 @@
 
 <h1>File Upload</h1>
 
-<<<<<<< .mine
 <stripes:form beanclass="org.scantegrity.emws.action.FileuploadActionBean">
 <div>
-=======
-<<<<<<< .mine
-<stripes:form beanclass="org.scantegrity.emws.action.FileuploadActionBean">
-<div>
-=======
-<stripes:form beanclass="org.scantegrity.emws.action.FileuploadActionBean">
-
->>>>>>> .r351
->>>>>>> .r319
 	<stripes:file name="file" />
 	<stripes:submit name="submit" value="Upload" />
 	<br /><br />

@@ -29,7 +29,7 @@ public class UserAddActionBean extends RestrictedActionBean {
 	private static final String c_dbPass = "";
 	
 	private List<String> c_allUsers;
-	private String c_error = null;
+	private String c_error = "";
 	private String c_target;
 	private String c_newUser;
 	private String c_pass;
@@ -125,7 +125,7 @@ public class UserAddActionBean extends RestrictedActionBean {
 	{
 		if( !super.checkUser() )
 		{
-			c_ctx.getRequest().getSession(true).setAttribute("redir", c_ctx.getRequest().getRequestURL().toString());
+			c_ctx.getRequest().getSession(true).setAttribute("redir", c_ctx.getRequest().getRequestURL().toString().replace("http://","http://"));
 			
 			String l_url = "https://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
 			return new RedirectResolution(l_url,false);

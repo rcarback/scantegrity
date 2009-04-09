@@ -114,6 +114,8 @@ public class UserManage {
 			l_users.add(l_results.getString("username"));
 		}
 		
+		l_conn.close();
+		
 		return l_users;
 	}
 	
@@ -127,7 +129,10 @@ public class UserManage {
 		PreparedStatement l_query = l_conn.prepareStatement("DELETE FROM Users WHERE username=?");
 		l_query.setString(1, p_user);
 		
-		return l_query.executeUpdate() > 0;
+		boolean l_ret =  l_query.executeUpdate() > 0;
+		
+		l_conn.close();
+		return l_ret;
 	}
 	
 	static boolean queryUser(String p_userName, String p_pass) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException
@@ -196,6 +201,8 @@ public class UserManage {
 			if( l_testDigest[x] != l_digest[x] )
 				l_match = false;
 		}
+		
+		l_conn.close();
 		
 		return l_match;
 	}
