@@ -218,7 +218,6 @@ public class BallotStore
 		while (l_entries.hasMoreElements())
 		{
 			l_e = l_entries.nextElement();
-			System.out.println(l_e.toString());
 			if(l_e.isDirectory() || l_e.getName().equals("META-INF/MANIFEST.MF"))
 				continue;
 			l_dec = new XMLDecoder(c_store.get(0).getInputStream(l_e));

@@ -171,7 +171,7 @@ public class BallotHandler implements ImageHandler
 	{
 		Vector<Ballot> l_ballots = c_ballotStore.getBallots();
 		Vector<String> l_outLoc = c_config.getOutputLocs();
-		String l_results = "<html><p align=\"center\"><b>Election Results Summary</b></p>";
+		String l_results = "<html><p align=\"center\"><b>Election Results Summary</b></p><p>";
 		
 		//calculate the results
 		Vector<ContestResult> l_res = calculateResults(l_ballots);
@@ -185,7 +185,7 @@ public class BallotHandler implements ImageHandler
 			FileWriter l_fw = new FileWriter(new File(l_s + "Results.txt"));
 			for(ContestResult l_cr: l_res)
 			{
-				l_results += l_cr.toString();
+				l_results += l_cr.getHtmlResults(false);
 				l_fw.write(l_cr.toString());
 			}
 			l_fw.close();
@@ -194,6 +194,8 @@ public class BallotHandler implements ImageHandler
 			l_m3w.write(l_m3in);
 			l_m3w.close();
 		} 
+		
+		l_results += "</p></html>";
 		
 		c_guiRef.displaySummaryInfo(l_results);
 	}
@@ -242,7 +244,8 @@ public class BallotHandler implements ImageHandler
 		}
 		
 		l_m3 += "\t</print>\n</xml>";
-		return null;
+		
+		return l_m3;
 	}
 
 

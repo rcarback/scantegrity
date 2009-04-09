@@ -34,7 +34,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -140,6 +142,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	
 	//JScrollPanes 
 	private JScrollPane c_ballotResultsScrollPanel;
+	private JScrollPane c_electionSummaryScrollPane;
 	
 	//Fields
 	private JTextField c_castField; 
@@ -781,7 +784,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_ballotResultsTextPane.setFont(new Font(c_fontStyle, Font.PLAIN, ScannerUIConstants.MEDIUM_TEXT_FONT_SIZE));
 		c_ballotResultsTextPane.setText(p_htmlBallotInfo);
 		c_ballotResultsTextPane.setBackground(Color.WHITE);
-		c_ballotResultsTextPane.setContentType("text/html; charset=EUC-JP"); //set to allow html
+		c_ballotResultsTextPane.setContentType("text/html; charset=UTF-8"); //set to allow html
 		
 		//puts the results into a scrollpane 
 		//only shows scrollbars if results are larger than panel size
@@ -824,12 +827,12 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_ballotSummaryTextPane = new JTextPane();
 		c_ballotSummaryTextPane.setEditable(false);
 		c_ballotSummaryTextPane.setFont(new Font(c_fontStyle, Font.PLAIN, ScannerUIConstants.SMALL_TEXT_FONT_SIZE));
+		c_ballotSummaryTextPane.setText("Election Results Summary");
 		c_ballotSummaryTextPane.setBackground(Color.WHITE);
-		c_ballotSummaryTextPane.setContentType("text/html; charset=EUC-JP"); //set to allow html
-		c_ballotSummaryTextPane.setText("");
+		c_ballotSummaryTextPane.setContentType("text/html; charset=UTF-8"); //set to allow html
 		
-		JScrollPane l_sp = new JScrollPane();
-		l_sp.add(c_ballotSummaryTextPane);
+		c_electionSummaryScrollPane = new JScrollPane(c_ballotSummaryTextPane);
+		c_electionSummaryScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(30, 100));
 		
 		//create cast ballot button
 		c_closeButton = new JButton();
@@ -850,7 +853,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		l_tmp.add(c_closeButton, BorderLayout.LINE_END);
 	
 		JPanel l_mainPanel = new JPanel(new BorderLayout());
-		l_mainPanel.add(l_sp, BorderLayout.CENTER);
+		l_mainPanel.add(c_electionSummaryScrollPane, BorderLayout.CENTER);
 		l_mainPanel.add(l_tmp, BorderLayout.PAGE_END);
 		
 		c_scannerInfoPanel.add(l_mainPanel, ScannerUIConstants.ELECTION_SUMMARY_CARD);
@@ -1035,7 +1038,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 */
 	private void endElection()
 	{
-		if(c_isElectionStarted)
+		if(c_isElectionStarted && c_ballotQueue.size() == 0)
 		{
 			try
 			{
@@ -1046,6 +1049,13 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		else
+		{
+			if(!c_isElectionStarted)
+				Dialogs.displayDialogBox("Cannot End Election. Election has not been started.");
+			else
+				Dialogs.displayDialogBox("Cannot end election with Ballots waiting to be cast.");
 		}
 	}
 	
@@ -1117,7 +1127,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			c_thread.start();
 		}
 
-		//else do nothing, validation unsucessful
+		//else do nothing, validation unsuccessful
 	}
 	
 	
@@ -1128,6 +1138,15 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	{
 		try
 		{
+			/*PrinterJob l_job = PrinterJob.getPrinterJob();
+			PageFormat lfmt = l_job.pageDialog(l_job.defaultPage());
+			l_job.setPrintable(, l_fmt);
+ 
+			if (l_job.printDialog() == false)
+			{
+				return;
+			}*/
+			
 			c_ballotSummaryTextPane.print();
 		}
 		catch (PrinterException e)

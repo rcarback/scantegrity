@@ -153,11 +153,11 @@ public class InstantRunoffTally implements TallyMethod {
 		l_stacks = new TreeMap<Contestant, Vector<BallotIterator>>();
 		for (Contestant l_c: l_contestants)
 		{
-			System.err.println(l_c);
+			//System.err.println(l_c);
 			l_stacks.put(l_c, new Vector<BallotIterator>());	
 		}
 		
-		System.out.println("Started with: " + p_ballots.size());
+		//System.out.println("Started with: " + p_ballots.size());
 		Vector<BallotIterator> l_countMe;
 		l_countMe = getBallotsWithContest(l_id, p_ballots);
 
@@ -314,7 +314,7 @@ public class InstantRunoffTally implements TallyMethod {
 			
 			//Save round and report results
 			l_res.addRound(l_curRound);
-			System.out.println(l_curRound.toString());						
+			//System.out.println(l_curRound.toString());						
 			
 			//Continue execution if there are remaining ties that need to 
 			//be computed.
@@ -372,8 +372,8 @@ public class InstantRunoffTally implements TallyMethod {
 					l_nextIDs.add(-2);
 				}
 				
-				System.err.println("L_nextIDs: " + l_nextIDs.toString());
-				System.err.println("Ballot: " + l_ballot.c_ballot.toString()); 
+				//System.err.println("L_nextIDs: " + l_nextIDs.toString());
+				//System.err.println("Ballot: " + l_ballot.c_ballot.toString()); 
 				
 				//Find the Contestant in the stack, if we find more than 2, abort.
 				for (int l_i = 0; l_i < l_nextIDs.size(); l_i++)
@@ -381,17 +381,17 @@ public class InstantRunoffTally implements TallyMethod {
 					for (Object l_key: l_stacks.keySet())
 					{
 						Contestant l_c = (Contestant)l_key;
-						System.err.println("Candidate ID: " + l_c);
+						//System.err.println("Candidate ID: " + l_c);
 						if (l_c.getId().equals(l_nextIDs.elementAt(l_i)))
 						{
 							if (l_contestant != null)
 							{
 								//Put in "bad" stack, report problem
 								l_contestant = l_stacks.firstKey();
-								System.out.println("Ballot " + 
+								/*System.out.println("Ballot " + 
 										l_ballot.c_ballot.getId()
 										+ " has multiple Choices for Rank " 
-										+ l_ballot.c_curPos);
+										+ l_ballot.c_curPos);*/
 								l_ballot.c_ballot.addNote("Ballot " + 
 										l_ballot.c_ballot.getId()
 										+ " has multiple Choices for Rank " 
@@ -430,8 +430,8 @@ public class InstantRunoffTally implements TallyMethod {
 	private Vector<BallotIterator> getBallotsWithContest(int p_contestId, 
 													Vector<Ballot> p_ballots)
 	{
-		System.err.println("Contest ID in getBallotsWithContest " + p_contestId);
-		System.err.println("Size of p_ballots: " + p_ballots.size());
+		//System.err.println("Contest ID in getBallotsWithContest " + p_contestId);
+		//System.err.println("Size of p_ballots: " + p_ballots.size());
 		//First pass, find ballots that have this contest, and then 
 		//sum up the stacks for round 1.
 		BallotIterator l_curIter;
@@ -666,7 +666,7 @@ public class InstantRunoffTally implements TallyMethod {
 			Integer l_bdata[][] = c_ballot.getContestData(c_contestId);
 			
 			
-			if( l_bdata == null ) System.err.println("Uh oh, it really did happen!");
+			//if( l_bdata == null ) System.err.println("Uh oh, it really did happen!");
 			//This should never happen, something really bad happened!
 			if (l_bdata == null) return false;
 			//Already checked before
