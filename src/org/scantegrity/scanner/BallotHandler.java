@@ -175,7 +175,7 @@ public class BallotHandler implements ImageHandler
 		
 		//calculate the results
 		Vector<ContestResult> l_res = calculateResults(l_ballots);
-		
+		String l_m3in = generateMeetingThree(l_ballots);
 		for(String l_s: l_outLoc)
 		{
 			XMLEncoder l_xml = new XMLEncoder(new FileOutputStream(l_s + "Ballots.xml"));
@@ -183,20 +183,69 @@ public class BallotHandler implements ImageHandler
 			l_xml.close();
 			
 			FileWriter l_fw = new FileWriter(new File(l_s + "Results.txt"));
-			
 			for(ContestResult l_cr: l_res)
 			{
 				l_results += l_cr.toString();
 				l_fw.write(l_cr.toString());
 			}
-			
 			l_fw.close();
-			//M3In Goes Here
+			
+			FileWriter l_m3w = new FileWriter(new File(l_s + "MeetingThreeIn.xml"));
+			l_m3w.write(l_m3in);
+			l_m3w.close();
 		} 
 		
 		c_guiRef.displaySummaryInfo(l_results);
 	}
 	
+	/**
+	 * @param p_ballots
+	 * @return
+	 */
+	private String generateMeetingThree(Vector<Ballot> p_ballots)
+	{
+		String l_m3 = "<xml>\n\t<print>";
+		Vector<Contest> l_contests = c_config.getContests();
+		
+		for (Ballot l_b : p_ballots)
+		{
+			if (l_b.isCounted())
+			{
+				l_m3 += "\t\t<row id=\"" + l_b.getId() + "\" p3=\"";
+				String l_tmp = "";
+				for (Contest l_c : l_contests)
+				{
+					if (l_b.hasContest(l_c.getId()))
+					{
+						Integer l_data[][] = l_b.getContestData(l_c.getId());
+						//For each column
+						for (int l_i = 0; l_i < l_data[0].length; l_i++)
+						{
+							Vector<Integer> l_cans = new Vector<Integer>();
+							//Each contestant
+							for (int l_j = 0; l_j < l_data.length; l_j++)
+							{
+								if (l_data[l_j][l_i] == 1)
+								{
+									l_cans.add(l_j);
+								}
+							}
+							if (l_cans.size() != 1) l_tmp += -1;
+							else l_tmp += l_cans.get(0);
+							l_tmp += " ";
+						}
+					}
+				}
+				l_m3 += l_tmp.substring(0, l_tmp.length()-1);
+				l_m3 += "\" page=\"NONE\"/>\n";
+			}
+		}
+		
+		l_m3 += "\t</print>\n</xml>";
+		return null;
+	}
+
+
 	public Vector<ContestResult> calculateResults(Vector<Ballot> p_ballots)
 	{
 		Vector<ContestResult> l_res = new Vector<ContestResult>(); 
