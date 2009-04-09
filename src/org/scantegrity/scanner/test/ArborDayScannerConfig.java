@@ -175,7 +175,7 @@ public class ArborDayScannerConfig
 		Vector<Contest> l_c = new Vector<Contest>();
 		Contest l_x = new Contest();
 		l_x.setId(0);
-		l_x.setContestName("Favorite Tree / çrbol Favorito");
+		l_x.setContestName("<b>Favorite Tree </b><br/><i> ï¿½rbol Favorito</i>");
 		Vector<Contestant> l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Cherry / el cerezo"));
 		l_can.add(new Contestant(1, "Elm / el olmo"));
@@ -188,9 +188,9 @@ public class ArborDayScannerConfig
 
 		l_x = new Contest();
 		l_x.setId(1);
-		l_x.setContestName("Favorite Forest Animal / Animal Arbolado Favorito");
+		l_x.setContestName("<b>Favorite Forest Animal</b><br/><i>Animal Arbolado Favorito</i>");
 		l_can = new Vector<Contestant>();
-		l_can.add(new Contestant(0, "Owl / Bœho"));
+		l_can.add(new Contestant(0, "Owl / Bï¿½ho"));
 		l_can.add(new Contestant(1, "Rabbit / Conejo"));
 		l_can.add(new Contestant(2, "Squirrel / Ardilla"));
 		l_can.add(new Contestant(3, "Write-In / o por escrito"));
@@ -200,23 +200,23 @@ public class ArborDayScannerConfig
 
 		l_x = new Contest();
 		l_x.setId(2);
-		l_x.setContestName("How many trees are on your property?" 
-				+ " / ÀCuanto ‡rboles estan en su propiedad?");
+		l_x.setContestName("<b>How many trees are on your property?" 
+				+ " </b><br/><i> ï¿½Cuanto ï¿½rboles estan en su propiedad?</i>");
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "0"));
 		l_can.add(new Contestant(1, "1-2"));
 		l_can.add(new Contestant(2, "3-5"));
 		l_can.add(new Contestant(3, "6-10"));
-		l_can.add(new Contestant(4, "More than 10 / M‡s de 10"));
+		l_can.add(new Contestant(4, "More than 10 / Mï¿½s de 10"));
 		l_x.setContestants(l_can);
 		l_x.setMethod(new PluralityTally());
 		l_c.add(l_x);		
 		
 		l_x = new Contest();
 		l_x.setId(3);
-		l_x.setContestName("Do you use less paper products than you did ten "
-						+ "years ago? / ÀUtiliza menos producto de papel que" +
-						" hace 10 a–os?");
+		l_x.setContestName("<b>Do you use less paper products than you did ten "
+						+ "years ago? </b><br/><i> ï¿½Utiliza menos producto de papel que" +
+						" hace 10 aï¿½os?</i>");
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Yes / Si"));
 		l_can.add(new Contestant(1, "No / No"));

@@ -60,5 +60,7 @@ public final class ScannerUIConstants extends Constants
 	 * Font Constants
 	 ****************************/
 	public static final String FONT_STYLE_SERIF = "Serif";
+	public static final String FONT_STYLE_TIMES = "Times New Roman";
+	
 	public static final String FONT_STYLE_ = "";
 }

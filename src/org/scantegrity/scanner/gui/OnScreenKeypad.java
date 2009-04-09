@@ -91,11 +91,44 @@ public class OnScreenKeypad extends JDialog implements ActionListener {
 	}*/
 	
 	public OnScreenKeypad(JFrame parent, String title, int height, int width, char blankChar) {
-		this(parent, title, height, width);
+		super(parent, title, true);
 		
 		this.blankChar = blankChar;
 		this.secure = true;
-		//this.sync = new Object() ;		
+		
+	    if (parent != null) {
+	        Dimension parentSize = parent.getSize(); 
+	        Point p = parent.getLocation(); 
+	        setLocation(p.x + parentSize.width / 4, p.y + parentSize.height / 4);
+	    }		
+				
+		this.defaultFont = new Font("Dialog", 1, 32) ;
+		
+		this.numRows = 6 ;
+		this.numCols = 3 ;
+		this.buttonHeight = height / numRows ;
+		this.buttonWidth = width / numCols ;
+
+		//getContentPane().add(getJContentPane());
+		getContentPane().setLayout(null);
+		getContentPane().add(getButton7(), null);
+		getContentPane().add(getButton8(), null);
+		getContentPane().add(getButton9(), null);
+		getContentPane().add(getButton4(), null);
+		getContentPane().add(getButton5(), null);
+		getContentPane().add(getButton6(), null);
+		getContentPane().add(getButton1(), null);
+		getContentPane().add(getButton2(), null);
+		getContentPane().add(getButton3(), null);
+		getContentPane().add(getButton0(), null);
+		getContentPane().add(getButtonDel(), null);
+		getContentPane().add(getButtonEnter(), null);
+		getContentPane().add(getJTextField(), null);
+		this.setMaximumSize(new Dimension(width, height+36));
+		this.setSize(width, height+36);		
+	    setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
+		ButtonEnter.addActionListener(this);
+		setVisible(true);		
 	}
 	
 	public OnScreenKeypad(JFrame parent, String title, int height, int width) {

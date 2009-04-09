@@ -57,5 +57,32 @@ public class Dialogs
 		ScantegrityJFrame dialog = new ScantegrityJFrame(); 
 		JOptionPane.showMessageDialog(dialog, message);
 	}
+	
+	//Dialogs with JFrame as parameter
+	
+	public static void displayDialogBox(String message, ScantegrityJFrame p_frame)
+	{ 
+		JOptionPane.showMessageDialog(p_frame, message, "Message", JOptionPane.PLAIN_MESSAGE);
+	}
+	
+	public static void displayErrorDialog(String message, ScantegrityJFrame p_frame)
+	{ 
+		JOptionPane.showMessageDialog(p_frame, message, "Error!", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	public static void displayInfoDialog(String message, String title, ScantegrityJFrame p_frame)
+	{ 
+		JOptionPane.showMessageDialog(p_frame, message, title, JOptionPane.INFORMATION_MESSAGE);
+	}
+	
+	public static void displayWarningDialog(String message, ScantegrityJFrame p_frame)
+	{ 
+		JOptionPane.showMessageDialog(p_frame, message, "Warning", JOptionPane.WARNING_MESSAGE);
+	}
+	
+	public static void displayMessageDialog(String message, ScantegrityJFrame p_frame)
+	{
+		JOptionPane.showMessageDialog(p_frame, message);
+	}
 
 }

@@ -41,8 +41,6 @@ import org.scantegrity.lib.methods.TallyMethod;
 import org.scantegrity.scanner.gui.PollingPlaceGUI;
 import org.scantegrity.util.DrunkDriver;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.ListIterator;
-
 /**
  * @author John Conway
  *
@@ -107,14 +105,14 @@ public class BallotImageHandler implements ImageHandler
 			
 			Vector<Contest> l_cv = c_config.getContests();
 			
-			c_results = "";
+			c_results = "<html><table align=\"center\" width=\"80%\">";
 			
 			for (Contest l_c: l_cv)
 			{ 				
 				c_tm = l_c.getMethod();
 				int l_id = l_c.getId();  
 				
-				c_results += "Contest: " + (l_id + 1) + "\n";
+				c_results += "<tr bgcolor=\"DDDDDD\"><td colspan=\"2\" align=\"center\">" + l_c.getContestName() + "</td></tr>";
 				
 				TreeMap<String, String> l_tm = c_tm.validateContest(l_id, l_b);
 				
@@ -122,11 +120,27 @@ public class BallotImageHandler implements ImageHandler
 				
 				for(String s: l_set)
 				{
-					c_results += "\t" + s + " : " + l_tm.get(s) + "\n";
+					String l_res = l_tm.get(s); 
+					
+					c_results += "<tr>";
+					
+					if(s.equals(""))
+						if(l_res.equals("Overvote"))
+							c_results += "<td align=\"center\" colspan=\"2\"><font color=\"red\">" + l_res + "</font>";
+						else
+							c_results += "<td align=\"center\" colspan=\"2\">" + l_res;
+					else
+						if(l_res.equals("Overvote"))
+							c_results += "<td align=\"center\">" + s + "</td><td align=\"center\"><font color=\"red\">" + l_res + "</font>";
+						else
+							c_results += "<td align=\"center\">" + s + "</td><td align=\"center\">" + l_res;
+						
+					
+					c_results += "</td></tr>";
 				}
-				
-				c_results += "\n";
 			}
+			
+			c_results += "</table></html>";
 		} 
 		catch (Exception l_e) 
 		{
