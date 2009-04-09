@@ -59,6 +59,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 	private JTextField jTextField = null;
 	
 	private Font defaultFont = null ;
+	private boolean secure = false ;
 	
 	private int height = 0 ;
 	private int width = 0 ;
@@ -66,6 +67,9 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 	private int numCols = 0 ;
 	private int buttonHeight = 0 ;
 	private int buttonWidth = 0 ;
+	
+	private String buffer = "" ;
+	private char blankChar = '*' ;
 	
 	private Object sync = null ;
 	
@@ -77,21 +81,38 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			sync.wait() ;
 		}
 
-		return getJTextField().getText() ;
+		return buffer ;
+	}
+	
+	public OnScreenKeypad(int height, int width, char blankChar) {
+		this.height = height + 36 ; // 36 accounts for widget
+		this.width = width ;
+		
+		this.defaultFont = new Font("Dialog", 1, 32) ;
+		
+		this.numRows = 6 ;
+		this.numCols = 3 ;
+		this.buttonHeight = height / numRows ;
+		this.buttonWidth = width / numCols ;
+		
+		this.blankChar = blankChar ;
+		this.secure = true ;
+		
+		this.sync = new Object() ;		
 	}
 	
 	public OnScreenKeypad(int height, int width) {
 		this.height = height + 36 ; // 36 accounts for widget
 		this.width = width ;
 		
-		defaultFont = new Font("Dialog", 1, 32) ;
+		this.defaultFont = new Font("Dialog", 1, 32) ;
 		
-		numRows = 6 ;
-		numCols = 3 ;
-		buttonHeight = height / numRows ;
-		buttonWidth = width / numCols ;
+		this.numRows = 6 ;
+		this.numCols = 3 ;
+		this.buttonHeight = height / numRows ;
+		this.buttonWidth = width / numCols ;
 		
-		sync = new Object() ;
+		this.sync = new Object() ;
 	}
 	
 	/**
@@ -344,7 +365,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			ButtonDel = new JButton();
 			ButtonDel.setActionCommand("ButtonDel");
 			ButtonDel.setHorizontalAlignment(SwingConstants.CENTER);
-			ButtonDel.setText("Del");
+			ButtonDel.setText("Backspace");
 			ButtonDel.setLocation(new Point((int)(0*buttonWidth), 5*buttonHeight));
 			ButtonDel.setSize(new Dimension((int)(1.5*buttonWidth), buttonHeight));
 			ButtonDel.setEnabled(true);
@@ -433,19 +454,37 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 	 * This method appends text to the JTextField
 	 */
 	public void jTextAppend(String str) {
-		getJTextField().setText(getJTextField().getText()+str) ;
+		buffer = buffer + str ;
+		if ( secure )
+		{
+			char[] ch = new char[buffer.length()];
+			 
+	        // fill each element of chars array with 'x'
+	        Arrays.fill(ch, blankChar) ;
+	        getJTextField().setText(String.valueOf(ch)) ;
+		} else {
+			getJTextField().setText(buffer) ;
+		}
 	}
 	
 	/**
 	 * This method deletes text from the JTextField
 	 */
 	public void jTextDelete() {
-		String tmp = getJTextField().getText() ;
-		if ( tmp.length() > 0 )
+		if ( buffer.length() > 0 )
 		{
-			tmp = tmp.substring(0, tmp.length()-1) ;
+			buffer = buffer.substring(0, buffer.length()-1) ;
 		}
-		getJTextField().setText(tmp) ;
+		if ( secure )
+		{
+			char[] ch = new char[buffer.length()];
+			 
+	        // fill each element of chars array with 'x'
+	        Arrays.fill(ch, blankChar) ;
+	        getJTextField().setText(String.valueOf(ch)) ;
+		} else {
+			getJTextField().setText(buffer) ;
+		}
 	}
 	
 	/**
