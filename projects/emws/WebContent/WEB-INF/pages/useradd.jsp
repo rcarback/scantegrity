@@ -23,8 +23,8 @@
 </stripes:form> 
 
 <stripes:form beanclass="org.scantegrity.emws.action.LoginActionBean">
-<table>
-<tr><th width="60%">User Name</th><th></th></tr>
+<table style="width: 80%">
+<tr><th>User Name</th><th></th></tr>
 	<c:forEach items="${actionBean.allUsers}" var="user">
 		<tr>
 			<td>${user}</td>
