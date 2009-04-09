@@ -83,66 +83,66 @@ public class ArborDayScannerConfig
 		//Contest 0
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1515, 645, 106, 36));
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1733, 645, 106, 36));
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1941, 645, 106, 36));
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(2157, 645, 106, 36));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1462, 708, 120, 51));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1661, 708, 120, 51));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1860, 708, 120, 51));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(2058, 708, 120, 51));
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1515, 745, 106, 36));
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1733, 745, 106, 36));
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1941, 745, 106, 36));
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(2157, 745, 106, 36));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1462, 807, 120, 51));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1661, 807, 120, 51));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1860, 807, 120, 51));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(2058, 807, 120, 51));
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1515, 845, 106, 36));
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1733, 845, 106, 36));
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1941, 845, 106, 36));
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(2157, 845, 106, 36));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1462, 907, 120, 51));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1661, 907, 120, 51));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1860, 907, 120, 51));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(2058, 907, 120, 51));
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1515, 947, 106, 36));
-		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1733, 947, 106, 36));
-		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1941, 947, 106, 36));
-		l_rects.elementAt(0).elementAt(3).add(new Rectangle(2157, 947, 106, 36));
+		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1515, 1007, 120, 51));
+		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1661, 1007, 120, 51));
+		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1860, 1007, 120, 51));
+		l_rects.elementAt(0).elementAt(3).add(new Rectangle(2058, 1007, 120, 51));
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1515, 1045, 106, 36));
-		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1733, 1045, 106, 36));
-		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1941, 1045, 106, 36));
-		l_rects.elementAt(0).elementAt(4).add(new Rectangle(2157, 1045, 106, 36));
+		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1515, 1107, 120, 51));
+		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1661, 1107, 120, 51));
+		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1860, 1107, 120, 51));
+		l_rects.elementAt(0).elementAt(4).add(new Rectangle(2058, 1107, 120, 51));
 		//Contest 1
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1737, 1597, 106, 36));
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1945, 1597, 106, 36));
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(2160, 1597, 106, 36));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1659, 1662, 120, 51));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1858, 1662, 120, 51));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(2056, 1662, 120, 51));
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1737, 1697, 106, 36));
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1945, 1697, 106, 36));
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(2160, 1697, 106, 36));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1659, 1762, 120, 51));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1858, 1762, 120, 51));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(2056, 1762, 120, 51));
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1737, 1797, 106, 36));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1945, 1797, 106, 36));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(2160, 1797, 106, 36));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1659, 1861, 120, 51));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1858, 1861, 120, 51));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(2056, 1861, 120, 51));
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1737, 1897, 106, 36));
-		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1945, 1897, 106, 36));
-		l_rects.elementAt(1).elementAt(3).add(new Rectangle(2160, 1897, 106, 36));
+		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1659, 1961, 120, 51));
+		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1858, 1961, 120, 51));
+		l_rects.elementAt(1).elementAt(3).add(new Rectangle(2056, 1961, 120, 51));
 		//Contest 2
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(0).add(new Rectangle(1437, 2608, 106, 36));
+		l_rects.elementAt(2).elementAt(0).add(new Rectangle(1467, 2673, 120, 51));
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(1).add(new Rectangle(1437, 2708, 106, 36));
+		l_rects.elementAt(2).elementAt(1).add(new Rectangle(1467, 2772, 120, 51));
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(2).add(new Rectangle(1437, 2808, 106, 36));
+		l_rects.elementAt(2).elementAt(2).add(new Rectangle(1467, 2872, 120, 51));
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(3).add(new Rectangle(1437, 2908, 106, 36));
+		l_rects.elementAt(2).elementAt(3).add(new Rectangle(1467, 2972, 120, 51));
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(4).add(new Rectangle(1437, 3008, 106, 36));
+		l_rects.elementAt(2).elementAt(4).add(new Rectangle(1467, 3072, 120, 51));
 		//Contest 3
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(3).add(new Vector<Rectangle>());
-		l_rects.elementAt(3).elementAt(0).add(new Rectangle(2170, 2810, 106, 36));
+		l_rects.elementAt(3).elementAt(0).add(new Rectangle(2057, 2870, 120, 51));
 		l_rects.elementAt(3).add(new Vector<Rectangle>());
-		l_rects.elementAt(3).elementAt(1).add(new Rectangle(2170, 2910, 106, 36));
+		l_rects.elementAt(3).elementAt(1).add(new Rectangle(2057, 2970, 120, 51));
 		
 		
 		Vector<Vector<Integer>> l_contestantIds = new Vector<Vector<Integer>>();
@@ -175,7 +175,7 @@ public class ArborDayScannerConfig
 		Vector<Contest> l_c = new Vector<Contest>();
 		Contest l_x = new Contest();
 		l_x.setId(0);
-		l_x.setContestName("<b>Favorite Tree </b><br/><i> �rbol Favorito</i>");
+		l_x.setContestName("<b>Favorite Tree </b><br/><i> Arbol Favorito</i>");
 		Vector<Contestant> l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Cherry / el cerezo"));
 		l_can.add(new Contestant(1, "Elm / el olmo"));
@@ -190,7 +190,7 @@ public class ArborDayScannerConfig
 		l_x.setId(1);
 		l_x.setContestName("<b>Favorite Forest Animal</b><br/><i>Animal Arbolado Favorito</i>");
 		l_can = new Vector<Contestant>();
-		l_can.add(new Contestant(0, "Owl / B�ho"));
+		l_can.add(new Contestant(0, "Owl / Buho"));
 		l_can.add(new Contestant(1, "Rabbit / Conejo"));
 		l_can.add(new Contestant(2, "Squirrel / Ardilla"));
 		l_can.add(new Contestant(3, "Write-In / o por escrito"));
@@ -201,13 +201,13 @@ public class ArborDayScannerConfig
 		l_x = new Contest();
 		l_x.setId(2);
 		l_x.setContestName("<b>How many trees are on your property?" 
-				+ " </b><br/><i> �Cuanto �rboles estan en su propiedad?</i>");
+				+ " </b><br/><i> Cuanto arboles estan en su propiedad?</i>");
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "0"));
 		l_can.add(new Contestant(1, "1-2"));
 		l_can.add(new Contestant(2, "3-5"));
 		l_can.add(new Contestant(3, "6-10"));
-		l_can.add(new Contestant(4, "More than 10 / M�s de 10"));
+		l_can.add(new Contestant(4, "More than 10 / Mas de 10"));
 		l_x.setContestants(l_can);
 		l_x.setMethod(new PluralityTally());
 		l_c.add(l_x);		
@@ -215,8 +215,8 @@ public class ArborDayScannerConfig
 		l_x = new Contest();
 		l_x.setId(3);
 		l_x.setContestName("<b>Do you use less paper products than you did ten "
-						+ "years ago? </b><br/><i> �Utiliza menos producto de papel que" +
-						" hace 10 a�os?</i>");
+						+ "years ago? </b><br/><i> Utiliza menos producto de papel que" +
+						" hace 10 anos?</i>");
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Yes / Si"));
 		l_can.add(new Contestant(1, "No / No"));
@@ -226,9 +226,10 @@ public class ArborDayScannerConfig
 		
 		Vector<String> l_locs = new Vector<String>();
 		l_locs.add("/home/scantegrity/");
+		//l_locs.add("/media/*/");
 		
 		Vector<String> l_outFileName = new Vector<String>();
-		l_outFileName.add("/home/scantegrity/ballots.jar");
+		l_outFileName.add("ballots.jar");
 		
 		Vector<BallotStyle> l_s = new Vector<BallotStyle>();
 		l_s.add(l_style);
