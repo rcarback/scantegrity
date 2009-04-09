@@ -21,7 +21,6 @@ package org.scantegrity.scanner;
 
 import java.awt.image.BufferedImage;
 import java.beans.XMLEncoder;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -33,7 +32,6 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
-import org.apache.derby.iapi.services.io.NewByteArrayInputStream;
 import org.scantegrity.common.*;
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.lib.Ballot;

@@ -30,6 +30,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -38,10 +39,14 @@ import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -56,6 +61,7 @@ import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
 import org.scantegrity.lib.Ballot;
 import org.scantegrity.scanner.BallotHandler;
+import org.scantegrity.scanner.JudgeAuthentication;
 import org.scantegrity.scanner.Scanner;
 import org.scantegrity.scanner.ScannerConfig;
 
@@ -943,6 +949,23 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		
 		boolean l_validated = false; 
 		
+		/*MessageDigest l_md = null;
+		
+		try
+		{
+			l_md = MessageDigest.getInstance("MD5");
+		}
+		catch (NoSuchAlgorithmException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		l_md.update(l_pass.getBytes(),0,l_pass.length());
+		System.out.println("Entered Hash: " + l_md.digest());
+		l_validated = JudgeAuthentication.authorizeJudge(new BigInteger(l_md.digest()), c_config);
+		*/
+		
 		if(l_pass.equals("1234"))
 			l_validated = true;
 		
@@ -970,7 +993,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		
 		boolean l_validated = false; 
 		
-		if(l_pass.equals("test"))
+		if(l_pass.equals("scan"))
 				l_validated = true;
 		
 		if(l_validated)
@@ -1019,6 +1042,12 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			c_frame.remove(c_scannerInfoPanel);
 			c_frame.add(c_compactElectionInfoPanel, BorderLayout.PAGE_START);
 			c_frame.add(c_scannerInfoPanel, BorderLayout.CENTER);
+			
+			
+			Dimension c_screenSize = new Dimension(Toolkit.getDefaultToolkit().getScreenSize());
+			c_frame.setPreferredSize(c_screenSize);
+			c_frame.setState(JFrame.MAXIMIZED_BOTH);
+			c_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			
 			c_frame.setVisible(true);
 	

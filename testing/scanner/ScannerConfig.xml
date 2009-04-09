@@ -10,7 +10,7 @@
    <void method="add"> 
     <object class="org.scantegrity.lib.Contest"> 
      <void property="contestName"> 
-      <string>&lt;b&gt;Favorite Tree &lt;/b&gt;&lt;br/&gt;&lt;i&gt; �rbol Favorito&lt;/i&gt;</string> 
+      <string>&lt;b&gt;Favorite Tree &lt;/b&gt;&lt;br/&gt;&lt;i&gt; Arbol Favorito&lt;/i&gt;</string> 
      </void> 
      <void property="contestants"> 
       <object class="java.util.Vector"> 
@@ -87,7 +87,7 @@
           <int>0</int> 
          </void> 
          <void property="name"> 
-          <string>Owl / B�ho</string> 
+          <string>Owl / Buho</string> 
          </void> 
         </object> 
        </void> 
@@ -134,7 +134,7 @@
    <void method="add"> 
     <object class="org.scantegrity.lib.Contest"> 
      <void property="contestName"> 
-      <string>&lt;b&gt;How many trees are on your property? &lt;/b&gt;&lt;br/&gt;&lt;i&gt; �Cuanto �rboles estan en su propiedad?&lt;/i&gt;</string> 
+      <string>&lt;b&gt;How many trees are on your property? &lt;/b&gt;&lt;br/&gt;&lt;i&gt; Cuanto arboles estan en su propiedad?&lt;/i&gt;</string> 
      </void> 
      <void property="contestants"> 
       <object class="java.util.Vector"> 
@@ -184,7 +184,7 @@
           <int>4</int> 
          </void> 
          <void property="name"> 
-          <string>More than 10 / M�s de 10</string> 
+          <string>More than 10 / Mas de 10</string> 
          </void> 
         </object> 
        </void> 
@@ -201,7 +201,7 @@
    <void method="add"> 
     <object class="org.scantegrity.lib.Contest"> 
      <void property="contestName"> 
-      <string>&lt;b&gt;Do you use less paper products than you did ten years ago? &lt;/b&gt;&lt;br/&gt;&lt;i&gt; �Utiliza menos producto de papel que hace 10 a�os?&lt;/i&gt;</string> 
+      <string>&lt;b&gt;Do you use less paper products than you did ten years ago? &lt;/b&gt;&lt;br/&gt;&lt;i&gt; Utiliza menos producto de papel que hace 10 anos?&lt;/i&gt;</string> 
      </void> 
      <void property="contestants"> 
       <object class="java.util.Vector"> 
@@ -239,6 +239,11 @@
   <void property="date"> 
    <string>April 11, 2009</string> 
   </void> 
+  <void property="judgePassHash"> 
+   <void index="0"> 
+    <string>[B@a90653</string> 
+   </void> 
+  </void> 
   <void property="location"> 
    <string>Takoma Park Community Center Azalea Room</string> 
   </void> 
@@ -247,7 +252,7 @@
   </void> 
   <void property="outputFileNames"> 
    <void method="add"> 
-    <string>/home/scantegrity/ballots.jar</string> 
+    <string>ballots.jar</string> 
    </void> 
   </void> 
   <void property="outputLocs"> 
@@ -263,14 +268,14 @@
     <array class="java.awt.Point" length="2"> 
      <void index="0"> 
       <object class="java.awt.Point"> 
-       <int>2344</int> 
-       <int>187</int> 
+       <int>2398</int> 
+       <int>440</int> 
       </object> 
      </void> 
      <void index="1"> 
       <object class="java.awt.Point"> 
-       <int>2344</int> 
-       <int>3118</int> 
+       <int>2398</int> 
+       <int>3239</int> 
       </object> 
      </void> 
     </array> 
@@ -292,10 +297,10 @@
     <object class="org.scantegrity.scanner.QRCodeReader"> 
      <void property="serialBoundingBox"> 
       <object class="java.awt.Rectangle"> 
-       <int>150</int> 
-       <int>150</int> 
-       <int>375</int> 
-       <int>375</int> 
+       <int>86</int> 
+       <int>79</int> 
+       <int>370</int> 
+       <int>370</int> 
       </object> 
      </void> 
     </object> 
@@ -318,34 +323,130 @@
           <object class="java.util.Vector"> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1515</int> 
-             <int>645</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1462</int> 
+             <int>708</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1733</int> 
-             <int>645</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1661</int> 
+             <int>708</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1941</int> 
-             <int>645</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1860</int> 
+             <int>708</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>2157</int> 
-             <int>645</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2058</int> 
+             <int>708</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2257</int> 
+             <int>708</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+          </object> 
+         </void> 
+         <void method="add"> 
+          <object class="java.util.Vector"> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1462</int> 
+             <int>807</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1661</int> 
+             <int>807</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1860</int> 
+             <int>807</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2058</int> 
+             <int>807</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2257</int> 
+             <int>807</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+          </object> 
+         </void> 
+         <void method="add"> 
+          <object class="java.util.Vector"> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1462</int> 
+             <int>907</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1661</int> 
+             <int>907</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1860</int> 
+             <int>907</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2058</int> 
+             <int>907</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2257</int> 
+             <int>907</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
           </object> 
@@ -355,69 +456,41 @@
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
              <int>1515</int> 
-             <int>745</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1007</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1733</int> 
-             <int>745</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1661</int> 
+             <int>1007</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1941</int> 
-             <int>745</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1860</int> 
+             <int>1007</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>2157</int> 
-             <int>745</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-          </object> 
-         </void> 
-         <void method="add"> 
-          <object class="java.util.Vector"> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>1515</int> 
-             <int>845</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2058</int> 
+             <int>1007</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1733</int> 
-             <int>845</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>1941</int> 
-             <int>845</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>2157</int> 
-             <int>845</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2257</int> 
+             <int>1007</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
           </object> 
@@ -427,69 +500,41 @@
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
              <int>1515</int> 
-             <int>947</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1107</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1733</int> 
-             <int>947</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1661</int> 
+             <int>1107</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1941</int> 
-             <int>947</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1860</int> 
+             <int>1107</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>2157</int> 
-             <int>947</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-          </object> 
-         </void> 
-         <void method="add"> 
-          <object class="java.util.Vector"> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>1515</int> 
-             <int>1045</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2058</int> 
+             <int>1107</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1733</int> 
-             <int>1045</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>1941</int> 
-             <int>1045</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>2157</int> 
-             <int>1045</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2257</int> 
+             <int>1107</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
           </object> 
@@ -502,54 +547,34 @@
           <object class="java.util.Vector"> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1737</int> 
-             <int>1597</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1659</int> 
+             <int>1662</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1945</int> 
-             <int>1597</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1858</int> 
+             <int>1662</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>2160</int> 
-             <int>1597</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-          </object> 
-         </void> 
-         <void method="add"> 
-          <object class="java.util.Vector"> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>1737</int> 
-             <int>1697</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2056</int> 
+             <int>1662</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1945</int> 
-             <int>1697</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>2160</int> 
-             <int>1697</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2255</int> 
+             <int>1662</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
           </object> 
@@ -558,70 +583,34 @@
           <object class="java.util.Vector"> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1737</int> 
-             <int>1797</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1659</int> 
+             <int>1762</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1945</int> 
-             <int>1797</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1858</int> 
+             <int>1762</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>2160</int> 
-             <int>1797</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-          </object> 
-         </void> 
-         <void method="add"> 
-          <object class="java.util.Vector"> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>1737</int> 
-             <int>1897</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2056</int> 
+             <int>1762</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1945</int> 
-             <int>1897</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>2160</int> 
-             <int>1897</int> 
-             <int>106</int> 
-             <int>36</int> 
-            </object> 
-           </void> 
-          </object> 
-         </void> 
-        </object> 
-       </void> 
-       <void method="add"> 
-        <object class="java.util.Vector"> 
-         <void method="add"> 
-          <object class="java.util.Vector"> 
-           <void method="add"> 
-            <object class="java.awt.Rectangle"> 
-             <int>1437</int> 
-             <int>2608</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2255</int> 
+             <int>1762</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
           </object> 
@@ -630,10 +619,34 @@
           <object class="java.util.Vector"> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1437</int> 
-             <int>2708</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1659</int> 
+             <int>1861</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1858</int> 
+             <int>1861</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2056</int> 
+             <int>1861</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2255</int> 
+             <int>1861</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
           </object> 
@@ -642,34 +655,34 @@
           <object class="java.util.Vector"> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1437</int> 
-             <int>2808</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1659</int> 
+             <int>1961</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
-          </object> 
-         </void> 
-         <void method="add"> 
-          <object class="java.util.Vector"> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1437</int> 
-             <int>2908</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1858</int> 
+             <int>1961</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
-          </object> 
-         </void> 
-         <void method="add"> 
-          <object class="java.util.Vector"> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>1437</int> 
-             <int>3008</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>2056</int> 
+             <int>1961</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2255</int> 
+             <int>1961</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
           </object> 
@@ -682,10 +695,10 @@
           <object class="java.util.Vector"> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>2170</int> 
-             <int>2810</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1467</int> 
+             <int>2673</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
           </object> 
@@ -694,10 +707,74 @@
           <object class="java.util.Vector"> 
            <void method="add"> 
             <object class="java.awt.Rectangle"> 
-             <int>2170</int> 
-             <int>2910</int> 
-             <int>106</int> 
-             <int>36</int> 
+             <int>1467</int> 
+             <int>2772</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+          </object> 
+         </void> 
+         <void method="add"> 
+          <object class="java.util.Vector"> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1467</int> 
+             <int>2872</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+          </object> 
+         </void> 
+         <void method="add"> 
+          <object class="java.util.Vector"> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1467</int> 
+             <int>2972</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+          </object> 
+         </void> 
+         <void method="add"> 
+          <object class="java.util.Vector"> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>1467</int> 
+             <int>3072</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+          </object> 
+         </void> 
+        </object> 
+       </void> 
+       <void method="add"> 
+        <object class="java.util.Vector"> 
+         <void method="add"> 
+          <object class="java.util.Vector"> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2057</int> 
+             <int>2870</int> 
+             <int>120</int> 
+             <int>51</int> 
+            </object> 
+           </void> 
+          </object> 
+         </void> 
+         <void method="add"> 
+          <object class="java.util.Vector"> 
+           <void method="add"> 
+            <object class="java.awt.Rectangle"> 
+             <int>2057</int> 
+             <int>2970</int> 
+             <int>120</int> 
+             <int>51</int> 
             </object> 
            </void> 
           </object> 

@@ -109,7 +109,7 @@ public class ImageLoader {
 		{
 			throw new IOException("Could not move file");
 		}
-
+		
 		c_handler.handleImage(l_image);
 		
 		return true;

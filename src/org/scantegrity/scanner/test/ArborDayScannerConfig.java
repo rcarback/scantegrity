@@ -50,7 +50,7 @@ import org.scantegrity.scanner.ScantegrityBallotReader;
  */
 public class ArborDayScannerConfig
 {
-	private static String c_loc = "testing/scanner/";
+	private static String c_loc = "/media/disk/scantegrity/config/";
 	private static String c_name = "ScannerConfig.xml";
 
 	/**
@@ -133,7 +133,7 @@ public class ArborDayScannerConfig
 		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1659, 1961, 120, 51));
 		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1858, 1961, 120, 51));
 		l_rects.elementAt(1).elementAt(3).add(new Rectangle(2056, 1961, 120, 51));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(2255, 1961, 120, 51));
+		l_rects.elementAt(1).elementAt(3).add(new Rectangle(2255, 1961, 120, 51));
 		//Contest 2
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
@@ -235,10 +235,10 @@ public class ArborDayScannerConfig
 		
 		Vector<String> l_locs = new Vector<String>();
 		l_locs.add("/home/scantegrity/");
-		//l_locs.add("/media/*/");
+		l_locs.add("/media/disk/scantegrity/");
 		
 		Vector<String> l_outFileName = new Vector<String>();
-		l_outFileName.add("ballots.jar");
+		l_outFileName.add("/media/disk/scantegrity/ballots.jar");
 		
 		Vector<BallotStyle> l_s = new Vector<BallotStyle>();
 		l_s.add(l_style);
@@ -259,6 +259,10 @@ public class ArborDayScannerConfig
 		
 		l_config.setScannerID(0);
 		l_config.setStyles(l_s);
+		
+		/*Vector<String> l_jh = new Vector<String>();
+		l_jh.add("[B@de6ced");
+		l_config.setJudgePassHash(l_jh);*/
 		
 		XMLEncoder e;
 		try
