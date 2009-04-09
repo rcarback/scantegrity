@@ -41,7 +41,11 @@ import java.awt.Choice;
  *
  */
 @SuppressWarnings("unused")
-public class OnScreenKeypad extends SwingWorker<String, Object> {
+public class OnScreenKeypad extends JDialog implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1042130783011707077L;
 	private JFrame jFrame = null;  //  @jve:decl-index=0:visual-constraint="3,-14"
 	private JPanel jContentPane = null;
 	private JButton Button1 = null;
@@ -73,6 +77,8 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 	
 	private Object sync = null ;
 	
+	
+	/*
 	@Override
 	protected String doInBackground() throws Exception {
 		getJFrame().setVisible(true);
@@ -82,37 +88,53 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 		}
 
 		return buffer ;
+	}*/
+	
+	public OnScreenKeypad(JFrame parent, String title, int height, int width, char blankChar) {
+		this(parent, title, height, width);
+		
+		this.blankChar = blankChar;
+		this.secure = true;
+		//this.sync = new Object() ;		
 	}
 	
-	public OnScreenKeypad(int height, int width, char blankChar) {
-		this.height = height + 36 ; // 36 accounts for widget
-		this.width = width ;
+	public OnScreenKeypad(JFrame parent, String title, int height, int width) {
+		super(parent, title, true);
 		
+	    if (parent != null) {
+	        Dimension parentSize = parent.getSize(); 
+	        Point p = parent.getLocation(); 
+	        setLocation(p.x + parentSize.width / 4, p.y + parentSize.height / 4);
+	    }		
+				
 		this.defaultFont = new Font("Dialog", 1, 32) ;
 		
 		this.numRows = 6 ;
 		this.numCols = 3 ;
 		this.buttonHeight = height / numRows ;
 		this.buttonWidth = width / numCols ;
-		
-		this.blankChar = blankChar ;
-		this.secure = true ;
-		
-		this.sync = new Object() ;		
-	}
-	
-	public OnScreenKeypad(int height, int width) {
-		this.height = height + 36 ; // 36 accounts for widget
-		this.width = width ;
-		
-		this.defaultFont = new Font("Dialog", 1, 32) ;
-		
-		this.numRows = 6 ;
-		this.numCols = 3 ;
-		this.buttonHeight = height / numRows ;
-		this.buttonWidth = width / numCols ;
-		
-		this.sync = new Object() ;
+
+		//getContentPane().add(getJContentPane());
+		getContentPane().setLayout(null);
+		getContentPane().add(getButton7(), null);
+		getContentPane().add(getButton8(), null);
+		getContentPane().add(getButton9(), null);
+		getContentPane().add(getButton4(), null);
+		getContentPane().add(getButton5(), null);
+		getContentPane().add(getButton6(), null);
+		getContentPane().add(getButton1(), null);
+		getContentPane().add(getButton2(), null);
+		getContentPane().add(getButton3(), null);
+		getContentPane().add(getButton0(), null);
+		getContentPane().add(getButtonDel(), null);
+		getContentPane().add(getButtonEnter(), null);
+		getContentPane().add(getJTextField(), null);
+		this.setMaximumSize(new Dimension(width, height+36));
+		this.setSize(width, height+36);		
+	    setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
+		ButtonEnter.addActionListener(this);
+		setVisible(true);
+		//this.sync = new Object() ;
 	}
 	
 	/**
@@ -394,6 +416,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			ButtonEnter.setSize(new Dimension((int)(1.5*buttonWidth), buttonHeight));
 			ButtonEnter.setEnabled(true);
 			ButtonEnter.setFont(defaultFont) ;
+			/*
 			ButtonEnter.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					synchronized(sync)
@@ -402,7 +425,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 					}
 					getJFrame().dispose() ;
 				}
-			});
+			});*/
 		}
 		return ButtonEnter;
 	}
@@ -429,6 +452,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 	 * 
 	 * @return javax.swing.JFrame
 	 */
+	/*
 	public JFrame getJFrame() {
 		if (jFrame == null) {
 			jFrame = new JFrame();
@@ -436,6 +460,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			jFrame.setSize(width, height);
 			jFrame.setContentPane(getJContentPane());
 			jFrame.setTitle("Scantegrity On-Screen Keypad");
+			/*
 			jFrame.addWindowListener(new WindowAdapter()
 			{
 				public void windowClosing(WindowEvent e)
@@ -445,10 +470,10 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 						sync.notifyAll() ;
 					}
 				}
-			});
+			});* /
 		}
 		return jFrame;
-	}
+	}*/
 
 	/**
 	 * This method appends text to the JTextField
@@ -512,5 +537,21 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 
 		}
 		return jContentPane;
+	}
+
+	public String getBuffer()
+	{
+		return buffer;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	@Override
+	public void actionPerformed(ActionEvent p_e)
+	{
+		// TODO Auto-generated method stub
+		setVisible(false);
+		dispose();
 	}
 }
