@@ -171,7 +171,7 @@ public class BallotHandler implements ImageHandler
 	{
 		Vector<Ballot> l_ballots = c_ballotStore.getBallots();
 		Vector<String> l_outLoc = c_config.getOutputLocs();
-		String l_results = "";
+		String l_results = "<html><p align=\"center\"><b>Election Results Summary</b></p>";
 		
 		//calculate the results
 		Vector<ContestResult> l_res = calculateResults(l_ballots);

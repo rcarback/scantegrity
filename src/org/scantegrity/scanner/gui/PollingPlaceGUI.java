@@ -34,6 +34,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -99,6 +100,9 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	//require pin flag
 	private Vector<Boolean> c_reqPin;
 	private Vector<Boolean> c_reqPinOnReject;
+	
+	//election started flag
+	private boolean c_isElectionStarted = false; 
 	
 	//The thread that controls the Thank You card wait time
 	private Thread c_thread;
@@ -816,14 +820,15 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 * Builds the Start and End Election Summary Screens
 	 */
 	private void buildSummaryScreens()
-	{
-		JScrollPane l_sp = new JScrollPane();
+	{	
 		c_ballotSummaryTextPane = new JTextPane();
 		c_ballotSummaryTextPane.setEditable(false);
-		c_ballotSummaryTextPane.setFont(new Font(c_fontStyle, Font.PLAIN, ScannerUIConstants.MEDIUM_TEXT_FONT_SIZE));
+		c_ballotSummaryTextPane.setFont(new Font(c_fontStyle, Font.PLAIN, ScannerUIConstants.SMALL_TEXT_FONT_SIZE));
 		c_ballotSummaryTextPane.setBackground(Color.WHITE);
 		c_ballotSummaryTextPane.setContentType("text/html; charset=EUC-JP"); //set to allow html
 		c_ballotSummaryTextPane.setText("");
+		
+		JScrollPane l_sp = new JScrollPane();
 		l_sp.add(c_ballotSummaryTextPane);
 		
 		//create cast ballot button
@@ -840,7 +845,15 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_printButton.addActionListener(this); 
 		c_printButton.setFont(new Font(c_fontStyle, Font.BOLD,  ScannerUIConstants.GIANT_TEXT_FONT_SIZE));
 		
-		c_scannerInfoPanel.add(l_sp, ScannerUIConstants.ELECTION_SUMMARY_CARD);
+		JPanel l_tmp = new JPanel(new BorderLayout());
+		l_tmp.add(c_printButton, BorderLayout.LINE_START);
+		l_tmp.add(c_closeButton, BorderLayout.LINE_END);
+	
+		JPanel l_mainPanel = new JPanel(new BorderLayout());
+		l_mainPanel.add(l_sp, BorderLayout.CENTER);
+		l_mainPanel.add(l_tmp, BorderLayout.PAGE_END);
+		
+		c_scannerInfoPanel.add(l_mainPanel, ScannerUIConstants.ELECTION_SUMMARY_CARD);
 	}
 	
 	/* ***********************************************
@@ -1011,6 +1024,8 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			//tell scanner to start all election threads
 			//and run all necessary election startup procedures
 			c_scannerRef.startElection(c_config);
+			
+			c_isElectionStarted = true;
 		}
 	}
 	
@@ -1020,18 +1035,18 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 */
 	private void endElection()
 	{
-		try
+		if(c_isElectionStarted)
 		{
-			c_bhRef.endElection();
+			try
+			{
+				c_bhRef.endElection();
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		c_frame.dispose();
-		System.exit(1);
 	}
 	
 	
@@ -1106,6 +1121,33 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	}
 	
 	
+	/**
+	 * Opens print dialog to print summary reports
+	 */
+	private void printSummary()
+	{
+		try
+		{
+			c_ballotSummaryTextPane.print();
+		}
+		catch (PrinterException e)
+		{
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			Dialogs.displayErrorDialog("Could not print Summary. Try again.");
+		}
+	}
+	
+	
+	/**
+	 * Closes the GUI to end election
+	 */
+	private void closeScanner()
+	{
+		c_frame.dispose();
+		c_scannerRef.endElection();
+	}
+	
 	/* ***********************************************
 	 * Action Listener Methods
 	 * 
@@ -1132,6 +1174,14 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		{
 			//reject ballot button pressed
 			rejectBallot(); 
+		}
+		else if(e.getActionCommand().equals(c_printButton.getText()))
+		{
+			printSummary(); 
+		}
+		else if(e.getActionCommand().equals(c_closeButton.getText()))
+		{
+			closeScanner(); 
 		}
 	}
 	

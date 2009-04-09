@@ -97,7 +97,6 @@ public class BallotStore
 			
 			if(!l_f.exists())
 			{
-				System.out.println("HERE");
 				l_f.createNewFile();
 				JarOutputStream l_j = new JarOutputStream(new FileOutputStream(l_f), new Manifest());
 				l_j.close(); 
@@ -219,6 +218,9 @@ public class BallotStore
 		while (l_entries.hasMoreElements())
 		{
 			l_e = l_entries.nextElement();
+			System.out.println(l_e.toString());
+			if(l_e.isDirectory() || l_e.getName().equals("META-INF/MANIFEST.MF"))
+				continue;
 			l_dec = new XMLDecoder(c_store.get(0).getInputStream(l_e));
 			l_ballots.add((Ballot)l_dec.readObject());
 			l_dec.close();

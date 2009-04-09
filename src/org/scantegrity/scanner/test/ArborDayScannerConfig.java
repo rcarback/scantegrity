@@ -225,11 +225,10 @@ public class ArborDayScannerConfig
 		l_c.add(l_x);		
 		
 		Vector<String> l_locs = new Vector<String>();
-		l_locs.add("/home/");
-		l_locs.add("/media/*/");
+		l_locs.add("/home/scantegrity/");
 		
 		Vector<String> l_outFileName = new Vector<String>();
-		l_outFileName.add("ballots.jar");
+		l_outFileName.add("/home/scantegrity/ballots.jar");
 		
 		Vector<BallotStyle> l_s = new Vector<BallotStyle>();
 		l_s.add(l_style);

@@ -43,8 +43,10 @@ import org.scantegrity.scanner.gui.PollingPlaceGUI;
 public class Scanner
 {	
 	private PollingPlaceGUI c_guiRef;
-
-	private static String c_name = "ScannerConfig.xml";
+	private static final String c_name = "ScannerConfig.xml";
+	private static final String c_srcDir = "/mnt/scantegritytmpfs/images";
+	private static final String c_destDir = "/mnt/scantegritytmpfs/backup";
+	private static final String c_errDir = "/mnt/scantegritytmpfs/error";
 	
 	public Scanner(PollingPlaceGUI p_guiRef)
 	{
@@ -53,11 +55,6 @@ public class Scanner
 	
 	public void startElection(ScannerConfig p_config)
 	{
-		//current directories for scanning images, error folder, and backup
-		String c_srcDir = "/mnt/scantegritytmpfs/images";
-		String c_destDir = "/mnt/scantegritytmpfs/backup";
-		String c_errDir = "/mnt/scantegritytmpfs/error";
-		
 		//Create Ballot Handler
 		BallotHandler l_bih = new BallotHandler(c_guiRef, c_errDir, p_config);
 		
@@ -68,6 +65,11 @@ public class Scanner
 		Runnable l_dirWatch = new DirectoryWatcher(c_srcDir, c_destDir, l_il);
 		Thread l_dirWatchThread = new Thread(l_dirWatch);
 		l_dirWatchThread.start();
+	}
+	
+	public void endElection()
+	{
+		System.exit(0);
 	}
 	
 	public static ScannerConfig getConfigurationFile()

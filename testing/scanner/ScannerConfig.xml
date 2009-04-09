@@ -247,15 +247,12 @@
   </void> 
   <void property="outputFileNames"> 
    <void method="add"> 
-    <string>ballots.jar</string> 
+    <string>/home/scantegrity/ballots.jar</string> 
    </void> 
   </void> 
   <void property="outputLocs"> 
    <void method="add"> 
-    <string>/home/</string> 
-   </void> 
-   <void method="add"> 
-    <string>/media/*/</string> 
+    <string>/home/scantegrity/</string> 
    </void> 
   </void> 
   <void property="pollID"> 
