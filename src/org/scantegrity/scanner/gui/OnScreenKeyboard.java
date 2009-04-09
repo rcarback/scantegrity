@@ -1,518 +1,252 @@
 /*
- * This class implements an on-screen QWERTY Keyboard using Swing/AWT.
+ * @(#)OnScreenKeyboard.java.java
+ *  
+ * Copyright (C) 2008-2009 Scantegrity Project
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 package org.scantegrity.scanner.gui;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.awt.event.KeyEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.Event;
-import java.awt.BorderLayout;
-import java.awt.Font;
-
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
-import javax.swing.KeyStroke;
-import java.awt.Point;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JMenuItem;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JFrame;
-import javax.swing.JDialog;
-import javax.swing.JTextField;
-
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+
 import javax.swing.JButton;
-import java.awt.Rectangle;
-import java.awt.Choice;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 /**
- * @author Paul Swenson (ps1@umbc.edu)
+ * @author John Conway
  *
  */
-@SuppressWarnings("unused")
-public class OnScreenKeyboard extends SwingWorker<String, Object> {
-	private JFrame jFrame = null;  //  @jve:decl-index=0:visual-constraint="3,-14"
-	private JPanel jContentPane = null;
-	private JButton Button1 = null;
-	private JButton Button2 = null;
-	private JButton Button3 = null;
-	private JButton Button4 = null;
-	private JButton Button5 = null;
-	private JButton Button6 = null;
-	private JButton Button7 = null;
-	private JButton Button8 = null;
-	private JButton Button9 = null;
-	private JButton Button0 = null;
-	private JButton ButtonDel = null;
-	private JButton ButtonEnter = null;
-	private JTextField jTextField = null;
-	
-	private Font defaultFont = null ;
-	private boolean secure = false ;
-	
-	private int height = 0 ;
-	private int width = 0 ;
-	private int numRows = 0 ;
-	private int numCols = 0 ;
-	private int buttonHeight = 0 ;
-	private int buttonWidth = 0 ;
-	
-	private String buffer = "" ;
-	private char blankChar = '*' ;
-	
-	private Object sync = null ;
-	
-	@Override
-	protected String doInBackground() throws Exception {
-		getJFrame().setVisible(true);
-		
-		synchronized(sync) {
-			sync.wait() ;
-		}
-
-		return getJTextField().getText() ;
-	}
-	
-	public OnScreenKeyboard(int height, int width, char blankChar) {
-		this.height = height + 36 ; // 36 accounts for widget
-		this.width = width ;
-		
-		this.defaultFont = new Font("Dialog", 1, 32) ;
-		
-		this.numRows = 6 ;
-		this.numCols = 3 ;
-		this.buttonHeight = height / numRows ;
-		this.buttonWidth = width / numCols ;
-		
-		this.blankChar = blankChar ;
-		this.secure = true ;
-		
-		this.sync = new Object() ;		
-	}
-	
-	public OnScreenKeyboard(int height, int width) {
-		this.height = height + 36 ; // 36 accounts for widget
-		this.width = width ;
-		
-		this.defaultFont = new Font("Dialog", 1, 32) ;
-		
-		this.numRows = 6 ;
-		this.numCols = 3 ;
-		this.buttonHeight = height / numRows ;
-		this.buttonWidth = width / numCols ;
-		
-		this.sync = new Object() ;
-	}
-	
+public class OnScreenKeyboard extends JDialog implements ActionListener
+{
 	/**
-	 * This method initializes Button1
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton1() {
-		if (Button1 == null) {
-			Button1 = new JButton();
-			Button1.setActionCommand("Button1");
-			Button1.setHorizontalAlignment(SwingConstants.CENTER);
-			Button1.setText("1");
-			Button1.setLocation(new Point(0*buttonWidth, 1*buttonHeight));
-			Button1.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button1.setEnabled(true);
-			Button1.setFont(defaultFont) ;
-			Button1.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("1") ;
-				}
-			});
-		}
-		return Button1;
-	}
-	
-	/**
-	 * This method initializes Button2
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton2() {
-		if (Button2 == null) {
-			Button2 = new JButton();
-			Button2.setActionCommand("Button2");
-			Button2.setHorizontalAlignment(SwingConstants.CENTER);
-			Button2.setText("2");
-			Button2.setLocation(new Point(1*buttonWidth, 1*buttonHeight));
-			Button2.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button2.setEnabled(true);
-			Button2.setFont(defaultFont) ;
-			Button2.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("2") ;
-				}
-			});
-		}
-		return Button2;
-	}
-
-	/**
-	 * This method initializes Button3
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton3() {
-		if (Button3 == null) {
-			Button3 = new JButton();
-			Button3.setActionCommand("Button3");
-			Button3.setHorizontalAlignment(SwingConstants.CENTER);
-			Button3.setText("3");
-			Button3.setLocation(new Point(2*buttonWidth, 1*buttonHeight));
-			Button3.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button3.setEnabled(true);
-			Button3.setFont(defaultFont) ;
-			Button3.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("3") ;
-				}
-			});
-		}
-		return Button3;
-	}
-	
-	/**
-	 * This method initializes Button4
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton4() {
-		if (Button4 == null) {
-			Button4 = new JButton();
-			Button4.setActionCommand("Button4");
-			Button4.setHorizontalAlignment(SwingConstants.CENTER);
-			Button4.setText("4");
-			Button4.setLocation(new Point(0*buttonWidth, 2*buttonHeight));
-			Button4.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button4.setEnabled(true);
-			Button4.setFont(defaultFont) ;
-			Button4.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("4") ;
-				}
-			});
-		}
-		return Button4;
-	}
-	
-	/**
-	 * This method initializes Button5
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton5() {
-		if (Button5 == null) {
-			Button5 = new JButton();
-			Button5.setActionCommand("Button5");
-			Button5.setHorizontalAlignment(SwingConstants.CENTER);
-			Button5.setText("5");
-			Button5.setLocation(new Point(1*buttonWidth, 2*buttonHeight));
-			Button5.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button5.setEnabled(true);
-			Button5.setFont(defaultFont) ;
-			Button5.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("5") ;
-				}
-			});
-		}
-		return Button5;
-	}
-	
-	/**
-	 * This method initializes Button6
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton6() {
-		if (Button6 == null) {
-			Button6 = new JButton();
-			Button6.setActionCommand("Button6");
-			Button6.setHorizontalAlignment(SwingConstants.CENTER);
-			Button6.setText("6");
-			Button6.setLocation(new Point(2*buttonWidth, 2*buttonHeight));
-			Button6.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button6.setEnabled(true);
-			Button6.setFont(defaultFont) ;
-			Button6.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("6") ;
-				}
-			});
-		}
-		return Button6;
-	}
-	
-	/**
-	 * This method initializes Button7	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton7() {
-		if (Button7 == null) {
-			Button7 = new JButton();
-			Button7.setActionCommand("Button7");
-			Button7.setHorizontalAlignment(SwingConstants.CENTER);
-			Button7.setText("7");
-			Button7.setLocation(new Point(0*buttonWidth, 3*buttonHeight));
-			Button7.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button7.setEnabled(true);
-			Button7.setFont(defaultFont) ;
-			Button7.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("7") ;
-				}
-			});
-		}
-		return Button7;
-	}
-	
-	/**
-	 * This method initializes Button8	
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton8() {
-		if (Button8 == null) {
-			Button8 = new JButton();
-			Button8.setActionCommand("Button8");
-			Button8.setHorizontalAlignment(SwingConstants.CENTER);
-			Button8.setText("8");
-			Button8.setLocation(new Point(1*buttonWidth, 3*buttonHeight));
-			Button8.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button8.setEnabled(true);
-			Button8.setFont(defaultFont) ;
-			Button8.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("8") ;
-				}
-			});
-		}
-		return Button8;
-	}
-	
-	/**
-	 * This method initializes Button9
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton9() {
-		if (Button9 == null) {
-			Button9 = new JButton();
-			Button9.setActionCommand("Button9");
-			Button9.setHorizontalAlignment(SwingConstants.CENTER);
-			Button9.setText("9");
-			Button9.setLocation(new Point(2*buttonWidth, 3*buttonHeight));
-			Button9.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button9.setEnabled(true);
-			Button9.setFont(defaultFont) ;
-			Button9.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("9") ;
-				}
-			});
-		}
-		return Button9;
-	}
-	
-	/**
-	 * This method initializes Button0
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton0() {
-		if (Button0 == null) {
-			Button0 = new JButton();
-			Button0.setActionCommand("Button0");
-			Button0.setHorizontalAlignment(SwingConstants.CENTER);
-			Button0.setText("0");
-			Button0.setLocation(new Point(0*buttonWidth, 4*buttonHeight));
-			Button0.setSize(new Dimension(3*buttonWidth, buttonHeight));
-			Button0.setEnabled(true);
-			Button0.setFont(defaultFont) ;
-			Button0.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("0") ;
-				}
-			});
-		}
-		return Button0;
-	}
-	
-	/**
-	 * This method initializes ButtonDel
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButtonDel() {
-		if (ButtonDel == null) {
-			ButtonDel = new JButton();
-			ButtonDel.setActionCommand("ButtonDel");
-			ButtonDel.setHorizontalAlignment(SwingConstants.CENTER);
-			ButtonDel.setText("Backspace");
-			ButtonDel.setLocation(new Point((int)(0*buttonWidth), 5*buttonHeight));
-			ButtonDel.setSize(new Dimension((int)(1.5*buttonWidth), buttonHeight));
-			ButtonDel.setEnabled(true);
-			ButtonDel.setFont(defaultFont) ;
-			ButtonDel.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextDelete() ;
-				}
-			});
-		}
-		return ButtonDel;
-	}
-	
-	/**
-	 * This method initializes ButtonEnter
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButtonEnter() {
-		if (ButtonEnter == null) {
-			ButtonEnter= new JButton();
-			ButtonEnter.setActionCommand("ButtonEnter");
-			ButtonEnter.setHorizontalAlignment(SwingConstants.CENTER);
-			ButtonEnter.setText("Enter");
-			ButtonEnter.setLocation(new Point((int)(1.5*buttonWidth), 5*buttonHeight));
-			ButtonEnter.setSize(new Dimension((int)(1.5*buttonWidth), buttonHeight));
-			ButtonEnter.setEnabled(true);
-			ButtonEnter.setFont(defaultFont) ;
-			ButtonEnter.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					synchronized(sync)
-					{
-						sync.notifyAll() ;
-					}
-					getJFrame().dispose() ;
-				}
-			});
-		}
-		return ButtonEnter;
-	}
-	
-	/**
-	 * This method initializes jTextField	
-	 * 	
-	 * @return javax.swing.JTextField	
-	 */
-	private JTextField getJTextField() {
-		if (jTextField == null) {
-			jTextField = new JTextField();
-			jTextField.setBounds(new Rectangle(0, 0, 3*buttonWidth, buttonHeight));
-			jTextField.setHorizontalAlignment(JTextField.CENTER) ;
-			jTextField.setFocusable(true) ;
-			jTextField.setEnabled(true) ;
-			jTextField.setFont(defaultFont) ;
-		}
-		return jTextField;
-	}
-	
-	/**
-	 * This method initializes jFrame
 	 * 
-	 * @return javax.swing.JFrame
 	 */
-	public JFrame getJFrame() {
-		if (jFrame == null) {
-			jFrame = new JFrame();
-			jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			jFrame.setSize(width, height);
-			jFrame.setContentPane(getJContentPane());
-			jFrame.setTitle("Scantegrity On-Screen Keypad");
-			jFrame.addWindowListener(new WindowAdapter()
+	private static final long serialVersionUID = -7633434637654379213L;
+
+
+	private static String c_rows[][] = {
+		{ "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" },
+		{ "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P" },
+		{ "A", "S", "D", "F", "G", "H", "J", "K", "L" },
+		{ "Z", "X", "C", "V", "B", "N", "M", "Shift" },
+		{ "Backspace", "Space", "Enter"}
+	};  //  @jve:decl-index=0:
+	
+	
+	private Font c_font = null;
+	private boolean secure = false;
+	
+	private int numRows = 0;
+	private int numCols = 0;
+	private int c_buttonHeight = 0;
+	private int c_buttonWidth = 0;
+	
+	private String c_buf = "";  //  @jve:decl-index=0:
+	private char blankChar = '*';
+	
+	
+	private JTextField c_textField = null;
+	private JPanel c_panel = null;
+	private JButton c_enter = null;
+	private JButton c_shift = null;
+	private JButton c_buttons[][] = null;
+	private boolean c_shifted = false;
+	
+	public OnScreenKeyboard(JFrame parent, String title, int height, int width) {
+		super(parent, title, true);
+				
+	    if (parent != null) {
+	        Dimension parentSize = parent.getSize(); 
+	        Point p = parent.getLocation(); 
+	        setLocation(p.x + parentSize.width / 4, p.y + parentSize.height / 4);
+	    }			
+	    	    
+		c_font = new Font("Dialog", 1, 32) ;
+		
+		
+		this.numRows = 6 ;
+		this.numCols = 3 ;
+		c_buttonHeight = height / numRows ;
+		c_buttonWidth = width / numCols ;
+				
+		
+		c_textField = new JTextField("");
+		//Each row get's it's own JPanel row.
+		c_panel = new JPanel(new GridLayout(c_rows.length+1, 0));
+		c_panel.add(c_textField);
+		//c_panel.
+		int l_minx = c_textField.getPreferredSize().width;
+		int l_miny = c_textField.getPreferredSize().height;
+		int l_x = 0, l_y = 0;
+		c_buttons = new JButton[c_rows.length][];
+		for (int l_i = 0; l_i < c_rows.length; l_i++)
+		{
+			c_buttons[l_i] = new JButton[c_rows[l_i].length];
+			JPanel l_panel = new JPanel(new FlowLayout());
+			l_x = 0;
+			for (int l_j = 0; l_j < c_rows[l_i].length; l_j++)
 			{
-				public void windowClosing(WindowEvent e)
-				{
-					synchronized(sync)
-					{
-						sync.notifyAll() ;
-					}
+				JButton l_tmp = createButton(c_rows[l_i][l_j]);
+				l_x += l_tmp.getPreferredSize().width;
+				l_y = Math.max(l_tmp.getPreferredSize().height, l_y);
+				l_panel.add(l_tmp);
+				c_buttons[l_i][l_j] = l_tmp;
+			}
+			l_minx = Math.max(l_x, l_minx);
+			l_miny += l_y+20;
+			c_panel.add(l_panel);
+		}
+	    setDefaultCloseOperation(DISPOSE_ON_CLOSE);		
+		c_enter.addActionListener(this);	    
+		setSize(l_minx, l_miny);
+		getContentPane().add(c_panel);
+		setVisible(true);
+		
+	    
+	}
+	
+	private JButton createButton(String p_msg)
+	{
+		JButton l_button = new JButton();
+		l_button.setActionCommand(p_msg + " Command");
+		l_button.setHorizontalAlignment(SwingConstants.CENTER);
+		l_button.setFont(c_font);
+		
+		//Is this a special button?
+		if (p_msg.equals("Shift"))
+		{
+			l_button.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					Shift();
 				}
-			});
+			});	
+			c_shift = l_button;
+			
 		}
-		return jFrame;
-	}
-
-	/**
-	 * This method appends text to the JTextField
-	 */
-	public void jTextAppend(String str) {
-		buffer = getJTextField().getText() ;
-		buffer = buffer + str ;
-		if ( secure )
+		else if (p_msg.equals("Backspace"))
 		{
-			char[] ch = new char[buffer.length()];
-			 
-	        // fill each element of chars array with 'x'
-	        Arrays.fill(ch, blankChar) ;
-	        getJTextField().setText(String.valueOf(ch)) ;
-		} else {
-			getJTextField().setText(buffer) ;
+			l_button.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					Backspace();
+				}
+			});				
 		}
-	}
-	
-	/**
-	 * This method deletes text from the JTextField
-	 */
-	public void jTextDelete() {
-		buffer = getJTextField().getText() ;
-		if ( buffer.length() > 0 )
+		else if (p_msg.equals("Space"))
 		{
-			buffer = buffer.substring(0, buffer.length()-1) ;
+			l_button.setSize(new Dimension(200, c_buttonHeight));
+			l_button.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					Append(" ");
+				}
+			});						
 		}
-		if ( secure )
+		else if (p_msg.equals("Enter"))
 		{
-			char[] ch = new char[buffer.length()];
-			 
-	        // fill each element of chars array with 'x'
-	        Arrays.fill(ch, blankChar) ;
-	        getJTextField().setText(String.valueOf(ch)) ;
-		} else {
-			getJTextField().setText(buffer) ;
+			c_enter = l_button;
 		}
+		else
+		{
+			l_button.setSize(new Dimension(c_buttonWidth, c_buttonHeight));
+			p_msg = p_msg.toLowerCase();
+			final String l_msg = new String(p_msg.toLowerCase());
+			l_button.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					Append(l_msg);
+				}
+			});			
+		}
+		
+		l_button.setText(p_msg);		
+		l_button.setEnabled(true);
+		return l_button;
 	}
 	
 	/**
-	 * This method initializes jContentPane
 	 * 
-	 * @return javax.swing.JPanel
 	 */
-	private JPanel getJContentPane() {
-		if (jContentPane == null) {
-			jContentPane = new JPanel();
-			jContentPane.setLayout(null);
-			jContentPane.add(getButton7(), null);
-			jContentPane.add(getButton8(), null);
-			jContentPane.add(getButton9(), null);
-			jContentPane.add(getButton4(), null);
-			jContentPane.add(getButton5(), null);
-			jContentPane.add(getButton6(), null);
-			jContentPane.add(getButton1(), null);
-			jContentPane.add(getButton2(), null);
-			jContentPane.add(getButton3(), null);
-			jContentPane.add(getButton0(), null);
-			jContentPane.add(getButtonDel(), null);
-			jContentPane.add(getButtonEnter(), null);
-			jContentPane.add(getJTextField(), null);
-
-		}
-		return jContentPane;
+	protected void Shift()
+	{
+		// TODO Auto-generated method stub
+		c_shifted = (c_shifted) ? false:true;
+		c_shift.setSelected(c_shifted);
+		for (int l_i = 0; l_i < c_rows.length; l_i++)
+		{
+			for (int l_j = 0; l_j < c_rows[l_i].length; l_j++)
+			{
+				JButton l_c = c_buttons[l_i][l_j]; 
+				if (l_c.getText().length() == 1)
+				{
+					if (c_shifted) l_c.setText(l_c.getText().toUpperCase());
+					else l_c.setText(l_c.getText().toLowerCase());
+				}
+			}
+		}		
 	}
+
+	/**
+	 * 
+	 */
+	protected void Backspace()
+	{
+		if ( c_buf.length() > 0 )
+		{
+			c_buf = c_buf.substring(0, c_buf.length()-1) ;
+		}
+		if ( secure )
+		{
+			char[] ch = new char[c_buf.length()];
+			 
+	        // fill each element of chars array with 'x'
+	        Arrays.fill(ch, blankChar) ;
+	        c_textField.setText(String.valueOf(ch)) ;
+		} else {
+			c_textField.setText(c_buf) ;
+		}		
+	}
+
+	private void Append(String p_msg)
+	{
+		if (c_shifted) p_msg = p_msg.toUpperCase();
+		c_buf += p_msg;
+		c_textField.setText(c_buf);
+	}
+
+	public String getBuffer()
+	{
+		return c_buf;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+	 */
+	@Override
+	public void actionPerformed(ActionEvent p_e)
+	{
+		setVisible(false);
+		dispose();		
+	}
+
 }
