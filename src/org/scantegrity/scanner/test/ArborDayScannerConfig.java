@@ -63,10 +63,10 @@ public class ArborDayScannerConfig
 		
 		Dimension l_d = new Dimension(2550, 4200);
 		Point[] l_marks = new Point[2];
-		l_marks[0] = new Point(2344, 187);
-		l_marks[1] = new Point(2344, 3118);
+		l_marks[0] = new Point(2398, 440);
+		l_marks[1] = new Point(2398, 3239);
 		QRCodeReader l_code = new QRCodeReader();
-		l_code.setSerialBoundingBox(new Rectangle(150, 150, 375, 375));
+		l_code.setSerialBoundingBox(new Rectangle(86, 79, 370, 370));
 		l_reader.setSerial(l_code);
 		l_reader.setAlignment(l_marks);
 		l_reader.setDimension(l_d);
