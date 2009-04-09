@@ -9,6 +9,7 @@ import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.validation.SimpleError;
 import net.sourceforge.stripes.validation.Validate;
@@ -103,18 +104,13 @@ public class LoginActionBean implements ActionBean {
 		
 		HttpSession l_sess = c_ctx.getRequest().getSession(true);
 		l_sess.setAttribute("username", c_user);
-		try {
-			String l_redir = (String) l_sess.getAttribute("redir");
-			if( l_redir == null || l_redir == "" )
-			{
-				l_redir = "index";
-			}
-			c_ctx.getResponse().sendRedirect(l_redir);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+		String l_redir = (String) l_sess.getAttribute("redir");
+		if( l_redir == null || l_redir == "" )
+		{
+			l_redir = "index";
 		}
-		return null;
+		return new RedirectResolution(l_redir, false);
 	}
 
 }

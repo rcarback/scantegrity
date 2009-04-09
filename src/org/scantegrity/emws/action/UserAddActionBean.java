@@ -1,5 +1,6 @@
 package org.scantegrity.emws.action;
 
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,6 +14,7 @@ import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 
 import org.scantegrity.emws.action.UserManage;
@@ -121,6 +123,13 @@ public class UserAddActionBean extends RestrictedActionBean {
 	@DefaultHandler
 	public Resolution submit()
 	{
+		if( !super.checkUser() )
+		{
+			c_ctx.getRequest().getSession(true).setAttribute("redir", c_ctx.getRequest().getRequestURL().toString());
+			
+			String l_url = "https://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
+			return new RedirectResolution(l_url,false);
+		}
 		ArrayList<String> l_users = new ArrayList<String>();
 		try
 		{

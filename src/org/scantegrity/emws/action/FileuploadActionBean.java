@@ -25,11 +25,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sourceforge.stripes.action.ActionBean;
-import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.validation.Validate;
 
@@ -44,7 +43,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class FileuploadActionBean implements ActionBean {
+public class FileuploadActionBean extends RestrictedActionBean {
 
 	//Parameters for database connection
 	private static final String c_dbAddress = "jdbc:derby:";
@@ -89,6 +88,13 @@ public class FileuploadActionBean implements ActionBean {
 	@DefaultHandler
 	public Resolution submit()
 	{
+		if(! super.checkUser() )
+		{
+			c_ctx.getRequest().getSession(true).setAttribute("redir", c_ctx.getRequest().getRequestURL().toString());
+			String l_url = "https://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
+			return new RedirectResolution(l_url,false);
+		}
+		
 		//System.setProperty("derby.system.home", "/opt/db-derby");
 		if( c_file != null )
 		{
@@ -525,20 +531,6 @@ public class FileuploadActionBean implements ActionBean {
 			return name.contains(".xml");
 		}
 		
-	}
-	
-	ActionBeanContext c_ctx;
-
-	@Override
-	public ActionBeanContext getContext() {
-		// TODO Auto-generated method stub
-		return c_ctx;
-	}
-
-	@Override
-	public void setContext(ActionBeanContext arg0) {
-		// TODO Auto-generated method stub
-		c_ctx = arg0;
 	}
 
 }
