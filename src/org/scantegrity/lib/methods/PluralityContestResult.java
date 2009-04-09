@@ -61,8 +61,34 @@ public class PluralityContestResult extends ContestResult
 	{
 		c_totals = p_totals;
 	}
-
+	
 	public String toString()
+	{
+		String l_res = "";
+		l_res += String.format("%26s", "CANDIDATE");
+		l_res += String.format("%26s", "VOTES");
+		l_res += "\n--------------------------------------------------";
+		
+		Integer l_key = super.c_ranking.firstKey();
+		int l_i = 0;
+		while (l_key != null)
+		{
+			Vector<Contestant> ll_contestants = super.c_ranking.get(l_key);
+			for( Contestant ll_con : ll_contestants )
+			{
+				l_res += String.format("%26s", ll_con.getName());
+				l_res += String.format("%26d", c_totals.get(l_i));
+				l_res += "\n";
+			}
+			l_key = super.c_ranking.higherKey(l_key);
+			l_i++;
+		}
+		
+		return l_res;
+	}
+
+	@Override
+	public String getHtmlResults()
 	{
 		ArrayList<Integer> l_graphVotes = new ArrayList<Integer>();
 		ArrayList<String> l_graphLabels = new ArrayList<String>();
