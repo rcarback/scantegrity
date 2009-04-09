@@ -319,8 +319,8 @@ public class FileuploadActionBean implements ActionBean {
 	@SuppressWarnings("unchecked")
 	private Vector<Contest> GetContests()
 	{
-		Vector<Contest> l_contests = new Vector<Contest>();
-		/*try
+		Vector<Contest> l_contests = null;//new Vector<Contest>();
+		try
 		{
 			File l_docsDir = new File(c_ctx.getServletContext().getRealPath("/docs/"));
 			File l_contestFile = new File(l_docsDir, "ContestInformation.xml");
@@ -330,15 +330,28 @@ public class FileuploadActionBean implements ActionBean {
 			Object l_decodedObject = l_dec.readObject();
 			
 			if( l_decodedObject instanceof Vector )
-				l_contests = (Vector<Contest>)l_dec.readObject();
+				l_contests = (Vector<Contest>)l_decodedObject;
 		}
 		catch(IOException e)
 		{
 			c_error += "Could not open contest information file. Please make sure that it has been uploaded.\n";
 			return null;
-		}*/
+		}
 		
-		Contest l_contestOne = new Contest();
+		System.out.println("Contests");
+		for (Contest l_c : l_contests)
+		{
+			System.out.println("\tName: " + l_c.getContestName());
+			System.out.println("\tID: " + l_c.getId());
+			System.out.print("\tContestants: ");
+			for (Contestant l_s : l_c.getContestants())
+			{
+				System.out.print(l_s.toString());
+			}
+			System.out.println("\n\tRace Type: " + l_c.getMethod().getClass().getCanonicalName());
+		}
+		
+		/*Contest l_contestOne = new Contest();
 		l_contestOne.setId(0);
 		l_contestOne.setContestName("Favorite Tree");
 		Vector<Contestant> l_contestantsOne = new Vector<Contestant>();
@@ -385,7 +398,7 @@ public class FileuploadActionBean implements ActionBean {
 		l_contests.add(l_contestOne);
 		l_contests.add(l_contestTwo);
 		l_contests.add(l_contestThree);
-		l_contests.add(l_contestFour); 
+		l_contests.add(l_contestFour); */
 		
 		return l_contests;
 	}
@@ -399,6 +412,8 @@ public class FileuploadActionBean implements ActionBean {
 		for( int x = 0; x < p_partitions.getLength(); x++ )
 		{	
 			Node l_contest = p_partitions.item(x);
+			int l_contestId = Integer.parseInt(l_contest.getAttributes().getNamedItem("id").getNodeValue());
+			
 			Node l_results = null;
 			for( int y = 0; y < l_contest.getChildNodes().getLength(); y++ )
 			{
@@ -446,18 +461,8 @@ public class FileuploadActionBean implements ActionBean {
 						l_values[Integer.parseInt(l_splits[z])][z] = 1;
 					}
 					
-					/*System.err.println("--------");
-					for( int i = 0; i < l_values.length; i++ )
-					{
-						for( int k = 0; k < l_values[i].length; k++ )
-						{
-							System.err.print(l_values[i][k] + " ");
-						}
-						System.err.println();
-					}
-					System.err.println("--------");*/
-					
-					l_ballotData.put(0, l_values);
+					l_ballotData.put(l_contestId, l_values);
+					System.err.println("Adding ballot with Contest ID: " + l_contestId);
 					
 					l_ballots.add(new Ballot(l_id, 0, l_ballotData));
 				}

@@ -153,6 +153,7 @@ public class InstantRunoffTally implements TallyMethod {
 		l_stacks = new TreeMap<Contestant, Vector<BallotIterator>>();
 		for (Contestant l_c: l_contestants)
 		{
+			System.err.println(l_c);
 			l_stacks.put(l_c, new Vector<BallotIterator>());	
 		}
 		
@@ -339,8 +340,8 @@ public class InstantRunoffTally implements TallyMethod {
 			//Set up next round.
 			l_prevRound = l_curRound;
 			l_curRound = l_res.new Round(l_prevRound);
-		} while (l_stacks.size() > 2 //End, or tied ending
-					|| l_tieStack.size() > 0); 
+		} while ((l_stacks.size() > 2 //End, or tied ending
+					|| l_tieStack.size() > 0) && l_res.getRounds().size() < 100); 
 		
 		l_res.setRanking(l_curRank);
 		
@@ -371,13 +372,17 @@ public class InstantRunoffTally implements TallyMethod {
 					l_nextIDs.add(-2);
 				}
 				
+				System.err.println("L_nextIDs: " + l_nextIDs.toString());
+				System.err.println("Ballot: " + l_ballot.c_ballot.toString()); 
+				
 				//Find the Contestant in the stack, if we find more than 2, abort.
 				for (int l_i = 0; l_i < l_nextIDs.size(); l_i++)
 				{
 					for (Object l_key: l_stacks.keySet())
 					{
 						Contestant l_c = (Contestant)l_key;
-						if (l_c.getId() == l_nextIDs.elementAt(l_i))
+						System.err.println("Candidate ID: " + l_c);
+						if (l_c.getId().equals(l_nextIDs.elementAt(l_i)))
 						{
 							if (l_contestant != null)
 							{
@@ -425,6 +430,8 @@ public class InstantRunoffTally implements TallyMethod {
 	private Vector<BallotIterator> getBallotsWithContest(int p_contestId, 
 													Vector<Ballot> p_ballots)
 	{
+		System.err.println("Contest ID in getBallotsWithContest " + p_contestId);
+		System.err.println("Size of p_ballots: " + p_ballots.size());
 		//First pass, find ballots that have this contest, and then 
 		//sum up the stacks for round 1.
 		BallotIterator l_curIter;
@@ -658,6 +665,8 @@ public class InstantRunoffTally implements TallyMethod {
 		{
 			Integer l_bdata[][] = c_ballot.getContestData(c_contestId);
 			
+			
+			if( l_bdata == null ) System.err.println("Uh oh, it really did happen!");
 			//This should never happen, something really bad happened!
 			if (l_bdata == null) return false;
 			//Already checked before
@@ -670,7 +679,7 @@ public class InstantRunoffTally implements TallyMethod {
 				c_curPos++;
 
 				//Bounds check
-				if (c_curPos < 0 || c_curPos >= l_bdata.length) {
+				if (c_curPos < 0 || c_curPos >= l_bdata[0].length) {
 					return false;
 				}
 

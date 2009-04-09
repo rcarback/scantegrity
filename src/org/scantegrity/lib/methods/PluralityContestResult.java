@@ -59,16 +59,18 @@ public class PluralityContestResult extends ContestResult
 	public String toString()
 	{
 		String l_res = "";
-		l_res += "Ranking\n";
 		Integer l_key = super.c_ranking.firstKey();
 		int l_i = 0;
+		l_res = "<table style=\"width: 100%; text-align: left;\">";
+		l_res += "<tr><th>Candidate</th><th>Votes</th>";
 		while (l_key != null)
 		{
-			l_res += l_key + ". " + super.c_ranking.get(l_key).toString();
-			l_res += " with " + c_totals.get(l_i) + " votes";
+			l_res += "<tr><td>" + super.c_ranking.get(l_key).toString() + "</td>";
+			l_res += "<td>" + c_totals.get(l_i) + "</td></tr>";
 			l_key = super.c_ranking.higherKey(l_key);
 			l_i++;
 		}
+		l_res += "</table>";
 		
 		return l_res;
 	}
