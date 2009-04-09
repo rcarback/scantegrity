@@ -44,15 +44,15 @@ import java.awt.Choice;
 public class OnScreenKeypad extends SwingWorker<String, Object> {
 	private JFrame jFrame = null;  //  @jve:decl-index=0:visual-constraint="3,-14"
 	private JPanel jContentPane = null;
-	private JButton Button7 = null;
-	private JButton Button8 = null;
-	private JButton Button9 = null;
-	private JButton Button4 = null;
-	private JButton Button5 = null;
-	private JButton Button6 = null;
 	private JButton Button1 = null;
 	private JButton Button2 = null;
 	private JButton Button3 = null;
+	private JButton Button4 = null;
+	private JButton Button5 = null;
+	private JButton Button6 = null;
+	private JButton Button7 = null;
+	private JButton Button8 = null;
+	private JButton Button9 = null;
 	private JButton Button0 = null;
 	private JButton ButtonDel = null;
 	private JButton ButtonEnter = null;
@@ -95,77 +95,77 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 	}
 	
 	/**
-	 * This method initializes Button7	
+	 * This method initializes Button1
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
-	private JButton getButton7() {
-		if (Button7 == null) {
-			Button7 = new JButton();
-			Button7.setActionCommand("Button7");
-			Button7.setHorizontalAlignment(SwingConstants.CENTER);
-			Button7.setText("7");
-			Button7.setLocation(new Point(0*buttonWidth, 1*buttonHeight));
-			Button7.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button7.setEnabled(true);
-			Button7.setFont(defaultFont) ;
-			Button7.addActionListener(new java.awt.event.ActionListener() {
+	private JButton getButton1() {
+		if (Button1 == null) {
+			Button1 = new JButton();
+			Button1.setActionCommand("Button1");
+			Button1.setHorizontalAlignment(SwingConstants.CENTER);
+			Button1.setText("1");
+			Button1.setLocation(new Point(0*buttonWidth, 1*buttonHeight));
+			Button1.setSize(new Dimension(buttonWidth, buttonHeight));
+			Button1.setEnabled(true);
+			Button1.setFont(defaultFont) ;
+			Button1.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("7") ;
+					jTextAppend("1") ;
 				}
 			});
 		}
-		return Button7;
+		return Button1;
 	}
 	
 	/**
-	 * This method initializes Button8	
+	 * This method initializes Button2
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
-	private JButton getButton8() {
-		if (Button8 == null) {
-			Button8 = new JButton();
-			Button8.setActionCommand("Button8");
-			Button8.setHorizontalAlignment(SwingConstants.CENTER);
-			Button8.setText("8");
-			Button8.setLocation(new Point(1*buttonWidth, 1*buttonHeight));
-			Button8.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button8.setEnabled(true);
-			Button8.setFont(defaultFont) ;
-			Button8.addActionListener(new java.awt.event.ActionListener() {
+	private JButton getButton2() {
+		if (Button2 == null) {
+			Button2 = new JButton();
+			Button2.setActionCommand("Button2");
+			Button2.setHorizontalAlignment(SwingConstants.CENTER);
+			Button2.setText("2");
+			Button2.setLocation(new Point(1*buttonWidth, 1*buttonHeight));
+			Button2.setSize(new Dimension(buttonWidth, buttonHeight));
+			Button2.setEnabled(true);
+			Button2.setFont(defaultFont) ;
+			Button2.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("8") ;
+					jTextAppend("2") ;
 				}
 			});
 		}
-		return Button8;
-	}
-	
-	/**
-	 * This method initializes Button9
-	 * 	
-	 * @return javax.swing.JButton	
-	 */
-	private JButton getButton9() {
-		if (Button9 == null) {
-			Button9 = new JButton();
-			Button9.setActionCommand("Button9");
-			Button9.setHorizontalAlignment(SwingConstants.CENTER);
-			Button9.setText("9");
-			Button9.setLocation(new Point(2*buttonWidth, 1*buttonHeight));
-			Button9.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button9.setEnabled(true);
-			Button9.setFont(defaultFont) ;
-			Button9.addActionListener(new java.awt.event.ActionListener() {
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("9") ;
-				}
-			});
-		}
-		return Button9;
+		return Button2;
 	}
 
+	/**
+	 * This method initializes Button3
+	 * 	
+	 * @return javax.swing.JButton	
+	 */
+	private JButton getButton3() {
+		if (Button3 == null) {
+			Button3 = new JButton();
+			Button3.setActionCommand("Button3");
+			Button3.setHorizontalAlignment(SwingConstants.CENTER);
+			Button3.setText("3");
+			Button3.setLocation(new Point(2*buttonWidth, 1*buttonHeight));
+			Button3.setSize(new Dimension(buttonWidth, buttonHeight));
+			Button3.setEnabled(true);
+			Button3.setFont(defaultFont) ;
+			Button3.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent e) {
+					jTextAppend("3") ;
+				}
+			});
+		}
+		return Button3;
+	}
+	
 	/**
 	 * This method initializes Button4
 	 * 	
@@ -239,75 +239,75 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 	}
 	
 	/**
-	 * This method initializes Button1
+	 * This method initializes Button7	
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
-	private JButton getButton1() {
-		if (Button1 == null) {
-			Button1 = new JButton();
-			Button1.setActionCommand("Button1");
-			Button1.setHorizontalAlignment(SwingConstants.CENTER);
-			Button1.setText("1");
-			Button1.setLocation(new Point(0*buttonWidth, 3*buttonHeight));
-			Button1.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button1.setEnabled(true);
-			Button1.setFont(defaultFont) ;
-			Button1.addActionListener(new java.awt.event.ActionListener() {
+	private JButton getButton7() {
+		if (Button7 == null) {
+			Button7 = new JButton();
+			Button7.setActionCommand("Button7");
+			Button7.setHorizontalAlignment(SwingConstants.CENTER);
+			Button7.setText("7");
+			Button7.setLocation(new Point(0*buttonWidth, 3*buttonHeight));
+			Button7.setSize(new Dimension(buttonWidth, buttonHeight));
+			Button7.setEnabled(true);
+			Button7.setFont(defaultFont) ;
+			Button7.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("1") ;
+					jTextAppend("7") ;
 				}
 			});
 		}
-		return Button1;
+		return Button7;
 	}
 	
 	/**
-	 * This method initializes Button2
+	 * This method initializes Button8	
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
-	private JButton getButton2() {
-		if (Button2 == null) {
-			Button2 = new JButton();
-			Button2.setActionCommand("Button2");
-			Button2.setHorizontalAlignment(SwingConstants.CENTER);
-			Button2.setText("2");
-			Button2.setLocation(new Point(1*buttonWidth, 3*buttonHeight));
-			Button2.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button2.setEnabled(true);
-			Button2.setFont(defaultFont) ;
-			Button2.addActionListener(new java.awt.event.ActionListener() {
+	private JButton getButton8() {
+		if (Button8 == null) {
+			Button8 = new JButton();
+			Button8.setActionCommand("Button8");
+			Button8.setHorizontalAlignment(SwingConstants.CENTER);
+			Button8.setText("8");
+			Button8.setLocation(new Point(1*buttonWidth, 3*buttonHeight));
+			Button8.setSize(new Dimension(buttonWidth, buttonHeight));
+			Button8.setEnabled(true);
+			Button8.setFont(defaultFont) ;
+			Button8.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("2") ;
+					jTextAppend("8") ;
 				}
 			});
 		}
-		return Button2;
+		return Button8;
 	}
-
+	
 	/**
-	 * This method initializes Button3
+	 * This method initializes Button9
 	 * 	
 	 * @return javax.swing.JButton	
 	 */
-	private JButton getButton3() {
-		if (Button3 == null) {
-			Button3 = new JButton();
-			Button3.setActionCommand("Button3");
-			Button3.setHorizontalAlignment(SwingConstants.CENTER);
-			Button3.setText("3");
-			Button3.setLocation(new Point(2*buttonWidth, 3*buttonHeight));
-			Button3.setSize(new Dimension(buttonWidth, buttonHeight));
-			Button3.setEnabled(true);
-			Button3.setFont(defaultFont) ;
-			Button3.addActionListener(new java.awt.event.ActionListener() {
+	private JButton getButton9() {
+		if (Button9 == null) {
+			Button9 = new JButton();
+			Button9.setActionCommand("Button9");
+			Button9.setHorizontalAlignment(SwingConstants.CENTER);
+			Button9.setText("9");
+			Button9.setLocation(new Point(2*buttonWidth, 3*buttonHeight));
+			Button9.setSize(new Dimension(buttonWidth, buttonHeight));
+			Button9.setEnabled(true);
+			Button9.setFont(defaultFont) ;
+			Button9.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					jTextAppend("3") ;
+					jTextAppend("9") ;
 				}
 			});
 		}
-		return Button3;
+		return Button9;
 	}
 	
 	/**
