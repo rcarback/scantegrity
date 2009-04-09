@@ -61,9 +61,9 @@ public class PluralityTally implements TallyMethod {
 		int l_sum = 0;
 		Integer l_bData[][] = p_ballot.getContestData(p_contestId);
 		if (l_bData.length == 0 || l_bData[0].length == 0) return null;
-		for (int l_i = 0; l_i < l_bData[0].length; l_i++)
+		for (int l_i = 0; l_i < l_bData.length; l_i++)
 		{
-			if (l_bData[0][l_i] == 1) l_sum++;
+			if (l_bData[l_i][0] == 1) l_sum++;
 		}
 		if (l_sum == 0) l_res.put("", "No Vote");
 		else if (l_sum == 1) l_res.put("", "Vote Recorded");
