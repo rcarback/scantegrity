@@ -19,7 +19,13 @@
  */
 package org.scantegrity.lib.methods;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Vector;
+
+import org.scantegrity.lib.Contestant;
 
 /**
  * @author John Conway
@@ -55,14 +61,12 @@ public class PluralityContestResult extends ContestResult
 	{
 		c_totals = p_totals;
 	}
-	
-	public String getHtmlResults()
-	{
-		return toString();
-	}
 
 	public String toString()
 	{
+		ArrayList<Integer> l_graphVotes = new ArrayList<Integer>();
+		ArrayList<String> l_graphLabels = new ArrayList<String>();
+		int l_total = 0;
 		String l_res = "";
 		Integer l_key = super.c_ranking.firstKey();
 		int l_i = 0;
@@ -70,12 +74,47 @@ public class PluralityContestResult extends ContestResult
 		l_res += "<tr><th>Candidate</th><th>Votes</th>";
 		while (l_key != null)
 		{
-			l_res += "<tr><td>" + super.c_ranking.get(l_key).toString() + "</td>";
-			l_res += "<td>" + c_totals.get(l_i) + "</td></tr>";
+			Vector<Contestant> ll_contestants = super.c_ranking.get(l_key);
+			for( Contestant ll_con : ll_contestants )
+			{
+				l_res += "<tr><td>" + ll_con.getName() + "</td>";
+				l_res += "<td>" + c_totals.get(l_i) + "</td></tr>";
+				l_total += c_totals.get(l_i);
+				l_graphVotes.add(c_totals.get(l_i));
+				l_graphLabels.add(ll_con.getName());
+			}
 			l_key = super.c_ranking.higherKey(l_key);
 			l_i++;
 		}
 		l_res += "</table>";
+		
+		DecimalFormat onePlace = new DecimalFormat("0.0");
+		String l_chart = "http://chart.apis.google.com/chart?";
+		String l_chartOpts = "chs=600x200&cht=p3&chd=t:";
+
+		for( Integer l_data : l_graphVotes )
+		{
+			l_chartOpts += onePlace.format(l_data / ((float)l_total));
+			l_chartOpts += ",";
+		}
+		l_chartOpts = l_chartOpts.substring(0, l_chartOpts.length() - 1); //Trim last comma
+		l_chartOpts += "&amp;chl=";
+		
+		for( String l_label : l_graphLabels )
+		{
+			try {
+				l_chartOpts += URLEncoder.encode(l_label, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			l_chartOpts += "|";
+		}
+		l_chartOpts = l_chartOpts.substring(0, l_chartOpts.length() - 1); //Trim last pipe
+		
+		l_chart += l_chartOpts;
+		
+		l_res += "<img src=\"" + l_chart + "\" />";
 		
 		return l_res;
 	}

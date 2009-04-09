@@ -37,8 +37,6 @@ import org.scantegrity.lib.Ballot;
 import org.scantegrity.lib.Contest;
 import org.scantegrity.lib.Contestant;
 import org.scantegrity.lib.methods.ContestResult;
-import org.scantegrity.lib.methods.InstantRunoffTally;
-import org.scantegrity.lib.methods.PluralityTally;
 import org.scantegrity.lib.methods.TallyMethod;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -241,7 +239,7 @@ public class FileuploadActionBean implements ActionBean {
 					
 					l_sqlStatement.close();
 					l_conn.close();
-					c_result = "File added successfully";
+					c_result = "Codes added successfully";
 					
 				} catch (SQLException e) {
 					//c_error = "Could not execute SQL: " + e.getMessage();
@@ -296,11 +294,13 @@ public class FileuploadActionBean implements ActionBean {
 			{
 				TallyMethod l_tally = l_contests.get(x).getMethod();
 				ContestResult l_res = l_tally.tally(l_contests.get(x), l_ballots.get(x));
-				l_writer.write("<h3>Contest " + l_contests.get(x).getId() + ": " + l_contests.get(x).getContestName() + "</h3>");
+				l_writer.write("<h3 style='color: olive;'>Contest " + (l_contests.get(x).getId() + 1) + ": " + l_contests.get(x).getContestName() + "</h3>");
 				l_writer.write(l_res.getHtmlResults());
 			}
 			
 			l_writer.close();
+			
+			c_result += "Results calculated successfully.";
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

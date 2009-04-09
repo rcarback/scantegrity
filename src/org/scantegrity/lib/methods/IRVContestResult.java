@@ -20,6 +20,9 @@
 package org.scantegrity.lib.methods;
 
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.util.Vector;
 
 import org.scantegrity.lib.Contestant;
@@ -47,7 +50,7 @@ public class IRVContestResult extends ContestResult
 							Vector<Contestant> p_contestants)
 	{
 		super();
-		p_contestId = c_contestId;
+		c_contestId = p_contestId;
 		this.setCandidates(p_contestants);
 		c_rounds = new Vector<Round>();		
 	}
@@ -119,7 +122,57 @@ public class IRVContestResult extends ContestResult
 	@Override
 	public String getHtmlResults()
 	{
-		return c_rounds.get(c_rounds.size() - 1).getHtmlRound();
+		String l_results = "";
+		
+		l_results += "<div id='divAllRounds" + c_contestId + "' style='display: none;'>";
+		for( int x = 0; x < c_rounds.size(); x++ )
+		{
+			if( x == c_rounds.size() - 1 )
+				l_results += "</div>";
+			
+			l_results += c_rounds.get(x).getHtmlRound();
+			l_results += getChart(c_rounds.get(x));
+		}
+		
+		l_results += "<br/><a id='viewLink" + c_contestId + "' href=\"javascript:divAllRounds" + c_contestId + ".style.display='';viewLink" + c_contestId + ".style.display='none';\">Click here to view intermediate rounds</a><br/>";
+		return l_results;
+	}
+	
+	public String getChart(Round p_round)
+	{
+		DecimalFormat onePlace = new DecimalFormat("0.0");
+		String l_chart = "http://chart.apis.google.com/chart?";
+		String l_chartOpts = "chs=600x200&cht=p3&chd=t:";
+		String l_res = "";
+		
+		int l_total = 0;
+		for( Integer l_data: p_round.getTotals() )
+			l_total += l_data;
+
+		for( Integer l_data : p_round.getTotals() )
+		{
+			l_chartOpts += onePlace.format(l_data / ((float)l_total));
+			l_chartOpts += ",";
+		}
+		l_chartOpts = l_chartOpts.substring(0, l_chartOpts.length() - 1); //Trim last comma
+		l_chartOpts += "&amp;chl=";
+		
+		for( Contestant l_label : c_contestants )
+		{
+			try {
+				l_chartOpts += URLEncoder.encode(l_label.getName(), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			l_chartOpts += "|";
+		}
+		l_chartOpts = l_chartOpts.substring(0, l_chartOpts.length() - 1); //Trim last pipe
+		
+		l_chart += l_chartOpts;
+		
+		l_res += "<img src=\"" + l_chart + "\" />";
+		return l_res;
 	}
 	
 	
@@ -336,12 +389,13 @@ public class IRVContestResult extends ContestResult
 			StringWriter l_out = new StringWriter();
 			int l_change = 0, l_tot = 0;
 			//ROUND\t\tCONTESTANTS\t\tCHANGE\t\tTOTALS
+			l_out.write("<h4>Round " + getId() + ": ");
 			l_out.write("<table style=\"width:100%; text-alignment: left; \">");
 			l_out.write("<tr><th>Contestant</th><th>Change</th><th>Total</th> <th>State</th></tr>");
 			for(int l_i = 0; l_i < c_contestants.size(); l_i++)
 			{
 				l_out.write("<tr>");
-				l_out.write("<td>" +  c_contestants.get(l_i) + "</td>");
+				l_out.write("<td>" +  c_contestants.get(l_i).getName() + "</td>");
 				l_out.write("<td>" + String.format("%+d", c_delta.get(l_i)) + "</td>");
 				l_out.write("<td>" +  c_totals.get(l_i) + "</td>");
 				l_out.write("<td>" +  c_state.get(l_i) + "</td>");
