@@ -4,7 +4,7 @@
   <void method="add"> 
    <object class="org.scantegrity.lib.Contest"> 
     <void property="contestName"> 
-     <string>Favorite Tree / ÔøΩrbol Favorito</string> 
+     <string>Favorite Tree / Árbol Favorito</string> 
     </void> 
     <void property="contestants"> 
      <object class="java.util.Vector"> 
@@ -81,7 +81,7 @@
          <int>0</int> 
         </void> 
         <void property="name"> 
-         <string>Owl / BÔøΩho</string> 
+         <string>Owl / Búho</string> 
         </void> 
        </object> 
       </void> 
@@ -128,7 +128,7 @@
   <void method="add"> 
    <object class="org.scantegrity.lib.Contest"> 
     <void property="contestName"> 
-     <string>How many trees are on your property? / ÔøΩCuanto ÔøΩrboles estan en su propiedad?</string> 
+     <string>How many trees are on your property? / ¿Cuanto árboles estan en su propiedad?</string> 
     </void> 
     <void property="contestants"> 
      <object class="java.util.Vector"> 
@@ -158,7 +158,7 @@
          <int>2</int> 
         </void> 
         <void property="name"> 
-         <string>2-5</string> 
+         <string>3-5</string> 
         </void> 
        </object> 
       </void> 
@@ -168,7 +168,17 @@
          <int>3</int> 
         </void> 
         <void property="name"> 
-         <string>More than 10 / MÔøΩs de 10</string> 
+         <string>6-10</string> 
+        </void> 
+       </object> 
+      </void> 
+      <void method="add"> 
+       <object class="org.scantegrity.lib.Contestant"> 
+        <void property="id"> 
+         <int>4</int> 
+        </void> 
+        <void property="name"> 
+         <string>More than 10 / Más de 10</string> 
         </void> 
        </object> 
       </void> 
@@ -185,7 +195,7 @@
   <void method="add"> 
    <object class="org.scantegrity.lib.Contest"> 
     <void property="contestName"> 
-     <string>Do you use less paper products than you did ten years ago? / ÔøΩUtiliza menos producto de papel que hace 10 aÔøΩos?</string> 
+     <string>Do you use less paper products than you did ten years ago? / ¿Utiliza menos producto de papel que hace 10 años?</string> 
     </void> 
     <void property="contestants"> 
      <object class="java.util.Vector"> 
