@@ -15,6 +15,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.Event;
 import java.awt.BorderLayout;
+import java.awt.Font;
+
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -56,6 +58,8 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 	private JButton ButtonEnter = null;
 	private JTextField jTextField = null;
 	
+	private Font defaultFont = null ;
+	
 	private int height = 0 ;
 	private int width = 0 ;
 	private int numRows = 0 ;
@@ -80,8 +84,10 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 		this.height = height + 36 ; // 36 accounts for widget
 		this.width = width ;
 		
-		numRows = 5 ;
-		numCols = 4 ;
+		defaultFont = new Font("Dialog", 1, 32) ;
+		
+		numRows = 6 ;
+		numCols = 3 ;
 		buttonHeight = height / numRows ;
 		buttonWidth = width / numCols ;
 		
@@ -102,6 +108,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button7.setLocation(new Point(0*buttonWidth, 1*buttonHeight));
 			Button7.setSize(new Dimension(buttonWidth, buttonHeight));
 			Button7.setEnabled(true);
+			Button7.setFont(defaultFont) ;
 			Button7.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("7") ;
@@ -125,6 +132,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button8.setLocation(new Point(1*buttonWidth, 1*buttonHeight));
 			Button8.setSize(new Dimension(buttonWidth, buttonHeight));
 			Button8.setEnabled(true);
+			Button8.setFont(defaultFont) ;
 			Button8.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("8") ;
@@ -148,6 +156,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button9.setLocation(new Point(2*buttonWidth, 1*buttonHeight));
 			Button9.setSize(new Dimension(buttonWidth, buttonHeight));
 			Button9.setEnabled(true);
+			Button9.setFont(defaultFont) ;
 			Button9.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("9") ;
@@ -171,6 +180,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button4.setLocation(new Point(0*buttonWidth, 2*buttonHeight));
 			Button4.setSize(new Dimension(buttonWidth, buttonHeight));
 			Button4.setEnabled(true);
+			Button4.setFont(defaultFont) ;
 			Button4.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("4") ;
@@ -194,6 +204,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button5.setLocation(new Point(1*buttonWidth, 2*buttonHeight));
 			Button5.setSize(new Dimension(buttonWidth, buttonHeight));
 			Button5.setEnabled(true);
+			Button5.setFont(defaultFont) ;
 			Button5.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("5") ;
@@ -217,6 +228,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button6.setLocation(new Point(2*buttonWidth, 2*buttonHeight));
 			Button6.setSize(new Dimension(buttonWidth, buttonHeight));
 			Button6.setEnabled(true);
+			Button6.setFont(defaultFont) ;
 			Button6.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("6") ;
@@ -240,6 +252,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button1.setLocation(new Point(0*buttonWidth, 3*buttonHeight));
 			Button1.setSize(new Dimension(buttonWidth, buttonHeight));
 			Button1.setEnabled(true);
+			Button1.setFont(defaultFont) ;
 			Button1.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("1") ;
@@ -263,6 +276,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button2.setLocation(new Point(1*buttonWidth, 3*buttonHeight));
 			Button2.setSize(new Dimension(buttonWidth, buttonHeight));
 			Button2.setEnabled(true);
+			Button2.setFont(defaultFont) ;
 			Button2.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("2") ;
@@ -286,6 +300,7 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button3.setLocation(new Point(2*buttonWidth, 3*buttonHeight));
 			Button3.setSize(new Dimension(buttonWidth, buttonHeight));
 			Button3.setEnabled(true);
+			Button3.setFont(defaultFont) ;
 			Button3.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("3") ;
@@ -307,8 +322,9 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			Button0.setHorizontalAlignment(SwingConstants.CENTER);
 			Button0.setText("0");
 			Button0.setLocation(new Point(0*buttonWidth, 4*buttonHeight));
-			Button0.setSize(new Dimension(2*buttonWidth, buttonHeight));
+			Button0.setSize(new Dimension(3*buttonWidth, buttonHeight));
 			Button0.setEnabled(true);
+			Button0.setFont(defaultFont) ;
 			Button0.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextAppend("0") ;
@@ -329,9 +345,10 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			ButtonDel.setActionCommand("ButtonDel");
 			ButtonDel.setHorizontalAlignment(SwingConstants.CENTER);
 			ButtonDel.setText("Del");
-			ButtonDel.setLocation(new Point(2*buttonWidth, 4*buttonHeight));
-			ButtonDel.setSize(new Dimension(buttonWidth, buttonHeight));
+			ButtonDel.setLocation(new Point((int)(0*buttonWidth), 5*buttonHeight));
+			ButtonDel.setSize(new Dimension((int)(1.5*buttonWidth), buttonHeight));
 			ButtonDel.setEnabled(true);
+			ButtonDel.setFont(defaultFont) ;
 			ButtonDel.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					jTextDelete() ;
@@ -352,9 +369,10 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 			ButtonEnter.setActionCommand("ButtonEnter");
 			ButtonEnter.setHorizontalAlignment(SwingConstants.CENTER);
 			ButtonEnter.setText("Enter");
-			ButtonEnter.setLocation(new Point(3*buttonWidth, 3*buttonHeight));
-			ButtonEnter.setSize(new Dimension(buttonWidth, 2*buttonHeight));
+			ButtonEnter.setLocation(new Point((int)(1.5*buttonWidth), 5*buttonHeight));
+			ButtonEnter.setSize(new Dimension((int)(1.5*buttonWidth), buttonHeight));
 			ButtonEnter.setEnabled(true);
+			ButtonEnter.setFont(defaultFont) ;
 			ButtonEnter.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					synchronized(sync)
@@ -376,10 +394,11 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 	private JTextField getJTextField() {
 		if (jTextField == null) {
 			jTextField = new JTextField();
-			jTextField.setBounds(new Rectangle(0, 0, 4*buttonWidth, buttonHeight));
+			jTextField.setBounds(new Rectangle(0, 0, 3*buttonWidth, buttonHeight));
 			jTextField.setHorizontalAlignment(JTextField.CENTER) ;
 			jTextField.setFocusable(false) ;
 			jTextField.setEnabled(true) ;
+			jTextField.setFont(defaultFont) ;
 		}
 		return jTextField;
 	}
@@ -438,7 +457,6 @@ public class OnScreenKeypad extends SwingWorker<String, Object> {
 		if (jContentPane == null) {
 			jContentPane = new JPanel();
 			jContentPane.setLayout(null);
-					
 			jContentPane.add(getButton7(), null);
 			jContentPane.add(getButton8(), null);
 			jContentPane.add(getButton9(), null);
