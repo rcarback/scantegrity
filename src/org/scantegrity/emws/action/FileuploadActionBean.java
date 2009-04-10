@@ -289,6 +289,7 @@ public class FileuploadActionBean extends RestrictedActionBean {
 			
 			NodeList l_partitions = l_doc.getElementsByTagName("partition");
 			Vector<Contest> l_contests = GetContests();
+			if( l_contests == null ) return;
 			Vector<Vector<Ballot>> l_ballots = GetData(l_partitions, l_contests);
 		
 			for( int x = 0; x < l_contests.size(); x++ )
@@ -340,19 +341,6 @@ public class FileuploadActionBean extends RestrictedActionBean {
 		{
 			c_error += "Could not open contest information file. Please make sure that it has been uploaded.\n";
 			return null;
-		}
-		
-		System.out.println("Contests");
-		for (Contest l_c : l_contests)
-		{
-			System.out.println("\tName: " + l_c.getContestName());
-			System.out.println("\tID: " + l_c.getId());
-			System.out.print("\tContestants: ");
-			for (Contestant l_s : l_c.getContestants())
-			{
-				System.out.print(l_s.toString());
-			}
-			System.out.println("\n\tRace Type: " + l_c.getMethod().getClass().getCanonicalName());
 		}
 		
 		/*Contest l_contestOne = new Contest();
