@@ -25,9 +25,10 @@ public class RestrictedActionBean implements ActionBean {
 		HttpSession c_sess = getContext().getRequest().getSession(true);
 		if( c_sess.getAttribute("username") == null )
 		{
-			c_sess.setAttribute("redir", c_ctx.getRequest().getRequestURL().toString().replace("http://","http://"));
-			
-			String l_url = "http://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
+			//c_sess.setAttribute("redir", c_ctx.getRequest().getRequestURL().toString());
+			c_sess.setAttribute("redir", c_ctx.getRequest().getRequestURL().toString().replace("http://","https://"));
+			//String l_url = "http://" + c_ctx.getRequest().getServerName() + ":" + c_ctx.getRequest().getServerPort() + c_ctx.getRequest().getContextPath() + "/login";
+			String l_url = "https://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
 			return new RedirectResolution(l_url,false);
 		}
 		return null;
