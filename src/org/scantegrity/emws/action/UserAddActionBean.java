@@ -1,6 +1,5 @@
 package org.scantegrity.emws.action;
 
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,10 +13,7 @@ import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
-import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
-
-import org.scantegrity.emws.action.UserManage;
 
 public class UserAddActionBean extends RestrictedActionBean {
 	private static final String VIEW = "/WEB-INF/pages/useradd.jsp";
@@ -68,14 +64,6 @@ public class UserAddActionBean extends RestrictedActionBean {
 		c_error = p_error;
 	}
 	
-	private ActionBeanContext c_ctx;
-	public ActionBeanContext getContext() { 
-		return c_ctx; 
-	}
-	public void setContext(ActionBeanContext p_ctx) { 
-		this.c_ctx = p_ctx; 
-	}
-	
 	@HandlesEvent(value="addUser")
 	public Resolution addUser()
 	{
@@ -123,13 +111,10 @@ public class UserAddActionBean extends RestrictedActionBean {
 	@DefaultHandler
 	public Resolution submit()
 	{
-		if( !super.checkUser() )
-		{
-			c_ctx.getRequest().getSession(true).setAttribute("redir", c_ctx.getRequest().getRequestURL().toString().replace("http://","http://"));
-			
-			String l_url = "https://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
-			return new RedirectResolution(l_url,false);
-		}
+		Resolution l_userCheck = super.checkUser();
+		if( l_userCheck != null ) return l_userCheck;
+		
+		
 		ArrayList<String> l_users = new ArrayList<String>();
 		try
 		{

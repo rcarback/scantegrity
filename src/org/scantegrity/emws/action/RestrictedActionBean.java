@@ -4,6 +4,8 @@ import javax.servlet.http.HttpSession;
 
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.RedirectResolution;
+import net.sourceforge.stripes.action.Resolution;
 
 public class RestrictedActionBean implements ActionBean {
 	
@@ -18,14 +20,17 @@ public class RestrictedActionBean implements ActionBean {
 		c_ctx = arg0;
 	}
 	
-	public boolean checkUser()
+	public Resolution checkUser()
 	{		
 		HttpSession c_sess = getContext().getRequest().getSession(true);
 		if( c_sess.getAttribute("username") == null )
 		{
-			return false;
+			c_sess.setAttribute("redir", c_ctx.getRequest().getRequestURL().toString().replace("http://","http://"));
+			
+			String l_url = "http://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
+			return new RedirectResolution(l_url,false);
 		}
-		return true;
+		return null;
 	}
 	
 

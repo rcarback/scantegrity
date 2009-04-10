@@ -28,7 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.FileBean;
 import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.validation.Validate;
 
@@ -88,12 +87,8 @@ public class FileuploadActionBean extends RestrictedActionBean {
 	@DefaultHandler
 	public Resolution submit()
 	{
-		if(! super.checkUser() )
-		{
-			c_ctx.getRequest().getSession(true).setAttribute("redir", c_ctx.getRequest().getRequestURL().toString().replace("http://", "http://"));
-			String l_url = "http://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
-			return new RedirectResolution(l_url,false);
-		}
+		Resolution l_userCheck = super.checkUser();
+		if( l_userCheck != null ) return l_userCheck;
 		
 		//System.setProperty("derby.system.home", "/opt/db-derby");
 		if( c_file != null )

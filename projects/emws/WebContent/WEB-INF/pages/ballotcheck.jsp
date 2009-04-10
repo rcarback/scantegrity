@@ -29,7 +29,7 @@ Before we start, we would like you to read the informed consent information belo
 <br/><br/>
 You must be 18 years or older to participate in this verification process and survey.
 <br/><br/>
-The purpose of this study is to determine how easy the Scantegrity voting system is to use, and how well voters accept the system.  You are being asked to participate in this survey because you have participated in the April 11, 2009, mock election and have requested to verify your vote.  The verification process and survey will take about ten minutes to complete.
+The purpose of this study is to determine how easy the Scantegrity voting system is to use, and how well voters accept the system.  You are being asked to participate in this survey because you have participated in the April 11, 2009 or May 25, 2009, mock election and have requested to verify your vote.  The verification process and survey will take about ten minutes to complete.
 <br/><br/>
 There are no known risks involved in completing this survey.  There are no tangible benefits for completing the survey, but in participating you will be helping to advance research in voting technology.  
 <br/><br/>

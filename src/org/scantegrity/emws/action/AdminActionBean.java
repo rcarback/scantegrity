@@ -8,7 +8,6 @@ import java.sql.Statement;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
-import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 
 public class AdminActionBean extends RestrictedActionBean {
@@ -55,13 +54,9 @@ public class AdminActionBean extends RestrictedActionBean {
 	@DefaultHandler
 	public Resolution submit()
 	{
-		if( !super.checkUser() )
-		{
-			c_ctx.getRequest().getSession(true).setAttribute("redir", c_ctx.getRequest().getRequestURL().toString().replace("http://","http://"));
-			
-			String l_url = "http://" + c_ctx.getRequest().getServerName() + c_ctx.getRequest().getContextPath() + "/login";
-			return new RedirectResolution(l_url,false);
-		}
+		Resolution l_userCheck = super.checkUser();
+		if( l_userCheck != null ) return l_userCheck;
+		
 		return new ForwardResolution("/WEB-INF/pages/admin.jsp");
 	}
 
