@@ -5,6 +5,7 @@ import java.util.Vector;
 import org.scantegrity.lib.Ballot;
 import org.scantegrity.lib.Contest;
 import org.scantegrity.lib.Contestant;
+import org.scantegrity.lib.constants.TallyConstants;
 
 
 /*
@@ -110,6 +111,19 @@ public class InstantRunoffTally implements TallyMethod {
 		//if ()
 		Integer l_bData[][] = p_ballot.getContestData(p_contestId);
 		if (l_bData.length == 0 || l_bData[0].length == 0) return null;
+		
+		for (int l_j = 0; l_j < l_bData[0].length; l_j++)
+		{
+			int l_rankCnt = 0;
+			for (int l_i = 0; l_i < l_bData.length; l_i++)
+			{
+				if (l_bData[l_j][l_i] == 1) 
+					l_rankCnt++;
+				
+				if(l_bData[l_j][l_i] == 1 && l_rankCnt > 1) l_res.put("Rank " + (l_i + 1), TallyConstants.OVERVOTE_ROW);
+			}
+		}
+		
 		for (int l_i = 0; l_i < l_bData[0].length; l_i++)
 		{
 			int l_rankCnt = 0;
@@ -118,9 +132,17 @@ public class InstantRunoffTally implements TallyMethod {
 				if (l_bData[l_j][l_i] == 1) l_rankCnt++;
 			}
 			String l_rankName = "Rank " + (l_i+1); 
-			if (l_rankCnt == 1)	l_res.put(l_rankName, "Vote Recorded");
-			else if (l_rankCnt == 0) l_res.put(l_rankName, "No Vote");
-			else l_res.put(l_rankName, "Overvote");
+			if (l_rankCnt == 1)
+			{
+				if(!l_res.containsKey(l_rankName))
+					l_res.put(l_rankName, TallyConstants.VOTE_RECORDED);
+			}
+			else if (l_rankCnt == 0) 
+			{
+				if(!l_res.containsKey(l_rankName))
+					l_res.put(l_rankName, TallyConstants.NO_VOTE);
+			}
+			else l_res.put(l_rankName, TallyConstants.OVERVOTE);
 		}
 		
 		return l_res;

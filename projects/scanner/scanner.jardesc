@@ -18,13 +18,12 @@
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Cluster.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{ImagePanel.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.lib.exceptions"/>
-        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InvisibleInkCodes.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InputConstants.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InvisibleInkCodes.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{MeetingReaderSax.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.lib"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{SecurityUtil.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Util.java"/>
-        <file path="/Scantegrity/.classpath"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.util"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{DirectoryWatcher.java"/>
         <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{MarkPermutations.java"/>

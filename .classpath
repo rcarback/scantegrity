@@ -25,12 +25,9 @@
 	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/commons-fileupload-1.2.1.jar"/>
 	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/commons-io-1.4.jar"/>
 	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/commons-logging-api-1.1.jar"/>
-	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/derby.jar"/>
-	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/derbyclient.jar"/>
 	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/mail.jar"/>
 	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/recaptcha4j-0.0.7.jar"/>
 	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/stripes-1.5.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.apache.geronimo.runtimeClasspathProvider/Apache Geronimo v2.1"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

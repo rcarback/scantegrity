@@ -37,6 +37,7 @@ import java.util.Vector;
 import org.scantegrity.lib.Ballot;
 import org.scantegrity.lib.Contest;
 import org.scantegrity.lib.Contestant;
+import org.scantegrity.lib.constants.TallyConstants;
 
 public class PluralityTally implements TallyMethod {
 	
@@ -65,9 +66,9 @@ public class PluralityTally implements TallyMethod {
 		{
 			if (l_bData[l_i][0] == 1) l_sum++;
 		}
-		if (l_sum == 0) l_res.put("", "No Vote");
-		else if (l_sum == 1) l_res.put("", "Vote Recorded");
-		else l_res.put("", "Overvote");
+		if (l_sum == 0) l_res.put("", TallyConstants.NO_VOTE);
+		else if (l_sum == 1) l_res.put("", TallyConstants.VOTE_RECORDED);
+		else l_res.put("", TallyConstants.OVERVOTE);
 		return l_res;
 	}
 	

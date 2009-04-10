@@ -23,6 +23,7 @@ package org.scantegrity.scanner.gui;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -55,8 +56,10 @@ import javax.swing.JSeparator;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.Border;
 
+import org.scantegrity.common.SysBeep;
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
 import org.scantegrity.lib.Ballot;
@@ -108,6 +111,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	//require pin flag
 	private Vector<Boolean> c_reqPin;
 	private Vector<Boolean> c_reqPinOnReject;
+	private boolean c_isPinEverRequired = false;
 	
 	//election started flag
 	private boolean c_isElectionStarted = false; 
@@ -252,7 +256,11 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 	 */
 	public void addBallotResults(String p_results, Ballot p_ballot, boolean p_reqPin)
 	{
-		c_reqPin.add(p_reqPin); 
+		if(c_isPinEverRequired)
+			c_reqPin.add(p_reqPin);
+		else
+			c_reqPin.add(false);
+		
 		c_reqPinOnReject.add(true);
 		
 		c_ballotResultsQueue.add(p_results);
@@ -795,6 +803,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		//puts the results into a scrollpane 
 		//only shows scrollbars if results are larger than panel size
 		c_ballotResultsScrollPanel = new JScrollPane(c_ballotResultsTextPane);
+		c_ballotResultsScrollPanel.getVerticalScrollBar().setPreferredSize(new Dimension(50, 1000));
 		
 		//add the panel
 		c_ballotResultsPanel.add(c_ballotResultsScrollPanel, BorderLayout.CENTER);
@@ -838,7 +847,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_ballotSummaryTextPane.setContentType("text/html; charset=UTF-8"); //set to allow html
 		
 		c_electionSummaryScrollPane = new JScrollPane(c_ballotSummaryTextPane);
-		c_electionSummaryScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(30, 100));
+		c_electionSummaryScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(50, 1000));
 		
 		//create cast ballot button
 		c_closeButton = new JButton();
@@ -1222,6 +1231,9 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		{
 			//reject ballot button pressed
 			rejectBallot(); 
+			
+			Thread l_th = new Thread(new SysBeep(3, 100));
+			l_th.start();
 		}
 		else if(e.getActionCommand().equals(c_printButton.getText()))
 		{

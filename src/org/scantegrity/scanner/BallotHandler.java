@@ -37,6 +37,7 @@ import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.lib.Ballot;
 import org.scantegrity.lib.BallotStyle;
 import org.scantegrity.lib.Contest;
+import org.scantegrity.lib.constants.TallyConstants;
 import org.scantegrity.lib.methods.ContestResult;
 import org.scantegrity.lib.methods.TallyMethod;
 import org.scantegrity.scanner.gui.PollingPlaceGUI;
@@ -374,45 +375,42 @@ public class BallotHandler implements ImageHandler
 				String l_res = l_tm.get(s); 
 				
 				c_results += "<tr>";
+				String l_fontColor = "black";
+				String l_colSpan = "1";
 				
-				if(s.equals(""))
+				if(l_res.equals(TallyConstants.OVERVOTE))
 				{
-					if(l_res.equals("Overvote"))
-					{
-						c_results += "<td align=\"center\" colspan=\"2\"><font color=\"red\">" + l_res + "</font>";
-						
-						l_b.addNote("Overvote");
-						
-						l_reqPin = true;
-					}
-					else
-					{
-						c_results += "<td align=\"center\" colspan=\"2\">" + l_res;
-					}
+					l_fontColor = "red";
+					l_b.addNote("Overvote");
+					
+					l_reqPin = true;
 				}
+				else if(l_res.equals(TallyConstants.OVERVOTE_ROW))
+				{
+					l_fontColor = "red";
+					l_b.addNote("Overvote in a Cannidate Row");
+					
+					l_reqPin = true;
+				}	
+				else if(l_res.equals(TallyConstants.VOTE_RECORDED))
+				{
+					l_fontColor = "green";
+				}
+				
+				if(!s.equals(""))
+					c_results += "<td align=\"center\">" + s + "</td>";
 				else
-				{
-					if(l_res.equals("Overvote"))
-					{
-						c_results += "<td align=\"center\">" + s + "</td><td align=\"center\"><font color=\"red\">" + l_res + "</font>";
-						
-						l_b.addNote("Overvote");
-						
-						l_reqPin = true;
-					}
-					else
-					{
-						c_results += "<td align=\"center\">" + s + "</td><td align=\"center\">" + l_res;
-					}
-				}
-				
-				c_results += "</td></tr>";
+					l_colSpan = "2";
+					
+					
+				c_results += "<td align=\"center\" colspan=\"" + l_colSpan + "\"><font color=\"" + l_fontColor + "\">";
+				c_results += l_res + "</font></td>";
+	
 			}
 		}
 		
 		c_results += "</table></html>";
-
-		
+			
 		//Send the results to the gui
 		c_guiRef.addBallotResults(c_results, l_b, l_reqPin);
 	}
