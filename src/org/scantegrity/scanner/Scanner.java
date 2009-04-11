@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+
 import org.scantegrity.common.DirectoryWatcher;
 import org.scantegrity.common.ImageLoader;
 import org.scantegrity.common.gui.Dialogs;
@@ -69,6 +70,18 @@ public class Scanner
 	
 	public void endElection()
 	{
+		try
+		{
+			Runtime.getRuntime().exec("mv /mnt/scantegritytmpfs/backup/* /media/disk/scantegrity/backup/").waitFor();
+			Runtime.getRuntime().exec("mv /mnt/scantegritytmpfs/error/* /media/disk/scantegrity/error/").waitFor();
+			Runtime.getRuntime().exec("shutdown -h now").waitFor();
+		}
+		catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		System.exit(0);
 	}
 	
