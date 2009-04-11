@@ -75,7 +75,7 @@ public class AffineCropper
 				} catch (ArrayIndexOutOfBoundsException e) {} 
 			}
 		}
-		/* BEGIN DEBUG * /
+		/* BEGIN DEBUG */
 		try {
 			ImageIO.write(l_res,"png",new File("serial" + i + ".png"));
 		} catch (IOException e) {
