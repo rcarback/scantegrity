@@ -4,7 +4,7 @@
     <stripes:layout-component name="contents">
 <h1>Check Codes</h1>
 
-<p>Please input your ballot serial below.  Any questions or concerns should be directed <a href="contact">here</a>.  Please also help us by taking a <a href="http://www.surveymonkey.com/s.aspx?sm=dZipmL8roQtNNvKtwqT1iA_3d_3d">short survey here</a> about your voting experience.</p>
+<p>Please input your ballot confirmation code below.  Any questions or concerns should be directed <a href="contact">here</a>.  Please also help us by taking a <a href="http://www.surveymonkey.com/s.aspx?sm=dZipmL8roQtNNvKtwqT1iA_3d_3d">short survey here</a> about your voting experience.</p>
 <stripes:form beanclass="org.scantegrity.emws.action.CheckCodesActionBean">
 <p>
 	<label for="name">Serial:</label>
@@ -16,7 +16,7 @@
 	
 	<stripes:errors/>
 	
-	${actionBean.result}
+	${actionBean.results}
 	<br/><br/>
 	${actionBean.errors}
 	<br/>
