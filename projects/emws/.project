@@ -35,14 +35,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>emws</name>
-			<type>2</type>
-			<location>/Users/carback1/Dropbox/workspace/Scantegrity/src/org/scantegrity/emws</location>
-		</link>
-		<link>
 			<name>src</name>
 			<type>2</type>
-			<location>/Users/carback1/Dropbox/workspace/Scantegrity/src</location>
+			<location>/Users/carback1/Dropbox/workspace/Scantegrity Trunk/src</location>
 		</link>
 	</linkedResources>
 </projectDescription>

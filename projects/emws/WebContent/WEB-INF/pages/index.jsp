@@ -16,6 +16,10 @@
         <ul>
             <li><a href="${pageContext.request.contextPath}/docs/ArborDayAnnouncement.pdf">
             Announcement in Takoma Park Newsletter [pdf]</a></li>
+            <li><a href="${pageContext.request.contextPath}SampleBallot.pdf">
+            Sample Ballot</a></li>
+             <li><a href="${pageContext.request.contextPath}/docs/getfiles">
+            Other Downloads</a></li>
         </ul>
 
     </stripes:layout-component>

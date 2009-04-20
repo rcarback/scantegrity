@@ -43,6 +43,7 @@
 		               <li><a href="${pageContext.request.contextPath}/index">Home</a></li>
 		               <li><a href="${pageContext.request.contextPath}/ballotcheck">Ballot Check</a></li>
 		               <li><a href="${pageContext.request.contextPath}/results">Results</a></li>
+                       <li><a href="${pageContext.request.contextPath}/getfiles">Downloads</a></li>
 		               <li><a href="${pageContext.request.contextPath}/faq">FAQ</a></li>
                        <li><a href="${pageContext.request.contextPath}/contact">Contact Us</a></li>
                        <li><a href="${pageContext.request.contextPath}/admin">Admin</a></li>

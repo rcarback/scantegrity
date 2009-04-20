@@ -66,7 +66,7 @@ public class ContactActionBean extends DefaultActionBean{
 	protected void initialize()
 	{
 		c_ReCaptcha = new ReCaptchaImpl();
-		c_bundle = ResourceBundle.getBundle("org.scantegrity.emws.Contact");
+		c_bundle = ResourceBundle.getBundle("Contact");
 		c_ReCaptcha.setPrivateKey(c_bundle.getString("ReCaptchaPriv"));
 		c_ReCaptcha.setPublicKey(c_bundle.getString("ReCaptchaPub"));
 		c_ReCaptcha.setRecaptchaServer(ReCaptchaImpl.HTTPS_SERVER);
