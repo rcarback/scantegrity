@@ -20,7 +20,7 @@ public class UserAddActionBean extends RestrictedActionBean {
 	
 	//Parameters for database connection
 	private static final String c_dbAddress = "jdbc:derby:";
-	private static final String c_dbName = "EMWS";
+	private static final String c_dbName = "CPDB";
 	private static final String c_dbUser = "APP";
 	private static final String c_dbPass = "";
 	
