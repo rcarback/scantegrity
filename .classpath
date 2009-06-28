@@ -28,6 +28,8 @@
 	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/mail.jar"/>
 	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/recaptcha4j-0.0.7.jar"/>
 	<classpathentry kind="lib" path="projects/emws/WebContent/WEB-INF/lib/stripes-1.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/JSane-Base-0.8.jar"/>
+	<classpathentry kind="lib" path="lib/JSane-Net-0.8.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
