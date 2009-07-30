@@ -11,10 +11,6 @@
     	${actionBean.htmlFiles}
     	
     	<br/><br/>
-        <br/><br/>
-        <br/><br/>
-        <br/><br/>
-        <br/><br/>
     
     </stripes:form>
     

@@ -36,7 +36,7 @@ public class CheckCodesActionBean implements ActionBean {
 		
 		for(int x = 0; x < c_codes.size(); x++ )
 		{
-			l_result += "<div";
+			l_result += "<div>";
 			l_result += "<h4>Contest " + (x + 1) + ": </h4>";
 			l_result += "<table style=\"width:60%;\"><tr><th style=\"text-align:left;\">Symbol</th><th style=\"text-align:left;\">Code</th></tr>";
 			for( String[] code : c_codes.get(x) )

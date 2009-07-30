@@ -16,7 +16,7 @@
 	
 	<stripes:errors/>
 	
-	${actionBean.results}
+	${actionBean.result}
 	<br/><br/>
 	${actionBean.errors}
 	<br/>

@@ -9,6 +9,7 @@ import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.action.RedirectResolution;
 
 public class AdminActionBean extends RestrictedActionBean {
 	//Parameters for database connection
@@ -17,6 +18,12 @@ public class AdminActionBean extends RestrictedActionBean {
 	private static final String c_dbUser = "APP";
 	private static final String c_dbPass = "";
 	
+	@HandlesEvent(value="logout")
+	public Resolution logout()
+	{
+		c_ctx.getRequest().getSession().invalidate();
+		return new RedirectResolution(c_ctx.getServletContext().getContextPath());
+	}
 	
 	@HandlesEvent(value="deleteDatabase")
 	public Resolution deleteDatabase()

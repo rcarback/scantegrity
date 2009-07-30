@@ -18,7 +18,9 @@
 			<meta http-equiv="Content-Type" 
 			                 content="application/xhtml+xml; charset=utf-8" />
 			<link rel="stylesheet" type="text/css" 
-			         href="${pageContext.request.contextPath}/styles/adme.css" />            
+			         href="${pageContext.request.contextPath}/styles/adme.css" />      
+			         
+			 <script type="text/javascript" src="${pageContext.request.contextPath}/ckeditor/ckeditor.js"></script>      
 
             <stripes:layout-component name="html_head"/>
         </head>
@@ -43,7 +45,6 @@
 		               <li><a href="${pageContext.request.contextPath}/index">Home</a></li>
 		               <li><a href="${pageContext.request.contextPath}/ballotcheck">Ballot Check</a></li>
 		               <li><a href="${pageContext.request.contextPath}/results">Results</a></li>
-                       <li><a href="${pageContext.request.contextPath}/getfiles">Downloads</a></li>
 		               <li><a href="${pageContext.request.contextPath}/faq">FAQ</a></li>
                        <li><a href="${pageContext.request.contextPath}/contact">Contact Us</a></li>
                        <li><a href="${pageContext.request.contextPath}/admin">Admin</a></li>

@@ -10,7 +10,9 @@
     	<stripes:form beanclass="org.scantegrity.emws.action.AdminActionBean">
     		<stripes:submit name="deleteDatabase" value="Delete Database" />
     	</stripes:form>
-    	
+    	<stripes:form beanclass="org.scantegrity.emws.action.AdminActionBean">
+    		<stripes:submit name="logout" value="Logout" />
+    	</stripes:form>
     </p>
     <br />
     <br />

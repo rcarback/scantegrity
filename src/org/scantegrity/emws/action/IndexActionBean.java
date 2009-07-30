@@ -1,5 +1,15 @@
-
-
 package org.scantegrity.emws.action;
 
-public class IndexActionBean extends DefaultActionBean{}
+import java.io.*;
+import java.util.Scanner;
+
+import javax.servlet.jsp.PageContext;
+
+public class IndexActionBean extends StaticActionBean{
+	
+	public IndexActionBean()
+	{
+		super("index.html");
+	}
+	
+}
