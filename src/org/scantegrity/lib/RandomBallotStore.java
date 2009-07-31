@@ -19,12 +19,25 @@
  */
 package org.scantegrity.lib;
 
+import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.RandomAccessFile;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Vector;
+
+import org.bouncycastle.util.Arrays;
 
 /**
  * Stores ballot objects at a random location in a large file. The intent is to
@@ -41,6 +54,18 @@ import java.util.Vector;
  * situations.
  * 
  * 
+ * TODO:
+ * 	- Block structure could/should be encapsulated in it's own class. That would
+ * 	  make it a little easier to follow.
+ *  - File table should be able to tell us all the blocks that comprise a file.
+ *    Perhaps we should have an additional file table entry structure.
+ *  - Part of the block structure should allow for a cryptographic checksum.
+ *    This would mandate a mimimum size for all blocks(e.g. 4-16k, or so).
+ *  - Encrypt the data - Link this with a TPM?
+ *  
+ * All these future directions are good, but we're just trying to get the random
+ * storage functionality down at this point in time. 
+ * 
  * @author Richard Carback
  *
  */
@@ -51,21 +76,55 @@ public class RandomBallotStore
 	private static String INVALID_SIZE = "Invalid file size parameter.";
 	private static String INVALID_BLKSIZE = "Invalid block size parameter."; 
 	private static String FILE_EXISTS = "File already exists.";
-	private static int MAXTRIES = 3;
+	private static String OOM = "Out of Memory!";
+	private static String BLTSTART = "BALLOT";
+	private static String NXTBLK = "NEXT";
+	private static String PRVBLK = "PREV";
+	private static String ENDBLK = "DONE";
+	private static byte FREEBLK = 0;
+	private static byte BLTBLK = 1;
+	private static byte CNTBLK = -1;
 	private String c_fname = "";
 	private RandomAccessFile c_file = null;
-	private long c_btab[] = null;
+	private byte c_btab[] = null;
 	private int c_blksize = 0;
+	private int c_numBlks = 0;
 	private long c_fsize = 0;
+	private MessageDigest c_digest = null;
+	private SecureRandom c_csprng = null;
 		
 	/**
 	 * Create a new RandomBallotStore Object.
 	 * 
 	 * @param p_fname
+	 * @throws NoSuchAlgorithmException 
 	 */
-	public RandomBallotStore(String p_fname)
+	public RandomBallotStore(String p_fname, MessageDigest p_hash, 
+								SecureRandom p_csprng) throws NoSuchAlgorithmException
 	{
 		c_fname = p_fname;
+		
+		if (p_hash == null)
+		{
+			c_digest = MessageDigest.getInstance("SHA-256");			
+		}
+		else
+		{
+			c_digest = p_hash;
+		}
+		
+		if (p_csprng == null)
+		{
+			c_csprng = SecureRandom.getInstance("SHA1PRNG");
+		}
+		else
+		{
+			c_csprng = p_csprng;
+		}
+		//NOTE: this might be problematic, but probably not if it uses 
+		// /dev/random - Need to check/be careful on this one. Date seeding (usually bad anyway)
+		// will not work in this context.
+		c_csprng.generateSeed(20); // 20*8 = 160 bits.
 	}
 	
 	/**
@@ -86,7 +145,7 @@ public class RandomBallotStore
 		}
 		
 		//Verify File Type
-		byte l_fstart[] = new byte[FILESTART.length()];
+		byte l_fstart[] = new byte[FILESTART.getBytes().length];
 		c_file.read(l_fstart);
 		String l_fstartstr = new String(l_fstart);
 		if (!l_fstartstr.equals(FILESTART))
@@ -106,15 +165,22 @@ public class RandomBallotStore
 			throw new IOException(INVALID_BLKSIZE);
 		}
 		
-		c_btab = new long[getTabSize(c_fsize, c_blksize)];
+		c_btab = new byte[getTabSize(c_fsize, c_blksize)];
 		int l_numBallots = 0;
 		for (int i = 0; i < c_btab.length; i++)
 		{
-			c_btab[i] = c_file.readLong();
+			c_btab[i] = c_file.readByte();
 			if (c_btab[i] > 0) {
 				l_numBallots++;
 			}
 		}
+		
+		c_numBlks = c_btab.length;
+
+		System.out.println("File Size: " + c_fsize);
+		System.out.println("Block Size: " + c_blksize);
+		
+		
 		return l_numBallots;
 	}
 	
@@ -132,74 +198,239 @@ public class RandomBallotStore
 		c_file = new RandomAccessFile(c_fname, "rwd");
 		if (c_file.length() != 0)
 		{
-			throw new IOException(FILE_EXISTS);
+			//throw new IOException(FILE_EXISTS);
 		}
 		
 		//Calculate true file size
 		int l_tabSize = getTabSize(p_size, p_blksize);
-		long l_evenSize = (p_size - FILESTART.length() - 16)/p_blksize;
-		l_evenSize += l_tabSize;
+		long l_evenSize = (p_size - FILESTART.getBytes().length - 12 - l_tabSize)/p_blksize;
 		l_evenSize *= p_blksize;
-		l_evenSize += FILESTART.length() + 16;
-		c_file.setLength(l_evenSize);
+		l_evenSize += l_tabSize;
+		l_evenSize += FILESTART.getBytes().length + 12;
 		
-		c_file.writeChars(FILESTART);
+		c_fsize = l_evenSize;
+		c_blksize = p_blksize;
+		c_btab = new byte[l_tabSize];
+		c_numBlks = l_tabSize;
+		
+		c_file.setLength(l_evenSize);
+		c_file.write(FILESTART.getBytes());
 		c_file.writeLong(l_evenSize);
 		c_file.writeInt(p_blksize);
 		c_file.getFD().sync();
 		
-		System.out.println(l_evenSize + " " + p_blksize);
+		System.out.println("Size: " + l_evenSize);
+		System.out.println("blksize: " + c_blksize);
+		System.out.println("table entries: " + c_numBlks);
 		
 		return 0;
 	}
 	
-	public void addBallot(Ballot p_ballot)
+	public void addBallot(Ballot p_ballot) throws IOException
 	{
-		//How many blocks does the ballot need?
+		//Convert the ballot into a serialized or XML Serialized object
 		ByteArrayOutputStream l_ballot = new ByteArrayOutputStream();
 		XMLEncoder l_enc = new XMLEncoder(l_ballot);
 		l_enc.writeObject(p_ballot);
 		l_enc.close();
-		int l_numBlks = l_ballot.size()/c_blksize;
 		
-		//Break up the blks
-		ByteArrayOutputStream l_blks[] = new ByteArrayOutputStream[l_numBlks];
-		for (int l_i = 0; l_i < l_numBlks; l_i++)
+		Vector<Block> l_blks = generateBlks(l_ballot.toByteArray());
+		
+		//Remaining blocks
+		//TODO: push this out elsewhere (doesn't need to be done on each insert)
+		int l_numLeft = 0;
+		for (int l_i = 0; l_i < c_numBlks; l_i++)
 		{
-			System.arraycopy(l_ballot, l_i*c_blksize, 
-								l_blks[l_i], 0, c_blksize);
+			if (c_btab[l_i] == FREEBLK)
+			{
+				l_numLeft++;
+			}
 		}
-
-		//hash each block to find it's position.
 		
+		int l_prevPos = 0;
+		int l_blkPos = 0;
+		for (int l_i = 0; l_i < l_blks.size(); l_i++)
+		{
+			//hash each block to find it's position.
+			int l_pos = getBlkLoc(l_blks.get(l_i).getData(), l_numLeft);
+			l_numLeft--;
+			
+			//Find the correct free blk
+			int l_countPos = 0;
+			l_blkPos = 0;
+			while (l_blkPos < c_numBlks)
+			{
+				//System.out.println(c_btab[l_blkPos] + ", " + l_blkPos + ", " + l_countPos);
+				if (c_btab[l_blkPos] == FREEBLK)
+				{
+					if (l_countPos >= l_pos) break;
+				 	else l_countPos++;	
+				}
+			
+				l_blkPos++;
+			}
+						
+			if (l_blkPos >= c_numBlks || c_btab[l_blkPos] != FREEBLK) 
+			{
+				throw new IOException(OOM);
+			}
+			
+			//If a position is found, check to make sure it's actually all 0's
+			//throw an IOException if it's not.
+			/*
+			if (!isPosEmpty(l_pos)) 
+			{
+				throw new IOException("Found used data in unused block!");
+			}*/
+			
+			//Mark the table entry
+			if (l_i == 0) c_btab[l_blkPos] = BLTBLK;
+			else c_btab[l_blkPos] = CNTBLK;
+			
+			//If there is a previous block
+			if (l_prevPos != 0)
+			{
+				l_blks.get(l_i).setPrev(l_prevPos);
+				l_blks.get(l_i).setNext(l_blkPos);
+				System.out.println("Writing block: " + l_prevPos);
+				writeBlock(l_prevPos, l_blks.get(l_i).getBytes());
+			}
+			l_prevPos = l_blkPos;
+		}
 		
-		//While the position is filled, continue hashing until an appropriate
-		//position is found. If MAXTRIES is reached, throw an IOException
-		
-		//If a position is found, check to make sure it's actually all 0's
-		//throw an IOException if it's not.
-		
-		//Convert the ballot into a serialized or XML Serialized object
-		
-		//Write the table entry
-		//Write the block to the file.
-		//Do the same process for the next block.
+		//Write the last block
+		System.out.println("Writing block: " + l_blkPos);
+		writeBlock(l_blkPos, l_blks.lastElement().getBytes());
+				
 		//Force a Sync of the file w/ the disk.
+		c_file.getFD().sync();
 	}
 	
-	public Vector<Ballot> getBallots()
+
+	public Vector<Ballot> getBallots() throws IOException
 	{
+		Vector<Ballot> l_res = new Vector<Ballot>();
 		//Read the table entries for ballots
-		//convert each serialized ballot into a ballot object
-		//Make sure the ballot object "makes sense"
-		//Add the ballot into the list
+		for (int l_i = 0; l_i < c_numBlks; l_i++)
+		{
+			if (c_btab[l_i] == BLTBLK)
+			{
+				//Read the ballot
+				System.out.println(l_i);
+				byte l_ballot[] = readFile(l_i);
+				//convert each serialized ballot into a ballot object
+				ByteArrayInputStream l_in = new ByteArrayInputStream(l_ballot);
+				XMLDecoder l_bData = new XMLDecoder(l_in);
+				Ballot l_b = null;
+				try
+				{
+					 l_b = (Ballot) l_bData.readObject();
+				} catch (Exception l_e)
+				{
+					//TODO
+					//Ignore exceptions here, but report that there is
+					//a problem
+					l_b = null;
+				}
+				//Make sure the ballot object "makes sense"
+				//TODO: Ballot object checker.
+				
+				//Add the ballot into the list
+				if (l_b != null)
+				{
+					l_res.add(l_b);
+				}
+			}
+		}
 		
-		return new Vector<Ballot>();
+		return l_res;
 	}
 	
+	/**
+	 * Read an entire file in to memory that begins at block p_start.
+	 * 
+	 * @param p_start the starting block.
+	 * @return
+	 * @throws IOException 
+	 */
+	private byte[] readFile(int p_start) throws IOException
+	{
+		byte[] l_res = null;
+		Vector<byte[]> l_blks = new Vector<byte[]>();
+
+		int l_nxt = p_start;		
+		Block l_cur = new Block();
+		l_cur.setBytes(getBlk(l_nxt), 0);
+		l_blks.add(l_cur.getData());
+		int l_size = l_cur.getData().length;
+		while (l_cur.getType() != Block.TYPE_END)
+		{
+			l_nxt = l_cur.getNext();
+			l_cur.setBytes(getBlk(l_nxt), 0);
+			l_blks.add(l_cur.getData());
+			l_size += l_cur.getData().length;
+		}
+		
+		//Re-assemble the file
+		l_res = new byte[l_size];
+		byte l_tmp[] = null;
+		int l_pos = 0;
+		for (int l_i = 0; l_i < l_blks.size(); l_i++)
+		{
+			l_tmp = l_blks.get(l_i);
+			System.arraycopy(l_tmp, 0, 
+								l_res, l_pos, l_tmp.length);
+			l_pos += l_tmp.length;
+		}
+		
+		String x = new String(l_res);
+		System.out.println(x);
+		
+		return l_res;
+	}
+	
+	/**
+	 * Read a block into memory.
+	 * @param p_start
+	 * @return
+	 * @throws IOException 
+	 */
+	private byte[] getBlk(int p_blkId) throws IOException
+	{
+		byte l_res[] = new byte[c_blksize];
+		long l_offset = FILESTART.getBytes().length + 12;
+
+		System.out.println("Reading Block: " + p_blkId);
+		System.out.println("Offset: " + (l_offset+c_numBlks+p_blkId*c_blksize));
+		//read the block		
+		c_file.seek(l_offset+c_numBlks+p_blkId*c_blksize);
+		c_file.read(l_res);	
+		
+		return l_res;
+	}
+
+	/**
+	 * Close the file.
+	 * 
+	 * @throws IOException
+	 */
 	public void close() throws IOException
 	{
 		c_file.close();
+	}
+	
+	private void writeBlock(int p_pos, byte[] p_blk) throws IOException
+	{
+		long l_offset = FILESTART.getBytes().length + 12;
+		
+		//Write the block		
+		System.out.println("Offset Write: " + (l_offset+c_numBlks+p_pos*c_blksize));
+		c_file.seek(l_offset+c_numBlks+p_pos*c_blksize);
+		c_file.write(p_blk);
+		
+		//Write the table
+		c_file.seek(l_offset+p_pos);
+		c_file.writeByte(c_btab[p_pos]);
 	}
 	
 	
@@ -220,12 +451,305 @@ public class RandomBallotStore
 	private int getTabSize(long p_fsize, long p_blksize)
 	{
 		//How many blks are possible?
-		long l_numBlks = (p_fsize - FILESTART.length() - 16)/p_blksize;
-		//How many entries can be stored in a blk?
-		long l_entriesPerBlk = p_blksize/8;
+		long l_numBlks = (p_fsize - FILESTART.length() - 12)/p_blksize;
+		//How many will I need to lose for the table?
+		long l_numLost = l_numBlks/p_blksize;
+				
+		return (int)(l_numBlks-l_numLost);
+	}
+	
+	
+	/**
+	 * Break ballot data up into blocks.
+	 * 
+	 * @param p_data The data to break up.
+	 * @return an array of each block and it's relevant data.
+	 * @throws IOException 
+	 * @throws IOException
+	 */
+	private Vector<Block> generateBlks(byte[] p_data) throws IOException 
+	{
+		Vector<Block> l_blks;		
+		l_blks = new Vector<Block>();
+
+		int l_size = p_data.length;
+		Block l_cur = new Block(Block.TYPE_START, c_blksize);
+		//NOTE: IF block size varies, this algorithm will have to change!
+		int l_dsize = l_cur.getData().length;
+		int l_dpos = 0; // data block pointer
+		while (l_dpos < l_size)
+		{
+			//Last block - Will what's left fit in the block?
+			if (l_size-l_dpos <= l_dsize)
+			{
+				l_cur.setType(Block.TYPE_END);
+				l_cur.write(p_data, l_dpos, l_size-l_dpos);
+				l_dpos = l_size; //loop terminating condition				
+			}
+			else
+			{
+				//Normal block
+				l_cur.write(p_data, l_dpos, l_dsize);
+				l_dpos += l_dsize;
+			}
+			
+			l_blks.add(l_cur);
+			l_cur = new Block(Block.TYPE_CONT, c_blksize);
+		}
 		
-		long l_tBlks = 1 + l_numBlks/l_entriesPerBlk;
-		return (int)(l_tBlks*p_blksize);
+		return l_blks;
+	}
+	
+	
+	/**
+	 * Given an arbitrary blk of ballot data, produce an index location.
+	 * 
+	 * The number is produced by concatenation of the ballot data with 
+	 * 20 bytes generated by a CSPRNG. The result is modded with the number
+	 * of possible blks to return the location.  
+	 * 
+	 * 
+	 * @param p_b the block of data to hash.
+	 * @param p_range the # of blocks left.
+	 * @return location in the 
+	 */
+	private int getBlkLoc(byte[] p_b, int p_range) 
+	{
+		if (p_range <= 0) return 0;
+		byte l_rnum[] = new byte[20];
+		c_csprng.nextBytes(l_rnum);
+		c_digest.update(l_rnum);
+		BigInteger l_bInt = (new BigInteger(c_digest.digest(p_b))).abs();
+		l_bInt = l_bInt.mod(BigInteger.valueOf(p_range));	
+		return l_bInt.intValue();
+	}
+	
+	/**
+	 * Encapsulated block structure. When we want to save a few bits, we can
+	 * modify the functions here to react to different block types and be more
+	 * smart about if there is a need to write previous and next pointers.
+	 * 
+	 * @author Richard Carback
+	 *
+	 */
+	private class Block
+	{
+		private static final byte TYPE_START = 1; //Starting block
+		private static final byte TYPE_CONT = 2; //Middle Block
+		private static final byte TYPE_END = 3; //Ending Block
+		
+		private static final String c_start = "BLK";
+		
+		private byte c_type = -1;
+		private int c_next = -1;
+		private int c_prev = -1;
+		private int c_size = 0;
+		private byte c_data[] = null;
+		
+		/**
+		 * Creates an empty, invalid block object.
+		 */
+		public Block()
+		{
+			c_type = -1;
+			c_size = -1;
+			c_next = -1;
+			c_prev = -1;
+			c_data = null;
+		}
+		
+		/**
+		 * Creates a block object of specified type and block size.
+		 * 
+		 * @param p_type type of block (start, continuing, end, etc). 
+		 * @param p_size the size of block.
+		 */
+		public Block(byte p_type, int p_size)
+		{
+			setType(p_type);
+			setSize(p_size);
+			c_next = -1;
+			c_prev = -1;
+		}
+		
+		public byte[] getHeader() throws IOException
+		{
+			ByteArrayOutputStream l_b = new ByteArrayOutputStream();
+			DataOutputStream l_out = new DataOutputStream(l_b);
+			l_out.writeChars(c_start);
+			l_out.write(c_type);
+			l_out.writeInt(c_size);
+			l_out.writeInt(c_prev);
+			l_out.writeInt(c_next);
+			
+			return l_b.toByteArray();
+		}
+		
+		public int getHeaderSize() throws IOException
+		{
+			return getHeader().length;
+		}
+				
+		/**
+		 * Generate and return the bytes contained in this block.
+		 * 
+		 * @return
+		 * @throws IOException
+		 */
+		public byte[] getBytes() throws IOException
+		{
+			ByteArrayOutputStream l_b = new ByteArrayOutputStream();
+			DataOutputStream l_out = new DataOutputStream(l_b);
+			l_out.writeBytes(c_start);
+			l_out.write(c_type);
+			l_out.writeInt(c_size);			
+			l_out.writeInt(c_prev);
+			l_out.writeInt(c_next);
+			l_out.write(c_data);
+			return l_b.toByteArray();
+		}
+		
+		/**
+		 * Parse the bytes as if they were generated by the getBytes function.
+		 * This sets the object to contain the same data as what is represented
+		 * in the byte stream.
+		 * 
+		 * @param p_block
+		 * @throws IOException 
+		 */
+		public void setBytes(byte[] p_block, int p_off) throws IOException
+		{
+			ByteArrayInputStream l_b = new ByteArrayInputStream(p_block);
+			DataInputStream l_in = new DataInputStream(l_b);
+			
+			//Read the block identifier.
+			byte l_id[] = new byte[c_start.length()];
+			l_in.read(l_id);
+			System.out.println(l_id[0]);
+			System.out.println(l_id[1]);
+			System.out.println(l_id[2]);
+			String l_tmp = new String(l_id);
+			
+			if (!l_tmp.equals(c_start)) {
+				System.out.println(l_tmp);
+				throw new IOException("Unrecognized block");
+			}
+			
+			c_type = l_in.readByte();
+			c_size = l_in.readInt();
+			c_prev = l_in.readInt();
+			c_next = l_in.readInt();
+			
+			System.out.println("type" + c_type);
+			System.out.println("Read byte" + c_size);
+			System.out.println("Read prev" + c_prev);
+			System.out.println("Read next" + c_next);
+			
+			c_data = new byte[c_size];
+			l_in.read(c_data, 0, c_size);
+		}
+
+		/**
+		 * @param p_data
+		 * @param p_off
+		 * @param p_length
+		 */
+		public void write(byte[] p_data, int p_off, int p_length)
+		{
+			if (p_length > c_size)
+			{
+				p_length = c_size;
+			}
+			System.arraycopy(p_data, p_off, c_data, 0, p_length);
+		}
+		
+
+		/**
+		 * Changes the size of this block.
+		 * 
+		 * @param p_size
+		 */
+		public void setSize(int p_size)
+		{
+			c_size = p_size;
+			byte l_tmp[] = new byte[c_size];
+			if (c_data != null)
+			{
+				System.arraycopy(c_data, 0, l_tmp, 0, c_data.length);
+			}
+			c_data = l_tmp;
+		}		
+		
+		/**
+		 * The size of this block object.
+		 * @return -1 if the block is invalid.
+		 */
+		public int size()
+		{
+			return c_size;
+		}
+				
+		/**
+		 * Set what type of block object this is.
+		 * 
+		 * @param p_type
+		 */
+		public void setType(byte p_type)
+		{
+			c_type = p_type;
+		}
+		
+		/**
+		 * This blocks type. -1 is an invalid block.
+		 * 
+		 * @return
+		 */
+		public byte getType()
+		{
+			return c_type;
+		}
+		
+		/**
+		 * Location of previous block.
+		 * 
+		 * @return
+		 */
+		public int getPrev()
+		{
+			return c_prev;
+		}
+		
+		public void setPrev(int p_prev)
+		{
+			c_prev = p_prev;
+		}
+		
+		/**
+		 * Location of th enext block.
+		 * 
+		 * @return
+		 */
+		public int getNext()
+		{
+			return c_next;
+		}
+		
+		public void setNext(int p_next)
+		{
+			c_next = p_next;
+		}
+		
+		
+		/**
+		 * Return the data segment of this block.
+		 * 
+		 * @return
+		 */
+		public byte[] getData()
+		{
+			return c_data;
+		}
+		
 	}
 	
 	
