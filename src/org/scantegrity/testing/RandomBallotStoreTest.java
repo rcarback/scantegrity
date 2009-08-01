@@ -19,6 +19,7 @@
  */
 package org.scantegrity.testing;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Vector;
@@ -40,7 +41,9 @@ public class RandomBallotStoreTest
 	 */
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException
 	{
-		RandomBallotStore l_store = new RandomBallotStore("testballots2.sbr", null, null);
+		File l_x = new File("testballots.sbr");
+		l_x.delete();
+		RandomBallotStore l_store = new RandomBallotStore("testballots.sbr", null, null);
 		l_store.create(10*1024*1024, 1024*4);
 		RandomBallotCreator l_c = new RandomBallotCreator();
 		Vector<Ballot> l_ballots = new Vector<Ballot>();

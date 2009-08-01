@@ -177,4 +177,21 @@ public class Ballot
 		c_notes.add(p_note);
 	}
 	
+	/**
+	 * This is really weak, that's on purpose!
+	 * @param l_rhs
+	 * @return
+	 */
+	public boolean equals(Object l_rhs)
+	{
+		if (l_rhs instanceof Ballot) 
+		{
+			if (((Ballot)l_rhs).getId().equals(c_id))
+			{
+				return true;
+			}
+		}
+		return false;	
+	}
+	
 }

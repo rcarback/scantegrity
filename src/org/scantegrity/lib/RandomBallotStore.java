@@ -21,23 +21,18 @@ package org.scantegrity.lib;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Vector;
-
-import org.bouncycastle.util.Arrays;
 
 /**
  * Stores ballot objects at a random location in a large file. The intent is to
@@ -65,6 +60,9 @@ import org.bouncycastle.util.Arrays;
  *  
  * All these future directions are good, but we're just trying to get the random
  * storage functionality down at this point in time. 
+ * 
+ * NOTE: The c_size/c_dsize params in Block have to be handled carefully.
+ * 
  * 
  * @author Richard Carback
  *
@@ -176,10 +174,10 @@ public class RandomBallotStore
 		}
 		
 		c_numBlks = c_btab.length;
-
+		/*
 		System.out.println("File Size: " + c_fsize);
 		System.out.println("Block Size: " + c_blksize);
-		
+		*/
 		
 		return l_numBallots;
 	}
@@ -219,10 +217,11 @@ public class RandomBallotStore
 		c_file.writeInt(p_blksize);
 		c_file.getFD().sync();
 		
+		/*
 		System.out.println("Size: " + l_evenSize);
 		System.out.println("blksize: " + c_blksize);
 		System.out.println("table entries: " + c_numBlks);
-		
+		*/
 		return 0;
 	}
 	
@@ -234,7 +233,13 @@ public class RandomBallotStore
 		l_enc.writeObject(p_ballot);
 		l_enc.close();
 		
-		Vector<Block> l_blks = generateBlks(l_ballot.toByteArray());
+		byte l_arr[] = l_ballot.toByteArray();
+		for (int l_i = 0; l_i < l_arr.length; l_i++)
+		{
+			//l_arr[l_i] = (byte)('A');
+		}
+		
+		Vector<Block> l_blks = generateBlks(l_arr);
 		
 		//Remaining blocks
 		//TODO: push this out elsewhere (doesn't need to be done on each insert)
@@ -291,15 +296,13 @@ public class RandomBallotStore
 			if (l_prevPos != 0)
 			{
 				l_blks.get(l_i).setPrev(l_prevPos);
-				l_blks.get(l_i).setNext(l_blkPos);
-				System.out.println("Writing block: " + l_prevPos);
-				writeBlock(l_prevPos, l_blks.get(l_i).getBytes());
+				l_blks.get(l_i-1).setNext(l_blkPos);
+				writeBlock(l_prevPos, l_blks.get(l_i-1).getBytes());
 			}
 			l_prevPos = l_blkPos;
 		}
 		
 		//Write the last block
-		System.out.println("Writing block: " + l_blkPos);
 		writeBlock(l_blkPos, l_blks.lastElement().getBytes());
 				
 		//Force a Sync of the file w/ the disk.
@@ -316,7 +319,6 @@ public class RandomBallotStore
 			if (c_btab[l_i] == BLTBLK)
 			{
 				//Read the ballot
-				System.out.println(l_i);
 				byte l_ballot[] = readFile(l_i);
 				//convert each serialized ballot into a ballot object
 				ByteArrayInputStream l_in = new ByteArrayInputStream(l_ballot);
@@ -382,10 +384,10 @@ public class RandomBallotStore
 								l_res, l_pos, l_tmp.length);
 			l_pos += l_tmp.length;
 		}
-		
+		/*
 		String x = new String(l_res);
 		System.out.println(x);
-		
+		*/
 		return l_res;
 	}
 	
@@ -400,11 +402,15 @@ public class RandomBallotStore
 		byte l_res[] = new byte[c_blksize];
 		long l_offset = FILESTART.getBytes().length + 12;
 
-		System.out.println("Reading Block: " + p_blkId);
-		System.out.println("Offset: " + (l_offset+c_numBlks+p_blkId*c_blksize));
+		//System.out.println("Reading Block: " + p_blkId);
+		//System.out.println("Offset: " + (l_offset+c_numBlks+p_blkId*c_blksize));
 		//read the block		
 		c_file.seek(l_offset+c_numBlks+p_blkId*c_blksize);
 		c_file.read(l_res);	
+		
+		//System.out.println("Block Data:");
+		//System.out.println(new String(l_res));
+		
 		
 		return l_res;
 	}
@@ -423,8 +429,6 @@ public class RandomBallotStore
 	{
 		long l_offset = FILESTART.getBytes().length + 12;
 		
-		//Write the block		
-		System.out.println("Offset Write: " + (l_offset+c_numBlks+p_pos*c_blksize));
 		c_file.seek(l_offset+c_numBlks+p_pos*c_blksize);
 		c_file.write(p_blk);
 		
@@ -471,7 +475,7 @@ public class RandomBallotStore
 	{
 		Vector<Block> l_blks;		
 		l_blks = new Vector<Block>();
-
+		
 		int l_size = p_data.length;
 		Block l_cur = new Block(Block.TYPE_START, c_blksize);
 		//NOTE: IF block size varies, this algorithm will have to change!
@@ -544,6 +548,7 @@ public class RandomBallotStore
 		private int c_next = -1;
 		private int c_prev = -1;
 		private int c_size = 0;
+		private int c_dsize = 0;
 		private byte c_data[] = null;
 		
 		/**
@@ -553,6 +558,7 @@ public class RandomBallotStore
 		{
 			c_type = -1;
 			c_size = -1;
+			c_dsize = -1;
 			c_next = -1;
 			c_prev = -1;
 			c_data = null;
@@ -563,8 +569,9 @@ public class RandomBallotStore
 		 * 
 		 * @param p_type type of block (start, continuing, end, etc). 
 		 * @param p_size the size of block.
+		 * @throws IOException 
 		 */
-		public Block(byte p_type, int p_size)
+		public Block(byte p_type, int p_size) throws IOException
 		{
 			setType(p_type);
 			setSize(p_size);
@@ -602,9 +609,15 @@ public class RandomBallotStore
 			DataOutputStream l_out = new DataOutputStream(l_b);
 			l_out.writeBytes(c_start);
 			l_out.write(c_type);
-			l_out.writeInt(c_size);			
+			l_out.writeInt(c_dsize);			
 			l_out.writeInt(c_prev);
 			l_out.writeInt(c_next);
+			//Write the block		
+			/*
+			System.out.print("Writing: ");
+			for (int i=0; i < 30; i++) System.out.print((char)c_data[i]);
+			System.out.println("");
+			*/
 			l_out.write(c_data);
 			return l_b.toByteArray();
 		}
@@ -625,28 +638,25 @@ public class RandomBallotStore
 			//Read the block identifier.
 			byte l_id[] = new byte[c_start.length()];
 			l_in.read(l_id);
-			System.out.println(l_id[0]);
-			System.out.println(l_id[1]);
-			System.out.println(l_id[2]);
 			String l_tmp = new String(l_id);
 			
 			if (!l_tmp.equals(c_start)) {
-				System.out.println(l_tmp);
 				throw new IOException("Unrecognized block");
 			}
 			
 			c_type = l_in.readByte();
-			c_size = l_in.readInt();
+			c_dsize = l_in.readInt();
+			c_size = c_dsize + getHeaderSize();
 			c_prev = l_in.readInt();
 			c_next = l_in.readInt();
-			
-			System.out.println("type" + c_type);
-			System.out.println("Read byte" + c_size);
-			System.out.println("Read prev" + c_prev);
-			System.out.println("Read next" + c_next);
-			
-			c_data = new byte[c_size];
-			l_in.read(c_data, 0, c_size);
+			/*
+			System.out.println("Type: " + c_type);
+			System.out.println("Size: " + c_size);
+			System.out.println("Prev: " + c_prev);
+			System.out.println("Next: " + c_next);
+			*/
+			c_data = new byte[c_dsize];
+			l_in.read(c_data, 0, c_dsize);
 		}
 
 		/**
@@ -656,10 +666,17 @@ public class RandomBallotStore
 		 */
 		public void write(byte[] p_data, int p_off, int p_length)
 		{
-			if (p_length > c_size)
+			if (p_length > c_dsize)
 			{
-				p_length = c_size;
+				p_length = c_dsize;
 			}
+			//Write the block		
+			/*
+			System.out.print("Writing: ");
+			for (int i=0; i < 30; i++) System.out.print((char)p_data[i+p_off]);
+			System.out.println("");
+			*/
+			c_dsize = p_length;
 			System.arraycopy(p_data, p_off, c_data, 0, p_length);
 		}
 		
@@ -668,11 +685,13 @@ public class RandomBallotStore
 		 * Changes the size of this block.
 		 * 
 		 * @param p_size
+		 * @throws IOException 
 		 */
-		public void setSize(int p_size)
+		public void setSize(int p_size) throws IOException
 		{
 			c_size = p_size;
-			byte l_tmp[] = new byte[c_size];
+			c_dsize = c_size - getHeaderSize();
+			byte l_tmp[] = new byte[c_dsize];
 			if (c_data != null)
 			{
 				System.arraycopy(c_data, 0, l_tmp, 0, c_data.length);
