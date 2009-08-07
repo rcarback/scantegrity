@@ -26,12 +26,12 @@ import java.net.UnknownHostException;
 
 import javax.imageio.ImageIO;
 
+import org.scantegrity.common.SysBeep;
+
 import uk.org.jsane.JSane_Net.JSane_Net_Connection;
 import uk.org.jsane.JSane_Base.JSane_Base_Device;
 import uk.org.jsane.JSane_Base.JSane_Base_Frame;
 import uk.org.jsane.JSane_Exceptions.JSane_Exception;
-
-
 
 /**
  * @author John Conway
@@ -53,7 +53,7 @@ public class ScannerInterface
 	/**
 	 * Default Constructor
 	 * 
-	 * Initializes the connection to local host with default port of 6566
+	 * Initializes the connection to local host with default port of 6567
 	 */
 	public ScannerInterface()
 	{
@@ -133,6 +133,12 @@ public class ScannerInterface
 		
 	}
 	
+	/** 
+	 * This method will keep polling the scanner until an image is returned. 
+	 * @return
+	 * @throws JSane_Exception
+	 * @throws IOException
+	 */
 	public BufferedImage getImageFromScanner() throws JSane_Exception, IOException
 	{
 		c_scannerDevice = c_saneConnection.getDevice(0);
@@ -147,8 +153,8 @@ public class ScannerInterface
 		}
 		catch (JSane_Exception e1)
 		{
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			Thread l_th = new Thread(new SysBeep(3, 100));
+			l_th.start();
 		} 
 		
 		c_scannerDevice.close();
@@ -160,7 +166,6 @@ public class ScannerInterface
 	{
 		c_scannerDevice = c_saneConnection.getDevice(0);
 		System.out.println(c_scannerDevice.getName()); 
-		c_scannerDevice.close(); 
 	}
 	
 	public static void main(String[] args)

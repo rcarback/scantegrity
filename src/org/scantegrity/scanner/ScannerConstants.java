@@ -26,8 +26,13 @@ package org.scantegrity.scanner;
 public class ScannerConstants
 {
 	/* *******************************************
+	 * Config Constants
+	 * ******************************************/
+	public static final String DEFAULT_CONFIG_NAME = "ScannerConfig.xml";
+	
+	/* *******************************************
 	 * Network Constants 
 	 * *******************************************/
 	public static final String LOCAL_IP = "127.0.0.1";
-	public static final int SANE_CONNECT_PORT = 6567;
+	public static final int SANE_CONNECT_PORT = 7000;
 }

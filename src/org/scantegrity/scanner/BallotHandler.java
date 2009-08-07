@@ -60,8 +60,7 @@ public class BallotHandler implements ImageHandler
 	
 	//References
 	private BallotReader c_reader;
-	private TallyMethod c_tm; 
-	private PollingPlaceGUI c_guiRef; 
+	private TallyMethod c_tm;  
 	private Vector<BallotStyle> c_styles = null;
 	private String c_errDir;
 	private ScannerConfig c_config;
@@ -84,14 +83,10 @@ public class BallotHandler implements ImageHandler
 	 * Takes a reference to the gui for sending results, the error directory 
 	 * to copy bad ballots, and a reference to configuration file
 	 */
-	public BallotHandler(PollingPlaceGUI p_guiRef, String p_errDir, ScannerConfig p_config)
+	public BallotHandler(String p_errDir, ScannerConfig p_config)
 	{
 		//gui and config ref
-		c_guiRef = p_guiRef;
 		c_config = p_config;
-		
-		//send the gui a reference to this
-		setRefInGUI();
 		
 		//get the reader and styles
 		c_reader = c_config.getReader();
@@ -196,7 +191,8 @@ public class BallotHandler implements ImageHandler
 		
 		l_results += "</p></html>";
 		
-		c_guiRef.displaySummaryInfo(l_results);
+		//TODO: What to do now....log?
+		//c_guiRef.displaySummaryInfo(l_results);
 	}
 	
 	/**
@@ -260,20 +256,6 @@ public class BallotHandler implements ImageHandler
 		}
 		
 		return l_res;
-	}
-	
-	/* ***************************************************
-	 * Other private Methods
-	 ****************************************************/
-	
-	/**
-	 * Sets a reference to this ballot handler in the gui
-	 * so it can inform the the ballot handler of cast and 
-	 * rejected ballots
-	 */
-	private void setRefInGUI()
-	{
-		c_guiRef.setBallotHandlerRef(this);
 	}
 	
 	
@@ -411,8 +393,8 @@ public class BallotHandler implements ImageHandler
 		
 		c_results += "</table></html>";
 			
-		//Send the results to the gui
-		c_guiRef.addBallotResults(c_results, l_b, l_reqPin);
+		//TODO: ???Send the results to the gui
+		//c_guiRef.addBallotResults(c_results, l_b, l_reqPin);
 	}
 
 }

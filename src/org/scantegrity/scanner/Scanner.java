@@ -20,11 +20,13 @@
 package org.scantegrity.scanner;
 
 import java.awt.HeadlessException;
+import java.awt.image.BufferedImage;
 import java.beans.XMLDecoder;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 
 import org.scantegrity.common.DirectoryWatcher;
@@ -33,6 +35,8 @@ import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.lib.FindFile;
 import org.scantegrity.scanner.ScannerConfig;
 import org.scantegrity.scanner.gui.PollingPlaceGUI;
+
+import uk.org.jsane.JSane_Exceptions.JSane_Exception;
 
 /**
  * @author John Conway
@@ -43,37 +47,11 @@ import org.scantegrity.scanner.gui.PollingPlaceGUI;
  */
 public class Scanner
 {	
-	private PollingPlaceGUI c_guiRef;
-	private static final String c_name = "ScannerConfig.xml";
-	private static final String c_srcDir = "/mnt/scantegritytmpfs/images";
-	private static final String c_destDir = "/mnt/scantegritytmpfs/backup";
-	private static final String c_errDir = "/mnt/scantegritytmpfs/error";
-	
-	public Scanner(PollingPlaceGUI p_guiRef)
-	{
-		c_guiRef = p_guiRef; 
-	}
-	
-	public void startElection(ScannerConfig p_config)
-	{
-		//Create Ballot Handler
-		BallotHandler l_bih = new BallotHandler(c_guiRef, c_errDir, p_config);
-		
-		//initialize the ImageLoader
-		ImageLoader l_il = new ImageLoader(l_bih);
-		
-		//initialize and start the directory watcher thread
-		Runnable l_dirWatch = new DirectoryWatcher(c_srcDir, c_destDir, l_il);
-		Thread l_dirWatchThread = new Thread(l_dirWatch);
-		l_dirWatchThread.start();
-	}
-	
-	public void endElection()
+	private static final String c_errDir = "~/error/"; 
+	public static void endElection()
 	{
 		try
 		{
-			Runtime.getRuntime().exec("mv /mnt/scantegritytmpfs/backup/* /media/disk/scantegrity/backup/").waitFor();
-			Runtime.getRuntime().exec("mv /mnt/scantegritytmpfs/error/* /media/disk/scantegrity/error/").waitFor();
 			Runtime.getRuntime().exec("shutdown -h now").waitFor();
 		}
 		catch (Exception e)
@@ -81,15 +59,30 @@ public class Scanner
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		System.exit(0);
 	}
 	
-	public static ScannerConfig getConfigurationFile()
+	public static ScannerConfig getConfiguration(String p_configPath)
 	{
 		ScannerConfig l_config = new ScannerConfig();
+	
+		File c_loc = null; 
 		
-		File c_loc = new FindFile(c_name).find();
+		try
+		{
+			c_loc = new File(p_configPath);
+			
+			if(!c_loc.isFile())
+			{
+				c_loc = new FindFile(ScannerConstants.DEFAULT_CONFIG_NAME).find();
+			}
+		}
+		catch(NullPointerException e_npe)
+		{
+			c_loc = new FindFile(ScannerConstants.DEFAULT_CONFIG_NAME).find();
+			//TODO: This should be logged and printed to std.err
+		}
+		
+		//TODO: make sure the file is found and is readable
 		
 		XMLDecoder e;
 		try
@@ -100,7 +93,7 @@ public class Scanner
 		}
 		catch(FileNotFoundException e_fnf)
 		{
-			Dialogs.displayErrorDialog("Could not open Configuration File. File not Found!");
+			System.err.println("Could not open Configuration File. File not Found!");
 		}
 		
 		return l_config;
@@ -111,46 +104,68 @@ public class Scanner
 	 * and runs the GUI. 
 	 * 
 	 * Flags: 
-	 * 	1. -f --fullscreen
-	 * 		sets the gui to fullscreen mode
+	 * 	
 	 * 
 	 * @param args CLI flags
 	 */
 	public static void main(String[] args)
 	{
-		boolean l_fullscreen = false;
+		//process command line arguments
 		
-		for(int i = 0; i < args.length; i++)
-		{
-			String l_temp = args[i]; 
-			if(l_temp.equals("-f") || l_temp.equals("--fullscreen"))
-				l_fullscreen = true;
-		}
- 
 		//Get the config file
-		ScannerConfig l_config = getConfigurationFile();
+		ScannerConfig l_config = getConfiguration(null);
 		
-		//no configuration, quit
-		//TODO: if the filefinder doesnt work, ask for it before quitting
-		if(l_config == null)
-			return;
+		//init audit log
 		
-		//set up the gui
-		Runnable l_gui = null;
+		//check hardware devices
+		//init ballot storage
 		
-		try
+		//authentication ??????????
+		
+		//register logging handlers if any
+		
+		//register devices if any
+		ScannerInterface l_scanner = new ScannerInterface(); 
+		
+		//start the election
+		BallotHandler l_ballotHandlerRef = new BallotHandler(c_errDir, l_config);
+		
+		//main loop
+		//TODO: terminating condition, button, or special ballot???
+		while(true)
 		{
-			l_gui = new PollingPlaceGUI(l_config, l_fullscreen);
-		}
-		catch(HeadlessException headEx)
-		{
-			Dialogs.displayErrorDialog("Sorry! Problem with starting the Scanner.");
+			BufferedImage l_ballotImg = null; 
+			//get a ballot
+			try
+			{
+				l_ballotImg = l_scanner.getImageFromScanner();
+			}
+			catch (JSane_Exception e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}  
+			
+			//process
+			
+			//cast or reject
+			
+			//resume scanning
 		}
 		
+		//end election (ballot handler)
 		
-		//start gui thread
-		Thread l_guiThread = new Thread(l_gui); 
-		l_guiThread.start();
-
+		//turn off storage
+		
+		//disconnect devices 
+		
+		//turn off audit log 
+		
+		//quit
 	}
 }
