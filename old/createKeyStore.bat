@@ -1,1 +1,0 @@
-keytool -genkey -alias jdc -dname "CN=PunchScanCommon, OU=JavaDevelopment, O=PunchScan.org, L=Arlington, S=Virginia, C=US" -validity 180 -keystore myKeys -storepass 123456
