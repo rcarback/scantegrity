@@ -23,7 +23,14 @@
   </organization>
   <modules>
   	<module>scanner</module>
+  	<module>common</module>
+  	<module>OpenSTV</module>
+  	<module>authoring</module>
+  	<module>auditor</module>
+  	<module>engine</module>
   	<module>emws</module>
+  	<module>jsane</module>
+  	<module>zxing</module>
   </modules>
   <build>
     <plugins>

@@ -1,0 +1,6 @@
+Copy JSane-Base-x.xx.jar , JSane-Net-x.xx.jar , (Optionaly JSane-Frontends-x.xx.jar)
+into {JAVA_HOME}/jre/lib/ext
+
+Where:
+ x.xx is the version number
+JAVA_HOME is the directory where Java was installed.
