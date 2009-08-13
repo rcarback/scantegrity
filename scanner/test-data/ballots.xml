@@ -1,0 +1,1914 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_07" class="java.beans.XMLDecoder"> 
+ <object class="java.util.Vector"> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <null/> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <null/> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+  <void method="add"> 
+   <object class="org.scantegrity.lib.Ballot"> 
+    <void property="ballotData"> 
+     <object class="java.util.TreeMap"> 
+      <void method="put"> 
+       <int>0</int> 
+       <array class="[Ljava.lang.Integer;" length="2"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="2"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+      <void method="put"> 
+       <int>1</int> 
+       <array class="[Ljava.lang.Integer;" length="3"> 
+        <void index="0"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="1"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>1</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>1</int> 
+          </void> 
+         </array> 
+        </void> 
+        <void index="2"> 
+         <array class="java.lang.Integer" length="3"> 
+          <void index="0"> 
+           <int>0</int> 
+          </void> 
+          <void index="1"> 
+           <int>0</int> 
+          </void> 
+          <void index="2"> 
+           <int>0</int> 
+          </void> 
+         </array> 
+        </void> 
+       </array> 
+      </void> 
+     </object> 
+    </void> 
+    <void property="ballotStyleID"> 
+     <int>0</int> 
+    </void> 
+    <void property="id"> 
+     <int>18</int> 
+    </void> 
+   </object> 
+  </void> 
+ </object> 
+</java> 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="file:///D:/PunchScan2.0/PunchScan2.0/distribution" href="xmlSig.jnlp">
+   <information>
+      <title>Xml Signature</title>
+      <vendor>SUN</vendor>
+      <offline-allowed/>
+   </information>
+   <offline-allowed/>
+   <resources>
+      <jar href="extJars/xmlSig/dom.jar"/>
+	  <jar href="extJars/xmlSig/jaxp-api.jar"/>
+	  <jar href="extJars/xmlSig/xalan.jar"/>
+	  <jar href="extJars/xmlSig/xercesImpl.jar"/>
+	  <jar href="extJars/xmlSig/xmldsig.jar"/>
+	  <jar href="extJars/xmlSig/xmlsec.jar"/>
+   </resources>
+	<security>
+		<all-permissions/>
+	</security>   
+   <component-desc/>
+</jnlp>

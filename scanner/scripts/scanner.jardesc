@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="Scantegrity/projects/scanner/Scanner.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/Scantegrity/projects/scanner/scanner.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="true" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" mainClassHandleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.test{GUITest.java[GUITest" manifestLocation="/Scantegrity/projects/scanner/scanner.mf" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+        <sealing sealJar="true">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{ImageToCoordinatesInches.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.engine.invisibleink"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Rrow.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{ImagePanel.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InputConstants.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InvisibleInkCodes.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.engine.ioExample"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.lib"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.util"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{DirectoryWatcher.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.testing"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{MarkPermutations.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Meeting.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.authoring.captcha"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.engine.gui"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.authoring"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.lib.methods"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{ImageLoader.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.authoring.invisibleink"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common.gui"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.gui"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{BallotGeometry.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Drow.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{BallotGeometryMap.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.lib.constants"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.authoring.scantegrity"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Cluster.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.lib.exceptions"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.authoring.gui"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{MeetingReaderSax.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.auditor.scantegrity"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.engine.scantegrity"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.engine"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{SecurityUtil.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.auditor.gui"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Util.java"/>
+        <file path="/Scantegrity/.classpath"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.auditor.invisibleink"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.auditor"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.test"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.scanner.scantegrity"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{ImageHandler.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{InvisibleInkCodes2.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Prow.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{Constants.java"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{SymbolRow.java"/>
+        <file path="/Scantegrity/src/org/scantegrity/common/README"/>
+        <javaElement handleIdentifier="=Scantegrity/src&lt;org.scantegrity.common{CodesReaderSax.java"/>
+    </selectedElements>
+    <fatjar builder="org.eclipse.jdt.ui.plain_jar_builder" launchConfig=""/>
+</jardesc>

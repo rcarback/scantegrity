@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="scanner/target/classes" path="scanner/src/main/java"/>
+	<classpathentry excluding="**" kind="src" output="scanner/target/classes" path="scanner/src/main/resources"/>
+	<classpathentry kind="src" output="scanner/target/test-classes" path="scanner/src/test/java"/>
+	<classpathentry excluding="**" kind="src" output="scanner/target/test-classes" path="scanner/src/test/resources"/>
+	<classpathentry kind="src" output="emws/target/classes" path="emws/src/main/java"/>
+	<classpathentry excluding="**" kind="src" output="emws/target/classes" path="emws/src/main/resources"/>
+	<classpathentry kind="src" output="emws/target/test-classes" path="emws/src/test/java"/>
+	<classpathentry excluding="**" kind="src" output="emws/target/test-classes" path="emws/src/test/resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

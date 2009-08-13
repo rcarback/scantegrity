@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Sealed: true
+Main-Class: org.scantegrity.scanner.Scanner
+SplashScreen-Image: images/LoadingScreen.png
+

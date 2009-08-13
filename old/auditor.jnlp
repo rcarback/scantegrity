@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+"
+  codebase="file:///D:/PunchScan2.0/PunchScan2.0/distribution"
+>
+<information>
+  <title>PunchScan Auditor</title>
+  <vendor>PunchScan.org</vendor>
+  <description>Auditing the tables</description>
+  <offline-allowed/>
+  <shortcut online="true">
+     <desktop/>
+     <menu/>
+  </shortcut>  
+</information>
+<offline-allowed/>
+<security>
+  <all-permissions/>
+</security>
+<resources>
+  <j2se version="1.5+" max-heap-size="256m"/>
+  <jar href="PunchScan-auditor-1.5.jar"/>    
+  <jar href="PunchScan-common-1.5.jar"/>
+  
+  <jar href="extJars/ballotStandard-1.0.jar"/>
+  <extension name="bcmail" href="BouncyCastle.jnlp"/>    
+</resources>
+<application-desc main-class="software.auditor.gui.ElectionAudit" />
+</jnlp>
