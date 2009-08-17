@@ -1,5 +1,5 @@
 /*
- * @(#)ExecTest.java.java
+ * @(#)FineFileTest.java.java
  *  
  * Copyright (C) 2008-2009 Scantegrity Project
  * 
@@ -19,25 +19,31 @@
  */
 package org.scantegrity.common;
 
+import java.io.File;
+
 import org.junit.Test;
+import org.scantegrity.common.FindFile;
 
 /**
  * @author John Conway
  *
  */
-public class ExecTest
+public class FindFileTest
 {
+
+	/**
+	 * @param args
+	 */
 	@Test
-	public void testExec()
-	{
-		try
-		{
-			Runtime.getRuntime().exec("").waitFor();
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void TestFindFile()
+	{	
+		FindFile l_ff = new FindFile();
+		File l_file = l_ff.find("ScannerConfig.xml");
+		
+		if(l_file != null)
+			System.out.println(l_file.getPath());
+		else
+			System.out.println("File Not Found");
 	}
+
 }

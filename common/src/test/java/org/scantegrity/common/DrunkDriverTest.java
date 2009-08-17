@@ -43,7 +43,6 @@ public class DrunkDriverTest
 	@Test
 	public void TestDrunkDriver()
 	{
-		/*
 		try
 		{
 			PlanarImage l_pn = JAI.create("fileload", "testing/scanner/sample-images/Basic/blank4.tiff");
@@ -60,7 +59,7 @@ public class DrunkDriverTest
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		*/
+		
 	}
 
 }

@@ -1,7 +1,7 @@
 /*
- * @(#)ExecTest.java.java
- *  
- * Copyright (C) 2008-2009 Scantegrity Project
+ * Scantegrity - Successor to Punchscan, a High Integrity Voting System
+ * Copyright (C) 2006  Richard Carback, David Chaum, Jeremy Clark, 
+ * Aleks Essex, Stefan Popoveniuc, and Jeremy Robin
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,25 +19,11 @@
  */
 package org.scantegrity.common;
 
-import org.junit.Test;
-
 /**
  * @author John Conway
  *
  */
-public class ExecTest
+public class Constants
 {
-	@Test
-	public void testExec()
-	{
-		try
-		{
-			Runtime.getRuntime().exec("").waitFor();
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+	
 }

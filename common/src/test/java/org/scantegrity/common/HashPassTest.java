@@ -1,5 +1,5 @@
 /*
- * @(#)ExecTest.java.java
+ * @(#)HashPass.java.java
  *  
  * Copyright (C) 2008-2009 Scantegrity Project
  * 
@@ -19,25 +19,38 @@
  */
 package org.scantegrity.common;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Scanner;
+
 import org.junit.Test;
 
 /**
  * @author John Conway
  *
  */
-public class ExecTest
+public class HashPassTest
 {
 	@Test
-	public void testExec()
+	public void TestHashPass()
 	{
+		System.out.println("Enter Pass: "); 
+		Scanner l_scan = new Scanner("Hello World");
+		String l_pass = l_scan.nextLine(); 
+		
+		MessageDigest l_m = null;
+		
 		try
 		{
-			Runtime.getRuntime().exec("").waitFor();
+			l_m = MessageDigest.getInstance("MD5");
 		}
-		catch (Exception e)
+		catch (NoSuchAlgorithmException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		l_m.update(l_pass.getBytes(), 0, l_pass.length());
+		System.out.println(l_m.digest());
 	}
 }

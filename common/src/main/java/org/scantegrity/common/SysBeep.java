@@ -1,5 +1,5 @@
 /*
- * @(#)ExecTest.java.java
+ * @(#)SysBeep.java.java
  *  
  * Copyright (C) 2008-2009 Scantegrity Project
  * 
@@ -19,25 +19,46 @@
  */
 package org.scantegrity.common;
 
-import org.junit.Test;
+import java.awt.Toolkit;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author John Conway
  *
  */
-public class ExecTest
+public class SysBeep implements Runnable
 {
-	@Test
-	public void testExec()
+	private int c_count = 0;
+	private long c_delay = 0;
+	private Timer c_timer;
+	
+	public SysBeep(int p_count, long p_delay)
 	{
-		try
+		c_count = p_count; 
+		c_delay = p_delay;
+		
+		c_timer = new Timer();
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
+	@Override
+	public void run()
+	{
+		for(int i = 0; i < c_count; i++)
 		{
-			Runtime.getRuntime().exec("").waitFor();
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Toolkit.getDefaultToolkit().beep();
+			try
+			{
+				Thread.sleep(200);
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			}
 		}
 	}
 }
