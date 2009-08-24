@@ -134,8 +134,10 @@ public class Scanner
 		//TODO: terminating condition, button, or special ballot???
 		while(true)
 		{
-			BufferedImage l_ballotImg = null; 
-			//get a ballot
+			BufferedImage l_ballotImg = null;
+			Ballot l_ballot = null;
+			
+			//get a ballot image
 			try
 			{
 				l_ballotImg = l_scanner.getImageFromScanner();
@@ -152,8 +154,10 @@ public class Scanner
 			}  
 			
 			//process
+			l_ballot = l_ballotHandlerRef.handleImage(l_ballotImg);
 			
 			//cast or reject
+			l_ballotHandlerRef.castBallot(l_ballot);
 			
 			//resume scanning
 		}

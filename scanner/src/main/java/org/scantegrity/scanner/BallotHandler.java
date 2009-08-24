@@ -266,7 +266,7 @@ public class BallotHandler implements ImageHandler
 	/* (non-Javadoc)
 	 * @see org.scantegrity.common.ImageHandler#handleImage(java.awt.image.BufferedImage)
 	 */
-	public void handleImage(BufferedImage p_image)
+	public Ballot handleImage(BufferedImage p_image)
 	{	
 		//Start running the tests to confirm the ballot is valid
 		Ballot l_b = null;
@@ -276,7 +276,7 @@ public class BallotHandler implements ImageHandler
 		{
 			//Give me your keys
 			if(DrunkDriver.isDrunk(p_image, 10))
-				return;
+				return null;
 		
 			//scan the ballot
 			l_b = c_reader.scanBallot(c_styles, p_image);
@@ -285,9 +285,9 @@ public class BallotHandler implements ImageHandler
 			if(l_b == null || l_b.getId() == null)
 			{
 				c_results = "Unable to Scan Ballot. Please Try Again";
-				Dialogs.displayInfoDialog(c_results, "Unable to Read Ballot! \n" 
+				/*Dialogs.displayInfoDialog(c_results, "Unable to Read Ballot! \n" 
 						+ "Either I couldn't find the alignment marks, or I "
-						+ "couldn't read the serial number.");
+						+ "couldn't read the serial number."); */
 				
 				//Copy the bad image to the error directory
 				ImageIO.write(p_image, "tiff", new File(c_errDir + "/error" + i + ".tiff"));
@@ -297,13 +297,13 @@ public class BallotHandler implements ImageHandler
 				
 				//TODO: log the bad image
 				
-				return;
+				return null;
 			}
 		}
 		catch (Exception l_e) 
 		{
 			c_results = "Unable to Scan Ballot. Please Try Again";
-			Dialogs.displayInfoDialog(c_results, "Sorry! Unable to Read the Ballot!");
+			//Dialogs.displayInfoDialog(c_results, "Sorry! Unable to Read the Ballot!");
 			
 			//
 			try
@@ -318,12 +318,12 @@ public class BallotHandler implements ImageHandler
 				e.printStackTrace();
 				System.out.println("Couldn't copy bad ballot image!");
 				 /*END DEBUG*/
-				return;
+				return null;
 			}
 			
 			//l_e.printStackTrace();
 			
-			return;
+			return null;
 		}
 		
 		//Validate the Results
@@ -395,6 +395,8 @@ public class BallotHandler implements ImageHandler
 			
 		//TODO: ???Send the results to the gui
 		//c_guiRef.addBallotResults(c_results, l_b, l_reqPin);
+		
+		return l_b;
 	}
 
 }
