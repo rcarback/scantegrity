@@ -87,14 +87,12 @@ import org.scantegrity.common.constants.TallyConstants;
  * the date of the election.
  * 
  * @author Richard Carback
- * @version 0.0.1 
- * @date 01/03/09
+ * @version 0.0.2 
+ * @date 09/07/09
  */
 
 public class InstantRunoffTally implements TallyMethod {	
-	/** TODO: This entire thing might benefit from a call back to ask 
-	 * the user to make certain decisions.
-	 */
+
 	
 
 	/* (non-Javadoc)
@@ -527,19 +525,31 @@ public class InstantRunoffTally implements TallyMethod {
 		return l_final;
 	}
 	
+	/**
+	 * getDefeated 
+	 * 	Determines the defeated candidate(s) based on their rank.  
+	 * 
+	 * @param p_rank Candidate rankings for the current round.
+	 * @param p_stacks The stacks of ballots for the current round.
+	 * @return the list of defeated candidates.
+	 */
 	private Vector<Contestant> getDefeated(
 			TreeMap<Integer, Vector<Contestant>> p_rank, 
 			TreeMap<Contestant, Vector<BallotIterator>> p_stacks)
 	{
-		/* TODO: Needs bounds checking! */
 		Vector<Contestant> l_defeated = new Vector<Contestant>();
-		Vector<Contestant> l_lowCans, l_upCan;
+		Vector<Contestant> l_lowCans;
 		Integer l_curKey = p_rank.lastKey();
 		if (l_curKey == null || p_rank.lowerKey(l_curKey) == null)
 		{
 			return l_defeated;
 		}
 		l_lowCans = p_rank.get(l_curKey);
+		l_defeated.addAll(l_lowCans);
+		
+		/* This code would normally total all the defeated candidates.
+		 * We only want the lowest candidate. If there is a tie for lowest, 
+		 * then we will return more than one candidate.
 		l_upCan = p_rank.get(p_rank.lowerKey(l_curKey));
 		//Only need 1 upcan
 		l_upCan.setSize(1);
@@ -547,6 +557,7 @@ public class InstantRunoffTally implements TallyMethod {
 		l_lowTot = getContestantTotals(l_lowCans, p_stacks);
 		l_upTot = getContestantTotals(l_upCan, p_stacks);
 		//System.out.println(l_lowTot + ", " + l_upTot);
+ 
 		while (l_lowTot < l_upTot)
 		{
 			l_defeated.addAll(l_lowCans);
@@ -560,7 +571,7 @@ public class InstantRunoffTally implements TallyMethod {
 
 			l_lowTot += getContestantTotals(l_lowCans, p_stacks);
 			l_upTot = getContestantTotals(l_upCan, p_stacks);
-		}
+		}*/
 		
 		return l_defeated;
 	}
