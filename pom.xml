@@ -32,6 +32,7 @@
   	<module>jsane</module>
   	<module>zxing</module>
   	<module>Inkerator</module>
+	<module>erm</module>
   </modules>
   <build>
     <plugins>
