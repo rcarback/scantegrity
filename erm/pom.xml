@@ -4,6 +4,14 @@
     <groupId>org.scantegrity</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
+  
+   <dependencies>
+  	<dependency>
+  		<groupId>org.scantegrity</groupId>
+  		<artifactId>common</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
+  	</dependencies>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.scantegrity</groupId>
   <artifactId>erm</artifactId>

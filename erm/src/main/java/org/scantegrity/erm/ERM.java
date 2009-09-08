@@ -1,10 +1,11 @@
-package scantegrity.erm;
+package org.scantegrity.erm;
 
 import javax.swing.SwingUtilities;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import org.scantegrity.common.*;
 
 public class ERM extends JFrame {
 
