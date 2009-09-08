@@ -196,7 +196,7 @@ public class InstantRunOffTallyTest
 			l_contest = getContestInfo(tests[l_i] + ".info");
 			
 			InstantRunoffTally l_tally = new InstantRunoffTally();
-			IRVContestResult l_x = (IRVContestResult)l_tally.tally(l_contest, l_ballots);
+			IRVContestResult l_x = (IRVContestResult)l_tally.tally(l_contest, l_ballots, new Vector<BallotStyle>());
 			
 			//System.out.println(l_x.toString());
 			TreeMap<Integer, Vector<Contestant>> l_c = l_x.getRanking();

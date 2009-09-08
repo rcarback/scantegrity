@@ -35,6 +35,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.scantegrity.common.Ballot;
+import org.scantegrity.common.BallotStyle;
 import org.scantegrity.common.Contest;
 import org.scantegrity.common.Contestant;
 import org.scantegrity.common.constants.TallyConstants;
@@ -77,7 +78,7 @@ public class PluralityTally implements TallyMethod {
 	 * @see org.scantegrity.lib.methods.TallyMethod#tally(org.scantegrity.scanner.Contest, java.util.Vector)
 	 */
 	@Override
-	public ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots)
+	public ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots, Vector<BallotStyle> p_styles)
 	{
 		PluralityContestResult l_res = new PluralityContestResult();
 		TreeMap<Contestant, Vector<Ballot>> l_stacks;
@@ -179,5 +180,6 @@ public class PluralityTally implements TallyMethod {
 		}
 
 		return l_final;
-	}		
+	}
+	
 }

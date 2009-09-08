@@ -3,6 +3,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.scantegrity.common.Ballot;
+import org.scantegrity.common.BallotStyle;
 import org.scantegrity.common.Contest;
 import org.scantegrity.common.Contestant;
 import org.scantegrity.common.constants.TallyConstants;
@@ -93,8 +94,6 @@ import org.scantegrity.common.constants.TallyConstants;
 
 public class InstantRunoffTally implements TallyMethod {	
 
-	
-
 	/* (non-Javadoc)
 	 * @see org.scantegrity.lib.methods.TallyMethod#validateBallot(org.scantegrity.scanner.Contest, org.scantegrity.scanner.Ballot)
 	 */
@@ -148,10 +147,9 @@ public class InstantRunoffTally implements TallyMethod {
 	
 	
 	/* (non-Javadoc)
-	 * @see org.scantegrity.lib.methods.TallyMethod#tally(int, java.util.Vector)
+	 * @see org.scantegrity.lib.methods.TallyMethod#tally(int, java.util.Vector, java.util.Vector)
 	 */
-	@Override
-	public ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots)
+	public ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots, Vector<BallotStyle> p_styles)
 	{
 		int l_id = p_contest.getId();
 		
@@ -436,6 +434,7 @@ public class InstantRunoffTally implements TallyMethod {
 		}
 	}
 	
+	/*
 	private Integer getContestantTotals(Vector<Contestant> l_contestants,
 						TreeMap<Contestant, Vector<BallotIterator>> l_stacks)
 	{
@@ -445,7 +444,7 @@ public class InstantRunoffTally implements TallyMethod {
 			l_tot += l_stacks.get(l_c).size();
 		}
 		return l_tot;
-	}
+	}*/
 	
 	private Vector<BallotIterator> getBallotsWithContest(int p_contestId, 
 													Vector<Ballot> p_ballots)
@@ -537,6 +536,7 @@ public class InstantRunoffTally implements TallyMethod {
 			TreeMap<Integer, Vector<Contestant>> p_rank, 
 			TreeMap<Contestant, Vector<BallotIterator>> p_stacks)
 	{
+		/** TODO: Try to break a tie, and report the loser, if possible. */
 		Vector<Contestant> l_defeated = new Vector<Contestant>();
 		Vector<Contestant> l_lowCans;
 		Integer l_curKey = p_rank.lastKey();
@@ -631,6 +631,12 @@ public class InstantRunoffTally implements TallyMethod {
 		return null;
 	}
 	
+	/**
+	 * Make a deep copy of the current ballot stack.
+	 * 
+	 * @param l_stack the current ballot stack.
+	 * @return A copy of the given stack.
+	 */
 	private TreeMap<Contestant, Vector<BallotIterator>> copyStack(
 					TreeMap<Contestant, Vector<BallotIterator>> l_stack)
 	{
@@ -670,6 +676,7 @@ public class InstantRunoffTally implements TallyMethod {
 		protected Vector<Integer> c_nextCan = null;
 		
 		/**
+		 * Constructor to create a new Ballot Iterator.
 		 * @param p_ballot
 		 */
 		public BallotIterator(Ballot p_ballot, Integer p_contestId)
@@ -748,4 +755,6 @@ public class InstantRunoffTally implements TallyMethod {
 			return l_res;
 		}
 	}
+
+
 }
