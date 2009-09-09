@@ -11,6 +11,6 @@ import java.awt.image.BufferedImage;
 
 public interface ImageHandler {
 	
-	public void handleImage(BufferedImage p_image);
+	public Ballot handleImage(BufferedImage p_image);
 
 }
