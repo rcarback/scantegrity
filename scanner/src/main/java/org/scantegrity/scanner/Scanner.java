@@ -19,7 +19,6 @@
  */
 package org.scantegrity.scanner;
 
-import java.awt.HeadlessException;
 import java.awt.image.BufferedImage;
 import java.beans.XMLDecoder;
 import java.io.BufferedInputStream;
@@ -27,15 +26,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
-
-import org.scantegrity.common.DirectoryWatcher;
-import org.scantegrity.common.ImageLoader;
-import org.scantegrity.common.gui.Dialogs;
+import org.scantegrity.common.Ballot;
+import org.scantegrity.common.Logging;
+import org.scantegrity.common.SysBeep;
 import org.scantegrity.common.FindFile;
 import org.scantegrity.scanner.ScannerConfig;
-import org.scantegrity.scanner.gui.PollingPlaceGUI;
-
 import uk.org.jsane.JSane_Exceptions.JSane_Exception;
 
 /**
@@ -83,6 +81,22 @@ public class Scanner
 		}
 		
 		//TODO: make sure the file is found and is readable
+		if(c_loc == null)
+		{
+			//TODO: Log 
+			Thread l_th = new Thread(new SysBeep(10, 500));
+			l_th.start();
+			
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				//e1.printStackTrace();
+			} 
+			
+			//TODO: Shutdown, but for now just exit
+			System.exit(-1);
+		}
 		
 		XMLDecoder e;
 		try
@@ -97,6 +111,24 @@ public class Scanner
 		}
 		
 		return l_config;
+	}
+	
+	/**
+	 * This method sets up the logging for the scanner
+	 */
+	public static Logging initializeLogger(ScannerConfig p_config)
+	{
+		String l_logName = p_config.getLogName(); 
+		
+		if(l_logName == null)
+		{
+			//TODO: add the date to the log file name
+			l_logName = "ScantegrityScannerLog-" + ".xml";
+		}
+		
+		Logging l_log = new Logging(p_config.getLogName(), p_config.getLogLevel());
+		
+		return l_log;
 	}
 	
 	/**
@@ -123,12 +155,13 @@ public class Scanner
 		//authentication ??????????
 		
 		//register logging handlers if any
+		Logging l_log = initializeLogger(l_config); 
 		
 		//register devices if any
-		ScannerInterface l_scanner = new ScannerInterface(); 
+		ScannerInterface l_scanner = new ScannerInterface(l_log); 
 		
 		//start the election
-		BallotHandler l_ballotHandlerRef = new BallotHandler(c_errDir, l_config);
+		BallotHandler l_ballotHandlerRef = new BallotHandler(l_log, c_errDir, l_config);
 		
 		//main loop
 		//TODO: terminating condition, button, or special ballot???

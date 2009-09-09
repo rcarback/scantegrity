@@ -64,6 +64,7 @@ public class BallotHandler implements ImageHandler
 	private Vector<BallotStyle> c_styles = null;
 	private String c_errDir;
 	private ScannerConfig c_config;
+	private Logging c_log; 
 	
 	//The ballot Store
 	private BallotStore c_ballotStore;
@@ -83,10 +84,11 @@ public class BallotHandler implements ImageHandler
 	 * Takes a reference to the gui for sending results, the error directory 
 	 * to copy bad ballots, and a reference to configuration file
 	 */
-	public BallotHandler(String p_errDir, ScannerConfig p_config)
+	public BallotHandler(Logging p_log, String p_errDir, ScannerConfig p_config)
 	{
-		//gui and config ref
+		//log and config ref
 		c_config = p_config;
+		c_log = p_log; 
 		
 		//get the reader and styles
 		c_reader = c_config.getReader();
@@ -252,7 +254,7 @@ public class BallotHandler implements ImageHandler
 		for(Contest l_c: l_cv)
 		{
 			TallyMethod l_tm = l_c.getMethod();
-			l_res.add(l_tm.tally(l_c, p_ballots));
+			l_res.add(l_tm.tally(l_c, p_ballots, c_styles));
 		}
 		
 		return l_res;
@@ -392,9 +394,6 @@ public class BallotHandler implements ImageHandler
 		}
 		
 		c_results += "</table></html>";
-			
-		//TODO: ???Send the results to the gui
-		//c_guiRef.addBallotResults(c_results, l_b, l_reqPin);
 		
 		return l_b;
 	}

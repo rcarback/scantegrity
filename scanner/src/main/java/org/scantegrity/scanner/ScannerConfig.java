@@ -22,6 +22,7 @@
 package org.scantegrity.scanner;
 
 import java.util.Vector;
+import java.util.logging.Level;
 
 import org.scantegrity.common.BallotStyle;
 import org.scantegrity.common.Contest;
@@ -56,6 +57,8 @@ public class ScannerConfig {
 	private String c_location = "Unknown Location";
 	private String c_date = "Unknown Date"; //Date and time are stored here.
 	private String c_time = "Unknown Time";
+	private String c_logName = null;
+	private Level c_logLevel = Level.ALL;
 	private Vector<String> c_chiefJudges = null;
 	private Vector<String> c_judgePassHash = null;
 	private BallotReader c_reader = null;
@@ -82,6 +85,8 @@ public class ScannerConfig {
 		c_location = "Unknown Location";
 		c_date = "Unknown Date"; //Date and time are stored here.
 		c_time = "Unknown Time";
+		c_logName = null;
+		c_logLevel = Level.ALL;
 		c_chiefJudges = new Vector<String>();
 		c_chiefJudges.add("Unknown Chief Judge");
 		c_judgePassHash = new Vector<String>();
@@ -198,7 +203,38 @@ public class ScannerConfig {
 	{
 		c_time = p_time;
 	}
+
+	/**
+	 * @return the log name
+	 */
+	public String getLogName()
+	{
+		return c_logName; 
+	}
 	
+	/**
+	 * @param p_logName
+	 */
+	public void setLogName(String p_logName)
+	{
+		c_logName = p_logName;
+	}
+
+	/**
+	 * @return the log level
+	 */
+	public Level getLogLevel()
+	{
+		return c_logLevel; 
+	}
+	
+	/**
+	 * @param p_logLevel
+	 */
+	public void setLogLevel(Level p_level)
+	{
+		c_logLevel = p_level; 
+	}
 	
 	/**
 	 * @return the chiefJudges

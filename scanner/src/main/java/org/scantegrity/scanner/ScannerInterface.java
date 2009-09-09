@@ -23,9 +23,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
+import org.scantegrity.common.Logging;
 import org.scantegrity.common.SysBeep;
 
 import uk.org.jsane.JSane_Net.JSane_Net_Connection;
@@ -49,27 +51,28 @@ public class ScannerInterface
 	
 	/* Scantegrity References */
 	private ScannerConfig c_scannerConfigRef; 
+	private Logging c_log; 
 	
 	/**
 	 * Default Constructor
 	 * 
 	 * Initializes the connection to local host with default port of 6567
 	 */
-	public ScannerInterface()
+	public ScannerInterface(Logging p_log)
 	{
+		c_log = p_log; 
+		
 		try
 		{
 			c_saneConnection = new JSane_Net_Connection(ScannerConstants.LOCAL_IP, ScannerConstants.SANE_CONNECT_PORT);
 		}
 		catch (UnknownHostException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			c_log.log(Level.FINER, e.getMessage());
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			c_log.log(Level.FINER, e.getMessage());
 		}
 	}
 	
@@ -78,21 +81,21 @@ public class ScannerInterface
 	 * scanner connection with local host on the given port. 
 	 * @param p_port
 	 */
-	public ScannerInterface(int p_port)
+	public ScannerInterface(Logging p_log, int p_port)
 	{
+		c_log = p_log;
+		
 		try
 		{
 			c_saneConnection = new JSane_Net_Connection(ScannerConstants.LOCAL_IP, p_port);
 		}
 		catch (UnknownHostException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			c_log.log(Level.FINER, e.getMessage());
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			c_log.log(Level.FINER, e.getMessage());
 		} 
 	}
 	
@@ -101,21 +104,21 @@ public class ScannerInterface
 	 * @param p_hostname
 	 * @param p_port
 	 */
-	public ScannerInterface(String p_hostname, int p_port)
+	public ScannerInterface(Logging p_log, String p_hostname, int p_port)
 	{
+		c_log = p_log;
+		
 		try
 		{
 			c_saneConnection = new JSane_Net_Connection(p_hostname, p_port);
 		}
 		catch (UnknownHostException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			c_log.log(Level.FINER, e.getMessage());
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			c_log.log(Level.FINER, e.getMessage());
 		} 
 	}
 	
@@ -125,8 +128,10 @@ public class ScannerInterface
 	 * 
 	 * @param p_scannerConfigRef
 	 */
-	public ScannerInterface(ScannerConfig p_scannerConfigRef)
+	public ScannerInterface(Logging p_log, ScannerConfig p_scannerConfigRef)
 	{
+		c_log = p_log;
+		
 		c_scannerConfigRef = p_scannerConfigRef; 
 		
 		//grab the hostname and port of the scanner
@@ -153,6 +158,7 @@ public class ScannerInterface
 		}
 		catch (JSane_Exception e1)
 		{
+			c_log.log(Level.FINE, "JSane Exception thrown. Cannot get image from the scanner.");
 			Thread l_th = new Thread(new SysBeep(3, 100));
 			l_th.start();
 		} 
@@ -162,47 +168,9 @@ public class ScannerInterface
 		return l_image; 
 	}
 	
-	private void printDevices() throws IOException, JSane_Exception
+	public void printDevices() throws IOException, JSane_Exception
 	{
 		c_scannerDevice = c_saneConnection.getDevice(0);
 		System.out.println(c_scannerDevice.getName()); 
-	}
-	
-	public static void main(String[] args)
-	{
-		ScannerInterface l_si = new ScannerInterface();
-		
-		try
-		{
-			l_si.printDevices();
-		}
-		catch (JSane_Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		
-		//get an image from the scanner
-		BufferedImage l_image = null;
-		try
-		{
-			l_image = l_si.getImageFromScanner();
-			ImageIO.write(l_image, "tiff", new File("test.tiff"));
-		}
-		catch (JSane_Exception e1)
-		{
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
 	}
 }

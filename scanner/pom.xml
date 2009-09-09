@@ -27,4 +27,27 @@
   		<scope>compile</scope>
   	</dependency>
   </dependencies>
+  <build>
+    <plugins>
+		<plugin> 
+			<artifactId>maven-assembly-plugin</artifactId> 
+			<configuration>
+				<descriptorRefs> 
+					<descriptorRef> 
+						jar-with-dependencies 
+					</descriptorRef> 
+				</descriptorRefs>
+				<formats>
+    				<format>jar</format>
+  				</formats> 
+				<archive> 
+					<manifest> 
+						<mainClass>org.scantegrity.scanner.Scanner</mainClass>
+						<packageName>org.scantegrity</packageName> 
+					</manifest> 
+				</archive>
+			</configuration>				 
+		</plugin> 
+    </plugins>
+  </build>  
 </project>
