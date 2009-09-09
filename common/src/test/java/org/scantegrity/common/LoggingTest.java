@@ -16,7 +16,5 @@ public class LoggingTest {
 		Logging l_log = new Logging("TestLog", Level.ALL);
 		l_log.log(Level.CONFIG, "Testing the config level for the logger.");
 		l_log.log(Level.ALL, "Test message for the logger.");
-
-		
 	}
 }

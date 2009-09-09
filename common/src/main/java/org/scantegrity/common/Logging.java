@@ -7,6 +7,18 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.XMLFormatter;
 
+/**
+ * This class is an extension of java.util.logging.Logger that
+ * is customized for Scantegrity. The log methods have been overridden 
+ * to provide for time and sequence information to always 
+ * be set to 0 when the log is written to in order to preserve
+ * anonymity. When using this class, only use the log methods 
+ * that take LogRecord, or level, msg. The 
+ * logp methods and the rest of the log methods have not been overridden.
+ * 
+ * @author jconway
+ *
+ */
 public class Logging extends Logger
 {
 	private FileHandler c_fileHandler; 
@@ -58,6 +70,13 @@ public class Logging extends Logger
 		c_formatter = new XMLFormatter(); 
 		c_fileHandler.setFormatter(c_formatter);
 	}
+	
+	public void log(LogRecord p_record)
+	{
+		p_record.setMillis(0);
+		p_record.setSequenceNumber(0);
+		super.log(p_record);
+	}
 
 	/**
 	 * Writes the log to the logger
@@ -66,9 +85,7 @@ public class Logging extends Logger
 	 */
 	public void log(Level p_level, String p_message)
 	{
-		LogRecord l_rec = new LogRecord(p_level, p_message);
-		l_rec.setMillis(0);
-		l_rec.setSequenceNumber(0);
-		this.log(l_rec);
+		LogRecord l_record = new LogRecord(p_level, p_message);
+		this.log(l_record);
 	} 
 }
