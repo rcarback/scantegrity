@@ -49,8 +49,12 @@ public class BallotStyle {
 	private Vector<Integer> c_contests;
 	//An array of contestandIds ordered as listed on the ballot.
 	private Vector<Vector<Integer>> c_contestantIds;
+	//An array of positions that are write-in positions.
+	private Vector<Vector<Integer>> c_writeIns;
 	//A list of the x,y locations and sizes of contests on the ballot image
 	private Vector<Vector<Vector<Rectangle>>> c_contestRects;
+	//A list of the x,y locations and sizes of write in locs on the ballot image
+	private Vector<Vector<Vector<Rectangle>>> c_writeInRects;
 	//Should this ballot be counted at the scanner?
 	private boolean c_counted;
 	
@@ -175,6 +179,34 @@ public class BallotStyle {
 	public boolean isCounted()
 	{
 		return c_counted;
+	}
+
+	/**
+	 * @param writeIns the writeIns to set
+	 */
+	public void setWriteIns(Vector<Vector<Integer>> writeIns) {
+		c_writeIns = writeIns;
+	}
+
+	/**
+	 * @return the writeIns
+	 */
+	public Vector<Vector<Integer>> getWriteIns() {
+		return c_writeIns;
+	}
+
+	/**
+	 * @param writeInRects the writeInRects to set
+	 */
+	public void setWriteInRects(Vector<Vector<Vector<Rectangle>>> writeInRects) {
+		c_writeInRects = writeInRects;
+	}
+
+	/**
+	 * @return the writeInRects
+	 */
+	public Vector<Vector<Vector<Rectangle>>> getWriteInRects() {
+		return c_writeInRects;
 	}
 
 	
