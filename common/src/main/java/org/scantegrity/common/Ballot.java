@@ -19,6 +19,7 @@
  */
 package org.scantegrity.common;
 
+import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.Vector;
 
@@ -33,16 +34,28 @@ import java.util.Vector;
  * Contest 3, Tally method permits this, left alone," or "No vote for contest 
  * 1." 
  * 
+ * This is raw ballot data, not result data. It should not be published 
+ * because of pattern marking (italian) attacks. Instead, contest-level 
+ * selections should be stored and published.
+ * 
  * @author Richard Carback
  *
  */
 public class Ballot
 {
+	/** TODO: Notes should be moved to the published object. */
+	
 	private Integer c_id;
 	private Integer c_ballotStyleID;
 	private Map<Integer, Integer[][]> c_ballotData;
 	private boolean c_counted;
 	private Vector<String> c_notes;
+	
+	/* Write-in Support */
+	//Rectangle clippings of write-in ballot location 
+	private Vector<Vector<BufferedImage>> c_writeInImgs = null;
+	//Map of write-ins to CandidateIDs in corresponding Contest.
+	private Vector<Map<Integer, Integer>> c_writeInMap = null;
 	
 	/**
 	 * Default Constructor, creates invalid ballot.
@@ -192,6 +205,22 @@ public class Ballot
 			}
 		}
 		return false;	
+	}
+
+	public void setWriteInImgs(Vector<Vector<BufferedImage>> writeInImgs) {
+		c_writeInImgs = writeInImgs;
+	}
+
+	public Vector<Vector<BufferedImage>> getWriteInImgs() {
+		return c_writeInImgs;
+	}
+
+	public void setWriteInMap(Vector<Map<Integer, Integer>> writeInMap) {
+		c_writeInMap = writeInMap;
+	}
+
+	public Vector<Map<Integer, Integer>> getWriteInMap() {
+		return c_writeInMap;
 	}
 	
 }
