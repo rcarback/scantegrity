@@ -35,6 +35,7 @@ public class Contest
 {
 	private String c_contestName;
 	private Integer c_id;
+	private int c_nextId = 0;
 	private Vector<Contestant> c_contestants;
 	//private MarkRules c_rules;
 	private TallyMethod c_method;
@@ -80,6 +81,26 @@ public class Contest
 	public void setContestants(Vector<Contestant> p_options)
 	{
 		c_contestants = p_options;
+		for( Contestant l_contestant : c_contestants )
+		{
+			if( l_contestant.getId() > c_nextId )
+				c_nextId = l_contestant.getId();
+		}
+		c_nextId++;
+	}
+	
+	public void addContestant(Contestant p_new)
+	{
+		c_contestants.add(p_new);
+		if( p_new.getId() > c_nextId )
+			c_nextId = p_new.getId();
+		
+		c_nextId++;
+	}
+	
+	public int getNextId()
+	{
+		return c_nextId;
 	}
 	/**
 	 * @return the rules

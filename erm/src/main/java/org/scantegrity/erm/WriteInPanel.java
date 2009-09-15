@@ -3,12 +3,14 @@ package org.scantegrity.erm;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.image.BufferedImage;
+import java.util.Vector;
+
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -27,7 +29,10 @@ public class WriteInPanel extends JPanel {
 	private JTextField textCandidate = null;
 	private JPanel imagePanel = null;
 	private JLabel imageLabel = null;
-	private Map<Integer, String> candidateMap = null;
+	private Vector<String> c_candidateList = null;
+	private WriteInResolver c_resolver = null;
+	private BufferedImage c_writeInImage = null;
+	private WriteInLoaderThread c_loader = null;
 
 	/**
 	 * This is the default constructor
@@ -35,6 +40,7 @@ public class WriteInPanel extends JPanel {
 	public WriteInPanel() {
 		super();
 		initialize();
+		
 	}
 
 	/**
@@ -45,13 +51,17 @@ public class WriteInPanel extends JPanel {
 	private void initialize() {
 		listModel = new DefaultListModel();
 		listModel.addElement("Test");
-		candidateMap = new HashMap<Integer, String>();
+		
+		c_candidateList = new Vector<String>();
+		c_resolver = new WriteInResolver();
 		
 		this.setSize(538, 336);
 		this.setLayout(new BorderLayout());
 		this.add(getJScrollPane(), BorderLayout.WEST);
 		this.add(getTextPanel(), BorderLayout.SOUTH);
 		this.add(getImagePanel(), BorderLayout.CENTER);
+		c_loader = new WriteInLoaderThread();
+		c_loader.start();
 	}
 
 	/**
@@ -106,21 +116,27 @@ public class WriteInPanel extends JPanel {
 			textCandidate = new JTextField();
 			textCandidate.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
-					if( !candidateMap.containsValue(textCandidate.getText()) )
-					{
-						int l_res = JOptionPane.showConfirmDialog(getParent(), "Candidate is not in list, would you like to add?", "Confirm Add", JOptionPane.YES_NO_OPTION);
-						if( l_res != JOptionPane.YES_OPTION )
-							return;
-						else
-						{
-							//Add candidate to map
-						}
-					}
-					//Add vote for candidate
+					AddVote(textCandidate.getText());
 				}
 			});
 		}
 		return textCandidate;
+	}
+	
+	public void AddVote(String p_name)
+	{
+		if( !c_candidateList.contains(p_name) )
+		{
+			int l_res = JOptionPane.showConfirmDialog(getParent(), "Candidate is not in list, would you like to add?", "Confirm Add", JOptionPane.YES_NO_OPTION);
+			if( l_res != JOptionPane.YES_OPTION )
+				return;
+			else
+			{
+				c_resolver.AddCandidate(p_name);
+			}
+		}
+		//Add vote for candidate
+		c_loader.notify();
 	}
 
 	/**
@@ -138,6 +154,40 @@ public class WriteInPanel extends JPanel {
 			imagePanel.add(imageLabel, null);
 		}
 		return imagePanel;
+	}
+	
+	private void UpdateState()
+	{
+		DefaultListModel l_model = new DefaultListModel();
+		for(String l_candidate : c_candidateList)
+		{
+			l_model.addElement(l_candidate);
+		}
+		jList.setModel(l_model);
+		
+		imageLabel.setIcon(new ImageIcon(c_writeInImage));
+	}
+	
+	//Inner class to load write-ins for resolution
+	private class WriteInLoaderThread extends Thread
+	{
+		public void run()
+		{
+			while(c_resolver.next())
+			{
+				c_candidateList = c_resolver.getCandidates();
+				c_writeInImage = c_resolver.getImage();
+				UpdateState();
+				//Wait for user to resolve write-in
+				try {
+					this.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			JOptionPane.showMessageDialog(getParent(), "Write-in resolution complete");
+		}
 	}
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
