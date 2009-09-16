@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-import org.scantegrity.common.gui.Dialogs;
 
 /************************************************************************
  * Loads in image from the filesystem, moves it to the directory specified
