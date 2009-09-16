@@ -62,7 +62,7 @@ import javax.swing.border.Border;
 import org.scantegrity.common.SysBeep;
 import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.gui.ScantegrityJFrame;
-import org.scantegrity.lib.Ballot;
+import org.scantegrity.common.Ballot;
 import org.scantegrity.scanner.BallotHandler;
 import org.scantegrity.scanner.JudgeAuthentication;
 import org.scantegrity.scanner.Scanner;
