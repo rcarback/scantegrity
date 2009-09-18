@@ -97,7 +97,6 @@ public class InstantRunoffTally implements TallyMethod {
 	/* (non-Javadoc)
 	 * @see org.scantegrity.lib.methods.TallyMethod#validateBallot(org.scantegrity.scanner.Contest, org.scantegrity.scanner.Ballot)
 	 */
-	@Override
 	public TreeMap<String, String> validateContest(int p_contestId,
 													Ballot p_ballot)
 	{
@@ -149,43 +148,50 @@ public class InstantRunoffTally implements TallyMethod {
 	/* (non-Javadoc)
 	 * @see org.scantegrity.lib.methods.TallyMethod#tally(int, java.util.Vector, java.util.Vector)
 	 */
-	public ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots, Vector<BallotStyle> p_styles)
+	public ContestResult tally(Contest p_contest, Vector<ContestChoice> p_ballots)
 	{
-		int l_id = p_contest.getId();
+		/** TODO: Should not need contestant information anymore. Formatting
+		 * and normalization is assumed to be done outside this function.
+		 */
 		
-		//The election is a series of rounds, which holds stacks for 
-		//each contestant and keeps track of good/bad ballots.
-		Vector<Contestant> l_contestants;		
-		l_contestants = new Vector<Contestant>(p_contest.getContestants());
-		//Add an "Exhausted" contestant.
+		//ID for this contest - Used in reporting.
+		int l_id = p_contest.getId();
+		//Each candidate gets his own stack.
+		TreeMap<Contestant, Vector<ContestChoiceIterator>> l_stacks;
+		Vector<Contestant> l_contestants;
+		//The ballots to count.
+		Vector<ContestChoiceIterator> l_countMe;
+		
+		//Get all the ballots
+		l_countMe = new Vector<ContestChoiceIterator>();
+		for (ContestChoice l_ballot : p_ballots)
+		{
+			l_countMe.add(new ContestChoiceIterator(l_ballot));
+		}
+		
+		//currently available stacks
+		l_stacks = new TreeMap<Contestant, Vector<ContestChoiceIterator>>();
+		l_contestants = p_contest.getContestants();
 		l_contestants.add(new Contestant(-2, "Exhausted Pile"));
-
-		//Results Object
+		for (Contestant l_c: p_contest.getContestants())
+		{
+			l_stacks.put(l_c, new Vector<ContestChoiceIterator>());	
+		}
+		
+		//Results Objects
 		IRVContestResult l_res = new IRVContestResult(l_id, l_contestants);		
 		IRVContestResult.Round l_curRound = l_res.new Round(1);
 		IRVContestResult.Round l_prevRound = null;
-
 		
-		//currently available stacks
-		TreeMap<Contestant, Vector<BallotIterator>> l_stacks;
-		l_stacks = new TreeMap<Contestant, Vector<BallotIterator>>();
-		for (Contestant l_c: l_contestants)
-		{
-			//System.err.println(l_c);
-			l_stacks.put(l_c, new Vector<BallotIterator>());	
-		}
 		
 		//System.out.println("Started with: " + p_ballots.size());
-		Vector<BallotIterator> l_countMe;
-		l_countMe = getBallotsWithContest(l_id, p_ballots);
 
 		//Stack's for resolving ties.
-		Vector<TreeMap<Contestant, Vector<BallotIterator>>> l_tieStack;
-		l_tieStack = new Vector<TreeMap<Contestant, Vector<BallotIterator>>>();
+		Vector<TreeMap<Contestant, Vector<ContestChoiceIterator>>> l_tieStack;
+		l_tieStack = new Vector<TreeMap<Contestant, Vector<ContestChoiceIterator>>>();
 		Vector<IRVContestResult.Round> l_roundStack;
 		l_roundStack = new Vector<IRVContestResult.Round>();
-		Vector<Contestant> l_canStack = new Vector<Contestant>();
-		
+		Vector<Contestant> l_canStack = new Vector<Contestant>();		
 		
 		//Process each round, create a round result for each iteration.
 		int l_numBallots = l_countMe.size();
@@ -195,7 +201,7 @@ public class InstantRunoffTally implements TallyMethod {
 			doRound(l_stacks, l_countMe);
 			
 			//Record current totals
-			Vector<BallotIterator> l_curStack;
+			Vector<ContestChoiceIterator> l_curStack;
 			for (int l_i = 0; l_i < l_contestants.size(); l_i++)
 			{
 				//Pull stack for this contestant
@@ -255,7 +261,7 @@ public class InstantRunoffTally implements TallyMethod {
 						for (l_i = 0; l_i < l_tied.size()-1; l_i++)
 						{
 							//System.out.println("Adding alternate exec: " + l_i);
-							TreeMap<Contestant, Vector<BallotIterator>> l_tmpStack;
+							TreeMap<Contestant, Vector<ContestChoiceIterator>> l_tmpStack;
 							IRVContestResult.Round l_tmpRnd;
 							Contestant l_tmpCan; 
 							l_tmpStack = copyStack(l_stacks);
@@ -281,7 +287,7 @@ public class InstantRunoffTally implements TallyMethod {
 											+ " DEFEATED (TIE)");
 						l_curRound.c_state.set(l_contestants.indexOf(l_tied.get(l_i)), 
 									"DEFEATED (TIE), Round " + l_curRound.getId());
-						l_countMe = new Vector<BallotIterator>();
+						l_countMe = new Vector<ContestChoiceIterator>();
 						l_countMe.addAll(l_stacks.get(l_tied.get(l_i)));
 						l_stacks.remove(l_tied.get(l_i));
 					}
@@ -299,7 +305,7 @@ public class InstantRunoffTally implements TallyMethod {
 			
 			if (l_defeated != null)
 			{
-				l_countMe = new Vector<BallotIterator>();
+				l_countMe = new Vector<ContestChoiceIterator>();
 				for (Contestant l_c : l_defeated) 
 				{
 					l_countMe.addAll(l_stacks.get(l_c));
@@ -345,7 +351,7 @@ public class InstantRunoffTally implements TallyMethod {
 				l_stacks = l_tieStack.get(l_index);
 				l_curRound = l_roundStack.get(l_index);
 				Contestant l_dropCan = l_canStack.get(l_index);
-				l_countMe = new Vector<BallotIterator>();
+				l_countMe = new Vector<ContestChoiceIterator>();
 				l_countMe.addAll(l_stacks.get(l_dropCan));
 				l_stacks.remove(l_dropCan);
 				l_tieStack.remove(l_index);
@@ -367,131 +373,54 @@ public class InstantRunoffTally implements TallyMethod {
 	}
 
 	/**
-	 * This is assuming the dead candidates are *removed* from the stack!
-	 * @param l_stacks
-	 * @param l_ballots
+	 * @param p_stacks The current stacks
+	 * @param p_ballots The current countable stack
+	 * @param p_defeatedIds the defeated candidate IDs.
 	 */
-	private void doRound(TreeMap<Contestant, Vector<BallotIterator>> l_stacks,
-						Vector<BallotIterator> l_ballots)
+	private void doRound(TreeMap<Contestant, Vector<ContestChoiceIterator>> p_stacks,
+						Vector<ContestChoiceIterator> p_ballots)
 	{
-		for (BallotIterator l_ballot : l_ballots)
+		/** TODO: The way we get valid contestants is hack-ish. Make it cleaner.
+		 */
+		for (ContestChoiceIterator l_ballot : p_ballots)
 		{
-			//Find the next contestant ID, recall that the ID's returned from
-			//the getNext method should be "normalized" to the standard
-			//ordering listed in the original config.
+			Vector<Integer> l_cans = new Vector<Integer>();
+			for (Contestant l_c : p_stacks.keySet()) l_cans.add(l_c.getId());
+			Vector<Integer> l_nextIDs = l_ballot.getNext(l_cans);
+			//System.out.println(l_nextIDs.toString());
 			Contestant l_contestant = null;
-			while (l_contestant == null)
+			int l_cid = -1;
+			if (l_nextIDs!= null && l_nextIDs.size() == 1)
 			{
-				Vector<Integer> l_nextIDs = l_ballot.getNext();
-				//If we reached the end..
-				if (l_nextIDs == null )
+				l_cid = l_nextIDs.get(0);
+			}
+			else
+			{
+				//Could be overvote, could be exhaust, result is the same.
+				l_cid = -2;
+			}
+			
+			for (Contestant l_c : p_stacks.keySet())
+			{
+				if (l_c.getId() == l_cid) 
 				{
-					l_nextIDs = new Vector<Integer>();
-					l_nextIDs.add(-2);
-				}
-				
-				//System.err.println("L_nextIDs: " + l_nextIDs.toString());
-				//System.err.println("Ballot: " + l_ballot.c_ballot.toString()); 
-				
-				//Find the Contestant in the stack, if we find more than 2, abort.
-				for (int l_i = 0; l_i < l_nextIDs.size(); l_i++)
-				{
-					for (Object l_key: l_stacks.keySet())
-					{
-						Contestant l_c = (Contestant)l_key;
-						//System.err.println("Candidate ID: " + l_c);
-						if (l_c.getId().equals(l_nextIDs.elementAt(l_i)))
-						{
-							if (l_contestant != null)
-							{
-								//Put in "bad" stack, report problem
-								l_contestant = l_stacks.firstKey();
-								/*System.out.println("Ballot " + 
-										l_ballot.c_ballot.getId()
-										+ " has multiple Choices for Rank " 
-										+ l_ballot.c_curPos);*/
-								l_ballot.c_ballot.addNote("Ballot " + 
-										l_ballot.c_ballot.getId()
-										+ " has multiple Choices for Rank " 
-										+ l_ballot.c_curPos);
-								l_i = l_nextIDs.size();
-								break;
-							}
-							else
-							{
-								l_contestant = l_c;
-							}
-						}
-					}
+					l_contestant = l_c;
 				}
 			}
 			
-			//System.out.println("Adding " + l_ballot.c_ballot.getId() 
+			if (l_contestant == null) l_contestant = p_stacks.firstKey();
+			
+			//System.out.println("Adding " + l_cid
 			//		+ " to " + l_contestant.toString());
-			Vector<BallotIterator> l_b = l_stacks.get(l_contestant);
+			Vector<ContestChoiceIterator> l_b = p_stacks.get(l_contestant);
 			l_b.add(l_ballot);
 			//l_stacks.get(l_contestant).add(l_ballot);	
 		}
 	}
 	
-	/*
-	private Integer getContestantTotals(Vector<Contestant> l_contestants,
-						TreeMap<Contestant, Vector<BallotIterator>> l_stacks)
-	{
-		Integer l_tot = 0;
-		for (Contestant l_c : l_contestants)
-		{
-			l_tot += l_stacks.get(l_c).size();
-		}
-		return l_tot;
-	}*/
-	
-	private Vector<BallotIterator> getBallotsWithContest(int p_contestId, 
-													Vector<Ballot> p_ballots)
-	{
-		//System.err.println("Contest ID in getBallotsWithContest " + p_contestId);
-		//System.err.println("Size of p_ballots: " + p_ballots.size());
-		//First pass, find ballots that have this contest, and then 
-		//sum up the stacks for round 1.
-		BallotIterator l_curIter;
-		Ballot l_curBallot;
-		Vector<BallotIterator> l_res = new Vector<BallotIterator>();
-		for (int l_i = 0; l_i < p_ballots.size(); l_i++)
-		{
-			l_curBallot = p_ballots.elementAt(l_i);
-			if (p_ballots.elementAt(l_i).hasContest(p_contestId))
-			{
-				//TODO: Maybe styles should be a map?
-				//Find the correct ballot style for each ballot to create
-				// a proper ballot iterator.
-				l_curIter = new BallotIterator(l_curBallot, p_contestId);
-				/*for (BallotStyle l_style : p_styles)
-				{
-					int l_sid = p_ballots.elementAt(l_i).getBallotStyleID();
-					if (l_style.getId() == l_sid)
-					{
-						l_curIter = new BallotIterator(l_curBallot, l_style, 
-														p_contestId);
-						break;
-					}
-				}
-				if (l_curIter == null) {
-					l_curIter = new BallotIterator(l_curBallot, null,
-													p_contestId);
-					//TODO: Make a note that this ballot was invalid!
-					System.out.println("Ballot " + l_curBallot.getId() + " has "
-							+ "no style!");
-				}*/
-				l_res.add(l_curIter);
-			}
-		}		
-		
-		return l_res;
-	}
-	
 	
 	private TreeMap<Integer, Vector<Contestant>> getRankOrder(
-							TreeMap<Contestant, Vector<BallotIterator>> p_stacks)
+							TreeMap<Contestant, Vector<ContestChoiceIterator>> p_stacks)
 	{
 		Object l_keys[] = p_stacks.keySet().toArray();
 		TreeMap<Integer, Vector<Contestant>> l_tmp, l_final;
@@ -534,7 +463,7 @@ public class InstantRunoffTally implements TallyMethod {
 	 */
 	private Vector<Contestant> getDefeated(
 			TreeMap<Integer, Vector<Contestant>> p_rank, 
-			TreeMap<Contestant, Vector<BallotIterator>> p_stacks)
+			TreeMap<Contestant, Vector<ContestChoiceIterator>> p_stacks)
 	{
 		/** TODO: Try to break a tie, and report the loser, if possible. */
 		Vector<Contestant> l_defeated = new Vector<Contestant>();
@@ -637,19 +566,19 @@ public class InstantRunoffTally implements TallyMethod {
 	 * @param l_stack the current ballot stack.
 	 * @return A copy of the given stack.
 	 */
-	private TreeMap<Contestant, Vector<BallotIterator>> copyStack(
-					TreeMap<Contestant, Vector<BallotIterator>> l_stack)
+	private TreeMap<Contestant, Vector<ContestChoiceIterator>> copyStack(
+					TreeMap<Contestant, Vector<ContestChoiceIterator>> l_stack)
 	{
-		TreeMap<Contestant, Vector<BallotIterator>> l_new;
-		l_new = new TreeMap<Contestant, Vector<BallotIterator>>();
+		TreeMap<Contestant, Vector<ContestChoiceIterator>> l_new;
+		l_new = new TreeMap<Contestant, Vector<ContestChoiceIterator>>();
 		Contestant l_c = l_stack.firstKey();
 		do
 		{
-			Vector<BallotIterator> l_bi;
-			l_bi = new Vector<BallotIterator>();
-			for (BallotIterator l_b : l_stack.get(l_c))
+			Vector<ContestChoiceIterator> l_bi;
+			l_bi = new Vector<ContestChoiceIterator>();
+			for (ContestChoiceIterator l_b : l_stack.get(l_c))
 			{
-				l_bi.add(new BallotIterator(l_b));
+				l_bi.add(new ContestChoiceIterator(l_b));
 			}
 			l_new.put(l_c, l_bi);
 			
@@ -657,104 +586,5 @@ public class InstantRunoffTally implements TallyMethod {
 		
 		return l_new;
 	}
-
-	/**
-	 * Encapsulates iteration over a ballot.
-	 * NOTE: BallotIterator Handles the following rules:
-	 * 		Check down one rank to see if 1 is marked. If not, put in 
-	 *      exhausted pile. 
-	 * It does this simply by running false to hasNext, in which case
-	 * it gets put in the bad pile.
-	 * @author Richard Carback
-	 *
-	 */
-	private class BallotIterator {
-
-		protected int c_curPos = -1;
-		protected int c_contestId = -1;
-		protected Ballot c_ballot;
-		protected Vector<Integer> c_nextCan = null;
-		
-		/**
-		 * Constructor to create a new Ballot Iterator.
-		 * @param p_ballot
-		 */
-		public BallotIterator(Ballot p_ballot, Integer p_contestId)
-		{
-			//super();
-			c_curPos = -1;
-			c_nextCan = null;
-			c_ballot = p_ballot;
-			c_contestId = p_contestId;
-		}		
-		
-		/**
-		 * @param p_b
-		 */
-		public BallotIterator(BallotIterator p_b)
-		{
-			this(p_b.c_ballot, p_b.c_contestId);
-			c_curPos = p_b.c_curPos;
-			c_nextCan = p_b.c_nextCan;			
-		}
-
-		/**
-		 * @return true if there are more (valid) ranks to count.
-		 */
-		public boolean hasNext() 
-		{
-			Integer l_bdata[][] = c_ballot.getContestData(c_contestId);
-			
-			
-			//if( l_bdata == null ) System.err.println("Uh oh, it really did happen!");
-			//This should never happen, something really bad happened!
-			if (l_bdata == null) return false;
-			//Already checked before
-			if (c_nextCan != null) return true;
-
-			int l_skip = 0;
-			Vector<Integer> l_can = new Vector<Integer>();
-			while (l_can.size() == 0 && l_skip < 1)
-			{
-				c_curPos++;
-
-				//Bounds check
-				if (c_curPos < 0 || c_curPos >= l_bdata[0].length) {
-					return false;
-				}
-
-				//Are there candidates in this column?
-				for (int l_j = 0; l_j < l_bdata.length; l_j++)
-				{
-					if (l_bdata[l_j][c_curPos] == 1) 
-					{	
-						l_can.add(l_j);
-					}
-				}
-				
-				//We may skip up to 1 position when counting.
-				l_skip++;		
-			} 
-						
-			if (l_can.size() > 0) {
-				c_nextCan = l_can;
-				return true;
-			}
-
-			return false;
-		}
-		
-		/**
-		 * @return the next Candidate ID.
-		 */
-		public Vector<Integer> getNext()
-		{
-			Vector<Integer> l_res = null;
-			if (hasNext()) l_res = c_nextCan;
-			c_nextCan = null;
-			return l_res;
-		}
-	}
-
 
 }

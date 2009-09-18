@@ -19,8 +19,8 @@
  */
 package org.scantegrity.common.methods;
 
+import java.util.Arrays;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Vector;
 
 import org.scantegrity.common.Ballot;
@@ -85,6 +85,25 @@ public class ContestChoice {
 			System.arraycopy(p_choices, 0, c_choices, 0, p_choices[l_i].length);
 		}
 	}
+
+	/**
+	 * Copy Constructor
+	 * 
+	 * @param p_choice
+	 */
+	public ContestChoice(ContestChoice p_choice)
+	{
+		c_contest = p_choice.c_contest;
+		c_id = p_choice.c_id;
+		c_choices = new int[p_choice.c_choices.length][];
+		for (int l_i = 0; l_i < p_choice.c_choices.length; l_i++)
+		{
+			c_choices[l_i] = new int[p_choice.c_choices[l_i].length];
+			System.arraycopy(p_choice.c_choices[l_i], 0, c_choices[l_i], 0, 
+								p_choice.c_choices[l_i].length);
+		}
+	}
+	
 	
 	/**
 	 * Using a ballot object, create a contest choice object.
@@ -148,8 +167,9 @@ public class ContestChoice {
 		for (int l_i = 0; l_i < p_raw[0].length; l_i++)
 		{
 			Vector<Integer> l_tmpIds = new Vector<Integer>();
-			for (int l_j = 0; l_j < p_raw.length; l_i++)
+			for (int l_j = 0; l_j < p_raw.length; l_j++)
 			{
+				//System.out.println(l_j + ", " + l_i);
 				if (p_raw[l_j][l_i] == 1)
 				{
 					l_tmpIds.add(l_j);
@@ -170,12 +190,13 @@ public class ContestChoice {
 				}
 			}
 		}
-		
 		return l_choices;
 	}
 	
 	private void normalizeChoiceStyle(BallotStyle p_style)
 	{
+		if (!p_style.isValid()) return;
+		
 		int l_contestIndex;
 		Vector<Integer> l_contestantMap;
 		
@@ -195,6 +216,8 @@ public class ContestChoice {
 	
 	private void normalizeChoiceWriteIn(BallotStyle p_style, Ballot p_ballot)
 	{
+		if (!p_style.isValid()) return;
+		
 		int l_contestIndex;
 		Map<Integer, Integer> l_writeInMap;
 		

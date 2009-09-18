@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.Contest;
 import org.scantegrity.common.Contestant;
+import org.scantegrity.common.methods.ContestChoice;
 import org.scantegrity.common.methods.IRVContestResult;
 import org.scantegrity.common.methods.InstantRunoffTally;
 
@@ -186,6 +187,8 @@ public class InstantRunOffTallyTest
 	public void test()
 	{
 		Vector<Ballot> l_ballots;
+		Vector<ContestChoice> l_choices;
+		BallotStyle l_style = new BallotStyle();
 		Contest l_contest;
 		System.out.println("Chad should win. The other will report bob based on him being the last calculated winner.");
 		System.out.println("If you make changes to the InstantRunoffTally.java file, you should verify that the full results have not changed.");
@@ -194,9 +197,16 @@ public class InstantRunOffTallyTest
 			System.out.println(tests[l_i] + ":");
 			l_ballots = getData(tests[l_i] + ".data");
 			l_contest = getContestInfo(tests[l_i] + ".info");
+			l_choices = new Vector<ContestChoice>();
+			for (int l_j = 0; l_j < l_ballots.size(); l_j++)
+			{
+				l_choices.add(new ContestChoice(l_j,
+												l_ballots.get(l_j),
+												l_style, l_contest));
+			}
 			
 			InstantRunoffTally l_tally = new InstantRunoffTally();
-			IRVContestResult l_x = (IRVContestResult)l_tally.tally(l_contest, l_ballots, new Vector<BallotStyle>());
+			IRVContestResult l_x = (IRVContestResult)l_tally.tally(l_contest, l_choices);
 			
 			//System.out.println(l_x.toString());
 			TreeMap<Integer, Vector<Contestant>> l_c = l_x.getRanking();

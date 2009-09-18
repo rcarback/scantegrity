@@ -209,5 +209,11 @@ public class BallotStyle {
 		return c_writeInRects;
 	}
 
+	public boolean isValid() {
+		if (c_counted == false && c_id == -1 
+				&& c_contests == null && c_contestRects == null ) return false;
+		else return true;
+	}
+
 	
 }

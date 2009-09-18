@@ -51,8 +51,9 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.scantegrity.common.Ballot;
-import org.scantegrity.common.BallotStyle;
 import org.scantegrity.common.Contest;
+import org.scantegrity.common.methods.ContestChoice;
+import org.scantegrity.common.methods.ContestResult;
 
 public interface TallyMethod {
 	/* TODO: It might turn out that this is better done through abstract
@@ -79,7 +80,7 @@ public interface TallyMethod {
 	 * @param p_ballots an array of 2 dimensional darkmark logic contest 
 	 * results.  
 	 */
-	ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots, Vector<BallotStyle> p_styles);
+	ContestResult tally(Contest p_contest, Vector<ContestChoice> p_ballots);
 	
 	
 }

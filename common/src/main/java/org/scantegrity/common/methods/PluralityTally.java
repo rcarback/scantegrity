@@ -54,7 +54,6 @@ public class PluralityTally implements TallyMethod {
 	/* (non-Javadoc)
 	 * @see org.scantegrity.lib.methods.TallyMethod#validateContest(int, org.scantegrity.scanner.Ballot)
 	 */
-	@Override
 	public TreeMap<String, String> validateContest(int p_contestId,
 			Ballot p_ballot)
 	{
@@ -77,51 +76,47 @@ public class PluralityTally implements TallyMethod {
 	/* (non-Javadoc)
 	 * @see org.scantegrity.lib.methods.TallyMethod#tally(org.scantegrity.scanner.Contest, java.util.Vector)
 	 */
-	@Override
-	public ContestResult tally(Contest p_contest, Vector<Ballot> p_ballots, Vector<BallotStyle> p_styles)
+	public ContestResult tally(Contest p_contest, Vector<ContestChoice> p_ballots)
 	{
 		PluralityContestResult l_res = new PluralityContestResult();
-		TreeMap<Contestant, Vector<Ballot>> l_stacks;
+		TreeMap<Contestant, Vector<ContestChoice>> l_stacks;
 		Vector<Contestant> l_contestants;		
 		l_contestants = new Vector<Contestant>(p_contest.getContestants());
 		l_contestants.add(new Contestant(-2, "Invalid Ballots"));
 		
-		l_stacks = new TreeMap<Contestant, Vector<Ballot>>();
+		l_stacks = new TreeMap<Contestant, Vector<ContestChoice>>();
 		Vector<Integer> l_conIds = new Vector<Integer>();
 		for (Contestant l_c: l_contestants)
 		{
-			l_stacks.put(l_c, new Vector<Ballot>());	
+			l_stacks.put(l_c, new Vector<ContestChoice>());	
 			l_conIds.add(l_c.getId());
 		}
 
-		for (Ballot l_b : p_ballots)
+		for (ContestChoice l_b : p_ballots)
 		{
-			if (l_b.hasContest(p_contest.getId()))
+			int l_bData[][] = l_b.getChoices();
+			int l_c = -1;
+			for (int l_i = 0; l_i < l_bData.length; l_i++)
 			{
-				Integer l_bData[][] = l_b.getContestData(p_contest.getId());
-				int l_c = -1;
-				for (int l_i = 0; l_i < l_bData.length; l_i++)
+				if (l_bData[l_i][0] == 1)
 				{
-					if (l_bData[l_i][0] == 1)
+					if (l_c == -1)
+					{ 
+						//Record Vote
+						l_c = l_i;
+					}
+					else 
 					{
-						if (l_c == -1)
-						{ 
-							//Record Vote
-							l_c = l_i;
-						}
-						else 
-						{
-							//OverVote
-							l_c = -2;
-							break;
-						}
+						//OverVote
+						l_c = -2;
+						break;
 					}
 				}
-				//No Vote
-				if (l_c == -1) l_c = -2;
-				
-				l_stacks.get(l_contestants.get(l_conIds.indexOf(l_c))).add(l_b);
 			}
+			//No Vote
+			if (l_c == -1) l_c = -2;
+			
+			l_stacks.get(l_contestants.get(l_conIds.indexOf(l_c))).add(l_b);
 		}
 
 		TreeMap<Integer, Vector<Contestant>> l_rank = getRankOrder(l_stacks);
@@ -148,7 +143,7 @@ public class PluralityTally implements TallyMethod {
 	 * @return
 	 */
 	private TreeMap<Integer, Vector<Contestant>> getRankOrder(
-			TreeMap<Contestant, Vector<Ballot>> p_stacks)
+			TreeMap<Contestant, Vector<ContestChoice>> p_stacks)
 	{
 		Object l_keys[] = p_stacks.keySet().toArray();
 		TreeMap<Integer, Vector<Contestant>> l_tmp, l_final;

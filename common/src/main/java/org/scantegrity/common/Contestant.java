@@ -24,7 +24,6 @@ package org.scantegrity.common;
  * @author Richard Carback
  *
  */
-@SuppressWarnings("unchecked")
 public class Contestant implements Comparable
 {
 	protected String c_name = null;
@@ -131,7 +130,6 @@ public class Contestant implements Comparable
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	@Override
 	public int compareTo(Object p_o)
 	{	
 		if (c_id.getClass() == p_o.getClass())
