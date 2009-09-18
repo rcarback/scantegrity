@@ -44,7 +44,6 @@ public class SysBeep implements Runnable
 	/* (non-Javadoc)
 	 * @see java.lang.Runnable#run()
 	 */
-	@Override
 	public void run()
 	{
 		for(int i = 0; i < c_count; i++)
