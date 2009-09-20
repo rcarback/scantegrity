@@ -53,7 +53,7 @@ public interface SerialNumberReader {
 	 * @return an integer of the serial number.
 	 * @throws Exception if the serial number is unreadable.
 	 */
-	abstract Integer getSerialNumber(BufferedImage p_img, AffineTransformOp p_op) 
+	abstract String readSerial(BufferedImage p_img, AffineTransformOp p_op) 
 	throws Exception;
 
 }

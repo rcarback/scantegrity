@@ -71,9 +71,10 @@ public class ScantegrityBallotReader extends BallotReader
 			return null; 
 		
 		//Read in the Serial Number
+		String l_serial = "";
 		try
 		{
-			l_res.setId(super.c_serial.getSerialNumber(p_img, l_alignmentOp));
+			l_serial = super.c_serial.readSerial(p_img, l_alignmentOp);
 		}
 		catch (Exception e)
 		{
@@ -82,10 +83,39 @@ public class ScantegrityBallotReader extends BallotReader
 			return null;
 		}		
 		
-		//Read in the Ballot Style, which is left most digit on 5 digit serial
-		//int l_styleID = l_res.getId()/10000;
-		int l_styleID = 0;
+		//Read in the Ballot Style, which is the digit before the "-"
+		String l_serials[] = l_serial.split("-");
+		int l_id;
+		int l_styleID;
+		
+		//The "New" way, parse a "-" to find the styleID.
+		if (l_serials.length == 2)
+		{
+			try {
+				l_id = Integer.parseInt(l_serials[1]);
+			} catch (NumberFormatException l_e) { l_id = -1; }
+			try {
+				l_styleID = Integer.parseInt(l_serials[0]);
+			} catch (NumberFormatException l_e) { l_styleID = -1; }
+		}
+		//The "old" way, default styleID of 0
+		else if (l_serials.length == 1) 
+		{
+			try {
+				l_id = Integer.parseInt(l_serials[0]);
+			} catch (NumberFormatException l_e) { l_id = -1; }
+			l_styleID = 0;
+		}
+		else
+		{
+			//ERROR, could not read serial number...
+			/** TODO: Is this appropriate to handle this error? */
+			l_id = -1;
+			l_styleID = -1;
+		}
 
+		//Set ballot ID number.
+		l_res.setId(l_id);
 		//Select the right Ballot Style, which gives a list of contest data		
 		BallotStyle l_style = null;
 	

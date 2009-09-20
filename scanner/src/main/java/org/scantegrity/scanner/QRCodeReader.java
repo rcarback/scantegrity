@@ -19,17 +19,12 @@
  */
 package org.scantegrity.scanner;
 
-import java.util.Vector;
-import java.util.Hashtable;
-
 import java.awt.Rectangle;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import org.scantegrity.common.AffineCropper;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.DecodeHintType;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
@@ -51,7 +46,7 @@ public class QRCodeReader implements SerialNumberReader
 	 * Since different barcode setups may require a whole ballot to process, it
 	 * probably shouldn't do that.
 	 */
-	public Integer getSerialNumber(BufferedImage p_img, AffineTransformOp p_op) 
+	public String readSerial(BufferedImage p_img, AffineTransformOp p_op) 
 	throws Exception
 	{
 		BufferedImageMonochromeBitmapSource l_serial;
@@ -76,7 +71,7 @@ public class QRCodeReader implements SerialNumberReader
 			
 			//System.out.println("The Result: " + result.getText());
 			//System.out.println("Serial Scan Time:" + (int)(System.currentTimeMillis()-l_start) + "ms");
-			return Integer.parseInt(result.getText());
+			return result.getText();
 		} catch (ReaderException e) {
 			e.printStackTrace();
 			return null;			
