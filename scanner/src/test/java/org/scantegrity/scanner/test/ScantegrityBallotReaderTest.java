@@ -33,12 +33,12 @@ import java.util.Vector;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
-import org.scantegrity.lib.Ballot;
-import org.scantegrity.lib.BallotStyle;
+import org.scantegrity.common.Ballot;
+import org.scantegrity.common.BallotStyle;
 import org.scantegrity.scanner.CircleAlignmentMarkReader;
 import org.scantegrity.scanner.QRCodeReader;
 import org.scantegrity.scanner.ScantegrityBallotReader;
-import org.scantegrity.util.DrunkDriver;
+import org.scantegrity.common.DrunkDriver;
 
 /**
  * Tests the scantegrityBallotReader object methods.

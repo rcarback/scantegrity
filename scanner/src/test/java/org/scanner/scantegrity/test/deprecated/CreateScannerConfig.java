@@ -17,7 +17,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.scantegrity.scanner.test;
+package org.scanner.scantegrity.test.deprecated;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -29,10 +29,10 @@ import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.Vector;
 
-import org.scantegrity.lib.BallotStyle;
-import org.scantegrity.lib.Contest;
-import org.scantegrity.lib.Contestant;
-import org.scantegrity.lib.methods.InstantRunoffTally;
+import org.scantegrity.common.BallotStyle;
+import org.scantegrity.common.Contest;
+import org.scantegrity.common.Contestant;
+import org.scantegrity.common.methods.InstantRunoffTally;
 import org.scantegrity.scanner.CircleAlignmentMarkReader;
 import org.scantegrity.scanner.QRCodeReader;
 import org.scantegrity.scanner.ScannerConfig;
@@ -150,7 +150,7 @@ public class CreateScannerConfig
 		l_config.setPollID(0);
 		l_config.setReader(l_reader);
 		l_config.setContests(l_c);
-		l_config.setDate(new Date());
+		l_config.setDate((new Date()).toString());
 		l_config.setScannerID(0);
 		l_config.setStyles(l_s);
 		

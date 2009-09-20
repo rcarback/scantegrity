@@ -25,9 +25,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Vector;
 
-import org.scantegrity.lib.BallotStyle;
-import org.scantegrity.lib.Contest;
-import org.scantegrity.lib.Contestant;
+import org.scantegrity.common.BallotStyle;
+import org.scantegrity.common.Contest;
+import org.scantegrity.common.Contestant;
 import org.scantegrity.scanner.BallotReader;
 import org.scantegrity.scanner.ScannerConfig;
 

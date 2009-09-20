@@ -33,14 +33,12 @@ import java.util.Vector;
 import javax.imageio.ImageIO;
 
 import org.scantegrity.common.*;
-import org.scantegrity.common.gui.Dialogs;
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
 import org.scantegrity.common.Contest;
 import org.scantegrity.common.constants.TallyConstants;
 import org.scantegrity.common.methods.ContestResult;
 import org.scantegrity.common.methods.TallyMethod;
-import org.scantegrity.scanner.gui.PollingPlaceGUI;
 import org.scantegrity.common.DrunkDriver;
 
 /**
@@ -248,6 +246,7 @@ public class BallotHandler implements ImageHandler
 
 	public Vector<ContestResult> calculateResults(Vector<Ballot> p_ballots)
 	{
+		/* Deprecated
 		Vector<ContestResult> l_res = new Vector<ContestResult>(); 
 		Vector<Contest> l_cv = c_config.getContests(); 
 		
@@ -258,6 +257,8 @@ public class BallotHandler implements ImageHandler
 		}
 		
 		return l_res;
+		*/
+		return null;
 	}
 	
 	

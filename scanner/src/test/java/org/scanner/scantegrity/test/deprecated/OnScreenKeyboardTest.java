@@ -1,9 +1,9 @@
 /**
  * Scantegrity Keypad Test Driver
  */
-package org.scantegrity.scanner.test;
+package org.scanner.scantegrity.test.deprecated;
 
-import org.scantegrity.scanner.gui.OnScreenKeyboard;
+import org.scantegrity.scanner.deprecated.OnScreenKeyboard;
 
 /**
  * @author pdswenso

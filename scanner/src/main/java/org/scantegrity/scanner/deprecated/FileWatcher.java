@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.scantegrity.scanner.gui;
+package org.scantegrity.scanner.deprecated;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

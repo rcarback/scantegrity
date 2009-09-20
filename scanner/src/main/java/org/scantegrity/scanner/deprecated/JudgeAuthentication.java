@@ -1,5 +1,5 @@
 /*
- * @(#)JudgeAuthorization.java.java
+ * @(#)JudgeAuthentication.java.java
  *  
  * Copyright (C) 2008-2009 Scantegrity Project
  * 
@@ -17,24 +17,27 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.scantegrity.scanner.gui;
+package org.scantegrity.scanner.deprecated;
+
+import java.math.BigInteger;
+
+import org.scantegrity.scanner.ScannerConfig;
 
 /**
  * @author John Conway
  *
  */
-public class JudgeAuthorization
-{
-	//references
-	//private Config c_configRef;
-	
-	public boolean checkJudgePin(String p_pin)
+public class JudgeAuthentication
+{	
+	public static boolean authorizeJudge(BigInteger p_hashPin, ScannerConfig p_config)
 	{
-		return false; 
-	}
-	
-	public boolean checkChiefJudgePassword(String p_pass)
-	{
-		return false; 
+		final BigInteger l_b = new BigInteger(p_config.getJudgePassHash().get(0)) ;
+		
+		System.out.println("Config Hash:" + l_b);
+		
+		if(l_b.equals(p_hashPin))
+			return false; 
+		
+		return true;
 	}
 }

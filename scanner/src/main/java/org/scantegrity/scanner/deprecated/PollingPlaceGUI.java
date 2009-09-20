@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package org.scantegrity.scanner.gui;
+package org.scantegrity.scanner.deprecated;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -60,11 +60,8 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 
 import org.scantegrity.common.SysBeep;
-import org.scantegrity.common.gui.Dialogs;
-import org.scantegrity.common.gui.ScantegrityJFrame;
 import org.scantegrity.common.Ballot;
 import org.scantegrity.scanner.BallotHandler;
-import org.scantegrity.scanner.JudgeAuthentication;
 import org.scantegrity.scanner.Scanner;
 import org.scantegrity.scanner.ScannerConfig;
 
@@ -191,7 +188,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 		c_config = p_config;
 		
 		//initalize scanner ref
-		c_scannerRef = new Scanner(this);
+		c_scannerRef = new Scanner();
 		
 		//initialize scanned ballot queue
 		c_ballotResultsQueue = new Vector<String>();
@@ -1064,7 +1061,7 @@ public class PollingPlaceGUI implements Runnable,ActionListener
 			
 			//tell scanner to start all election threads
 			//and run all necessary election startup procedures
-			c_scannerRef.startElection(c_config);
+			//c_scannerRef.startElection(c_config);
 			
 			c_isElectionStarted = true;
 		}

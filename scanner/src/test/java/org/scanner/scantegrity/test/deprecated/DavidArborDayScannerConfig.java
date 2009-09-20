@@ -17,7 +17,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.scantegrity.scanner.test;
+package org.scanner.scantegrity.test.deprecated;
 
 import java.awt.Dimension;
 import java.awt.Point;
@@ -30,11 +30,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Vector;
 
-import org.scantegrity.lib.BallotStyle;
-import org.scantegrity.lib.Contest;
-import org.scantegrity.lib.Contestant;
-import org.scantegrity.lib.methods.InstantRunoffTally;
-import org.scantegrity.lib.methods.PluralityTally;
+import org.scantegrity.common.BallotStyle;
+import org.scantegrity.common.Contest;
+import org.scantegrity.common.Contestant;
+import org.scantegrity.common.methods.InstantRunoffTally;
+import org.scantegrity.common.methods.PluralityTally;
 import org.scantegrity.scanner.CircleAlignmentMarkReader;
 import org.scantegrity.scanner.QRCodeReader;
 import org.scantegrity.scanner.ScannerConfig;
@@ -48,7 +48,7 @@ import org.scantegrity.scanner.ScantegrityBallotReader;
  * @author Richard Carback
  *
  */
-public class ArborDayScannerConfig
+public class DavidArborDayScannerConfig
 {
 	private static String c_loc = "/media/disk/scantegrity/config/";
 	private static String c_name = "ScannerConfig.xml";
@@ -63,10 +63,10 @@ public class ArborDayScannerConfig
 		
 		Dimension l_d = new Dimension(2550, 4200);
 		Point[] l_marks = new Point[2];
-		l_marks[0] = new Point(2380, 448);
-		l_marks[1] = new Point(2398, 3251);
+		l_marks[0] = new Point(2480, 464);
+		l_marks[1] = new Point(2498, 3268);
 		QRCodeReader l_code = new QRCodeReader();
-		l_code.setSerialBoundingBox(new Rectangle(86, 117, 371, 370));
+		l_code.setSerialBoundingBox(new Rectangle(266, 132, 371, 370));
 		l_reader.setSerial(l_code);
 		l_reader.setAlignment(l_marks);
 		l_reader.setDimension(l_d);
@@ -83,75 +83,75 @@ public class ArborDayScannerConfig
 		//Contest 0
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1462, 744, 146, 51));
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1661, 744, 146, 51));
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1860, 744, 146, 51));
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(2058, 744, 146, 51));
-		l_rects.elementAt(0).elementAt(0).add(new Rectangle(2257, 744, 146, 51));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1582, 762, 146, 51));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1776, 762, 146, 51));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(1960, 762, 146, 51));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(2158, 762, 146, 51));
+		l_rects.elementAt(0).elementAt(0).add(new Rectangle(2357, 762, 146, 51));
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1462, 845, 146, 51));
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1661, 845, 146, 51));
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1860, 845, 146, 51));
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(2058, 845, 146, 51));
-		l_rects.elementAt(0).elementAt(1).add(new Rectangle(2257, 845, 146, 51));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1582, 861, 146, 51));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1776, 861, 146, 51));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(1960, 861, 146, 51));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(2158, 861, 146, 51));
+		l_rects.elementAt(0).elementAt(1).add(new Rectangle(2357, 861, 146, 51));
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1462, 945, 146, 51));
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1661, 945, 146, 51));
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1860, 945, 146, 51));
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(2058, 945, 146, 51));
-		l_rects.elementAt(0).elementAt(2).add(new Rectangle(2257, 945, 146, 51));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1582, 960, 146, 51));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1776, 960, 146, 51));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(1960, 960, 146, 51));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(2158, 960, 146, 51));
+		l_rects.elementAt(0).elementAt(2).add(new Rectangle(2357, 960, 146, 51));
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1462, 1045, 146, 51));
-		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1661, 1045, 146, 51));
-		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1860, 1045, 146, 51));
-		l_rects.elementAt(0).elementAt(3).add(new Rectangle(2058, 1045, 146, 51));
-		l_rects.elementAt(0).elementAt(3).add(new Rectangle(2257, 1045, 146, 51));
+		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1582, 1060, 146, 51));
+		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1776, 1060, 146, 51));
+		l_rects.elementAt(0).elementAt(3).add(new Rectangle(1960, 1060, 146, 51));
+		l_rects.elementAt(0).elementAt(3).add(new Rectangle(2158, 1060, 146, 51));
+		l_rects.elementAt(0).elementAt(3).add(new Rectangle(2357, 1060, 146, 51));
 		l_rects.elementAt(0).add(new Vector<Rectangle>());
-		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1462, 1145, 146, 51));
-		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1661, 1145, 146, 51));
-		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1860, 1145, 146, 51));
-		l_rects.elementAt(0).elementAt(4).add(new Rectangle(2058, 1145, 146, 51));
-		l_rects.elementAt(0).elementAt(4).add(new Rectangle(2257, 1145, 146, 51));
+		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1582, 1160, 146, 51));
+		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1776, 1160, 146, 51));
+		l_rects.elementAt(0).elementAt(4).add(new Rectangle(1960, 1160, 146, 51));
+		l_rects.elementAt(0).elementAt(4).add(new Rectangle(2158, 1160, 146, 51));
+		l_rects.elementAt(0).elementAt(4).add(new Rectangle(2357, 1160, 146, 51));
 		//Contest 1
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1659, 1700, 123, 54));
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1858, 1700, 123, 54));
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(2056, 1700, 123, 54));
-		l_rects.elementAt(1).elementAt(0).add(new Rectangle(2255, 1700, 123, 54));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1779, 1716, 123, 54));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(1973, 1716, 123, 54));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(2166, 1716, 123, 54));
+		l_rects.elementAt(1).elementAt(0).add(new Rectangle(2360, 1716, 123, 54));
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1659, 1800, 123, 54));
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1858, 1800, 123, 54));
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(2056, 1800, 123, 54));
-		l_rects.elementAt(1).elementAt(1).add(new Rectangle(2255, 1800, 123, 54));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1779, 1816, 123, 54));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(1973, 1816, 123, 54));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(2166, 1816, 123, 54));
+		l_rects.elementAt(1).elementAt(1).add(new Rectangle(2360, 1816, 123, 54));
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1659, 1900, 123, 54));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1858, 1900, 123, 54));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(2056, 1900, 123, 54));
-		l_rects.elementAt(1).elementAt(2).add(new Rectangle(2255, 1900, 123, 54));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1779, 1916, 123, 54));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(1973, 1916, 123, 54));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(2166, 1916, 123, 54));
+		l_rects.elementAt(1).elementAt(2).add(new Rectangle(2360, 1916, 123, 54));
 		l_rects.elementAt(1).add(new Vector<Rectangle>());
-		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1659, 2000, 123, 54));
-		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1858, 2000, 123, 54));
-		l_rects.elementAt(1).elementAt(3).add(new Rectangle(2056, 2000, 123, 54));
-		l_rects.elementAt(1).elementAt(3).add(new Rectangle(2255, 2000, 123, 54));
+		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1779, 2016, 123, 54));
+		l_rects.elementAt(1).elementAt(3).add(new Rectangle(1973, 2016, 123, 54));
+		l_rects.elementAt(1).elementAt(3).add(new Rectangle(2166, 2016, 123, 54));
+		l_rects.elementAt(1).elementAt(3).add(new Rectangle(2360, 2016, 123, 54));
 		//Contest 2
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(0).add(new Rectangle(1467, 2710, 120, 51));
+		l_rects.elementAt(2).elementAt(0).add(new Rectangle(1592, 2727, 120, 51));
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(1).add(new Rectangle(1467, 2810, 120, 51));
+		l_rects.elementAt(2).elementAt(1).add(new Rectangle(1592, 2827, 120, 51));
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(2).add(new Rectangle(1467, 2910, 120, 51));
+		l_rects.elementAt(2).elementAt(2).add(new Rectangle(1592, 2927, 120, 51));
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(3).add(new Rectangle(1467, 3010, 120, 51));
+		l_rects.elementAt(2).elementAt(3).add(new Rectangle(1592, 3027, 120, 51));
 		l_rects.elementAt(2).add(new Vector<Rectangle>());
-		l_rects.elementAt(2).elementAt(4).add(new Rectangle(1467, 3110, 120, 51));
+		l_rects.elementAt(2).elementAt(4).add(new Rectangle(1592, 3270, 120, 51));
 		//Contest 3
 		l_rects.add(new Vector<Vector<Rectangle>>());
 		l_rects.elementAt(3).add(new Vector<Rectangle>());
-		l_rects.elementAt(3).elementAt(0).add(new Rectangle(2057, 2907, 123, 55));
+		l_rects.elementAt(3).elementAt(0).add(new Rectangle(2167, 2924, 123, 55));
 		l_rects.elementAt(3).add(new Vector<Rectangle>());
-		l_rects.elementAt(3).elementAt(1).add(new Rectangle(2057, 3007, 123, 55));
+		l_rects.elementAt(3).elementAt(1).add(new Rectangle(2167, 3024, 123, 55));
 		
 		
 		Vector<Vector<Integer>> l_contestantIds = new Vector<Vector<Integer>>();

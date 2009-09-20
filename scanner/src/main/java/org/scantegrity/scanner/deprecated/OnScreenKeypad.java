@@ -2,7 +2,7 @@
  * This class implements an on-screen numeric keypad using Swing/AWT.
  */
 
-package org.scantegrity.scanner.gui;
+package org.scantegrity.scanner.deprecated;
 
 import java.io.*;
 import java.net.*;
