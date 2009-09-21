@@ -290,7 +290,10 @@ public class InvisibleInkFactory {
 		int l_vCurSize = l_v;
 		c_xGridCoords.add(0);
 		c_yGridCoords.add(0);
-		p_img = FillGridCell(p_img, 0, 0, l_h, l_v);
+		Color l_tmp;
+		l_tmp = getGridCellColor(p_img, 0, 0, l_h, l_v);
+		l_g2d.setColor(l_tmp);
+		l_g2d.fillRect(0, 0, l_h, l_v);		
 		while ((l_h + l_hCurSpace) < l_width || 
 				  (l_v + l_vCurSpace) < l_height) {
 
@@ -323,9 +326,13 @@ public class InvisibleInkFactory {
 			
 			
 			//Color the Current (Next) Diagonal Block
-			p_img = FillGridCell(p_img, c_xGridCoords.lastElement(), 
+			l_tmp = getGridCellColor(p_img, c_xGridCoords.lastElement(), 
 					 c_yGridCoords.lastElement(), 
 					 l_hCurSize, l_vCurSize);
+			l_g2d.setColor(l_tmp);
+			l_g2d.fillRect(c_xGridCoords.lastElement(), 
+							c_yGridCoords.lastElement(), 
+							l_hCurSize, l_vCurSize);
 			//Blocks above or below current block.				
 			for (int l_i = l_index-1; l_i >= 0; l_i--) {
 				int l_tmpSize = 0;
@@ -333,7 +340,12 @@ public class InvisibleInkFactory {
 				if (l_i < c_xGridCoords.size()) {
 					l_tmpSize = Math.min(c_hGridSize[l_i%c_hGridSize.length],
 										l_width-c_xGridCoords.elementAt(l_i));
-					p_img = FillGridCell(p_img, c_xGridCoords.elementAt(l_i),
+					l_tmp = getGridCellColor(p_img, c_xGridCoords.elementAt(l_i),
+									 c_yGridCoords.lastElement(), 
+									 l_tmpSize,
+									 l_vCurSize);
+					l_g2d.setColor(l_tmp);
+					l_g2d.fillRect(c_xGridCoords.elementAt(l_i),
 									 c_yGridCoords.lastElement(), 
 									 l_tmpSize,
 									 l_vCurSize);
@@ -342,15 +354,81 @@ public class InvisibleInkFactory {
 				if (l_i < c_yGridCoords.size()) {
 					l_tmpSize = Math.min(c_vGridSize[l_i%c_vGridSize.length],
 							l_height-c_yGridCoords.elementAt(l_i));
-					p_img = FillGridCell(p_img, c_xGridCoords.lastElement(),
+					l_tmp = getGridCellColor(p_img, c_xGridCoords.lastElement(),
 						 c_yGridCoords.elementAt(l_i),
 						 l_hCurSize,
 						 l_tmpSize);
+					l_g2d.setColor(l_tmp);
+					l_g2d.fillRect(c_xGridCoords.lastElement(),
+							 c_yGridCoords.elementAt(l_i),
+							 l_hCurSize,
+							 l_tmpSize);
 				}
+				//break;
 			}
+			//break;
 		}
 		return p_img;
 	}	
+
+	/**
+	 * Samples the given cell and returns the foreground or background color
+	 * of the texel. This function handles the routines for adding the masking
+	 * color and randomizing the texel intensity.
+	 * 
+	 * @param p_image - the image containing the cell.
+	 * @param p_x - the rightmost col of the cell.
+	 * @param p_y - the topmost row of the cell.
+	 * @param p_sizeX - the width in pixels of the cell.
+	 * @param p_sizeY - the height in pixels of the cell.
+	 */
+	private Color getGridCellColor(BufferedImage p_img, int p_x, int p_y, 
+									int p_sizeX, int p_sizeY)
+	{
+		int l_mCount = 0;	
+		Color l_tmp = null;
+		float[] tmpFloat = {0,0,0,0};
+		//For each pixel, count instance of magenta
+		Raster l_tmpRaster = p_img.getRaster();
+		
+		/* Old sampling Method - Deprecated
+		for (int l_i = 0; l_i < p_sizeX; l_i++) {
+			for (int l_j = 0; l_j < p_sizeY; l_j++) {
+				l_tmpRaster.getPixel(l_i+p_x, l_j+p_y, tmpFloat);
+				l_tmp = new Color(c_cs, tmpFloat, 1);
+				if (l_tmp.equals(c_defFontColor)) l_mCount++;
+			}
+		}*/
+		
+		//Simple "Middling" sample method. Sample 9 points, if 5 have magenta
+		//make the whole texel magenta
+		int l_i = 0;
+		while (l_i < p_sizeX)
+		{
+			int l_j = 0;
+			while (l_j < p_sizeY)
+			{
+				l_tmpRaster.getPixel(l_i+p_x, l_j+p_y, tmpFloat);
+				l_tmp = new Color(c_cs, tmpFloat, 1);
+				if (l_tmp.equals(c_defFontColor)) l_mCount++;
+				
+				l_j += Math.max(1, Math.round(p_sizeY/4.0));
+			}
+			l_i += Math.max(1, Math.round(p_sizeX/4.0));
+		}
+		
+		//Background Color
+		float[] l_color = {0,0,0,0};
+		if (l_mCount < 5) {
+			l_color = getRandomBgColor();
+		}
+		else { //Font Color
+			l_color = getRandomFontColor();
+		}
+		l_color = AddMask(l_color);		
+		
+		return new Color(c_cs, l_color, 1);
+	}
 	
 	/**
 	 * Samples and fills a cell with foreground or background depending on which 
@@ -361,7 +439,7 @@ public class InvisibleInkFactory {
 	 * @param p_sizeX - width of cell
 	 * @param p_sizeY - length of cell
 	 * @return - a modified image
-	 */
+	 *
 	private BufferedImage FillGridCell(BufferedImage p_img, int p_x, int p_y, 
 									int p_sizeX, int p_sizeY) {
 		int l_mCount = 0;	
@@ -389,7 +467,7 @@ public class InvisibleInkFactory {
 		l_g2d.setColor(new Color(c_cs, l_color, 1));
 		l_g2d.fillRect(p_x, p_y, p_sizeX, p_sizeY);		
 		return p_img;
-	}
+	}*/
 	
 	/**
 	 * AddMask - Uses the preset CSPRNG to generate random additions of
