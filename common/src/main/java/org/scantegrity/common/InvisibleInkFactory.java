@@ -33,8 +33,11 @@ import java.awt.image.PixelInterleavedSampleModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Vector;
 import org.scantegrity.common.CMYKColorSpace;
+
+import com.sun.tools.javac.code.Attribute.Array;
  
 /**
  * Generates images to print text in reactive (yellow) and dummy (magenta) ink.
@@ -80,8 +83,7 @@ public class InvisibleInkFactory {
 	private Integer[] c_hGridSize = { 5 };
 	private Integer[] c_vGridSize = { 5 };
 	private Color c_gridColor = Color.WHITE;
-	private Vector<Integer> c_xGridCoords = null;
-	private Vector<Integer> c_yGridCoords = null;
+
 	/**
 	 * Default constructor for the class, which uses a 18pt Serif
 	 * Font, 10 pixel padding, and block mode without any csprng stuff.   
@@ -140,19 +142,7 @@ public class InvisibleInkFactory {
 		l_height += c_padding*2;
 		l_width += c_padding*2;
 		
-		//Generate image and set colors
-		ComponentColorModel l_ccm = new ComponentColorModel(c_cs, false, false,
-													1, DataBuffer.TYPE_FLOAT);
-		int[] l_bandoff = {0, 1, 2, 3};
-		PixelInterleavedSampleModel l_sm = new PixelInterleavedSampleModel(
-												   DataBuffer.TYPE_FLOAT,
-												   (int)l_width, (int)l_height, 
-										     	   4,(int)l_width*4, l_bandoff);
-		WritableRaster l_raster = WritableRaster.createWritableRaster(l_sm, 
-																new Point(0,0));
-		l_ret = new BufferedImage(l_ccm, l_raster, false, null);
-		 
-		
+		l_ret = createCMYKImage(Math.round(l_width), Math.round(l_height));
 		
 		l_g2d = l_ret.createGraphics();
 		
@@ -165,7 +155,7 @@ public class InvisibleInkFactory {
 		//Draw Text
 		l_g2d.setFont(c_font);
 		l_g2d.setColor(c_defFontColor);
-		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding); 
+		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding);
 		
 		l_ret = GenBlockGrid(l_ret);
 		
@@ -273,103 +263,118 @@ public class InvisibleInkFactory {
 	 * @param p_img
 	 * @return
 	 */
-	private BufferedImage GenBlockGrid(BufferedImage p_img) {
-		/* TODO: This function is probably too long */
-		Graphics2D l_g2d = p_img.createGraphics();
+	private BufferedImage GenBlockGrid(BufferedImage p_img) {		
+		BufferedImage l_res;
+		Graphics2D l_g2d;
 		
-		c_xGridCoords = new Vector<Integer>();
-		c_yGridCoords = new Vector<Integer>();
-		int l_index = 0;
-		int l_width = p_img.getWidth();
-		int l_height = p_img.getHeight();
-		int l_h = c_hGridSize[0];
-		int l_v = c_vGridSize[0];
-		int l_hCurSpace = c_hGridSpace[0];
-		int l_vCurSpace = c_vGridSpace[0];
-		int l_hCurSize = l_h;
-		int l_vCurSize = l_v;
-		c_xGridCoords.add(0);
-		c_yGridCoords.add(0);
-		Color l_tmp;
-		l_tmp = getGridCellColor(p_img, 0, 0, l_h, l_v);
-		l_g2d.setColor(l_tmp);
-		l_g2d.fillRect(0, 0, l_h, l_v);		
-		while ((l_h + l_hCurSpace) < l_width || 
-				  (l_v + l_vCurSpace) < l_height) {
-
-			l_index++;
-			l_g2d.setColor(c_gridColor);
-			//Vertical Lines
-			if (l_h + l_hCurSpace < l_width) {
-				l_g2d.fillRect(l_h, 0, l_hCurSpace, l_height);
-				l_hCurSize = c_hGridSize[l_index%c_hGridSize.length];
-				l_h += l_hCurSpace + l_hCurSize;				
-				l_hCurSpace = c_hGridSpace[l_index%c_hGridSpace.length];
-				c_xGridCoords.add(Math.min(l_width-1, l_h - l_hCurSize));
-			}
-
-			//Horizontal Lines
-			if (l_v + l_vCurSpace < l_height) {
-				l_g2d.fillRect(0, l_v, l_width, l_vCurSpace);
-				l_vCurSize = c_vGridSize[l_index%c_vGridSize.length];
-				l_v += l_vCurSpace + l_vCurSize;				
-				l_vCurSpace = c_vGridSpace[l_index%c_vGridSpace.length];
-				c_yGridCoords.add(Math.min(l_height-1, l_v - l_vCurSize));
-			}			
+		//Calculate the width and height of the new image.
+		int l_numCols = getTotalCellSize(p_img.getWidth(), c_hGridSize);
+		int l_numRows = getTotalCellSize(p_img.getHeight(), c_vGridSize);
 		
-			if (c_xGridCoords.lastElement() + l_hCurSize > l_width) {
-				l_hCurSize = l_width - c_xGridCoords.lastElement();
-			}
-			if (c_yGridCoords.lastElement() + l_vCurSize > l_height) {
-				l_vCurSize = l_height - c_yGridCoords.lastElement();
-			}
-			
-			
-			//Color the Current (Next) Diagonal Block
-			l_tmp = getGridCellColor(p_img, c_xGridCoords.lastElement(), 
-					 c_yGridCoords.lastElement(), 
-					 l_hCurSize, l_vCurSize);
-			l_g2d.setColor(l_tmp);
-			l_g2d.fillRect(c_xGridCoords.lastElement(), 
-							c_yGridCoords.lastElement(), 
-							l_hCurSize, l_vCurSize);
-			//Blocks above or below current block.				
-			for (int l_i = l_index-1; l_i >= 0; l_i--) {
-				int l_tmpSize = 0;
-				//Horizontal
-				if (l_i < c_xGridCoords.size()) {
-					l_tmpSize = Math.min(c_hGridSize[l_i%c_hGridSize.length],
-										l_width-c_xGridCoords.elementAt(l_i));
-					l_tmp = getGridCellColor(p_img, c_xGridCoords.elementAt(l_i),
-									 c_yGridCoords.lastElement(), 
-									 l_tmpSize,
-									 l_vCurSize);
-					l_g2d.setColor(l_tmp);
-					l_g2d.fillRect(c_xGridCoords.elementAt(l_i),
-									 c_yGridCoords.lastElement(), 
-									 l_tmpSize,
-									 l_vCurSize);
-				}
-				//Vertical
-				if (l_i < c_yGridCoords.size()) {
-					l_tmpSize = Math.min(c_vGridSize[l_i%c_vGridSize.length],
-							l_height-c_yGridCoords.elementAt(l_i));
-					l_tmp = getGridCellColor(p_img, c_xGridCoords.lastElement(),
-						 c_yGridCoords.elementAt(l_i),
-						 l_hCurSize,
-						 l_tmpSize);
-					l_g2d.setColor(l_tmp);
-					l_g2d.fillRect(c_xGridCoords.lastElement(),
-							 c_yGridCoords.elementAt(l_i),
-							 l_hCurSize,
-							 l_tmpSize);
-				}
-				//break;
-			}
-			//break;
+		//Sample the grid first
+		Vector<Vector<Color>> l_gridColors = getGridColors(p_img, 
+															l_numCols,
+															l_numRows);
+		
+		//Caclulate the new image size.
+		int l_width = 0;
+		int l_height = 0;
+		for (int l_i = 0; l_i < l_numCols; l_i++)
+		{
+			l_width += c_hGridSize[l_i%c_hGridSize.length];
+			l_width += c_hGridSpace[l_i%c_hGridSize.length];
 		}
-		return p_img;
+		for (int l_i = 0; l_i < l_numRows; l_i++)
+		{
+			l_height += c_vGridSize[l_i%c_vGridSize.length];
+			l_height += c_vGridSpace[l_i%c_vGridSize.length];
+		}
+		
+		//Create the grid
+		l_res = createCMYKImage(l_width, l_height);
+		l_g2d = l_res.createGraphics();
+		int l_curx = 0;
+		int l_cury = 0;
+		for (int l_i = 0; l_i < l_numCols; l_i++)
+		{	
+			l_cury = 0;
+			for (int l_j = 0; l_j < l_numRows; l_j++)
+			{
+				//Fill in Texel
+				l_g2d.setColor(l_gridColors.get(l_i).get(l_j));
+				l_g2d.fillRect(l_curx, l_cury, 
+								c_hGridSize[l_i%c_hGridSize.length], 
+								c_vGridSize[l_i%c_vGridSize.length]);
+
+				l_cury += c_vGridSize[l_i%c_vGridSize.length];
+				//Draw Vertical Line (On the first iteration).
+				l_cury += c_vGridSpace[l_i%c_vGridSpace.length];
+			}
+			l_curx += c_hGridSize[l_i%c_hGridSize.length];
+			//Draw Horizontal Line
+			l_curx += c_hGridSpace[l_i%c_hGridSpace.length];
+		}
+		
+		return l_res;
 	}	
+	
+	/**
+	 * Runs through an array of cell sizes, and calculates how many cells need
+	 * to be generated.
+	 * @param p_size - the size of the image
+	 * @param p_cellSizes - the sizes of the cells
+	 * @return the number of cells that fit into the image + 1 (round up).
+	 */
+	private int getTotalCellSize(int p_size, Integer[] p_cellSizes)
+	{
+		int l_sum = 0;
+		int l_index = 0;
+		while (l_sum < p_size)
+		{
+			l_sum += p_cellSizes[l_index%p_cellSizes.length];
+			l_index++;
+		}
+		return l_index;
+	}
+
+	/**
+	 * Get the color for each texel in the grid.
+	 * 
+	 * @param p_img
+	 * @param p_numCols
+	 * @param p_numRows
+	 * @return
+	 */
+	private Vector<Vector<Color>> getGridColors(BufferedImage p_img, 
+												int p_numCols, int p_numRows) 
+	{
+		Vector<Vector<Color>> l_res = new Vector<Vector<Color>>();
+		
+		int l_x = p_img.getWidth();
+		int l_y = p_img.getHeight();
+		int l_curx = 0;
+		int l_cury = 0;
+		int l_cellWidth, l_cellHeight;
+		//width left...
+		for (int l_i = 0; l_i < p_numCols; l_i++)
+		{
+			l_res.add(new Vector<Color>());
+			l_cellWidth = Math.min(l_x-l_curx, 
+									c_hGridSize[l_i%c_hGridSize.length]); 
+			//height
+			l_cury = 0;
+			for (int l_j = 0; l_j < p_numRows; l_j++)
+			{
+				l_cellHeight = Math.min(l_y-l_cury, 
+										c_vGridSize[l_j%c_vGridSize.length]);  
+				l_res.get(l_i).add(getGridCellColor(p_img, l_curx, 
+						l_cury, l_cellWidth, l_cellHeight));
+				l_cury += l_cellHeight;
+			}
+			l_curx += l_cellWidth;
+		}
+		return l_res;
+	}
 
 	/**
 	 * Samples the given cell and returns the foreground or background color
@@ -391,28 +396,37 @@ public class InvisibleInkFactory {
 		//For each pixel, count instance of magenta
 		Raster l_tmpRaster = p_img.getRaster();
 		
-		/* Old sampling Method - Deprecated
+		//System.out.println(p_x + ", " + p_y + ", " + p_sizeX + ", " + p_sizeY);
+		/*	
+		// Old sampling Method - Deprecated
 		for (int l_i = 0; l_i < p_sizeX; l_i++) {
 			for (int l_j = 0; l_j < p_sizeY; l_j++) {
 				l_tmpRaster.getPixel(l_i+p_x, l_j+p_y, tmpFloat);
 				l_tmp = new Color(c_cs, tmpFloat, 1);
 				if (l_tmp.equals(c_defFontColor)) l_mCount++;
 			}
-		}*/
-		
+		}
+		*/
+
 		//Simple "Middling" sample method. Sample 9 points, if 5 have magenta
 		//make the whole texel magenta
+		//Graphics2D l_g2d = p_img.createGraphics();
 		int l_i = 0;
 		while (l_i < p_sizeX)
 		{
 			int l_j = 0;
 			while (l_j < p_sizeY)
 			{
+				/* Debugging.
+				float l_tmpc[] = {1, 0, 0, 0}; 
+				l_g2d.setColor(new Color(c_cs, l_tmpc, 1));
+				l_g2d.fillRect(l_i+p_x, l_j+p_y, 1, 1);
+				*/
 				l_tmpRaster.getPixel(l_i+p_x, l_j+p_y, tmpFloat);
 				l_tmp = new Color(c_cs, tmpFloat, 1);
 				if (l_tmp.equals(c_defFontColor)) l_mCount++;
-				
 				l_j += Math.max(1, Math.round(p_sizeY/4.0));
+				
 			}
 			l_i += Math.max(1, Math.round(p_sizeX/4.0));
 		}
@@ -428,6 +442,21 @@ public class InvisibleInkFactory {
 		l_color = AddMask(l_color);		
 		
 		return new Color(c_cs, l_color, 1);
+	}
+	
+	private BufferedImage createCMYKImage(int p_width, int p_height)
+	{
+		//Generate image and set colors
+		ComponentColorModel l_ccm = new ComponentColorModel(c_cs, false, false,
+													1, DataBuffer.TYPE_FLOAT);
+		int[] l_bandoff = {0, 1, 2, 3};
+		PixelInterleavedSampleModel l_sm = new PixelInterleavedSampleModel(
+												   DataBuffer.TYPE_FLOAT,
+												   (int)p_width, (int)p_height, 
+										     	   4,(int)p_width*4, l_bandoff);
+		WritableRaster l_raster = WritableRaster.createWritableRaster(l_sm, 
+																new Point(0,0));
+		return new BufferedImage(l_ccm, l_raster, false, null);		
 	}
 	
 	/**
