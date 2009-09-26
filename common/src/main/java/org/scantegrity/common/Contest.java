@@ -19,8 +19,12 @@
  */
 package org.scantegrity.common;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
+import org.scantegrity.common.Contestant.ContestantType;
 import org.scantegrity.common.methods.TallyMethod;
 /**
  * Contest describes a race, question, or other contest that appears in an 
@@ -39,6 +43,8 @@ public class Contest
 	private Vector<Contestant> c_contestants;
 	//private MarkRules c_rules;
 	private TallyMethod c_method;
+	private TreeSet<Integer> c_writeIns = new TreeSet<Integer>(); //Indices in c_contestants that are write-in candidates originally (i.e. candidates named "write-in")
+	private TreeSet<Integer> c_resolved = new TreeSet<Integer>(); //Indices in c_contestants that are resolved write-in candidates (i.e. candidates that were not on the ballot)
 	
 	/**
 	 * @return the contestName
@@ -81,10 +87,22 @@ public class Contest
 	public void setContestants(Vector<Contestant> p_options)
 	{
 		c_contestants = p_options;
-		for( Contestant l_contestant : c_contestants )
+		c_writeIns.clear();
+		c_resolved.clear();
+		for( int x = 0; x < c_contestants.size(); x++ )
 		{
+			Contestant l_contestant = c_contestants.get(x);
 			if( l_contestant.getId() > c_nextId )
 				c_nextId = l_contestant.getId();
+			ContestantType l_type = l_contestant.getCandidateType();
+			if( l_type == ContestantType.WRITEIN )
+			{
+				c_writeIns.add(x);
+			}
+			else if( l_type == ContestantType.RESOLVED )
+			{
+				c_resolved.add(x);
+			}
 		}
 		c_nextId++;
 	}
@@ -93,9 +111,18 @@ public class Contest
 	{
 		c_contestants.add(p_new);
 		if( p_new.getId() > c_nextId )
-			c_nextId = p_new.getId();
-		
-		c_nextId++;
+		{
+			c_nextId = p_new.getId() + 1;
+		}
+		ContestantType l_type = p_new.getCandidateType();
+		if( l_type == ContestantType.WRITEIN )
+		{
+			c_writeIns.add(c_contestants.indexOf(p_new));
+		}
+		else if( l_type == ContestantType.RESOLVED )
+		{
+			c_resolved.add(c_contestants.indexOf(p_new));
+		}
 	}
 	
 	public int getNextId()

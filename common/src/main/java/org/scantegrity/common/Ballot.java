@@ -52,10 +52,11 @@ public class Ballot
 	private Vector<String> c_notes;
 	
 	/* Write-in Support */
-	//Rectangle clippings of write-in ballot location 
-	private Vector<Vector<BufferedImage>> c_writeInImgs = null;
-	//Map of write-ins to CandidateIDs in corresponding Contest.
-	private Vector<Map<Integer, Integer>> c_writeInMap = null;
+	//Rectangle clippings of write-in ballot location.  Maps contest ID to map of write-in candidate IDs to images
+	private Map<Integer, Map<Integer, BufferedImage>> c_writeInImgs = null;
+	//Map of write-ins to CandidateIDs in corresponding Contest. Maps contest ID to map of original write-in candidate ID
+	//to new candidate ID
+	private Map<Integer, Map<Integer, Integer>> c_writeInMap = null;
 	
 	/**
 	 * Default Constructor, creates invalid ballot.
@@ -207,19 +208,19 @@ public class Ballot
 		return false;	
 	}
 
-	public void setWriteInImgs(Vector<Vector<BufferedImage>> writeInImgs) {
+	public void setWriteInImgs(Map<Integer, Map<Integer, BufferedImage>> writeInImgs) {
 		c_writeInImgs = writeInImgs;
 	}
 
-	public Vector<Vector<BufferedImage>> getWriteInImgs() {
+	public Map<Integer, Map<Integer,BufferedImage>> getWriteInImgs() {
 		return c_writeInImgs;
 	}
 
-	public void setWriteInMap(Vector<Map<Integer, Integer>> writeInMap) {
+	public void setWriteInMap(Map<Integer, Map<Integer, Integer>> writeInMap) {
 		c_writeInMap = writeInMap;
 	}
 
-	public Vector<Map<Integer, Integer>> getWriteInMap() {
+	public Map<Integer, Map<Integer, Integer>> getWriteInMap() {
 		return c_writeInMap;
 	}
 	

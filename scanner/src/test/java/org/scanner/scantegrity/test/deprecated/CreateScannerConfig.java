@@ -116,7 +116,7 @@ public class CreateScannerConfig
 		Contest l_x = new Contest();
 		Vector<Contestant> l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Bruce R. Williams"));
-		l_can.add(new Contestant(1, "Write-In Candidate"));
+		l_can.add(new Contestant(1, "Write-In Candidate", ContestantType.WRITEIN));
 		l_x.setId(0);
 		l_x.setContestName("Mayor");
 		l_x.setContestants(l_can);
@@ -127,7 +127,7 @@ public class CreateScannerConfig
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Bridget Bowers"));
 		l_can.add(new Contestant(1, "Dan Robinson"));
-		l_can.add(new Contestant(2, "Write-In Candidate"));
+		l_can.add(new Contestant(2, "Write-In Candidate", ContestantType.WRITEIN));
 		l_x.setId(1);
 		l_x.setContestants(l_can);
 		l_x.setContestName("Council Member Ward 3");

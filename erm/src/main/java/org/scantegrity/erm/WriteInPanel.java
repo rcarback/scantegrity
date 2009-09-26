@@ -19,6 +19,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import org.scantegrity.scanner.ScannerConfig;
+
 public class WriteInPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -33,12 +35,14 @@ public class WriteInPanel extends JPanel {
 	private WriteInResolver c_resolver = null;
 	private BufferedImage c_writeInImage = null;
 	private WriteInLoaderThread c_loader = null;
+	private ScannerConfig c_config = null;
 
 	/**
 	 * This is the default constructor
 	 */
-	public WriteInPanel() {
+	public WriteInPanel(ScannerConfig p_config) {
 		super();
+		c_config = p_config;
 		initialize();
 		
 	}
@@ -53,7 +57,7 @@ public class WriteInPanel extends JPanel {
 		listModel.addElement("Test");
 		
 		c_candidateList = new Vector<String>();
-		c_resolver = new WriteInResolver();
+		c_resolver = new WriteInResolver(c_config);
 		
 		this.setSize(538, 336);
 		this.setLayout(new BorderLayout());
@@ -134,6 +138,7 @@ public class WriteInPanel extends JPanel {
 			{
 				c_resolver.AddCandidate(p_name);
 			}
+			c_resolver.Resolve(p_name);
 		}
 		//Add vote for candidate
 		c_loader.notify();

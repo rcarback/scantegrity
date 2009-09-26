@@ -28,6 +28,14 @@ public class Contestant implements Comparable
 {
 	protected String c_name = null;
 	protected Integer c_id = -1;
+	protected ContestantType c_state = ContestantType.ORIGINAL;
+	
+	enum ContestantType
+	{
+		ORIGINAL,
+		WRITEIN,
+		RESOLVED
+	};
 	
 	/** 
 	 * Creates a bad contestant.
@@ -37,6 +45,14 @@ public class Contestant implements Comparable
 		super();
 		c_name = "No Name";
 		c_id = -1;
+	}
+	
+	public Contestant(int p_id, String p_name, ContestantType p_state)
+	{
+		super();
+		c_state = p_state;
+		c_id = p_id;
+		c_name = p_name;
 	}
 	
 	/**
@@ -127,6 +143,11 @@ public class Contestant implements Comparable
 	}
 	
 
+	public ContestantType getCandidateType()
+	{
+		return c_state;
+	}
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */

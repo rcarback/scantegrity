@@ -22,6 +22,8 @@ package org.scantegrity.common;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.ListIterator;
+import java.util.Vector;
+import java.util.regex.Pattern;
 
 import org.scantegrity.common.constants.FindFileConst;
 
@@ -40,16 +42,34 @@ public class FindFile implements Runnable
 	private ArrayList<Thread> c_threadList;
 	
 	//directory stack
-	private ArrayList<File> c_dirToSearch;
+	private ArrayList<SearchDirectory> c_dirToSearch;
 	
 	//reference to parent
 	private FindFile c_parent; 
 	
 	//Configuration File
-	private File c_fileFound;
+	private Vector<File> c_filesFound;
 	
 	//flag for config found
 	private boolean c_isConfigFound = false;
+	
+	//Depth of directories to recurse
+	public int c_recurseDepth = -1;
+	private boolean c_findMultiple = false;
+	
+	private Pattern c_pattern = null;
+	
+	class SearchDirectory
+	{
+		public int depth;
+		public File directory;
+		public SearchDirectory(int p_depth, File p_directory)
+		{
+			depth = p_depth;
+			directory = p_directory;
+		}
+	}
+	
 
 	/**
 	 * Searches for a file based on a regular expression for that file
@@ -59,9 +79,21 @@ public class FindFile implements Runnable
 	public FindFile()
 	{
 		c_filename = null;
-		c_dirToSearch = new ArrayList<File>(); 
+		c_dirToSearch = new ArrayList<SearchDirectory>(); 
 		c_parent = null; 
-		c_fileFound = null;
+		c_filesFound = null;
+		
+		determineOS(); 
+		
+		getPathsToSearch(); 
+	}
+	
+	public FindFile(Pattern p_pattern)
+	{
+		c_pattern = p_pattern;
+		c_dirToSearch = new ArrayList<SearchDirectory>();
+		c_parent = null;
+		c_filesFound = null;
 		
 		determineOS(); 
 		
@@ -75,9 +107,9 @@ public class FindFile implements Runnable
 	public FindFile(String p_filename)
 	{
 		c_filename = p_filename; 
-		c_dirToSearch = new ArrayList<File>();
+		c_dirToSearch = new ArrayList<SearchDirectory>();
 		c_parent = null;
-		c_fileFound = null;
+		c_filesFound = null;
 		
 		determineOS(); 
 		
@@ -92,10 +124,10 @@ public class FindFile implements Runnable
 	public FindFile(FindFile p_parent)
 	{
 		c_filename = p_parent.getFilename();
-		c_dirToSearch = new ArrayList<File>();
+		c_dirToSearch = new ArrayList<SearchDirectory>();
 		c_dirToSearch.add(p_parent.getDirToSearch());
 		c_parent = p_parent;
-		c_fileFound = null;
+		c_filesFound = null;
 	}
 	
 	public File find()
@@ -145,16 +177,37 @@ public class FindFile implements Runnable
 			searchNextDir(); 
 		
 		if(c_isConfigFound)
-			return c_fileFound;
+			return c_filesFound.get(0);
 		else
 			return null;
 			
 		
 	}
 	
+	public Vector<File> findMultiple()
+	{
+		return findMultiple(c_filename);
+	}
+	
+	public Vector<File> findMultiple(String p_filename)
+	{
+		c_filename = p_filename;
+		c_findMultiple = true;
+		
+		c_threadList = new ArrayList<Thread>();
+		
+		while(c_dirToSearch.size() != 0)
+			searchNextDir(); 
+		
+		if(c_isConfigFound)
+			return c_filesFound;
+		else
+			return null;
+	}
+	
 	public synchronized void setFileFound(File p_fileFound)
 	{
-		c_fileFound = p_fileFound;
+		c_filesFound.add(p_fileFound);
 		c_isConfigFound = true;
 	}
 	
@@ -163,7 +216,7 @@ public class FindFile implements Runnable
 		return c_filename; 
 	}
 	
-	public synchronized File getDirToSearch()
+	public synchronized SearchDirectory getDirToSearch()
 	{
 		if(c_dirToSearch.size() != 0)
 			return c_dirToSearch.remove(0);
@@ -176,18 +229,19 @@ public class FindFile implements Runnable
 	 */
 	public void run()
 	{
-		while(c_dirToSearch.size() != 0 && !c_isConfigFound)
+		while(c_dirToSearch.size() != 0 && (c_findMultiple || !c_isConfigFound))
 		{
 			searchNextDir(); 
 			
 			if(c_dirToSearch.size() == 0)
 			{
-				File l_dir = c_parent.getDirToSearch();
+				SearchDirectory l_search = c_parent.getDirToSearch();
+				File l_dir = l_search.directory;
 				
 				if(l_dir == null)
 					return;
 				else
-					c_dirToSearch.add(l_dir);
+					c_dirToSearch.add(new SearchDirectory(l_search.depth, l_dir));
 			}
 		}
 	}
@@ -212,13 +266,14 @@ public class FindFile implements Runnable
 		
 		for(int i = 0; i < l_paths.length; i++)
 		{
-			c_dirToSearch.add(new File(l_paths[i]));
+			c_dirToSearch.add(new SearchDirectory(0, new File(l_paths[i])));
 		}
 	}
 	
 	private void searchNextDir()
 	{
-		File l_file = c_dirToSearch.remove(0);
+		SearchDirectory l_search = c_dirToSearch.remove(0);
+		File l_file = l_search.directory;
 		
 		//get the listing of directories and files in current dir
 		String[] l_currDirList = l_file.list(); 
@@ -233,17 +288,32 @@ public class FindFile implements Runnable
 			
 			if(l_tempFile.isFile())
 			{	
-				if(l_tempFile.getName().equals(c_filename))
+				if( c_pattern == null )
 				{
-					setFileFound(l_tempFile);
-				
-					return;
+					if(l_tempFile.getName().equals(c_filename))
+					{
+						setFileFound(l_tempFile);
+						if( !c_findMultiple )
+							return;
+					}
+				}
+				else
+				{
+					if( c_pattern.matcher(l_tempFile.getName()).matches() )
+					{
+						setFileFound(l_tempFile);
+						if( !c_findMultiple )
+							return;
+					}
 				}
 			}
 			else if(l_tempFile.isDirectory())
 			{
 				//push the directory on the directories to search stack 
-				c_dirToSearch.add(0, l_tempFile);
+				if( l_search.depth <= c_recurseDepth || c_recurseDepth < 0 )
+				{
+					c_dirToSearch.add(0, new SearchDirectory(l_search.depth + 1, l_tempFile));
+				}
 			}	
 		}
 	}

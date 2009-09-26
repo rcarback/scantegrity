@@ -11,6 +11,11 @@
   		<artifactId>common</artifactId>
   		<version>0.0.1-SNAPSHOT</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.scantegrity</groupId>
+  		<artifactId>scanner</artifactId>
+  		<version>0.0.1-SNAPSHOT</version>
+  	</dependency>
   	</dependencies>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.scantegrity</groupId>
