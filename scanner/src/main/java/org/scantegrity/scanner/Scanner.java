@@ -33,6 +33,13 @@ import org.scantegrity.common.Ballot;
 import org.scantegrity.common.Logging;
 import org.scantegrity.common.SysBeep;
 import org.scantegrity.common.FindFile;
+import org.apache.commons.cli.CommandLine;
+import org.scantegrity.ostv.CommandLineParser;
+import org.scantegrity.ostv.HelpFormatter;
+import org.scantegrity.ostv.Option;
+import org.scantegrity.ostv.Options;
+import org.scantegrity.ostv.ParseException;
+import org.scantegrity.ostv.PosixParser;
 import org.scantegrity.scanner.ScannerConfig;
 import uk.org.jsane.JSane_Exceptions.JSane_Exception;
 
@@ -46,16 +53,46 @@ import uk.org.jsane.JSane_Exceptions.JSane_Exception;
 public class Scanner
 {	
 	private static final String c_errDir = "~/error/"; 
-	public static void endElection()
+	
+	/**
+	 * Create options for this application. Currently there is only 1, and 
+	 * that is if the user wants to include a contest information file.
+	 */
+	public static void setOptions()
 	{
-		try
+		c_opts = new Options();
+		
+		Option l_contestInfo = OptionBuilder.withArgName( "contestinfo" )
+						.hasArg()
+						.withDescription("Use a file that contains contest information.")
+						.create("info");
+		
+		Option l_help = new Option("help", "Print help message.");
+		Option l_verb = new Option("v", "Unimplemented verbosity setting, prints more info.");
+		
+		c_opts.addOption(l_contestInfo);	
+		c_opts.addOption(l_help);	
+		c_opts.addOption(l_verb);	
+		
+	}
+	
+	/**
+	 * Prints the usage information for the application. 
+	 */
+	public static void printUsage()
+	{
+		try {			
+			HelpFormatter l_form  = new HelpFormatter();
+			l_form.printHelp(80, "mt2ostv [OPTIONS] INFILE [OUTFILE]", 
+					"mt2ostv converts results files in Scantegrity to the BLT format " +
+					"used by the OpenSTV counting program. It uses the Scantegrity" +
+					" results INFILE, usually named MeetingThreeOut.xml to produce" +
+					" a BLT compatible file to stdout or OUTFILE.\n\nOPTIONS:", c_opts, "", false);
+		} 
+		catch (Exception l_e)
 		{
-			Runtime.getRuntime().exec("shutdown -h now").waitFor();
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			l_e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 	
@@ -72,12 +109,13 @@ public class Scanner
 			if(!c_loc.isFile())
 			{
 				c_loc = new FindFile(ScannerConstants.DEFAULT_CONFIG_NAME).find();
+				System.err.println("Could not open file ");
 			}
 		}
 		catch(NullPointerException e_npe)
 		{
 			c_loc = new FindFile(ScannerConstants.DEFAULT_CONFIG_NAME).find();
-			//TODO: This should be logged and printed to std.err
+			System.err.println("Could not open file ");
 		}
 		
 		//TODO: make sure the file is found and is readable
@@ -116,19 +154,32 @@ public class Scanner
 	/**
 	 * This method sets up the logging for the scanner
 	 */
-	public static Logging initializeLogger(ScannerConfig p_config)
+	public static Logging initializeLogger(org.scantegrity.scanner.ScannerConfig p_config)
 	{
 		String l_logName = p_config.getLogName(); 
 		
 		if(l_logName == null)
 		{
 			//TODO: add the date to the log file name
-			l_logName = "ScantegrityScannerLog-" + ".xml";
+			l_logName = "ScantegrityScannerLog-" + p_config.getScannerID() + ".xml";
 		}
 		
 		Logging l_log = new Logging(p_config.getLogName(), p_config.getLogLevel());
 		
 		return l_log;
+	}
+	
+	public static void endElection()
+	{
+		try
+		{
+			Runtime.getRuntime().exec("shutdown -h now").waitFor();
+		}
+		catch (Exception e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -143,19 +194,41 @@ public class Scanner
 	public static void main(String[] args)
 	{
 		//process command line arguments
+		setOptions();
 		
+		String l_args[] = null;
+		CommandLine l_cmdLine = null;
+		try {
+			CommandLineParser l_parser = new PosixParser();
+		    l_cmdLine = l_parser.parse(c_opts, args);
+		    l_args = l_cmdLine.getArgs();
+		}
+		catch( ParseException l_e ) {
+			l_e.printStackTrace();
+		    return;
+		}
+		
+	    if (l_cmdLine == null || l_cmdLine.hasOption("help") || l_args == null 
+	    		|| l_args.length < 1 || l_args.length > 2)
+	    {
+	    	printUsage();
+	    	return;
+	    }
+	    
 		//Get the config file
 		ScannerConfig l_config = getConfiguration(null);
 		
-		//init audit log
+		//register logging handlers if any
+		Logging l_log = initializeLogger(l_config); 
 		
 		//check hardware devices
+		
+		//grab all mounts points, log uuid, and setup scantegrity file struct
+		
 		//init ballot storage
 		
 		//authentication ??????????
 		
-		//register logging handlers if any
-		Logging l_log = initializeLogger(l_config); 
 		
 		//register devices if any
 		ScannerInterface l_scanner = new ScannerInterface(l_log); 

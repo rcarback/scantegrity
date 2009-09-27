@@ -65,6 +65,8 @@ public class ScannerConfig {
 	private Vector<Contest> c_contests = null;
 	protected Vector<BallotStyle> c_styles = null;
 	private Vector<String> c_outputFileNames = null;
+	private String c_errDir = null;
+	
 	/**
 	 * @return the styles
 	 */
@@ -96,6 +98,7 @@ public class ScannerConfig {
 		c_styles = new Vector<BallotStyle>();	
 		c_outputLocs = new Vector<String>();
 		c_outputFileNames = new Vector<String>();
+		c_errDir = "";
 	}
 
 
@@ -347,6 +350,23 @@ public class ScannerConfig {
 	public Vector<Contest> getContests()
 	{
 		return c_contests;
+	}
+	
+	/**
+	 * @param p_errDir the directory to store bad ballots
+	 */
+	public void setErrorDirectory(String p_errDir)
+	{
+		c_errDir = p_errDir;
+	}
+
+
+	/**
+	 * @return the error directory
+	 */
+	public String getErrorDirectory()
+	{
+		return c_errDir;
 	}
 
 }

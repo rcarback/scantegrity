@@ -107,7 +107,7 @@ public class BallotHandler implements ImageHandler
 		}
 		
 		//set error directory to copy bad images to
-		c_errDir = p_errDir;
+		c_errDir = c_config.getErrorDirectory();
 	}
 	
 	
