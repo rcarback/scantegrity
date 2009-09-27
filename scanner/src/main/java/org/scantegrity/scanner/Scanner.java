@@ -26,20 +26,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.Logging;
 import org.scantegrity.common.SysBeep;
 import org.scantegrity.common.FindFile;
 import org.apache.commons.cli.CommandLine;
-import org.scantegrity.ostv.CommandLineParser;
-import org.scantegrity.ostv.HelpFormatter;
-import org.scantegrity.ostv.Option;
-import org.scantegrity.ostv.Options;
-import org.scantegrity.ostv.ParseException;
-import org.scantegrity.ostv.PosixParser;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.PosixParser;
 import org.scantegrity.scanner.ScannerConfig;
 import uk.org.jsane.JSane_Exceptions.JSane_Exception;
 
@@ -53,6 +52,7 @@ import uk.org.jsane.JSane_Exceptions.JSane_Exception;
 public class Scanner
 {	
 	private static final String c_errDir = "~/error/"; 
+	private static Options c_opts;
 	
 	/**
 	 * Create options for this application. Currently there is only 1, and 
