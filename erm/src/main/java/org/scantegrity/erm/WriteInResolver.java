@@ -106,7 +106,7 @@ public class WriteInResolver {
 				//If it is a write in contestant, search the row for a vote
 				for(int x = 0; x < l_contestData.length; x++ )
 				{
-					if( l_contestants.get(x).getCandidateType() == CandidateType.WRITEIN)
+					if( l_contestants.get(x).getCandidateType() == Contestant.ContestantType.WRITEIN)
 					{
 						boolean l_voteFound = false;
 						for(int y = 0; y < l_contestData[x].length; y++ )

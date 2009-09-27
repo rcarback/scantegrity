@@ -30,7 +30,7 @@ public class Contestant implements Comparable
 	protected Integer c_id = -1;
 	protected ContestantType c_state = ContestantType.ORIGINAL;
 	
-	enum ContestantType
+	public enum ContestantType
 	{
 		ORIGINAL,
 		WRITEIN,
