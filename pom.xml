@@ -56,6 +56,21 @@
   	</dependency>
   </dependencies>
   <repositories>
+  	<repository>
+  		<id>mvnsearch.org</id>
+  		<name>mvnsearch</name>
+  		<url>http://www.mvnsearch.org/maven2</url>
+  		<releases>
+        	<enabled>true</enabled>
+        	<updatePolicy>never</updatePolicy>
+       	 	<checksumPolicy>warn</checksumPolicy>
+      	</releases>
+      	<snapshots>
+        	<enabled>false</enabled>
+        	<updatePolicy>always</updatePolicy>
+        	<checksumPolicy>warn</checksumPolicy>
+      	</snapshots>
+  	</repository>
     <repository>
       <id>java.net2</id>
       <url>http://repo2.maven.org/maven2</url>

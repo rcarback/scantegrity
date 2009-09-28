@@ -21,6 +21,7 @@ package org.scantegrity.common;
 
 import java.awt.image.BufferedImage;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 
 /**
@@ -53,10 +54,7 @@ public class Ballot
 	
 	/* Write-in Support */
 	//Rectangle clippings of write-in ballot location.  Maps contest ID to map of write-in candidate IDs to images
-	private Map<Integer, Map<Integer, BufferedImage>> c_writeInImgs = null;
-	//Map of write-ins to CandidateIDs in corresponding Contest. Maps contest ID to map of original write-in candidate ID
-	//to new candidate ID
-	private Map<Integer, Map<Integer, Integer>> c_writeInMap = null;
+	private TreeMap<Integer, TreeMap<Integer, byte[]>> c_writeIns = null;
 	
 	/**
 	 * Default Constructor, creates invalid ballot.
@@ -208,20 +206,19 @@ public class Ballot
 		return false;	
 	}
 
-	public void setWriteInImgs(Map<Integer, Map<Integer, BufferedImage>> writeInImgs) {
-		c_writeInImgs = writeInImgs;
+	/**
+	 * @param writeIns the writeIns to set
+	 */
+	public void setWriteIns(TreeMap<Integer, TreeMap<Integer, byte[]>> writeIns) {
+		c_writeIns = writeIns;
 	}
 
-	public Map<Integer, Map<Integer,BufferedImage>> getWriteInImgs() {
-		return c_writeInImgs;
-	}
-
-	public void setWriteInMap(Map<Integer, Map<Integer, Integer>> writeInMap) {
-		c_writeInMap = writeInMap;
-	}
-
-	public Map<Integer, Map<Integer, Integer>> getWriteInMap() {
-		return c_writeInMap;
+	/**
+	 * @return the writeIns
+	 */
+	public TreeMap<Integer, TreeMap<Integer, byte[]>> getWriteIns() {
+		return c_writeIns;
 	}
 	
+		
 }

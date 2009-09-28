@@ -19,8 +19,10 @@
  */
 package org.scantegrity.common.methods;
 
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import org.scantegrity.common.Ballot;
@@ -219,10 +221,13 @@ public class ContestChoice {
 		if (!p_style.isValid()) return;
 		
 		int l_contestIndex;
-		Map<Integer, Integer> l_writeInMap;
+		/* TODO: The mapping should be provided to the contestchoice class, AFTER the 
+		 * resolution manager has decided what it is.
+		 * 
+		 * TreeMap<Integer, BufferedImage> l_writeInMap;
 		
 		l_contestIndex = p_style.getContests().indexOf(new Integer(c_contest));
-		l_writeInMap = p_ballot.getWriteInMap().get(l_contestIndex);
+		l_writeInMap = p_ballot.getWriteIns().get(l_contestIndex);
 		
 		//For each rank
 		for (int l_i = 0; l_i < c_choices.length; l_i++)
@@ -236,7 +241,7 @@ public class ContestChoice {
 					c_choices[l_i][l_j] = l_writeInMap.get(l_k);
 				}
 			}
-		}	
+		}*/	
 		
 	}	
 }

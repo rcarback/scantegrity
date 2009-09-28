@@ -27,6 +27,7 @@ import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
+import org.scantegrity.common.DrunkDriver;
 import org.scantegrity.common.Logging;
 import org.scantegrity.common.SysBeep;
 
@@ -34,6 +35,8 @@ import uk.org.jsane.JSane_Net.JSane_Net_Connection;
 import uk.org.jsane.JSane_Base.JSane_Base_Device;
 import uk.org.jsane.JSane_Base.JSane_Base_Frame;
 import uk.org.jsane.JSane_Exceptions.JSane_Exception;
+import uk.org.jsane.JSane_Exceptions.JSane_Exception_IoError;
+import uk.org.jsane.JSane_Exceptions.JSane_Exception_NoDocs;
 
 /**
  * @author John Conway
@@ -48,6 +51,8 @@ public class ScannerInterface
 	/* Sane Variables */
 	private JSane_Base_Device c_scannerDevice;
 	private JSane_Net_Connection c_saneConnection; 
+	private String c_hostname; 
+	private int c_port; 
 	
 	/* Scantegrity References */
 	private ScannerConfig c_scannerConfigRef; 
@@ -61,19 +66,12 @@ public class ScannerInterface
 	public ScannerInterface(Logging p_log)
 	{
 		c_log = p_log; 
+		c_log.log(Level.INFO, "Setting up JSane Connection to Scanner using default settings.");
 		
-		try
-		{
-			c_saneConnection = new JSane_Net_Connection(ScannerConstants.LOCAL_IP, ScannerConstants.SANE_CONNECT_PORT);
-		}
-		catch (UnknownHostException e)
-		{
-			c_log.log(Level.FINER, e.getMessage());
-		}
-		catch (IOException e)
-		{
-			c_log.log(Level.FINER, e.getMessage());
-		}
+		c_hostname = ScannerConstants.LOCAL_IP; 
+		c_port = ScannerConstants.SANE_CONNECT_PORT; 
+		
+		connect(c_hostname, c_port);
 	}
 	
 	/**
@@ -84,19 +82,12 @@ public class ScannerInterface
 	public ScannerInterface(Logging p_log, int p_port)
 	{
 		c_log = p_log;
+		c_log.log(Level.INFO, "Setting up JSane Connection to Scanner using localhost and port "
+								+ p_port + ".");
+		c_hostname = ScannerConstants.LOCAL_IP; 
+		c_port = p_port; 
 		
-		try
-		{
-			c_saneConnection = new JSane_Net_Connection(ScannerConstants.LOCAL_IP, p_port);
-		}
-		catch (UnknownHostException e)
-		{
-			c_log.log(Level.FINER, e.getMessage());
-		}
-		catch (IOException e)
-		{
-			c_log.log(Level.FINER, e.getMessage());
-		} 
+		connect(c_hostname, c_port);
 	}
 	
 	/**
@@ -107,19 +98,14 @@ public class ScannerInterface
 	public ScannerInterface(Logging p_log, String p_hostname, int p_port)
 	{
 		c_log = p_log;
+		c_log.log(Level.INFO, "Setting up JSane Connection to Scanner using hostname "
+								+ p_hostname + " and port "
+								+ p_port + ".");
 		
-		try
-		{
-			c_saneConnection = new JSane_Net_Connection(p_hostname, p_port);
-		}
-		catch (UnknownHostException e)
-		{
-			c_log.log(Level.FINER, e.getMessage());
-		}
-		catch (IOException e)
-		{
-			c_log.log(Level.FINER, e.getMessage());
-		} 
+		c_hostname = p_hostname;
+		c_port = p_port; 
+		
+		connect(c_hostname, c_port);
 	}
 	
 	/**
@@ -134,8 +120,53 @@ public class ScannerInterface
 		
 		c_scannerConfigRef = p_scannerConfigRef; 
 		
-		//grab the hostname and port of the scanner
+		//TODO: grab the hostname and port of the scanner
+
+	}
+	
+	public void connect(String p_hostname, int p_port)
+	{
+		try 
+		{
+			c_saneConnection = new JSane_Net_Connection(p_hostname, p_port);
+			c_scannerDevice = c_saneConnection.getDevice(0);
+			c_scannerDevice.open();
+			c_scannerDevice.getOption("resolution").setValue("150");
+		} 
+		catch (UnknownHostException e_uh) 
+		{
+			c_log.log(Level.SEVERE, e_uh.getMessage() + " Cannot reconnect.");
+		}
+		catch (JSane_Exception e_gen) 
+		{
+			c_log.log(Level.SEVERE, e_gen.getMessage() + " Cannot reconnect.");
+		}
+		catch (IOException e_io) 
+		{
+			c_log.log(Level.SEVERE, e_io.getMessage() + " Cannot reconnect.");
+		}
+	}
+	
+	public void reconnect()
+	{
+		//destroy old connection
+		try 
+		{
+			c_log.log(Level.INFO, "Closing Old JSane Connection");
+			c_scannerDevice.close();
+			c_saneConnection.exit();
+		} 
+		catch (IOException e_io) 
+		{
+			c_log.log(Level.SEVERE, "Could not close the old JSane Connection");
+		}
+		catch (JSane_Exception e) 
+		{
+			c_log.log(Level.SEVERE, "Could not close the old JSane Connection");
+		} 
 		
+		//reconnect
+		connect(c_hostname, c_port); 
 	}
 	
 	/** 
@@ -145,25 +176,44 @@ public class ScannerInterface
 	 * @throws IOException
 	 */
 	public BufferedImage getImageFromScanner() throws JSane_Exception, IOException
-	{
-		c_scannerDevice = c_saneConnection.getDevice(0);
-		c_scannerDevice.open(); 
-		
-		JSane_Base_Frame l_frame;
+	{	
 		BufferedImage l_image = null; 
-		try
-		{
-			l_frame = c_scannerDevice.getFrame();
-			l_image = l_frame.getImage(false);
-		}
-		catch (JSane_Exception e1)
-		{
-			c_log.log(Level.FINE, "JSane Exception thrown. Cannot get image from the scanner.");
-			Thread l_th = new Thread(new SysBeep(3, 100));
-			l_th.start();
-		} 
 		
-		c_scannerDevice.close();
+		c_log.log(Level.INFO, "Scanning Image");
+		
+		while(l_image == null)
+		{	
+			try
+			{
+				JSane_Base_Frame l_frame = c_scannerDevice.getFrame();
+				l_image = l_frame.getImage();
+			}
+			catch (JSane_Exception_NoDocs e_noDoc)
+			{
+				continue; 
+			}
+			catch (JSane_Exception_IoError e_io)
+			{
+				c_log.log(Level.SEVERE, "JSane Exception thrown : " + e_io.getMessage() + ". Reconnecting");
+				Thread l_th = new Thread(new SysBeep(3, 100));
+				l_th.start();
+				
+				throw new JSane_Exception_IoError(); 
+			}
+			catch (JSane_Exception e_gen)
+			{
+				c_log.log(Level.SEVERE, "JSane Exception thrown : " + e_gen.getMessage() + ". Cannot get image from the scanner.");
+				Thread l_th = new Thread(new SysBeep(3, 100));
+				l_th.start();
+				
+				return null;
+			}
+		}
+		
+		//drunkDriver
+		//Give me your keys
+		if(DrunkDriver.isDrunk(l_image, 10))
+			return null;
 		
 		return l_image; 
 	}

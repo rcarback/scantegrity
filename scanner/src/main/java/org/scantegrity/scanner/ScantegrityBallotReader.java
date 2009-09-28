@@ -23,8 +23,14 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
+
+import javax.imageio.ImageIO;
 
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
@@ -131,6 +137,9 @@ public class ScantegrityBallotReader extends BallotReader
 		if (l_style == null) return null;
 		//Process each contest
 		Vector<Vector<Vector<Rectangle>>> l_rects = l_style.getContestRects();
+		TreeMap<Integer, TreeMap<Integer, Rectangle>> l_writeInRects = l_style.getWriteInRects();
+		TreeMap<Integer, TreeMap<Integer, byte[]>> l_writeIns;
+		l_writeIns = new TreeMap<Integer, TreeMap<Integer, byte[]>>();
 		Integer l_r[][][] = new Integer[l_rects.size()][][];
 		BufferedImage l_tmp = null;
 		for (int l_i = 0; l_i < l_rects.size(); l_i++) 
@@ -161,8 +170,7 @@ public class ScantegrityBallotReader extends BallotReader
 						else
 						{
 							l_r[l_i][l_cid][l_k] = 0;
-						}
-							
+						}	
 					}
 					catch (Exception e)
 					{
@@ -170,6 +178,42 @@ public class ScantegrityBallotReader extends BallotReader
 						e.printStackTrace();
 						l_r[l_i][l_cid][l_k] = 0;
 					}
+				}
+				
+				//IS this a write-in position? (record it if marked or not!)
+				if (l_writeInRects != null 
+						&& l_writeInRects.containsKey(l_i) 
+						&& l_writeInRects.get(l_i).containsKey(l_j))
+				{
+					TreeMap<Integer, byte[]> l_wtmp;
+					
+					if (l_writeIns.containsKey(l_i))
+					{
+						l_wtmp = l_writeIns.get(l_i); 
+					}
+					else
+					{
+						l_wtmp = new TreeMap<Integer, byte[]>();
+						l_writeIns.put(l_i, l_wtmp);
+					}
+					
+					//Ignore duplicates, which shouldn't happen!
+					if (!l_wtmp.containsKey(l_j))
+					{
+						try {
+							l_wtmp.put(l_j, getImgBytes(AffineCropper.crop(p_img, l_alignmentOp, 
+									 l_writeInRects.get(l_i).get(l_j))));
+						} 
+						catch (Exception e) 
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}							
+					}
+					else
+					{
+						//This should not happen.
+					}							
 				}
 			}
 		}
@@ -181,12 +225,29 @@ public class ScantegrityBallotReader extends BallotReader
 			l_bData.put(l_style.getContests().get(l_i), l_r[l_i]);
 		}
 		l_res.setBallotData(l_bData);
+		l_res.setWriteIns(l_writeIns);
 		l_res.setCounted(l_style.isCounted());
 		l_res.setBallotStyleID(l_style.getId());
 		
 		return l_res;
 	}
 	
+	private byte[] getImgBytes(BufferedImage p_crop) 
+	{
+        if(p_crop != null) {
+            BufferedImage image = (BufferedImage)p_crop;
+            ByteArrayOutputStream l_baos = new ByteArrayOutputStream();
+            try {
+                ImageIO.write(image, "png", l_baos);
+            } catch (IOException e) {
+                return new byte[0];
+            }
+            byte[] l_b = l_baos.toByteArray();
+            return l_b;
+        }
+        return new byte[0];
+	}
+
 	private boolean isMarked(BufferedImage p_img)
 	{
 		int l_cw = (int) Math.round(p_img.getWidth()/2.0);

@@ -2,6 +2,7 @@ package org.scantegrity.common;
 import java.awt.Point;
 import java.io.IOException;
 
+import org.junit.Test;
 import org.scantegrity.common.SquareSpiralPattern;
 
 /**
@@ -19,7 +20,8 @@ public class SquareSpiralTest {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) throws IOException {
+	@Test
+	public void TestSquareSpiral() throws IOException {
 		char l_grid[][] = new char[c_size][c_size];
 		
 		for (int i = 0; i < c_size; i++) {
@@ -42,9 +44,9 @@ public class SquareSpiralTest {
 			if (l_startx+next.x >= 0 && l_startx+next.x < c_size
 					&& l_starty+next.y >= 0 && l_starty+next.y < c_size) {
 				l_grid[l_startx+next.x][l_starty+next.y] = 'X';
-				printGrid(l_grid);
+				//printGrid(l_grid);
 			}
-			System.in.read();
+			//System.in.read();
 		}
 		
 		

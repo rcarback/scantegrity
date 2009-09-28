@@ -41,6 +41,8 @@
 package org.scantegrity.common;
 
 import java.awt.Rectangle;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 
 public class BallotStyle {
@@ -49,12 +51,12 @@ public class BallotStyle {
 	private Vector<Integer> c_contests;
 	//An array of contestandIds ordered as listed on the ballot.
 	private Vector<Vector<Integer>> c_contestantIds;
-	//An array of positions that are write-in positions.
-	private Vector<Vector<Integer>> c_writeIns;
 	//A list of the x,y locations and sizes of contests on the ballot image
 	private Vector<Vector<Vector<Rectangle>>> c_contestRects;
+
 	//A list of the x,y locations and sizes of write in locs on the ballot image
-	private Vector<Vector<Vector<Rectangle>>> c_writeInRects;
+	private TreeMap<Integer, TreeMap<Integer, Rectangle>> c_writeInRects;
+
 	//Should this ballot be counted at the scanner?
 	private boolean c_counted;
 	
@@ -182,30 +184,16 @@ public class BallotStyle {
 	}
 
 	/**
-	 * @param writeIns the writeIns to set
-	 */
-	public void setWriteIns(Vector<Vector<Integer>> writeIns) {
-		c_writeIns = writeIns;
-	}
-
-	/**
-	 * @return the writeIns
-	 */
-	public Vector<Vector<Integer>> getWriteIns() {
-		return c_writeIns;
-	}
-
-	/**
 	 * @param writeInRects the writeInRects to set
 	 */
-	public void setWriteInRects(Vector<Vector<Vector<Rectangle>>> writeInRects) {
+	public void setWriteInRects(TreeMap<Integer, TreeMap<Integer, Rectangle>> writeInRects) {
 		c_writeInRects = writeInRects;
 	}
 
 	/**
 	 * @return the writeInRects
 	 */
-	public Vector<Vector<Vector<Rectangle>>> getWriteInRects() {
+	public TreeMap<Integer, TreeMap<Integer, Rectangle>> getWriteInRects() {
 		return c_writeInRects;
 	}
 
@@ -213,7 +201,5 @@ public class BallotStyle {
 		if (c_counted == false && c_id == -1 
 				&& c_contests == null && c_contestRects == null ) return false;
 		else return true;
-	}
-
-	
+	}	
 }
