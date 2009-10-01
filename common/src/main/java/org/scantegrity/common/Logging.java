@@ -23,7 +23,7 @@ public class Logging extends Logger
 {
 	private FileHandler c_fileHandler; 
 	private XMLFormatter c_formatter; 
-	private static String c_tmpFileName = "/home/jconway/Desktop/log1.txt";
+	private static String c_tmpFileName = "log1.txt";
 	
 	public Logging(String p_logName, String p_logFileName, Level p_level)
 	{
