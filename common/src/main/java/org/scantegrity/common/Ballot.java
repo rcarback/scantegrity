@@ -20,9 +20,17 @@
 package org.scantegrity.common;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
+
+import javax.imageio.ImageIO;
+
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 /**
  * Ballot is used for counting the final tally at the end of the day and for
@@ -54,7 +62,7 @@ public class Ballot
 	
 	/* Write-in Support */
 	//Rectangle clippings of write-in ballot location.  Maps contest ID to map of write-in candidate IDs to images
-	private TreeMap<Integer, TreeMap<Integer, byte[]>> c_writeIns = null;
+	private TreeMap<Integer, TreeMap<Integer, String>> c_writeIns = null;
 	
 	/**
 	 * Default Constructor, creates invalid ballot.
@@ -209,16 +217,119 @@ public class Ballot
 	/**
 	 * @param writeIns the writeIns to set
 	 */
-	public void setWriteIns(TreeMap<Integer, TreeMap<Integer, byte[]>> writeIns) {
+	public void setWriteIns(TreeMap<Integer, TreeMap<Integer, String>> writeIns) 
+	{
 		c_writeIns = writeIns;
 	}
 
 	/**
 	 * @return the writeIns
 	 */
-	public TreeMap<Integer, TreeMap<Integer, byte[]>> getWriteIns() {
+	public TreeMap<Integer, TreeMap<Integer, String>> getWriteIns() 
+	{
 		return c_writeIns;
 	}
 	
+	/**
+	 * Add a write-in Image to the ballot.
+	 * 
+	 * @param p_contestId
+	 * @param p_contestantId
+	 * @param p_img
+	 */
+	public void addWriteIn(int p_contestId, int p_contestantId, 
+							BufferedImage p_img)
+	{
+		//Ignore null images.
+		if (p_img == null) return;
+		//Create write-in object
+		if (c_writeIns == null)
+		{
+			c_writeIns = new TreeMap<Integer, TreeMap<Integer, String>>();
+		}
+		//Add an entry for this contest, if necessary.
+		if (!c_writeIns.containsKey(p_contestId))
+		{
+			c_writeIns.put(p_contestId, new TreeMap<Integer, String>());
+		}
+		//Remove duplicates
+		if (!c_writeIns.get(p_contestId).containsKey(p_contestantId))
+		{
+			c_writeIns.get(p_contestId).remove(p_contestantId);
+		}
+		
+		//Get bytestream
+		ByteArrayOutputStream l_baos = new ByteArrayOutputStream();
+        try {
+        	ImageIO.write(p_img, "png", l_baos);
+        } catch (IOException e) {
+        	return;
+        }	
+ 		//UUEncode
+ 		BASE64Encoder l_enc = new BASE64Encoder();
+	 	c_writeIns.get(p_contestId).put(p_contestantId, 
+	 									l_enc.encode(l_baos.toByteArray())); 
+	}
+	
+	/**
+	 * Get all the write in Images.
+	 * 
+	 * @return
+	 */
+	public TreeMap<Integer, TreeMap<Integer, BufferedImage>> getWriteInImgs()
+	{
+		if (c_writeIns == null) return null;
+		
+		TreeMap<Integer, TreeMap<Integer, BufferedImage>> l_res;
+		l_res = new TreeMap<Integer, TreeMap<Integer,BufferedImage>>();
+		//For each contestId
+		for (Integer l_contestId : c_writeIns.keySet())
+		{
+			//for each contestantId..
+			l_res.put(l_contestId, new TreeMap<Integer, BufferedImage>());
+			for (Integer l_contestantId : c_writeIns.get(l_contestId).keySet())
+			{
+				//Add the image to the list.
+				l_res.get(l_contestId).put(l_contestantId, 
+							getWriteInImg(l_contestId, l_contestantId));
+			}
+		}
+		
+		return l_res;
+	}
+	
+	/**
+	 * Get the BufferedImage for a specific contest and candidate.
+	 * 
+	 * @param p_contestId - the contest ID
+	 * @param p_contestantId - the contestant ID
+	 * @return
+	 */
+	public BufferedImage getWriteInImg(int p_contestId, int p_contestantId)
+	{
+		if (c_writeIns == null) return null;
+		
+		BufferedImage l_img = null;
+		//If we can find it.. decode it.
+		if (c_writeIns.containsKey(p_contestId)) 
+		{
+			if (c_writeIns.get(p_contestId).containsKey(p_contestantId))
+			{
+				String l_str = c_writeIns.get(p_contestId).get(p_contestantId);
+				BASE64Decoder l_dec = new BASE64Decoder();
+				//Decode and read in the image.
+				try {
+					byte[] l_bais = l_dec.decodeBuffer(l_str);
+		            if (l_bais != null && (l_bais.length > 0)) {
+		                l_img = ImageIO.read(new ByteArrayInputStream(l_bais));
+		            }
+				} catch (Exception e) {
+					//return null...
+				}
+			}
+		}
+		
+		return l_img;
+	}
 		
 }
