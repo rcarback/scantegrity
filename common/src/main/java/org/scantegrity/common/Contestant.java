@@ -159,5 +159,4 @@ public class Contestant implements Comparable
 			return c_id.compareTo(((Contestant)p_o).getId());
 		else return 0; //Equals if we don't know what it is..
 	}
-	
 }

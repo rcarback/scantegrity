@@ -93,7 +93,7 @@ public class FindFile implements Runnable
 		c_pattern = p_pattern;
 		c_dirToSearch = new ArrayList<SearchDirectory>();
 		c_parent = null;
-		c_filesFound = null;
+		c_filesFound = new Vector<File>();
 		
 		determineOS(); 
 		
@@ -109,7 +109,7 @@ public class FindFile implements Runnable
 		c_filename = p_filename; 
 		c_dirToSearch = new ArrayList<SearchDirectory>();
 		c_parent = null;
-		c_filesFound = null;
+		c_filesFound = new Vector<File>();
 		
 		determineOS(); 
 		
@@ -127,7 +127,7 @@ public class FindFile implements Runnable
 		c_dirToSearch = new ArrayList<SearchDirectory>();
 		c_dirToSearch.add(p_parent.getDirToSearch());
 		c_parent = p_parent;
-		c_filesFound = null;
+		c_filesFound = new Vector<File>();
 	}
 	
 	public File find()

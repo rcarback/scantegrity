@@ -202,4 +202,26 @@ public class BallotStyle {
 				&& c_contests == null && c_contestRects == null ) return false;
 		else return true;
 	}	
+	
+	public String toString()
+	{
+		String l_ret = "Ballot Style (" + c_id + ")\n";
+		l_ret += "-----------------------\n";
+		l_ret += "Contests:\n";
+		for( int x = 0; x < c_contests.size(); x++ )
+		{
+			l_ret += c_contests.get(x).toString() + '\n';
+		}
+		l_ret += "Contest IDs:\n";
+		getContestantIds();
+		for( int x = 0; x < c_contestantIds.size(); x++ )
+		{
+			for( int y = 0; y < c_contestantIds.get(x).size(); y++ )
+			{
+				l_ret += c_contestantIds.get(x).get(y) + "\n";
+			}
+			l_ret += "\n";
+		}
+		return l_ret;
+	}
 }

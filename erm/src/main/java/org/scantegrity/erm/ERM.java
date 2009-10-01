@@ -13,10 +13,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.scantegrity.common.*;
 import org.scantegrity.scanner.*;
+import java.awt.GridBagLayout;
 
 public class ERM extends JFrame {
 
@@ -25,6 +28,9 @@ public class ERM extends JFrame {
 	private WriteInPanel writeInPanel = null;
 	private File c_scannerConfigFile = null;
 	private ScannerConfig c_config = null;
+	private TallyPanel tallyPanel = null;
+	private LoadPanel loadPanel = null;
+	private SpoiledPanel spoiledPanel = null;
 	/**
 	 * This method initializes jTabbedPane	
 	 * 	
@@ -33,7 +39,10 @@ public class ERM extends JFrame {
 	private JTabbedPane getJTabbedPane() {
 		if (jTabbedPane == null) {
 			jTabbedPane = new JTabbedPane();
-			jTabbedPane.addTab("Write-In", null, getWriteInPanel(), null);
+			jTabbedPane.addTab("Load Ballots", null, getLoadPanel(), null);
+			jTabbedPane.addTab("Write-In Resolution", null, getWriteInPanel(), null);
+			jTabbedPane.addTab("Tally", null, getTallyPanel(), null);
+			jTabbedPane.addTab("Spoiled Ballots", null, getSpoiledPanel(), null);
 		}
 		return jTabbedPane;
 	}
@@ -51,12 +60,63 @@ public class ERM extends JFrame {
 	}
 
 	/**
+	 * This method initializes tallyPanel	
+	 * 	
+	 * @return org.scantegrity.erm.TallyPanel	
+	 */
+	private TallyPanel getTallyPanel() {
+		if (tallyPanel == null) {
+			tallyPanel = new TallyPanel();
+		}
+		return tallyPanel;
+	}
+
+	/**
+	 * This method initializes loadPanel	
+	 * 	
+	 * @return org.scantegrity.erm.LoadPanel	
+	 */
+	private LoadPanel getLoadPanel() {
+		if (loadPanel == null) {
+			loadPanel = new LoadPanel();
+		}
+		return loadPanel;
+	}
+
+	/**
+	 * This method initializes spoiledPanel	
+	 * 	
+	 * @return org.scantegrity.erm.SpoiledPanel	
+	 */
+	private SpoiledPanel getSpoiledPanel() {
+		if (spoiledPanel == null) {
+			spoiledPanel = new SpoiledPanel();
+		}
+		return spoiledPanel;
+	}
+
+	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
+				try {
+					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnsupportedLookAndFeelException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				ERM thisClass = new ERM();
 				thisClass.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				thisClass.setVisible(true);
@@ -108,7 +168,7 @@ public class ERM extends JFrame {
 	private void initialize() {
 		this.setSize(800, 600);
 		this.setContentPane(getJTabbedPane());
-		this.setTitle("JFrame");
+		this.setTitle("Election Resolution Manager");
 	}
 
 }

@@ -19,6 +19,7 @@
  */
 package org.scantegrity.common;
 
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -156,5 +157,20 @@ public class Contest
 	public void setMethod(TallyMethod p_method)
 	{
 		c_method = p_method;
+	}
+	
+	public String toString()
+	{
+		String l_ret = "Contest\n";
+		l_ret += "-----------\n";
+		l_ret += "Name: " + c_contestName + "\n";
+		l_ret += "ID: " + c_id + "\n";
+		l_ret += "Contestants:" + "\n";
+		for(int x = 0; x < c_contestants.size(); x++ )
+		{
+			l_ret += c_contestants.get(x).toString() + "\n";
+		}
+		l_ret += "\n";
+		return l_ret;
 	}
 }

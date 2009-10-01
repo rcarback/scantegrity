@@ -6,15 +6,19 @@ import org.scantegrity.common.Contest;
 import org.scantegrity.common.Contestant;
 import org.scantegrity.common.FindFile;
 import org.scantegrity.common.RandomBallotStore;
+import org.scantegrity.common.methods.ContestChoice;
 import org.scantegrity.scanner.ScannerConfig;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
@@ -30,17 +34,20 @@ public class WriteInResolver {
 	private Contest c_currentContest = null;
 	private ScannerConfig c_config = null;
 	private WriteInLocation c_currentLocation = null;
+	private Vector<ContestChoice> c_contestChoices = null;
 	
 	class WriteInLocation
 	{
 		public Ballot ballot;
+		public ContestChoice choice;
 		public int contestId;
 		public int candidateId;
-		public WriteInLocation(Ballot p_ballot, int p_contestId, int p_candidateId)
+		public WriteInLocation(ContestChoice p_choice, Ballot p_ballot, int p_contestId, int p_candidateId)
 		{
 			ballot = p_ballot;
 			contestId = p_contestId;
 			candidateId = p_candidateId;
+			choice = p_choice;
 		}
 	}
 	
@@ -48,16 +55,21 @@ public class WriteInResolver {
 	{
 		c_config = p_config;
 		Vector<BallotStyle> l_styles = c_config.getStyles();
+		c_contestChoices = new Vector<ContestChoice>();
+		c_locations = new LinkedList<WriteInLocation>();
 		
 		c_ballotStyles = new HashMap<Integer, BallotStyle>();
 		for( BallotStyle l_style : l_styles )
 		{
+			System.err.println(l_style.toString());
 			c_ballotStyles.put(l_style.getId(), l_style);
 		}
 		
 		Vector<Contest> l_contests = c_config.getContests();
+		c_contests = new HashMap<Integer, Contest>();
 		for( Contest l_contest : l_contests )
 		{
+			System.err.println(l_contest.toString());
 			c_contests.put(l_contest.getId(), l_contest);
 		}
 		
@@ -103,10 +115,20 @@ public class WriteInResolver {
 				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
 				Contest l_contest = c_contests.get(l_contestId);
 				Vector<Contestant> l_contestants = l_contest.getContestants();
+				
+				//Create contestchoice and add to vector
+				ContestChoice l_choice = new ContestChoice(0, l_ballot, l_style, l_contest);
+				c_contestChoices.add(l_choice);
+				
+				if( !l_style.getWriteInRects().containsKey(l_contestId))
+					continue;
+				
+				TreeMap<Integer, Rectangle> l_writeInMap = l_style.getWriteInRects().get(l_contestId);
+				
 				//If it is a write in contestant, search the row for a vote
 				for(int x = 0; x < l_contestData.length; x++ )
 				{
-					if( l_contestants.get(x).getCandidateType() == Contestant.ContestantType.WRITEIN)
+					if( l_writeInMap.containsKey(l_contestants.get(x).getId()) )
 					{
 						boolean l_voteFound = false;
 						for(int y = 0; y < l_contestData[x].length; y++ )
@@ -117,7 +139,7 @@ public class WriteInResolver {
 						
 						if( l_voteFound )
 						{
-							c_locations.add(new WriteInLocation(l_ballot, l_contestId, l_contestants.get(x).getId()));
+							c_locations.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
 						}
 					}
 				}
@@ -132,9 +154,9 @@ public class WriteInResolver {
 
 	public boolean next() {
 		c_currentLocation = c_locations.poll();
-		c_currentContest = c_contests.get(c_currentLocation.contestId);
 		if( c_currentLocation == null )
 			return false;
+		c_currentContest = c_contests.get(c_currentLocation.contestId);
 		return true;
 	}
 		
@@ -149,7 +171,7 @@ public class WriteInResolver {
 
 	public BufferedImage getImage() {
 		Ballot l_curBallot = c_currentLocation.ballot;
-		Map<Integer, Map<Integer, BufferedImage>> l_imageMap = l_curBallot.getWriteInImgs();
+		TreeMap<Integer, TreeMap<Integer, BufferedImage>> l_imageMap = l_curBallot.getWriteInImgs();
 		return l_imageMap.get(c_currentLocation.contestId).get(c_currentLocation.candidateId);
 	}
 	
@@ -164,7 +186,7 @@ public class WriteInResolver {
 			}
 		}
 		
-		Map<Integer, Map<Integer, Integer>> l_map = c_currentLocation.ballot.getWriteInMap();
+		/*Map<Integer, Map<Integer, Integer>> l_map = c_currentLocation.ballot.getWriteInMap();
 		if( l_map == null )
 			l_map = new HashMap<Integer, Map<Integer, Integer>>();
 		
@@ -172,7 +194,8 @@ public class WriteInResolver {
 			l_map.put(c_currentContest.getId(), new HashMap<Integer, Integer>());
 		
 		Map<Integer, Integer> l_innerMap = l_map.get(c_currentContest.getId());
-		l_innerMap.put(c_currentLocation.candidateId, l_candidateId);
+		l_innerMap.put(c_currentLocation.candidateId, l_candidateId);*/
+		c_currentLocation.choice.normalizeChoiceWriteIn(c_currentLocation.candidateId, l_candidateId);
 		
 	}
 

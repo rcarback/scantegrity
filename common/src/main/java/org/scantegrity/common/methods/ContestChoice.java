@@ -127,7 +127,7 @@ public class ContestChoice {
 		normalizeChoiceStyle(p_style);
 		
 		//Search and replace for Write-Ins.
-		normalizeChoiceWriteIn(p_style, p_ballot);
+		//normalizeChoiceWriteIn(p_style, p_ballot);
 		
 	}
 
@@ -204,6 +204,8 @@ public class ContestChoice {
 		
 		l_contestIndex = p_style.getContests().indexOf(new Integer(c_contest));
 		l_contestantMap = p_style.getContestantIds().get(l_contestIndex);
+		if( l_contestantMap == null || l_contestantMap.size() == 0 )
+			return;
 		
 		//For each rank
 		for (int l_i = 0; l_i < c_choices.length; l_i++)
@@ -211,7 +213,8 @@ public class ContestChoice {
 			//Replace each contestant
 			for (int l_j = 0; l_j < c_choices[l_i].length; l_j++)
 			{
-				c_choices[l_i][l_j] = l_contestantMap.get(c_choices[l_i][l_j]);
+					if( c_choices[l_i][l_j] >= 0 )
+						c_choices[l_i][l_j] = l_contestantMap.get(c_choices[l_i][l_j]);
 			}
 		}	
 	}
@@ -244,4 +247,18 @@ public class ContestChoice {
 		}*/	
 		
 	}	
+	
+	public void normalizeChoiceWriteIn(int p_oldId, int p_newId)
+	{
+		for( int x = 0; x < c_choices.length; x++ )
+		{
+			for( int y = c_choices[x].length; y < c_choices[x].length; y++ )
+			{
+				if( c_choices[x][y] == p_oldId )
+				{
+					c_choices[x][y] = p_newId;
+				}
+			}
+		}
+	}
 }

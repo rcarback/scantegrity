@@ -3,6 +3,9 @@ package org.scantegrity.erm;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
@@ -34,7 +37,7 @@ public class WriteInPanel extends JPanel {
 	private Vector<String> c_candidateList = null;
 	private WriteInResolver c_resolver = null;
 	private BufferedImage c_writeInImage = null;
-	private WriteInLoaderThread c_loader = null;
+	private WriteInLoaderThread c_loader = null;  //  @jve:decl-index=0:
 	private ScannerConfig c_config = null;
 
 	/**
@@ -54,7 +57,6 @@ public class WriteInPanel extends JPanel {
 	 */
 	private void initialize() {
 		listModel = new DefaultListModel();
-		listModel.addElement("Test");
 		
 		c_candidateList = new Vector<String>();
 		c_resolver = new WriteInResolver(c_config);
@@ -77,6 +79,15 @@ public class WriteInPanel extends JPanel {
 		if (jList == null) {
 			jList = new JList();
 			jList.setModel(listModel);
+			MouseListener l_mouseListener = new MouseAdapter() {
+			     public void mouseClicked(MouseEvent e) {
+			         if (e.getClickCount() == 2) {
+			             int index = jList.locationToIndex(e.getPoint());
+			             AddVote((String) jList.getModel().getElementAt(index));
+			          }
+			     }
+			};
+			jList.addMouseListener(l_mouseListener);
 		}
 		return jList;
 	}
@@ -141,7 +152,10 @@ public class WriteInPanel extends JPanel {
 			c_resolver.Resolve(p_name);
 		}
 		//Add vote for candidate
-		c_loader.notify();
+		synchronized(c_loader)
+		{
+			c_loader.notify();
+		}
 	}
 
 	/**
@@ -152,7 +166,7 @@ public class WriteInPanel extends JPanel {
 	private JPanel getImagePanel() {
 		if (imagePanel == null) {
 			imageLabel = new JLabel();
-			imageLabel.setText("JLabel");
+			imageLabel.setText("");
 			imagePanel = new JPanel();
 			imagePanel.setLayout(new BoxLayout(getImagePanel(), BoxLayout.X_AXIS));
 			imagePanel.setBorder(BorderFactory.createTitledBorder(null, "Image", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font("Dialog", Font.BOLD, 12), new Color(51, 51, 51)));
@@ -185,7 +199,10 @@ public class WriteInPanel extends JPanel {
 				UpdateState();
 				//Wait for user to resolve write-in
 				try {
-					this.wait();
+					synchronized(this)
+					{
+						this.wait();
+					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
