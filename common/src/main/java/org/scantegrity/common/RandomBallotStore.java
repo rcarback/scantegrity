@@ -770,6 +770,10 @@ public class RandomBallotStore
 		}
 		
 	}
+
+	public String getLocation() {
+		return c_fname;
+	}
 	
 	
 }
