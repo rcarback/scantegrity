@@ -72,6 +72,7 @@ public class Scanner
 	private static RandomBallotStore[] c_store;
 	private static Vector<Integer> c_ballotIds; 
 	private static int c_numErrorFiles = 0; 
+	private static int c_myId = -1;
 	
 	/**
 	 * Create options for this application. Currently there is only 1, and 
@@ -196,7 +197,8 @@ public class Scanner
 			for(int i = 0; i < p_storeLocs.size(); i++)
 			{
 				c_log.log(Level.INFO, "Creating Random Ballot Store : " + p_storeLocs.get(i));
-				l_store[i] = new RandomBallotStore(p_storeLocs.get(i), 
+				l_store[i] = new RandomBallotStore(c_myId,
+													p_storeLocs.get(i), 
 													l_hash, 
 													l_csprng);
 				l_store[i].create(10*1024*1024, 512);
@@ -424,6 +426,8 @@ public class Scanner
 		//Get the config file
 		c_config = getConfiguration(null);
 		
+		c_myId = c_config.getPollID();
+		
 		//register logging handlers if any
 		c_log = initializeLogger(); 
 		c_log.log(Level.INFO, "Logging Intialized");
@@ -455,6 +459,7 @@ public class Scanner
 				continue;
 			
 			l_ballot = getBallot(l_ballotImg); 
+			l_ballot.setScannerId(c_myId);
 			
 			if(l_ballot == null)
 				continue;
