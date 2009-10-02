@@ -534,6 +534,20 @@ public class RandomBallotStore
 	}
 	
 	/**
+	 * @return the scannerId
+	 */
+	public int getScannerId() {
+		return c_scannerId;
+	}
+
+	/**
+	 * @param p_scannerId the scannerId to set
+	 */
+	public void setScannerId(int p_scannerId) {
+		c_scannerId = p_scannerId;
+	}
+
+	/**
 	 * Encapsulated block structure. When we want to save a few bits, we can
 	 * modify the functions here to react to different block types and be more
 	 * smart about if there is a need to write previous and next pointers.
