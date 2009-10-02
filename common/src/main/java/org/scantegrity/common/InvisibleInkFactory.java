@@ -36,8 +36,6 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Vector;
 import org.scantegrity.common.CMYKColorSpace;
-
-import com.sun.tools.javac.code.Attribute.Array;
  
 /**
  * Generates images to print text in reactive (yellow) and dummy (magenta) ink.
