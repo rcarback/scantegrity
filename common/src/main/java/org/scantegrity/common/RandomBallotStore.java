@@ -83,6 +83,7 @@ public class RandomBallotStore
 	private static byte BLTBLK = 1;
 	private static byte CNTBLK = -1;
 	private String c_fname = "";
+	private int c_scannerId = -1;
 	private RandomAccessFile c_file = null;
 	private byte c_btab[] = null;
 	private int c_blksize = 0;
@@ -97,9 +98,10 @@ public class RandomBallotStore
 	 * @param p_fname
 	 * @throws NoSuchAlgorithmException 
 	 */
-	public RandomBallotStore(String p_fname, MessageDigest p_hash, 
+	public RandomBallotStore(int p_scannerId, String p_fname, MessageDigest p_hash, 
 								SecureRandom p_csprng) throws NoSuchAlgorithmException
 	{
+		c_scannerId = p_scannerId;
 		c_fname = p_fname;
 		
 		if (p_hash == null)
@@ -162,6 +164,8 @@ public class RandomBallotStore
 		{
 			throw new IOException(INVALID_BLKSIZE);
 		}
+		//Read the scannerId
+		c_scannerId = c_file.readInt();		
 		
 		c_btab = new byte[getTabSize(c_fsize, c_blksize)];
 		int l_numBallots = 0;
@@ -201,10 +205,10 @@ public class RandomBallotStore
 		
 		//Calculate true file size
 		int l_tabSize = getTabSize(p_size, p_blksize);
-		long l_evenSize = (p_size - FILESTART.getBytes().length - 12 - l_tabSize)/p_blksize;
+		long l_evenSize = (p_size - FILESTART.getBytes().length - 16 - l_tabSize)/p_blksize;
 		l_evenSize *= p_blksize;
 		l_evenSize += l_tabSize;
-		l_evenSize += FILESTART.getBytes().length + 12;
+		l_evenSize += FILESTART.getBytes().length + 16;
 		
 		c_fsize = l_evenSize;
 		c_blksize = p_blksize;
@@ -215,6 +219,7 @@ public class RandomBallotStore
 		c_file.write(FILESTART.getBytes());
 		c_file.writeLong(l_evenSize);
 		c_file.writeInt(p_blksize);
+		c_file.writeInt(c_scannerId);
 		c_file.getFD().sync();
 		
 		/*
@@ -400,7 +405,7 @@ public class RandomBallotStore
 	private byte[] getBlk(int p_blkId) throws IOException
 	{
 		byte l_res[] = new byte[c_blksize];
-		long l_offset = FILESTART.getBytes().length + 12;
+		long l_offset = FILESTART.getBytes().length + 16;
 
 		//System.out.println("Reading Block: " + p_blkId);
 		//System.out.println("Offset: " + (l_offset+c_numBlks+p_blkId*c_blksize));
@@ -427,7 +432,7 @@ public class RandomBallotStore
 	
 	private void writeBlock(int p_pos, byte[] p_blk) throws IOException
 	{
-		long l_offset = FILESTART.getBytes().length + 12;
+		long l_offset = FILESTART.getBytes().length + 16;
 		
 		c_file.seek(l_offset+c_numBlks+p_pos*c_blksize);
 		c_file.write(p_blk);
@@ -455,7 +460,7 @@ public class RandomBallotStore
 	private int getTabSize(long p_fsize, long p_blksize)
 	{
 		//How many blks are possible?
-		long l_numBlks = (p_fsize - FILESTART.length() - 12)/p_blksize;
+		long l_numBlks = (p_fsize - FILESTART.length() - 16)/p_blksize;
 		//How many will I need to lose for the table?
 		long l_numLost = l_numBlks/p_blksize;
 				
