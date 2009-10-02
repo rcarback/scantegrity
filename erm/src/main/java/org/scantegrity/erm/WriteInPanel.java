@@ -9,6 +9,8 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
+import org.apache.commons.lang.*;
+
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -23,6 +25,8 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.scantegrity.scanner.ScannerConfig;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
 
 public class WriteInPanel extends JPanel {
 
@@ -35,10 +39,13 @@ public class WriteInPanel extends JPanel {
 	private JPanel imagePanel = null;
 	private JLabel imageLabel = null;
 	private Vector<String> c_candidateList = null;
-	private WriteInResolver c_resolver = null;
+	private WriteInResolver c_resolver = null;  //  @jve:decl-index=0:
 	private BufferedImage c_writeInImage = null;
 	private WriteInLoaderThread c_loader = null;  //  @jve:decl-index=0:
 	private ScannerConfig c_config = null;
+	private JPanel headerPanel = null;
+	private JLabel headerLabel = null;
+	private String c_contestName = null;
 
 	/**
 	 * This is the default constructor
@@ -66,6 +73,7 @@ public class WriteInPanel extends JPanel {
 		this.add(getJScrollPane(), BorderLayout.WEST);
 		this.add(getTextPanel(), BorderLayout.SOUTH);
 		this.add(getImagePanel(), BorderLayout.CENTER);
+		this.add(getHeaderPanel(), BorderLayout.NORTH);
 		c_loader = new WriteInLoaderThread();
 		c_loader.start();
 	}
@@ -142,6 +150,20 @@ public class WriteInPanel extends JPanel {
 	{
 		if( !c_candidateList.contains(p_name) )
 		{
+			int l_res = JOptionPane.NO_OPTION;
+			for( int x = 0; x < c_candidateList.size() && l_res != JOptionPane.YES_OPTION; x++ )
+			{
+				if( c_candidateList.get(x).toLowerCase() == p_name.toLowerCase() || StringUtils.getLevenshteinDistance(c_candidateList.get(x), p_name) <= 2 )
+				{
+					l_res = JOptionPane.showConfirmDialog(getParent(), "Do you mean " + c_candidateList.get(x) + "?","Confirm Match", JOptionPane.YES_NO_OPTION  );
+					if( l_res == JOptionPane.YES_OPTION )
+						p_name = c_candidateList.get(x);
+				}
+			}
+		}
+		
+		if( !c_candidateList.contains(p_name) )
+		{
 			int l_res = JOptionPane.showConfirmDialog(getParent(), "Candidate is not in list, would you like to add?", "Confirm Add", JOptionPane.YES_NO_OPTION);
 			if( l_res != JOptionPane.YES_OPTION )
 				return;
@@ -149,8 +171,10 @@ public class WriteInPanel extends JPanel {
 			{
 				c_resolver.AddCandidate(p_name);
 			}
-			c_resolver.Resolve(p_name);
 		}
+		c_resolver.Resolve(p_name);
+		textCandidate.setText("");
+		textCandidate.requestFocusInWindow();
 		//Add vote for candidate
 		synchronized(c_loader)
 		{
@@ -183,7 +207,7 @@ public class WriteInPanel extends JPanel {
 			l_model.addElement(l_candidate);
 		}
 		jList.setModel(l_model);
-		
+		headerLabel.setText("Contest: " + c_contestName);
 		imageLabel.setIcon(new ImageIcon(c_writeInImage));
 	}
 	
@@ -196,6 +220,7 @@ public class WriteInPanel extends JPanel {
 			{
 				c_candidateList = c_resolver.getCandidates();
 				c_writeInImage = c_resolver.getImage();
+				c_contestName = c_resolver.getContestName();
 				UpdateState();
 				//Wait for user to resolve write-in
 				try {
@@ -210,6 +235,22 @@ public class WriteInPanel extends JPanel {
 			}
 			JOptionPane.showMessageDialog(getParent(), "Write-in resolution complete");
 		}
+	}
+
+	/**
+	 * This method initializes headerPanel	
+	 * 	
+	 * @return javax.swing.JPanel	
+	 */
+	private JPanel getHeaderPanel() {
+		if (headerPanel == null) {
+			headerLabel = new JLabel();
+			headerLabel.setText("Contest: ");
+			headerPanel = new JPanel();
+			headerPanel.setLayout(new GridBagLayout());
+			headerPanel.add(headerLabel, new GridBagConstraints());
+		}
+		return headerPanel;
 	}
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"

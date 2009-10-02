@@ -30,7 +30,7 @@ public class WriteInResolver {
 	
 	private Map<Integer, BallotStyle> c_ballotStyles = null;
 	private Map<Integer, Contest> c_contests = null;
-	private Queue<WriteInLocation> c_locations = null;
+	private Map<Integer, ContestQueue> c_locations = null;
 	private Contest c_currentContest = null;
 	private ScannerConfig c_config = null;
 	private WriteInLocation c_currentLocation = null;
@@ -51,12 +51,24 @@ public class WriteInResolver {
 		}
 	}
 	
+	class ContestQueue
+	{
+		public int contestId;
+		public Queue<WriteInLocation> queue;
+		public String contestName;
+		public ContestQueue(int p_id, String p_name)
+		{
+			queue = new LinkedList<WriteInLocation>();
+			contestName = p_name;
+		}
+	}
+	
 	public WriteInResolver(ScannerConfig p_config)
 	{
 		c_config = p_config;
 		Vector<BallotStyle> l_styles = c_config.getStyles();
 		c_contestChoices = new Vector<ContestChoice>();
-		c_locations = new LinkedList<WriteInLocation>();
+		c_locations = new TreeMap<Integer, ContestQueue>();
 		
 		c_ballotStyles = new HashMap<Integer, BallotStyle>();
 		for( BallotStyle l_style : l_styles )
@@ -139,7 +151,14 @@ public class WriteInResolver {
 						
 						if( l_voteFound )
 						{
-							c_locations.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
+							if( c_locations.containsKey(l_contestId) )
+								c_locations.get(l_contestId).queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
+							else
+							{
+								ContestQueue l_newQueue = new ContestQueue(l_contestId, l_contest.getContestName());
+								l_newQueue.queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
+								c_locations.put(l_contestId, l_newQueue);
+							}
 						}
 					}
 				}
@@ -153,7 +172,15 @@ public class WriteInResolver {
 	}
 
 	public boolean next() {
-		c_currentLocation = c_locations.poll();
+		c_currentLocation = null;
+		for( int x = 0; x < c_contests.size() && c_currentLocation == null; x++ )
+		{
+			int l_id = c_contests.get(x).getId();
+			if( c_locations.containsKey(l_id) && c_locations.get(l_id).queue.peek() != null )
+			{
+				c_currentLocation = c_locations.get(l_id).queue.poll();
+			}
+		}
 		if( c_currentLocation == null )
 			return false;
 		c_currentContest = c_contests.get(c_currentLocation.contestId);
@@ -197,6 +224,11 @@ public class WriteInResolver {
 		l_innerMap.put(c_currentLocation.candidateId, l_candidateId);*/
 		c_currentLocation.choice.normalizeChoiceWriteIn(c_currentLocation.candidateId, l_candidateId);
 		
+	}
+	
+	public String getContestName()
+	{
+		return c_currentContest.getContestName();
 	}
 
 }
