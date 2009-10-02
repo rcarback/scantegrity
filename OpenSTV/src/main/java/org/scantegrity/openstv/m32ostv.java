@@ -17,19 +17,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.scantegrity.misc;
+package org.scantegrity.openstv;
 
 import java.beans.XMLDecoder;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -45,17 +41,14 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.scantegrity.lib.Ballot;
-import org.scantegrity.lib.Contest;
-import org.scantegrity.scanner.ScannerConfig;
+import org.scantegrity.common.Ballot;
+import org.scantegrity.common.Contest;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
-
-import org.scantegrity.lib.Contestant;
+import org.scantegrity.common.Contestant;
 
 /**
  * Converts MeetingThreeOut.xml (results) files to the OSTV format. Requires
@@ -332,7 +325,7 @@ public class m32ostv
 			
 			//System.err.println("Rows: " + l_rows.getLength());
 
-			int l_length = 0;
+			//int l_length = 0;
 			
 			Vector<Ballot> l_ballots = new Vector<Ballot>();
 			//For each ballot..
@@ -434,6 +427,7 @@ public class m32ostv
 	 * @param l_fname
 	 * @throws FileNotFoundException 
 	 */
+	@SuppressWarnings("unchecked")
 	public static Vector<Contest> loadContest(String p_fname) throws FileNotFoundException
 	{
 		Vector<Contest> l_res;
@@ -448,6 +442,7 @@ public class m32ostv
 	 * Create options for this application. Currently there is only 1, and 
 	 * that is if the user wants to include a contest information file.
 	 */
+	@SuppressWarnings("static-access")
 	public static void setOptions()
 	{
 		c_opts = new Options();
