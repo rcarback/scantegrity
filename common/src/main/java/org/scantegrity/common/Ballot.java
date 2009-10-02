@@ -29,8 +29,8 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
+
 
 /**
  * Ballot is used for counting the final tally at the end of the day and for
@@ -266,9 +266,9 @@ public class Ballot
         	return;
         }	
  		//UUEncode
- 		BASE64Encoder l_enc = new BASE64Encoder();
+ 		Base64 l_enc = new Base64();
 	 	c_writeIns.get(p_contestId).put(p_contestantId, 
-	 									l_enc.encode(l_baos.toByteArray())); 
+ 									l_enc.encodeToString(l_baos.toByteArray())); 
 	}
 	
 	/**
@@ -316,10 +316,10 @@ public class Ballot
 			if (c_writeIns.get(p_contestId).containsKey(p_contestantId))
 			{
 				String l_str = c_writeIns.get(p_contestId).get(p_contestantId);
-				BASE64Decoder l_dec = new BASE64Decoder();
+				Base64 l_dec = new Base64();
 				//Decode and read in the image.
 				try {
-					byte[] l_bais = l_dec.decodeBuffer(l_str);
+					byte[] l_bais = l_dec.decode(l_str);
 		            if (l_bais != null && (l_bais.length > 0)) {
 		                l_img = ImageIO.read(new ByteArrayInputStream(l_bais));
 		            }
