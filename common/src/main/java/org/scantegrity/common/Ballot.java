@@ -56,6 +56,7 @@ public class Ballot
 	
 	private Integer c_id;
 	private Integer c_ballotStyleID;
+	private Integer c_scannerId = -1;
 	private Map<Integer, Integer[][]> c_ballotData;
 	private boolean c_counted;
 	private Vector<String> c_notes;
@@ -139,6 +140,20 @@ public class Ballot
 	public void setBallotStyleID(Integer p_ballotStyleID)
 	{
 		c_ballotStyleID = p_ballotStyleID;
+	}
+
+	/**
+	 * @param scannerId the scannerId to set
+	 */
+	public void setScannerId(Integer scannerId) {
+		c_scannerId = scannerId;
+	}
+
+	/**
+	 * @return the scannerId
+	 */
+	public Integer getScannerId() {
+		return c_scannerId;
 	}
 
 	/**
