@@ -86,5 +86,21 @@
         <checksumPolicy>warn</checksumPolicy>
       </snapshots>
     </repository>
+    <repository>
+      <id>repository.jboss.org</id>
+      <url>http://repository.jboss.org/maven2</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </snapshots>
+    </repository>
+    
   </repositories>  
 </project>
