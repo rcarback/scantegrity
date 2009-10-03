@@ -28,8 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -39,19 +37,15 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
-import org.scantegrity.common.Contest;
 import org.scantegrity.common.FindFile;
 import org.scantegrity.common.Logging;
 import org.scantegrity.common.RandomBallotStore;
 import org.scantegrity.common.SysBeep;
-import org.scantegrity.common.constants.TallyConstants;
-
 import uk.org.jsane.JSane_Exceptions.JSane_Exception;
 import uk.org.jsane.JSane_Exceptions.JSane_Exception_IoError;
 
@@ -82,15 +76,9 @@ public class Scanner
 	{
 		c_opts = new Options();
 		
-		Option l_contestInfo = OptionBuilder.withArgName( "contestinfo" )
-						.hasArg()
-						.withDescription("Use a file that contains contest information.")
-						.create("info");
-		
 		Option l_help = new Option("help", "Print help message.");
 		Option l_verb = new Option("v", "Unimplemented verbosity setting, prints more info.");
 		
-		c_opts.addOption(l_contestInfo);	
 		c_opts.addOption(l_help);	
 		c_opts.addOption(l_verb);	
 		
@@ -103,11 +91,10 @@ public class Scanner
 	{
 		try {			
 			HelpFormatter l_form  = new HelpFormatter();
-			l_form.printHelp(80, "mt2ostv [OPTIONS] INFILE [OUTFILE]", 
-					"mt2ostv converts results files in Scantegrity to the BLT format " +
-					"used by the OpenSTV counting program. It uses the Scantegrity" +
-					" results INFILE, usually named MeetingThreeOut.xml to produce" +
-					" a BLT compatible file to stdout or OUTFILE.\n\nOPTIONS:", c_opts, "", false);
+			l_form.printHelp(80, "scanner [ScannerConfig.xml]", 
+					"This is the scanner daemon for the scantegrity voting" +
+					"system. If you do not provide a configuration, the system" +
+					"will attempt to find one.\n\nOPTIONS:", c_opts, "", false);
 		} 
 		catch (Exception l_e)
 		{
@@ -417,14 +404,15 @@ public class Scanner
 		}
 		
 	    if (l_cmdLine == null || l_cmdLine.hasOption("help") || l_args == null 
-	    		|| l_args.length < 1 || l_args.length > 2)
+	    		|| l_args.length > 2)
 	    {
 	    	printUsage();
 	    	return;
 	    }
 	    
 		//Get the config file
-		c_config = getConfiguration(null);
+	    if (l_args.length == 2) c_config = getConfiguration(l_args[1]);
+	    else c_config = getConfiguration("ScannerConfig.xml");
 		
 		c_myId = c_config.getPollID();
 		

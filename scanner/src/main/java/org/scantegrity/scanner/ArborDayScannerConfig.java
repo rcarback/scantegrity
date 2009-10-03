@@ -51,7 +51,7 @@ import org.scantegrity.scanner.ScantegrityBallotReader;
  */
 public class ArborDayScannerConfig
 {
-	private static String c_loc = "/home/jconway/ScantegrityConfigs/";
+	private static String c_loc = "";
 	private static String c_name = "ScannerConfig.xml";
 
 	/**
