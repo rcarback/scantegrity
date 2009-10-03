@@ -67,7 +67,7 @@ public class ERM extends JFrame {
 	 */
 	private TallyPanel getTallyPanel() {
 		if (tallyPanel == null) {
-			tallyPanel = new TallyPanel(c_resolver);
+			tallyPanel = new TallyPanel(c_resolver, c_path);
 		}
 		return tallyPanel;
 	}

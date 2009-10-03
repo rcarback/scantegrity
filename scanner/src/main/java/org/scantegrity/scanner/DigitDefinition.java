@@ -25,7 +25,7 @@ package org.scantegrity.scanner;
  * @author stefan
  *
  */
-public class DigitDeffinition {
+public class DigitDefinition {
 
 	static byte[][][] digits={
 		{
@@ -203,7 +203,7 @@ public class DigitDeffinition {
 	}
 
 	public static void main(String args[]) throws Exception {
-		DigitDeffinition dd = new DigitDeffinition();
+		DigitDefinition dd = new DigitDefinition();
 		dd.allHamingDistances();
 		/*
 		for (int i=0;i<dd.getNumberOfDigits();i++) {

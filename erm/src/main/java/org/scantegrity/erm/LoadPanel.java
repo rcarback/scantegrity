@@ -125,7 +125,6 @@ public class LoadPanel extends JPanel {
 					FindFile l_finder = new FindFile(Pattern.compile(".*\\.sbr"));
 					l_finder.c_recurseDepth = 2;
 					Vector<File> l_files = l_finder.findMultiple();
-					System.err.println("Found " + l_files.size());
 					Vector<RandomBallotStore> l_stores = new Vector<RandomBallotStore>();
 					for( File l_file : l_files )
 					{
@@ -145,9 +144,22 @@ public class LoadPanel extends JPanel {
 					for( RandomBallotStore l_store : l_confirmDialog.c_stores )
 					{
 						try {
+							if( listModel.contains(l_store.getScannerId()))
+							{
+								int l_resp = JOptionPane.showConfirmDialog(getParent(), "A ballot store from scanner " + l_store.getScannerId() + " has already been loaded.  Are you sure you would like to add this one?");
+								if( l_resp != JOptionPane.YES_OPTION )
+									continue;
+								
+							}
+							int x = 0;
+							String l_newFile = c_path + File.separator + "Ballots-" + l_store.getScannerId() + ".sbr";
+							while( new File(l_newFile).exists() )
+							{
+								l_newFile = c_path + File.separator + "Ballots-" + l_store.getScannerId() + "-" + x + ".sbr";
+								x++;
+							}
 							c_resolver.LoadBallots(l_store);
 							String l_curFile = l_store.getLocation();
-							String l_newFile = c_path + File.separator + "Ballots-" + l_store.getScannerId() + ".sbr";
 							l_store.close();
 							FileUtils.copyFile(new File(l_curFile), new File(l_newFile));
 							listModel.addElement(l_store.getScannerId());

@@ -204,7 +204,7 @@ public class WriteInPanel extends JPanel {
 			l_model.addElement(l_candidate);
 		}
 		jList.setModel(l_model);
-		headerLabel.setText("Contest: " + c_contestName);
+		headerLabel.setText("<HTML>Contest: " + c_contestName + "</HTML>");
 		imageLabel.setIcon(new ImageIcon(c_writeInImage));
 	}
 	

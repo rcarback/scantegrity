@@ -4,7 +4,7 @@
 	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.iam.jdt.core.mavenClasspathContainer"/>
 	<classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/emws/WebContent/WEB-INF/lib/commons-io-1.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

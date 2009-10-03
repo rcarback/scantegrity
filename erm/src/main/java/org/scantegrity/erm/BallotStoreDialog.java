@@ -33,7 +33,7 @@ public class BallotStoreDialog extends JDialog {
 	 * @param owner
 	 */
 	public BallotStoreDialog(Frame owner, Vector<RandomBallotStore> p_stores) {
-		super(owner);
+		super(owner, true);
 		setTitle("Confirm");
 		c_stores = p_stores;
 		c_model = new DefaultListModel();
