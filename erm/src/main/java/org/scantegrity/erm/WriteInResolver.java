@@ -1,14 +1,5 @@
 package org.scantegrity.erm;
 
-import org.scantegrity.common.Ballot;
-import org.scantegrity.common.BallotStyle;
-import org.scantegrity.common.Contest;
-import org.scantegrity.common.Contestant;
-import org.scantegrity.common.FindFile;
-import org.scantegrity.common.RandomBallotStore;
-import org.scantegrity.common.methods.ContestChoice;
-import org.scantegrity.scanner.ScannerConfig;
-
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -20,7 +11,16 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.regex.Pattern;
+
+import javax.swing.JOptionPane;
+
+import org.scantegrity.common.Ballot;
+import org.scantegrity.common.BallotStyle;
+import org.scantegrity.common.Contest;
+import org.scantegrity.common.Contestant;
+import org.scantegrity.common.RandomBallotStore;
+import org.scantegrity.common.methods.ContestChoice;
+import org.scantegrity.scanner.ScannerConfig;
 
 /* This class loads in ballots and uses a queue to pull up all the write-in positions that need to be
  * resolved.
@@ -35,6 +35,7 @@ public class WriteInResolver {
 	private ScannerConfig c_config = null;
 	private WriteInLocation c_currentLocation = null;
 	private Vector<ContestChoice> c_contestChoices = null;
+	private Vector<ContestChoice> c_unalteredChoices = null;
 	
 	class WriteInLocation
 	{
@@ -68,12 +69,13 @@ public class WriteInResolver {
 		c_config = p_config;
 		Vector<BallotStyle> l_styles = c_config.getStyles();
 		c_contestChoices = new Vector<ContestChoice>();
+		c_unalteredChoices = new Vector<ContestChoice>();
 		c_locations = new TreeMap<Integer, ContestQueue>();
 		
 		c_ballotStyles = new HashMap<Integer, BallotStyle>();
 		for( BallotStyle l_style : l_styles )
 		{
-			System.err.println(l_style.toString());
+			//System.err.println(l_style.toString());
 			c_ballotStyles.put(l_style.getId(), l_style);
 		}
 		
@@ -81,37 +83,20 @@ public class WriteInResolver {
 		c_contests = new HashMap<Integer, Contest>();
 		for( Contest l_contest : l_contests )
 		{
-			System.err.println(l_contest.toString());
+			//System.err.println(l_contest.toString());
 			c_contests.put(l_contest.getId(), l_contest);
 		}
 		
-		LoadBallots();
 	}
 	
 	//1) Finds ballot stores on all removable disks
 	//2) Reads ballots from each store and figures out which ballot positions need to be resolved
 	//3) Adds each ballot position to a queue for the user to resolve
-	private void LoadBallots()
+	public void LoadBallots(RandomBallotStore p_store) throws IOException
 	{
-		FindFile l_finder = new FindFile(Pattern.compile(".*\\.sbr"));
-		l_finder.c_recurseDepth = 2;
-		Vector<File> l_files = l_finder.findMultiple();
-		for( File l_file : l_files )
-		{
-			try {
-				RandomBallotStore l_store = new RandomBallotStore(l_file.getPath(), null, null);
-				l_store.open();
-				Vector<Ballot> l_ballots = l_store.getBallots();
-				l_store.close();
-				ParseBallots(l_ballots);
-			} catch (NoSuchAlgorithmException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+			Vector<Ballot> l_ballots;
+			l_ballots = p_store.getBallots();
+			ParseBallots(l_ballots);
 	}
 	
 	//Search through each ballot to find positions where there are votes for a write-in candidate
@@ -131,6 +116,7 @@ public class WriteInResolver {
 				//Create contestchoice and add to vector
 				ContestChoice l_choice = new ContestChoice(0, l_ballot, l_style, l_contest);
 				c_contestChoices.add(l_choice);
+				c_unalteredChoices.add(new ContestChoice(l_choice));
 				
 				if( !l_style.getWriteInRects().containsKey(l_contestId))
 					continue;

@@ -3,14 +3,13 @@ package org.scantegrity.erm;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
-
-import org.apache.commons.lang.*;
-
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -24,9 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import org.scantegrity.scanner.ScannerConfig;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
+import org.apache.commons.lang.StringUtils;
 
 public class WriteInPanel extends JPanel {
 
@@ -42,17 +39,17 @@ public class WriteInPanel extends JPanel {
 	private WriteInResolver c_resolver = null;  //  @jve:decl-index=0:
 	private BufferedImage c_writeInImage = null;
 	private WriteInLoaderThread c_loader = null;  //  @jve:decl-index=0:
-	private ScannerConfig c_config = null;
 	private JPanel headerPanel = null;
 	private JLabel headerLabel = null;
 	private String c_contestName = null;
+	private boolean c_hadWriteins = false;
 
 	/**
 	 * This is the default constructor
 	 */
-	public WriteInPanel(ScannerConfig p_config) {
+	public WriteInPanel(WriteInResolver p_resolver) {
 		super();
-		c_config = p_config;
+		c_resolver = p_resolver;
 		initialize();
 		
 	}
@@ -66,7 +63,6 @@ public class WriteInPanel extends JPanel {
 		listModel = new DefaultListModel();
 		
 		c_candidateList = new Vector<String>();
-		c_resolver = new WriteInResolver(c_config);
 		
 		this.setSize(538, 336);
 		this.setLayout(new BorderLayout());
@@ -216,8 +212,27 @@ public class WriteInPanel extends JPanel {
 	{
 		public void run()
 		{
-			while(c_resolver.next())
+			while(true)
 			{
+				if( !c_resolver.next() )
+				{
+					if( c_hadWriteins )
+					{
+						JOptionPane.showMessageDialog(getParent(), "Write-in resolution complete");
+						c_hadWriteins = false;
+					}
+					try {
+						synchronized(this)
+						{
+							Thread.sleep(2000);
+						}
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					continue;
+				}
+				c_hadWriteins = true;
 				c_candidateList = c_resolver.getCandidates();
 				c_writeInImage = c_resolver.getImage();
 				c_contestName = c_resolver.getContestName();
@@ -233,7 +248,6 @@ public class WriteInPanel extends JPanel {
 					e.printStackTrace();
 				}
 			}
-			JOptionPane.showMessageDialog(getParent(), "Write-in resolution complete");
 		}
 	}
 

@@ -1,17 +1,20 @@
 package org.scantegrity.erm;
 
 import java.awt.GridBagLayout;
+
 import javax.swing.JPanel;
 
 public class TallyPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
+	WriteInResolver c_resolver = null;
 
 	/**
 	 * This is the default constructor
 	 */
-	public TallyPanel() {
+	public TallyPanel(WriteInResolver p_resolver) {
 		super();
+		c_resolver = p_resolver;
 		initialize();
 	}
 

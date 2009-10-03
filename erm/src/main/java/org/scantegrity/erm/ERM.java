@@ -1,7 +1,5 @@
 package org.scantegrity.erm;
 
-import javax.swing.SwingUtilities;
-import java.awt.BorderLayout;
 import java.beans.XMLDecoder;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -9,17 +7,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.scantegrity.common.*;
-import org.scantegrity.scanner.*;
-import java.awt.GridBagLayout;
+import org.scantegrity.common.FindFile;
+import org.scantegrity.scanner.ScannerConfig;
+import org.scantegrity.scanner.ScannerConstants;
 
 public class ERM extends JFrame {
 
@@ -31,6 +29,9 @@ public class ERM extends JFrame {
 	private TallyPanel tallyPanel = null;
 	private LoadPanel loadPanel = null;
 	private SpoiledPanel spoiledPanel = null;
+	public WriteInResolver c_resolver = null;
+	private String c_path = null;
+	
 	/**
 	 * This method initializes jTabbedPane	
 	 * 	
@@ -54,7 +55,7 @@ public class ERM extends JFrame {
 	 */
 	private WriteInPanel getWriteInPanel() {
 		if (writeInPanel == null) {
-			writeInPanel = new WriteInPanel(c_config);
+			writeInPanel = new WriteInPanel(c_resolver);
 		}
 		return writeInPanel;
 	}
@@ -66,7 +67,7 @@ public class ERM extends JFrame {
 	 */
 	private TallyPanel getTallyPanel() {
 		if (tallyPanel == null) {
-			tallyPanel = new TallyPanel();
+			tallyPanel = new TallyPanel(c_resolver);
 		}
 		return tallyPanel;
 	}
@@ -78,7 +79,7 @@ public class ERM extends JFrame {
 	 */
 	private LoadPanel getLoadPanel() {
 		if (loadPanel == null) {
-			loadPanel = new LoadPanel();
+			loadPanel = new LoadPanel(c_resolver, c_path);
 		}
 		return loadPanel;
 	}
@@ -90,7 +91,7 @@ public class ERM extends JFrame {
 	 */
 	private SpoiledPanel getSpoiledPanel() {
 		if (spoiledPanel == null) {
-			spoiledPanel = new SpoiledPanel();
+			spoiledPanel = new SpoiledPanel(c_resolver);
 		}
 		return spoiledPanel;
 	}
@@ -151,12 +152,33 @@ public class ERM extends JFrame {
 			XMLDecoder l_dec = new XMLDecoder(new BufferedInputStream(new FileInputStream(c_scannerConfigFile)));
 			c_config = (ScannerConfig)l_dec.readObject();
 			l_dec.close();	
+			c_resolver = new WriteInResolver(c_config);
 		}
 		catch(FileNotFoundException e_fnf)
 		{
 			JOptionPane.showMessageDialog(getParent(), "Error loading scanner config file!");
 			System.exit(-1);
 		}
+		
+		JOptionPane.showMessageDialog(getParent(), "Please choose a directory to store results files.");
+		JFileChooser l_chooser = new JFileChooser();
+		l_chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		
+		boolean l_canWrite = false;
+		while( !l_canWrite )
+		{
+			while( l_chooser.showSaveDialog(getParent()) != JFileChooser.APPROVE_OPTION )
+			{}
+			
+			File l_selected = l_chooser.getSelectedFile();
+			l_canWrite = l_selected.canWrite();
+			if( !l_canWrite )
+			{
+				JOptionPane.showMessageDialog(getParent(),"Cannot write to chosen directory");
+			}
+		}
+		c_path = l_chooser.getSelectedFile().getPath();
+		
 		initialize();
 	}
 
@@ -166,6 +188,7 @@ public class ERM extends JFrame {
 	 * @return void
 	 */
 	private void initialize() {
+		c_resolver = new WriteInResolver(c_config);
 		this.setSize(800, 600);
 		this.setContentPane(getJTabbedPane());
 		this.setTitle("Election Resolution Manager");
