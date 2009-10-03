@@ -189,7 +189,7 @@ public class ERM extends JFrame {
 	 */
 	private void initialize() {
 		c_resolver = new WriteInResolver(c_config);
-		this.setSize(800, 600);
+		this.setSize(1024, 768);
 		this.setContentPane(getJTabbedPane());
 		this.setTitle("Election Resolution Manager");
 	}

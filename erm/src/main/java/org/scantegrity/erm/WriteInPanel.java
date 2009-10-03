@@ -82,6 +82,7 @@ public class WriteInPanel extends JPanel {
 	private JList getJList() {
 		if (jList == null) {
 			jList = new JList();
+			jList.setFont(new Font("Helvetica", Font.PLAIN, 22));
 			jList.setModel(listModel);
 			MouseListener l_mouseListener = new MouseAdapter() {
 			     public void mouseClicked(MouseEvent e) {

@@ -1,22 +1,20 @@
 package org.scantegrity.erm;
 
-import javax.swing.JPanel;
-import java.awt.Frame;
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.Vector;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.scantegrity.common.RandomBallotStore;
-
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
-import javax.swing.JList;
-import java.awt.GridBagLayout;
-import javax.swing.JButton;
 
 public class BallotStoreDialog extends JDialog {
 

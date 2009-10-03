@@ -2,30 +2,27 @@ package org.scantegrity.erm;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.*;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JLabel;
-import javax.swing.SpringLayout;
 import javax.swing.border.TitledBorder;
 
+import org.apache.commons.io.FileUtils;
 import org.scantegrity.common.FindFile;
 import org.scantegrity.common.RandomBallotStore;
 
@@ -76,6 +73,7 @@ public class LoadPanel extends JPanel {
 	private JScrollPane getJScrollPane() {
 		if (jScrollPane == null) {
 			jScrollPane = new JScrollPane();
+			jScrollPane.setPreferredSize(new Dimension(200,400));
 			jScrollPane.setViewportView(getJList());
 			jScrollPane.setBorder(BorderFactory.createTitledBorder(null, "Loaded Ballots (Scanner ID)", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, new Font("Dialog", Font.BOLD, 12), new Color(51, 51, 51)));
 		}
@@ -106,6 +104,7 @@ public class LoadPanel extends JPanel {
 	private JList getJList() {
 		if (jList == null) {
 			jList = new JList();
+			jList.setFont(new Font("Helvetica", Font.PLAIN, 20));
 			listModel = new DefaultListModel();
 			jList.setModel(listModel);
 		}

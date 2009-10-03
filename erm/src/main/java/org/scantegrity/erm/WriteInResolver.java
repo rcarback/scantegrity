@@ -2,17 +2,13 @@ package org.scantegrity.erm;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 import java.util.Vector;
-
-import javax.swing.JOptionPane;
 
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
