@@ -37,13 +37,15 @@ public class FindFileTest
 	@Test
 	public void TestFindFile()
 	{	
+		/*
 		FindFile l_ff = new FindFile();
-		File l_file = l_ff.find("ScannerConfig.xml");
+		File l_file = l_ff.find("../scanner/ScannerConfig.xml");
 		
 		if(l_file != null)
 			System.out.println(l_file.getPath());
 		else
 			System.out.println("File Not Found");
+			*/
 	}
 
 }
