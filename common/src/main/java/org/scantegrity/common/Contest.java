@@ -46,6 +46,22 @@ public class Contest
 	private TallyMethod c_method;
 	private TreeSet<Integer> c_writeIns = new TreeSet<Integer>(); //Indices in c_contestants that are write-in candidates originally (i.e. candidates named "write-in")
 	private TreeSet<Integer> c_resolved = new TreeSet<Integer>(); //Indices in c_contestants that are resolved write-in candidates (i.e. candidates that were not on the ballot)
+	private String c_shortName = null;
+	
+	public TallyMethod getTallyMethod()
+	{
+		return c_method;
+	}
+	
+	public String getShortName()
+	{
+		return c_shortName;
+	}
+	
+	public void setShortName(String p_shortName)
+	{
+		c_shortName = p_shortName;
+	}
 	
 	/**
 	 * @return the contestName
@@ -54,12 +70,20 @@ public class Contest
 	{
 		return c_contestName;
 	}
+	
+	public void setContestName(String p_contestName, String p_shortName)
+	{
+		c_contestName = p_contestName;
+		c_shortName = p_shortName;
+	}
+	
 	/**
 	 * @param p_contestName the contestName to set
 	 */
 	public void setContestName(String p_contestName)
 	{
 		c_contestName = p_contestName;
+		c_shortName = p_contestName;
 	}
 	/**
 	 * @return the id

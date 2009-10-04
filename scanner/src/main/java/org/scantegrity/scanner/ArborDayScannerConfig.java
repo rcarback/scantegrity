@@ -51,7 +51,7 @@ import org.scantegrity.scanner.ScantegrityBallotReader;
  */
 public class ArborDayScannerConfig
 {
-	private static String c_loc = "";
+	private static String c_loc = "/Users/Travis/Desktop/ScantegrityConfigs/";
 	private static String c_name = "ScannerConfig.xml";
 
 	/**
@@ -198,6 +198,7 @@ public class ArborDayScannerConfig
 		Contest l_x = new Contest();
 		l_x.setId(0);
 		l_x.setContestName("<b>Favorite Tree </b><br/><i> Arbol Favorito</i>");
+		l_x.setShortName("FavoriteTree");
 		Vector<Contestant> l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Cherry / el cerezo"));
 		l_can.add(new Contestant(1, "Elm / el olmo"));
@@ -211,6 +212,7 @@ public class ArborDayScannerConfig
 		l_x = new Contest();
 		l_x.setId(1);
 		l_x.setContestName("<b>Favorite Forest Animal</b><br/><i>Animal Arbolado Favorito</i>");
+		l_x.setShortName("FavoriteForestName");
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Owl / Buho"));
 		l_can.add(new Contestant(1, "Rabbit / Conejo"));
@@ -224,6 +226,7 @@ public class ArborDayScannerConfig
 		l_x.setId(2);
 		l_x.setContestName("<b>How many trees are on your property?" 
 				+ " </b><br/><i> Cuanto arboles estan en su propiedad?</i>");
+		l_x.setContestName("NumberTrees");
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "0"));
 		l_can.add(new Contestant(1, "1-2"));
@@ -239,6 +242,7 @@ public class ArborDayScannerConfig
 		l_x.setContestName("<b>Do you use less paper products than you did ten "
 						+ "years ago? </b><br/><i> Utiliza menos producto de papel que" +
 						" hace 10 anos?</i>");
+		l_x.setShortName("LessPaper");
 		l_can = new Vector<Contestant>();
 		l_can.add(new Contestant(0, "Yes / Si"));
 		l_can.add(new Contestant(1, "No / No"));
