@@ -129,7 +129,7 @@ public class LoadPanel extends JPanel {
 					for( File l_file : l_files )
 					{
 						try {
-							RandomBallotStore l_newStore = new RandomBallotStore(0, l_file.getPath(), null, null);
+							RandomBallotStore l_newStore = new RandomBallotStore(0,0,0, l_file.getPath(), null, null);
 							l_newStore.open();
 							l_stores.add(l_newStore);
 						} catch (NoSuchAlgorithmException e1) {

@@ -252,7 +252,7 @@ public class ContestChoice {
 	{
 		for( int x = 0; x < c_choices.length; x++ )
 		{
-			for( int y = c_choices[x].length; y < c_choices[x].length; y++ )
+			for( int y = 0; y < c_choices[x].length; y++ )
 			{
 				if( c_choices[x][y] == p_oldId )
 				{

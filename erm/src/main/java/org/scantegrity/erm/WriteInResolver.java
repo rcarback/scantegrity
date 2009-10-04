@@ -40,15 +40,19 @@ import org.scantegrity.common.Contest;
 import org.scantegrity.common.Contestant;
 import org.scantegrity.common.RandomBallotStore;
 import org.scantegrity.common.methods.ContestChoice;
+import org.scantegrity.common.methods.ContestResult;
+import org.scantegrity.common.methods.TallyMethod;
 import org.scantegrity.scanner.ScannerConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.lowagie.text.BadElementException;
 import com.lowagie.text.DocumentException;
+import com.lowagie.text.FontFactory;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 /* This class loads in ballots and uses a queue to pull up all the write-in positions that need to be
  * resolved.
@@ -268,11 +272,11 @@ public class WriteInResolver {
 	
 	public void Resolve(String p_name)
 	{
-		int l_candidateId = 0;
+		int l_candidateId = -1;
 		WriteInResolution l_res = null;
 		for( Contestant l_contestant : c_currentContest.getContestants() )
 		{
-			if( l_contestant.getName() == p_name )
+			if( l_contestant.getName().equalsIgnoreCase(p_name) )
 			{
 				l_candidateId = l_contestant.getId();
 				l_res = new WriteInResolution(getImage(), p_name, Integer.toString(l_contestant.getId()));
@@ -300,7 +304,7 @@ public class WriteInResolver {
 		{
 			File l_file = (File)l_iterator.next();
 			try {
-				RandomBallotStore l_store = new RandomBallotStore(0, l_file.getPath(), null, null);
+				RandomBallotStore l_store = new RandomBallotStore(0, 0, 0, l_file.getPath(), null, null);
 				l_store.open();
 				Vector<Ballot> l_ballots = l_store.getBallots();
 				for( Ballot l_ballot : l_ballots )
@@ -389,6 +393,10 @@ public class WriteInResolver {
 	
 	private void WriteContestResults(Vector<ContestChoice> p_choices, Contest p_contest, String p_out)
 	{
+		TallyMethod l_method = p_contest.getTallyMethod();
+		ContestResult l_result = l_method.tally(p_contest, p_choices);
+		TreeMap<Integer, Vector<Contestant>> l_rankings = l_result.getRanking();
+
 		DocumentBuilderFactory l_factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder l_builder = null;
 		try {
@@ -461,10 +469,40 @@ public class WriteInResolver {
 			}
 		}
 		
+		Element l_resultsNode = l_doc.createElement("Results");
+		l_root.appendChild(l_resultsNode);
+		
+		Integer l_key = l_rankings.firstKey();
+		while(l_key != null)
+		{
+			Element l_rankNode = l_doc.createElement("Rank");
+			l_rankNode.setAttribute("id", Integer.toString(l_key));
+			l_resultsNode.appendChild(l_rankNode);
+			
+			Vector<Contestant> l_candidates = l_rankings.get(l_key);
+			for( Contestant l_contestant : l_candidates )
+			{
+				Element l_contestantNode = l_doc.createElement("Contestant");
+				l_rankNode.appendChild(l_contestantNode);
+				
+				Element l_contestantNameNode = l_doc.createElement("Name");
+				l_contestantNameNode.appendChild(l_doc.createTextNode(l_contestant.getName()));
+				l_contestantNode.appendChild(l_contestantNameNode);
+				
+				Element l_contestantIdNode = l_doc.createElement("ID");
+				l_contestantIdNode.appendChild(l_doc.createTextNode(Integer.toString(l_contestant.getId())));
+				l_contestantNode.appendChild(l_contestantIdNode);
+				
+				
+			}
+			l_key = l_rankings.higherKey(l_key);
+		}
+		
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer;
 		try {
 			transformer = transformerFactory.newTransformer();
+			transformer.setOutputProperty("indent", "yes");
 	        DOMSource source = new DOMSource(l_doc);
 	        FileOutputStream l_out = new FileOutputStream(p_out);
 	        StreamResult result =  new StreamResult(l_out);
@@ -488,6 +526,9 @@ public class WriteInResolver {
 	
 	public void WriteResolutionPdf(String p_outDir)
 	{
+		if( c_resolutions.isEmpty() )
+			return;
+		
 		com.lowagie.text.Document l_doc = new com.lowagie.text.Document();
 		com.lowagie.text.Image l_img;
 		String l_formatString = "Name: %s (%s)\nContest Name: %s\nWrite-in Choice ID: %s";
@@ -504,6 +545,11 @@ public class WriteInResolver {
 				l_table.addCell(String.format(l_formatString, l_res.name, l_res.id, l_res.contest.getShortName(), l_res.choice.getId()));
 			}
 			l_doc.add(l_table);
+			com.lowagie.text.Phrase l_phrase = new com.lowagie.text.Phrase();
+			com.lowagie.text.Paragraph l_para = new com.lowagie.text.Paragraph("Judge Signature _____________");
+			l_phrase.add(l_para);
+			com.lowagie.text.HeaderFooter l_footer = new com.lowagie.text.HeaderFooter(l_phrase, true);
+			l_doc.setFooter(l_footer);
 			l_doc.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
