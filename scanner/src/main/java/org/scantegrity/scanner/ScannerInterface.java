@@ -57,12 +57,12 @@ public class ScannerInterface
 	private String c_hostname; 
 	private static int c_port; 
 	
-	private static String c_daemon = "saned";
-	private static String c_pgrep = "ps -ef | grep %s | awk '{ print $2 }'";
+	private static String c_daemon = "sanescript";
+	//private static String c_pgrep = "ps -ef | grep %s | awk '{ print $2 }'"; //mac
+	private static String c_pgrep = "pgrep %s"; //linux
 	private static String c_pkill = "killall -9 %s";
 	
 	/* Scantegrity References */
-	private ScannerConfig c_scannerConfigRef; 
 	private static Logging c_log; 
 	
 	/**
@@ -115,28 +115,28 @@ public class ScannerInterface
 		connect(c_hostname, c_port);
 	}
 	
-	/**
-	 * This constructor gets the hostname and port from the 
-	 * config file. 
-	 * 
-	 * @param p_scannerConfigRef
-	 */
-	public ScannerInterface(Logging p_log, ScannerConfig p_scannerConfigRef)
-	{
-		c_log = p_log;
-		
-		c_scannerConfigRef = p_scannerConfigRef; 
-		
-		//TODO: grab the hostname and port of the scanner
-
-	}
-	
 	public int connect(String p_hostname, int p_port)
 	{
 		try 
 		{
 			c_saneConnection = new JSane_Net_Connection(p_hostname, p_port);
 			c_scannerDevice = c_saneConnection.getDevice(0);
+			
+			while(c_scannerDevice == null)
+			{
+				c_log.log(Level.WARNING, "Unable to open scanning device...trying again in 2 seconds");
+				
+				synchronized (this) {
+					try {
+						wait(2000);
+					} catch (InterruptedException e) {
+						c_log.log(Level.SEVERE, "Unable to Wait.");
+					}		
+				}
+				
+				c_scannerDevice = c_saneConnection.getDevice(0);
+			}
+			
 			c_scannerDevice.open();
 			c_scannerDevice.getOption("resolution").setValue("150");
 			c_log.log(Level.INFO, "sane daemon connection successful.");
@@ -194,6 +194,12 @@ public class ScannerInterface
 		{	
 			try
 			{
+				if(c_scannerDevice == null)
+				{
+					c_log.log(Level.SEVERE, "Unable to access scanner device while scanning....reconnecting"); 
+					throw new JSane_Exception_IoError();
+				}
+				
 				JSane_Base_Frame l_frame = c_scannerDevice.getFrame();
 				l_image = l_frame.getImage();
 			}
@@ -265,7 +271,7 @@ public class ScannerInterface
 	 * startDaemon
 	 *   Start the daemon. Selecting a random port.
 	 */
-	public static int startDaemon()
+	public int startDaemon()
 	{
 		//There can be only one.
 		stopDaemon();
@@ -277,12 +283,12 @@ public class ScannerInterface
 		c_port = l_port;
 		c_log.log(Level.INFO, "sane daemon port: " + c_port);
 		try {
-			Runtime.getRuntime().exec(c_daemon + " -d -p " + c_port);
+			Runtime.getRuntime().exec(c_daemon + " -a -p " + c_port + " > /output");
 			Process l_p = Runtime.getRuntime().exec(
 								String.format(c_pgrep, c_daemon));
 			DataInputStream l_str = new DataInputStream(l_p.getInputStream());
 			c_log.log(Level.INFO, "sane daemon started.");
-
+			
 			return l_str.readInt();
 		} catch (IOException e) { 
 			e.printStackTrace();
