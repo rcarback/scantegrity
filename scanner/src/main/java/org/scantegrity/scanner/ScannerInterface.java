@@ -20,9 +20,12 @@
 package org.scantegrity.scanner;
  
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Random;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
@@ -52,11 +55,15 @@ public class ScannerInterface
 	private JSane_Base_Device c_scannerDevice;
 	private JSane_Net_Connection c_saneConnection; 
 	private String c_hostname; 
-	private int c_port; 
+	private static int c_port; 
+	
+	private static String c_daemon = "saned";
+	private static String c_pgrep = "ps -ef | grep %s | awk '{ print $2 }'";
+	private static String c_pkill = "killall -9 %s";
 	
 	/* Scantegrity References */
 	private ScannerConfig c_scannerConfigRef; 
-	private Logging c_log; 
+	private static Logging c_log; 
 	
 	/**
 	 * Default Constructor
@@ -70,7 +77,7 @@ public class ScannerInterface
 		
 		c_hostname = ScannerConstants.LOCAL_IP; 
 		c_port = ScannerConstants.SANE_CONNECT_PORT; 
-		
+		startDaemon();
 		connect(c_hostname, c_port);
 	}
 	
@@ -86,7 +93,7 @@ public class ScannerInterface
 								+ p_port + ".");
 		c_hostname = ScannerConstants.LOCAL_IP; 
 		c_port = p_port; 
-		
+		startDaemon();
 		connect(c_hostname, c_port);
 	}
 	
@@ -104,7 +111,7 @@ public class ScannerInterface
 		
 		c_hostname = p_hostname;
 		c_port = p_port; 
-		
+		startDaemon();
 		connect(c_hostname, c_port);
 	}
 	
@@ -124,7 +131,7 @@ public class ScannerInterface
 
 	}
 	
-	public void connect(String p_hostname, int p_port)
+	public int connect(String p_hostname, int p_port)
 	{
 		try 
 		{
@@ -132,6 +139,8 @@ public class ScannerInterface
 			c_scannerDevice = c_saneConnection.getDevice(0);
 			c_scannerDevice.open();
 			c_scannerDevice.getOption("resolution").setValue("150");
+			c_log.log(Level.INFO, "sane daemon connection successful.");
+			return 1;
 		} 
 		catch (UnknownHostException e_uh) 
 		{
@@ -145,28 +154,28 @@ public class ScannerInterface
 		{
 			c_log.log(Level.SEVERE, e_io.getMessage() + " Cannot reconnect.");
 		}
+		return 0;
 	}
 	
 	public void reconnect()
 	{
-		//destroy old connection
-		try 
-		{
-			c_log.log(Level.INFO, "Closing Old JSane Connection");
-			c_scannerDevice.close();
-			c_saneConnection.exit();
-		} 
-		catch (IOException e_io) 
-		{
-			c_log.log(Level.SEVERE, "Could not close the old JSane Connection");
-		}
-		catch (JSane_Exception e) 
-		{
-			c_log.log(Level.SEVERE, "Could not close the old JSane Connection");
-		} 
+		int l_tries = 0;
+		int l_state = 0;
 		
-		//reconnect
-		connect(c_hostname, c_port); 
+		while (l_state == 0 && l_tries < 10)
+		{
+			stopDaemon();
+			startDaemon();
+			l_state = connect(c_hostname, c_port);
+			l_tries++;
+			if (l_state == 1) 
+			{
+				c_log.log(Level.INFO, "Restarted sane daemons.");
+				return;
+			}
+		}
+		
+		c_log.log(Level.SEVERE, "Sane daemon failed to restart.");		
 	}
 	
 	/** 
@@ -210,7 +219,6 @@ public class ScannerInterface
 			}
 		}
 		
-		//drunkDriver
 		//Give me your keys
 		if(DrunkDriver.isDrunk(l_image, 10))
 			return null;
@@ -223,4 +231,65 @@ public class ScannerInterface
 		c_scannerDevice = c_saneConnection.getDevice(0);
 		System.out.println(c_scannerDevice.getName()); 
 	}
+	
+	/**
+	 * @param daemon the daemon to set
+	 */
+	public void setDaemon(String daemon) {
+		c_daemon = daemon;
+	}
+
+	/**
+	 * @return the daemon
+	 */
+	public String getDaemon() {
+		return c_daemon;
+	}
+
+	/**
+	 * stopDaemon
+	 * 	 Forcibly stop all daemon processes running on the system.
+	 */
+	public static void stopDaemon()
+	{
+		c_log.log(Level.INFO, "Killing all running sane daemons.");
+		try {
+			Runtime.getRuntime().exec(String.format(c_pkill, c_daemon));
+		} catch (IOException e) {
+			e.printStackTrace();
+			c_log.log(Level.SEVERE, "sane daemon failed to die.");			
+		} // Do nothing
+	}
+	
+	/**
+	 * startDaemon
+	 *   Start the daemon. Selecting a random port.
+	 */
+	public static int startDaemon()
+	{
+		//There can be only one.
+		stopDaemon();
+		c_log.log(Level.INFO, "Starting sane daemon.");
+		//Port Range: 6000-8999
+		Random l_rand = new Random(System.currentTimeMillis());
+		int l_port = c_port;
+		while (l_port == c_port) l_port = l_rand.nextInt()%3000 + 6000; 
+		c_port = l_port;
+		c_log.log(Level.INFO, "sane daemon port: " + c_port);
+		try {
+			Runtime.getRuntime().exec(c_daemon + " -d -p " + c_port);
+			Process l_p = Runtime.getRuntime().exec(
+								String.format(c_pgrep, c_daemon));
+			DataInputStream l_str = new DataInputStream(l_p.getInputStream());
+			c_log.log(Level.INFO, "sane daemon started.");
+
+			return l_str.readInt();
+		} catch (IOException e) { 
+			e.printStackTrace();
+		} // Do nothing
+		c_log.log(Level.SEVERE, "sane daemon failed to start.");
+		return -1;
+		
+	}
+	
 }
