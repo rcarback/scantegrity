@@ -128,7 +128,8 @@ public class Scanner
 		}
 		catch(NullPointerException e_npe)
 		{
-			System.err.println("Could not open file. File does not exists.");
+			System.err.println("Could not open file. File does not exist.");
+			e_npe.printStackTrace();
 		}
 		
 		//TODO: make sure the file is found and is readable
@@ -184,11 +185,21 @@ public class Scanner
 			for(int i = 0; i < p_storeLocs.size(); i++)
 			{
 				c_log.log(Level.INFO, "Creating Random Ballot Store : " + p_storeLocs.get(i));
-				l_store[i] = new RandomBallotStore(c_myId,
+				l_store[i] = new RandomBallotStore(c_myId, 
+													10*1024*1024, 
+													512,
 													p_storeLocs.get(i), 
 													l_hash, 
 													l_csprng);
-				l_store[i].create(10*1024*1024, 512);
+				
+				if(l_store[i].initializeStore() < 0)
+				{
+					c_log.log(Level.SEVERE, "Failed to open random ballot store " + p_storeLocs.get(i));
+				}
+				else
+				{
+					c_log.log(Level.INFO, "Random Ballot Store Created.");
+				}
 			}
 		}
 		catch(Exception e_e)
@@ -315,7 +326,7 @@ public class Scanner
 	private static void saveBallot(Ballot p_ballot)
 	{
 		//do some logging
-		c_log.log(Level.INFO, "Saving Ballot " + p_ballot.getId() + " to Random Ballot Store");
+		c_log.log(Level.INFO, "Saving Ballot to Random Ballot Store");
 	
 		for(RandomBallotStore l_store : c_store)
 		{

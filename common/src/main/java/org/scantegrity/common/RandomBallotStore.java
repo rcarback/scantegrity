@@ -34,6 +34,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Vector;
 
+import java.io.File;
+
+import org.apache.commons.io.IOExceptionWithCause;
+
 /**
  * Stores ballot objects at a random location in a large file. The intent is to
  * provide some anonymity by destroying the order in which ballots have been
@@ -87,6 +91,7 @@ public class RandomBallotStore
 	private RandomAccessFile c_file = null;
 	private byte c_btab[] = null;
 	private int c_blksize = 0;
+	private int c_size = 0; 
 	private int c_numBlks = 0;
 	private long c_fsize = 0;
 	private MessageDigest c_digest = null;
@@ -98,10 +103,12 @@ public class RandomBallotStore
 	 * @param p_fname
 	 * @throws NoSuchAlgorithmException 
 	 */
-	public RandomBallotStore(int p_scannerId, String p_fname, MessageDigest p_hash, 
+	public RandomBallotStore(int p_scannerId, int p_size, int p_blksize, String p_fname, MessageDigest p_hash, 
 								SecureRandom p_csprng) throws NoSuchAlgorithmException
 	{
 		c_scannerId = p_scannerId;
+		c_size = p_size; 
+		c_blksize = p_blksize;
 		c_fname = p_fname;
 		
 		if (p_hash == null)
@@ -125,6 +132,38 @@ public class RandomBallotStore
 		// /dev/random - Need to check/be careful on this one. Date seeding (usually bad anyway)
 		// will not work in this context.
 		c_csprng.generateSeed(20); // 20*8 = 160 bits.
+	}
+	
+	public int initializeStore()
+	{
+		File l_file = new File(c_fname);
+		int l_i = 0;
+		while (l_file.exists())
+		{
+			try
+			{
+				return open();
+			}
+			catch (IOException e_io)
+			{
+			}
+			
+			//Failure, move the file to a different name, or change our name...
+			l_file = new File(c_fname + "-" + l_i);
+			l_i++;
+		}
+		
+		try 
+		{
+			create(c_size, c_blksize);
+			return 0; 
+		} 
+		catch (IOException e_io) 
+		{
+			//Critical failure, unable to write.
+			return -1; 
+		}
+		
 	}
 	
 	/**
