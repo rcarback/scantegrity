@@ -135,7 +135,7 @@ public class Contest
 	public void addContestant(Contestant p_new)
 	{
 		c_contestants.add(p_new);
-		if( p_new.getId() > c_nextId )
+		if( p_new.getId() >= c_nextId )
 		{
 			c_nextId = p_new.getId() + 1;
 		}

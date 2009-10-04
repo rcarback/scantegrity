@@ -50,6 +50,7 @@ public class TallyPanel extends JPanel {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					c_resolver.Tally(c_path);
 					c_resolver.WriteResults(c_path);
+					c_resolver.WriteResolutionPdf(c_path);
 				}
 			});
 		}

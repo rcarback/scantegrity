@@ -15,6 +15,7 @@ import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -40,13 +41,13 @@ import org.scantegrity.common.Contestant;
 import org.scantegrity.common.RandomBallotStore;
 import org.scantegrity.common.methods.ContestChoice;
 import org.scantegrity.scanner.ScannerConfig;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.lowagie.text.BadElementException;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
 /* This class loads in ballots and uses a queue to pull up all the write-in positions that need to be
@@ -64,12 +65,18 @@ public class WriteInResolver {
 	private TreeMap<Integer, Vector<ContestChoice>> c_contestChoices = null;
 	private TreeMap<Integer, Vector<ContestChoice>> c_unalteredChoices = null;
 	private Vector<WriteInResolution> c_resolutions = null;
+	private HashSet<Integer> c_usedIds = null;
+	private SecureRandom c_random = null;
 	
+	
+	//Represents a resolution that was done by the user.  Used for the resolution pdf.
 	class WriteInResolution
 	{
 		public BufferedImage image;
 		public String name;
 		public String id;
+		public Contest contest;
+		public ContestChoice choice;
 		
 		public WriteInResolution(BufferedImage p_image, String p_name, String p_id)
 		{
@@ -115,10 +122,12 @@ public class WriteInResolver {
 		c_locations = new TreeMap<Integer, ContestQueue>();
 		c_resolutions = new Vector<WriteInResolution>();
 		
+		c_usedIds = new HashSet<Integer>();
+		c_random = new SecureRandom();
+		
 		c_ballotStyles = new HashMap<Integer, BallotStyle>();
 		for( BallotStyle l_style : l_styles )
 		{
-			//System.err.println(l_style.toString());
 			c_ballotStyles.put(l_style.getId(), l_style);
 		}
 		
@@ -126,7 +135,6 @@ public class WriteInResolver {
 		c_contests = new HashMap<Integer, Contest>();
 		for( Contest l_contest : l_contests )
 		{
-			//System.err.println(l_contest.toString());
 			c_contests.put(l_contest.getId(), l_contest);
 		}
 		
@@ -156,8 +164,16 @@ public class WriteInResolver {
 				Contest l_contest = c_contests.get(l_contestId);
 				Vector<Contestant> l_contestants = l_contest.getContestants();
 				
+				int l_newId = Math.abs(c_random.nextInt());
+				while( c_usedIds.contains(l_newId) )
+				{
+					l_newId = Math.abs(c_random.nextInt());
+				}
+				
+				c_usedIds.add(l_newId);
+				
 				//Create contestchoice and add to vector
-				ContestChoice l_choice = new ContestChoice(0, l_ballot, l_style, l_contest);
+				ContestChoice l_choice = new ContestChoice(l_newId, l_ballot, l_style, l_contest);
 				
 				if( !c_contestChoices.containsKey(l_contestId) )
 				{
@@ -259,22 +275,15 @@ public class WriteInResolver {
 			if( l_contestant.getName() == p_name )
 			{
 				l_candidateId = l_contestant.getId();
-				l_res = new WriteInResolution(getImage(), p_name, Integer.toString(l_candidateId));
+				l_res = new WriteInResolution(getImage(), p_name, Integer.toString(l_contestant.getId()));
+				l_res.contest = c_currentContest;
+				l_res.choice = c_currentLocation.choice;
 			}
 		}
 		
 		if( l_res != null )
 			c_resolutions.add(l_res);
 		
-		/*Map<Integer, Map<Integer, Integer>> l_map = c_currentLocation.ballot.getWriteInMap();
-		if( l_map == null )
-			l_map = new HashMap<Integer, Map<Integer, Integer>>();
-		
-		if( !l_map.containsKey(c_currentContest.getId()))
-			l_map.put(c_currentContest.getId(), new HashMap<Integer, Integer>());
-		
-		Map<Integer, Integer> l_innerMap = l_map.get(c_currentContest.getId());
-		l_innerMap.put(c_currentLocation.candidateId, l_candidateId);*/
 		c_currentLocation.choice.normalizeChoiceWriteIn(c_currentLocation.candidateId, l_candidateId);
 		
 	}
@@ -479,42 +488,30 @@ public class WriteInResolver {
 	
 	public void WriteResolutionPdf(String p_outDir)
 	{
-		BufferedImage c_img = new BufferedImage(0,0,0);
-		Raster l_tmpRaster = c_img.getRaster();
-		DataBuffer l_db = l_tmpRaster.getDataBuffer();
-		byte[] l_bytes = new byte[l_db.getSize()];
-
-		for (int l_i = 0; l_i < l_bytes.length; l_i++) {
-			l_bytes[l_i] = (byte)Math.round(l_db.getElemFloat(l_i)*(float)255);
-		}
-		
-		
-		com.lowagie.text.Image l_img = null;
-		try {
-			l_img = com.lowagie.text.Image.getInstance(
-														l_tmpRaster.getWidth(), 
-														l_tmpRaster.getHeight(), 
-														4, 8, l_bytes);
-		} catch (BadElementException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		l_img.setDpi(300, 300);
 		com.lowagie.text.Document l_doc = new com.lowagie.text.Document();
-		//l_doc.setMargins(0,0,0,0);
-
+		com.lowagie.text.Image l_img;
+		String l_formatString = "Name: %s (%s)\nContest Name: %s\nWrite-in Choice ID: %s";
+		
 		//Make sure we don't overwrite previous saves.
 		try {
 			PdfWriter.getInstance(l_doc, new FileOutputStream(p_outDir + File.separator + "Resolves.pdf"));
 			l_doc.open();
-			l_doc.add(l_img);
-			Paragraph l_p = new Paragraph("Version: 0.4.2\n");
-			l_doc.add(l_p);
+			PdfPTable l_table = new PdfPTable(2);
+			for( WriteInResolution l_res : c_resolutions )
+			{
+				l_img = com.lowagie.text.Image.getInstance(l_res.image, null);
+				l_table.addCell(l_img);
+				l_table.addCell(String.format(l_formatString, l_res.name, l_res.id, l_res.contest.getShortName(), l_res.choice.getId()));
+			}
+			l_doc.add(l_table);
 			l_doc.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (DocumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}		
