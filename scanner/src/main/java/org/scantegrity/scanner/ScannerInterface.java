@@ -21,9 +21,11 @@ package org.scantegrity.scanner;
  
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.logging.Level;
@@ -57,10 +59,10 @@ public class ScannerInterface
 	private String c_hostname; 
 	private static int c_port; 
 	
-	private static String c_daemon = "sanescript";
+	private static String c_daemon = "saned";
 	//private static String c_pgrep = "ps -ef | grep %s | awk '{ print $2 }'"; //mac
 	private static String c_pgrep = "pgrep %s"; //linux
-	private static String c_pkill = "killall -9 %s";
+	private static String c_pkill = "kill -9 %s";
 	
 	/* Scantegrity References */
 	private static Logging c_log; 
@@ -122,7 +124,7 @@ public class ScannerInterface
 			c_saneConnection = new JSane_Net_Connection(p_hostname, p_port);
 			c_scannerDevice = c_saneConnection.getDevice(0);
 			
-			while(c_scannerDevice == null)
+			if (c_scannerDevice == null)
 			{
 				c_log.log(Level.WARNING, "Unable to open scanning device...trying again in 2 seconds");
 				
@@ -133,26 +135,24 @@ public class ScannerInterface
 						c_log.log(Level.SEVERE, "Unable to Wait.");
 					}		
 				}
-				
-				c_scannerDevice = c_saneConnection.getDevice(0);
+				return 0;
 			}
-			
+
+
 			c_scannerDevice.open();
 			c_scannerDevice.getOption("resolution").setValue("150");
 			c_log.log(Level.INFO, "sane daemon connection successful.");
 			return 1;
 		} 
-		catch (UnknownHostException e_uh) 
-		{
-			c_log.log(Level.SEVERE, e_uh.getMessage() + " Cannot reconnect.");
-		}
 		catch (JSane_Exception e_gen) 
 		{
 			c_log.log(Level.SEVERE, e_gen.getMessage() + " Cannot reconnect.");
-		}
-		catch (IOException e_io) 
-		{
-			c_log.log(Level.SEVERE, e_io.getMessage() + " Cannot reconnect.");
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return 0;
 	}
@@ -205,6 +205,14 @@ public class ScannerInterface
 			}
 			catch (JSane_Exception_NoDocs e_noDoc)
 			{
+				c_log.log(Level.INFO, "No more documents in scanner: " + e_noDoc.getMessage());
+				synchronized (this) {
+					try {
+						wait(1000);
+					} catch (InterruptedException e) {
+						c_log.log(Level.SEVERE, "Unable to Wait.");
+					}		
+				}
 				continue; 
 			}
 			catch (JSane_Exception_IoError e_io)
@@ -256,15 +264,36 @@ public class ScannerInterface
 	 * stopDaemon
 	 * 	 Forcibly stop all daemon processes running on the system.
 	 */
-	public static void stopDaemon()
+	public void stopDaemon()
 	{
 		c_log.log(Level.INFO, "Killing all running sane daemons.");
 		try {
-			Runtime.getRuntime().exec(String.format(c_pkill, c_daemon));
+			synchronized(this)
+			{
+				Process l_p = Runtime.getRuntime().exec(
+						String.format(c_pgrep, c_daemon));
+				l_p.waitFor();
+				BufferedReader l_buf = new BufferedReader(new InputStreamReader(l_p.getInputStream()));
+				String l_str = l_buf.readLine();
+				int l_cur = 0;
+				while (l_str != null && l_str.length() > 0)
+				{
+					l_cur = Integer.parseInt(l_str);
+					if (l_cur > 0)
+					{
+						Runtime.getRuntime().exec(String.format(c_pkill, l_cur)).waitFor();
+					}
+					l_str = l_buf.readLine();
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			c_log.log(Level.SEVERE, "sane daemon failed to die.");			
 		} // Do nothing
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -283,16 +312,31 @@ public class ScannerInterface
 		c_port = l_port;
 		c_log.log(Level.INFO, "sane daemon port: " + c_port);
 		try {
-			Runtime.getRuntime().exec(c_daemon + " -a -p " + c_port + " > /output");
-			Process l_p = Runtime.getRuntime().exec(
-								String.format(c_pgrep, c_daemon));
-			DataInputStream l_str = new DataInputStream(l_p.getInputStream());
-			c_log.log(Level.INFO, "sane daemon started.");
-			
-			return l_str.readInt();
+			synchronized(this)
+			{
+				Runtime.getRuntime().exec(c_daemon + " -d -p " + c_port);
+				Process l_p = Runtime.getRuntime().exec(
+									String.format(c_pgrep, c_daemon));
+				l_p.waitFor();
+				BufferedReader l_buf = new BufferedReader(new InputStreamReader(l_p.getInputStream()));
+				String l_str = l_buf.readLine();
+				if (l_str != null && l_str.length() > 0)
+				{
+					int l_cur = Integer.parseInt(l_str);
+					if (l_cur > 0)
+					{
+						c_log.log(Level.INFO, "sane daemon started on pid " + l_cur + ".");
+						return l_cur;
+					}
+				}
+			}
 		} catch (IOException e) { 
 			e.printStackTrace();
 		} // Do nothing
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		c_log.log(Level.SEVERE, "sane daemon failed to start.");
 		return -1;
 		

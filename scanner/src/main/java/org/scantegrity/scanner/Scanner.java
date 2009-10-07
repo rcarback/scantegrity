@@ -67,6 +67,7 @@ public class Scanner
 	private static Vector<Integer> c_ballotIds; 
 	private static int c_numErrorFiles = 0; 
 	private static int c_myId = -1;
+	private static int c_count = 0;
 	
 	/**
 	 * Create options for this application. Currently there is only 1, and 
@@ -182,6 +183,7 @@ public class Scanner
 			
 			c_log.log(Level.INFO, "Initializing the Random Ballot Stores");
 			l_store = new RandomBallotStore[p_storeLocs.size()];
+			int l_ret = -1;
 			for(int i = 0; i < p_storeLocs.size(); i++)
 			{
 				c_log.log(Level.INFO, "Creating Random Ballot Store : " + p_storeLocs.get(i));
@@ -191,10 +193,13 @@ public class Scanner
 													p_storeLocs.get(i), 
 													l_hash, 
 													l_csprng);
-				
-				if(l_store[i].initializeStore() < 0)
+				l_ret = l_store[i].initializeStore();
+				c_count = Math.max(l_ret, c_count);
+				if(l_ret < 0)
 				{
 					c_log.log(Level.SEVERE, "Failed to open random ballot store " + p_storeLocs.get(i));
+					System.err.println("Failed to open random ballot store " + p_storeLocs.get(i));
+					System.err.println("This error may prevent you from storing ballots!");
 				}
 				else
 				{
@@ -306,7 +311,7 @@ public class Scanner
 		try 
 		{
 			ImageIO.write(p_ballotImg, "tiff", new File(c_config.getErrorDirectory() 
-														+ "/error" 
+														+ "error" 
 														+ c_numErrorFiles 
 														+ ".tiff"));
 			
@@ -332,7 +337,7 @@ public class Scanner
 		{
 			try 
 			{
-				c_log.log(Level.INFO, "Saving to ballot store: " + l_store.getLocation());
+				c_log.log(Level.INFO, "Saving to ballot " + c_count + " store: " + l_store.getLocation());
 				l_store.addBallot(p_ballot);
 			} 
 			catch (IOException e) 
@@ -458,10 +463,12 @@ public class Scanner
 				continue;
 			
 			l_ballot = getBallot(l_ballotImg); 
-			l_ballot.setScannerId(c_myId);
 			
 			if(l_ballot == null)
 				continue;
+
+			c_count++;
+			l_ballot.setScannerId(c_myId);
 			
 			if(isDuplicate(l_ballot))
 			{

@@ -51,7 +51,7 @@ import org.scantegrity.scanner.ScantegrityBallotReader;
  */
 public class ArborDayScannerConfig
 {
-	private static String c_loc = "/Users/Travis/Desktop/ScantegrityConfigs/";
+	private static String c_loc = "";
 	private static String c_name = "ScannerConfig.xml";
 
 	/**
@@ -255,7 +255,8 @@ public class ArborDayScannerConfig
 		l_locs.add("/media/disk/scantegrity/");
 		
 		Vector<String> l_outFileName = new Vector<String>();
-		l_outFileName.add("/home/scantegrity/ballots.sbr");
+		l_outFileName.add("ballots.sbr");
+		
 		
 		Vector<BallotStyle> l_s = new Vector<BallotStyle>();
 		l_s.add(l_style);
