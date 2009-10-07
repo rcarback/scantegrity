@@ -110,7 +110,7 @@ public class JSane_Net_Frame extends JSane_Base_Frame
 			do
 			{
 				size = _wire.getWord();
-				if ( size > 0 )
+				if ( size >= 0 )
 				{
 					_getData( size );
 				}

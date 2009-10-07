@@ -48,6 +48,7 @@ public abstract class JSane_Wire
 		throws IOException, UnknownHostException
 	{
 		_socket = new Socket(hostname, port);
+		_socket.setSoTimeout(5000);
 		_in = _socket.getInputStream();
 		_out = _socket.getOutputStream();
 	}
