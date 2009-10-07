@@ -33,10 +33,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Vector;
-
 import java.io.File;
-
-import org.apache.commons.io.IOExceptionWithCause;
 
 /**
  * Stores ballot objects at a random location in a large file. The intent is to
