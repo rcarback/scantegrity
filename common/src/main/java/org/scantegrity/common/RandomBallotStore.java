@@ -389,6 +389,44 @@ public class RandomBallotStore
 		return l_res;
 	}
 	
+	public Vector<Integer> getBallotIds() throws IOException
+	{
+		Vector<Integer> l_res = new Vector<Integer>();
+		Ballot l_tmp;
+
+		for (int l_i = 0; l_i < c_numBlks; l_i++)
+		{
+			if (c_btab[l_i] == BLTBLK)
+			{
+				//Read the ballot
+				byte l_ballot[] = readFile(l_i);
+				//convert each serialized ballot into a ballot object
+				ByteArrayInputStream l_in = new ByteArrayInputStream(l_ballot);
+				XMLDecoder l_bData = new XMLDecoder(l_in);
+				l_tmp = null;
+				try
+				{
+					 l_tmp = (Ballot) l_bData.readObject();
+				} catch (Exception l_e)
+				{
+					//TODO
+					//Ignore exceptions here, but report that there is
+					//a problem
+					l_tmp = null;
+				}
+				//Make sure the ballot object "makes sense"
+				//TODO: Ballot object checker.
+				
+				//Add the ballot into the list
+				if (l_tmp != null)
+				{
+					l_res.add(l_tmp.getId());
+				}
+			}
+		}	
+		return l_res;
+	}
+	
 	/**
 	 * Read an entire file in to memory that begins at block p_start.
 	 * 
