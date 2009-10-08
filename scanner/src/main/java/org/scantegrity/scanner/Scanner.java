@@ -59,7 +59,7 @@ import uk.org.jsane.JSane_Exceptions.JSane_Exception_IoError;
  */
 public class Scanner
 {	
-	private static String c_errDir = "~/error/"; 
+	private static String c_errDir = "error/"; 
 	private static Options c_opts;
 	private static ScannerConfig c_config; 
 	private static Logging c_log; 
@@ -93,10 +93,14 @@ public class Scanner
 	{
 		try {			
 			HelpFormatter l_form  = new HelpFormatter();
-			l_form.printHelp(80, "scanner [ScannerConfig.xml]", 
+			l_form.printHelp(80, "scanner [ScannerConfig.xml] [binpath] [inpath] [outpath]", 
 					"This is the scanner daemon for the scantegrity voting" +
 					"system. If you do not provide a configuration, the system" +
-					"will attempt to find one.\n\nOPTIONS:", c_opts, "", false);
+					"will attempt to find one.\n\n"
+					+ "\t [binpath] - The path to binaries used by the scanner (e.g. scanimage)\n"
+					+ "\t [inpath] - The path to input files. This should be a ramdisk (tmpfs)\n"
+					+ "\t [outpath] - The path to save output images, if any.\n"
+					+ "\nOPTIONS:", c_opts, "", false);
 		} 
 		catch (Exception l_e)
 		{
@@ -406,17 +410,16 @@ public class Scanner
 		    return;
 		}
 		
-	    if (l_cmdLine == null || l_cmdLine.hasOption("help") || l_args == null 
-	    		|| l_args.length > 2)
+	    if (l_cmdLine == null || l_cmdLine.hasOption("help") || l_args == null)
 	    {
 	    	printUsage();
 	    	return;
 	    }
 	    
 		//Get the config file
-	    if (l_args.length == 2) c_config = getConfiguration(l_args[1]);
+	    if (l_args.length >= 2) c_config = getConfiguration(l_args[1]);
 	    else c_config = getConfiguration("ScannerConfig.xml");
-		
+	    		    	
 		c_myId = c_config.getPollID();
 		
 		//register logging handlers if any
@@ -425,8 +428,24 @@ public class Scanner
 		
 		//check hardware devices
 		//register devices if any
-		c_scanner = new ScannerController(c_log); 
-		
+		String l_bin, l_in, l_out;
+	    //Binaries path.
+	    if (l_args.length >= 3) l_bin = l_args[2]; 
+	    else l_bin = null;	    
+	    //Infolder path.
+	    if (l_args.length >= 4) l_in = l_args[3]; 
+	    else l_in = null;	    
+		//Outfolder path.
+	    if (l_args.length >= 5) l_out = l_args[4]; 
+	    else l_out = null;
+	    
+	    if (l_out != null)
+	    {
+	    	c_errDir += l_out;
+	    }
+	    
+		c_scanner = new ScannerController(c_log, l_bin, l_in, l_out, true); 
+
 		//grab all mounts points, log uuid, and setup scantegrity file struct
 		//grab mount points from config 
 		

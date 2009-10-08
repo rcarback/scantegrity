@@ -33,6 +33,7 @@ import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 
+import org.apache.commons.io.FileUtils;
 import org.scantegrity.common.Logging;
 
 /**
@@ -42,8 +43,10 @@ import org.scantegrity.common.Logging;
  *
  */
 public class ScannerController {
-
-	private String c_scanimgcmd = "/usr/local/bin/scanscript";
+	private String c_binpath = "/usr/local/bin/";
+	private String c_inpath = "/mnt/scantegrityfs/";
+	private String c_outpath = "./";
+	private String c_scanimgcmd = "scanscript";
 	private String c_testopts = "-L";
 	private String c_scanopts = "scan-%d.tiff";
 	private String c_scanfmt = "scan-%s.tiff";
@@ -53,6 +56,10 @@ public class ScannerController {
 	private Logger c_log = null;
 	private long c_timeout = 3000;
 	private long c_hangup = 12000;
+	private boolean c_delete = true;
+	//Incremented/added to scanfmt and scanopts when unable to delete file...
+	private int c_suffix = 0;
+	private int c_err = 0;
 	
 	/**
 	 * Default Constructor. 
@@ -62,7 +69,7 @@ public class ScannerController {
 	 */
 	public ScannerController()
 	{
-		this(null, null, null, null);
+		this(null, null, null, null, false);
 	}
 	
 	/**
@@ -73,36 +80,94 @@ public class ScannerController {
 	 */
 	public ScannerController(Logger p_log)
 	{
-		this(p_log, null, null, null);
+		this(p_log, null, null, null, false);
 	}
 	
 	
 	/**
 	 * Full Constructor. Most of the common options can be set.
 	 * 
-	 * @param p_log
-	 * @param p_scanimgcmd
-	 * @param p_testopts
-	 * @param p_scanopts
+	 * @param p_log - The logging option.
+	 * @param p_binpath - The path to the binaries for the scannercontroller.
+	 * @param p_inpath - The path for input (image files). This should be a ramdisk!
+	 * @param p_outpath - Where output files should be stored.
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public ScannerController(Logger p_log, String p_scanimgcmd, 
-								String p_testopts, String p_scanopts)
+	public ScannerController(Logger p_log, String p_binpath, String p_inpath, 
+								String p_outpath, boolean p_delete)
 	{
-		if (p_scanimgcmd != null) c_scanimgcmd = p_scanimgcmd;
-		if (p_testopts != null) c_testopts = p_testopts;
-		if (p_scanopts != null) c_scanopts = p_scanopts;
+		if (p_binpath != null) c_binpath = p_binpath;
+		if (p_outpath != null) setOutpath(p_outpath);
+		if (p_inpath != null) setInpath(p_inpath);
+		
+		c_delete = p_delete;
 		
 		c_log = p_log;		
 		if (c_log == null)
 		{
 			c_log = new Logging("log1.txt", Level.OFF);
 		}
-		try
+		
+		//Can I read/write to the paths?
+		//....Assume we can read/write to ""
+		try 
 		{
+			File l_f = new File(p_binpath);
+			if (!l_f.exists() || !l_f.isDirectory() || !l_f.canRead())
+			{
+				p_binpath = "";
+			}
+		}
+		catch (Exception l_e)
+		{
+			p_binpath = "";
+		}
+		if (p_binpath == "") 
+		{
+			c_log.log(Level.WARNING, "Binary path is unusable: " + p_binpath);			
+		}
+		//input path
+		try 
+		{
+			File l_f = new File(p_inpath);
+			if (!l_f.exists() || !l_f.isDirectory() || !l_f.canRead())
+			{
+				p_inpath = "";
+			}
+		}
+		catch (Exception l_e)
+		{
+			p_inpath = "";
+		}
+		if (p_inpath == "")
+		{
+			c_log.log(Level.WARNING, "In path is unusable: " + p_inpath);
+		}
+		
+		//output path
+		try 
+		{
+			File l_f = new File(p_outpath);
+			if (!l_f.exists() || !l_f.isDirectory() || !l_f.canWrite())
+			{
+				p_outpath = "";
+			}
+		}
+		catch (Exception l_e)
+		{
+			p_outpath = "";
+		}
+		if (p_outpath == "")
+		{
+			c_log.log(Level.WARNING, "Output path is unusable: " + p_outpath);			
+		}
+	
+		try
+		{	
 			//Test to make sure the command works.
-			Process l_p = Runtime.getRuntime().exec(c_scanimgcmd + " " + c_testopts);
+			Process l_p = Runtime.getRuntime().exec(c_binpath + c_scanimgcmd 
+													+ " " + c_testopts);
 			synchronized(this)
 			{
 				l_p.waitFor();
@@ -137,7 +202,7 @@ public class ScannerController {
 	{
 		Process l_p;
 		int l_pid = 0; 
-		String l_cmd = c_scanimgcmd + " " + c_scanopts;
+		String l_cmd = c_binpath + c_scanimgcmd + " " + c_inpath + c_scanopts;
 		//Execute the scan command
 		l_p = Runtime.getRuntime().exec(l_cmd);
 		l_pid = getPid(c_scanimgcmd);
@@ -148,8 +213,8 @@ public class ScannerController {
 			}
 			catch (IllegalThreadStateException l_e)
 			{
-				c_log.log(Level.WARNING, c_scanimgcmd + " failed to exec." + 
-						getErrorMsg(l_p));
+				c_log.log(Level.WARNING, c_binpath + c_scanimgcmd 
+						+ " failed to exec." + getErrorMsg(l_p));
 			}
 			l_pid = -1;
 		}
@@ -202,23 +267,51 @@ public class ScannerController {
 		{
 			try
 			{
-				File l_imgFile = new File(String.format(c_scanfmt, l_i+1));
+				File l_imgFile = new File(c_inpath + String.format(c_scanfmt, l_i+1));
 				if (l_imgFile.exists())
 				{
 					try
 					{
-						RenderedOp l_op = JAI.create("FileLoad", l_imgFile.getName());
+						RenderedOp l_op = JAI.create("FileLoad", l_imgFile.getAbsolutePath());
 						l_imgs[l_i] = l_op.createInstance().getAsBufferedImage();
 					}
 					catch (Exception l_e)
 					{
 						l_imgs[l_i] = null;
-						c_log.log(Level.WARNING, "Read Error: " + l_imgFile);
-						//TODO: Handle the error image by moving it
+						c_log.log(Level.WARNING, "Read Error: " + l_e.getMessage());
+						//Handle the error image by moving it
 					}
-					//TODO: Delete or move the scanned image after reading.
-
-				
+					
+					//Delete or move the scanned image after reading.
+					try
+					{
+						if (l_imgs[l_i] == null)
+						{
+							FileUtils.copyFile(l_imgFile, 
+									new File(c_outpath + "readerror-" + c_err 
+											+ ".tiff"));
+							c_err++;
+						}
+						if (c_delete)
+						{
+							FileUtils.forceDelete(l_imgFile);
+							
+						}
+						else
+						{
+							FileUtils.copyFile(l_imgFile, new File(c_outpath));
+							FileUtils.forceDelete(l_imgFile);
+						}
+					}
+					catch (Exception l_e)
+					{
+						c_log.log(Level.WARNING, "Unable to move or delete the" 
+										+ " ballot image file.. Changing the"
+										+ " scanformat name.");
+						c_suffix++;
+						c_scanopts += "-" + c_suffix;
+						c_scanfmt += "-" + c_suffix;
+					}
 				}
 				else
 				{
@@ -229,13 +322,14 @@ public class ScannerController {
 			}
 			catch (Exception l_e)
 			{
+				//Couldn't even open it...
 				l_imgs[l_i] = null;
 				c_log.log(Level.WARNING, "Error: " + l_e.getMessage());
 			}
 		}
 		
 		//If we failed, check the return value. Log it.
-		if (l_imgs[0] == null && l_imgs[1] == null)
+		if (l_imgs == null || (l_imgs[0] == null && l_imgs[1] == null))
 		{
 			int l_err = l_p.exitValue();
 			switch (l_err)
@@ -249,10 +343,7 @@ public class ScannerController {
 					break;
 			}
 		}
-		else
-		{
-			return l_imgs;
-		}
+
 		return l_imgs;
 	}
 
@@ -399,6 +490,118 @@ public class ScannerController {
 
 	public String getScanfmt() {
 		return c_scanfmt;
+	}
+
+	/**
+	 * @return the sigcmd
+	 */
+	public String getSigcmd() {
+		return c_sigcmd;
+	}
+
+	/**
+	 * @param p_sigcmd the sigcmd to set
+	 */
+	public void setSigcmd(String p_sigcmd) {
+		c_sigcmd = p_sigcmd;
+	}
+
+	/**
+	 * @return the killcmd
+	 */
+	public String getKillcmd() {
+		return c_killcmd;
+	}
+
+	/**
+	 * @param p_killcmd the killcmd to set
+	 */
+	public void setKillcmd(String p_killcmd) {
+		c_killcmd = p_killcmd;
+	}
+
+	/**
+	 * @return the pgrep
+	 */
+	public String getPgrep() {
+		return c_pgrep;
+	}
+
+	/**
+	 * @param p_pgrep the pgrep to set
+	 */
+	public void setPgrep(String p_pgrep) {
+		c_pgrep = p_pgrep;
+	}
+
+	/**
+	 * @return the timeout
+	 */
+	public long getTimeout() {
+		return c_timeout;
+	}
+
+	/**
+	 * @param p_timeout the timeout to set
+	 */
+	public void setTimeout(long p_timeout) {
+		c_timeout = p_timeout;
+	}
+
+	/**
+	 * @return the hangup
+	 */
+	public long getHangup() {
+		return c_hangup;
+	}
+
+	/**
+	 * @param p_hangup the hangup to set
+	 */
+	public void setHangup(long p_hangup) {
+		c_hangup = p_hangup;
+	}
+
+	/**
+	 * @return the delete
+	 */
+	public boolean isDelete() {
+		return c_delete;
+	}
+
+	/**
+	 * @param p_delete the delete to set
+	 */
+	public void setDelete(boolean p_delete) {
+		c_delete = p_delete;
+	}
+
+	/**
+	 * @param inpath the inpath to set
+	 */
+	public void setInpath(String inpath) {
+		c_inpath = inpath;
+	}
+
+	/**
+	 * @return the inpath
+	 */
+	public String getInpath() {
+		return c_inpath;
+	}
+
+	/**
+	 * @param outpath the outpath to set
+	 */
+	public void setOutpath(String outpath) {
+		c_outpath = outpath;
+	}
+
+	/**
+	 * @return the outpath
+	 */
+	public String getOutpath() {
+		return c_outpath;
 	}
 
 	/**
