@@ -17,7 +17,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package org.scantegrity.scanner;
+package org.scantegrity.scanner.deprecated;
  
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -35,6 +35,7 @@ import javax.imageio.ImageIO;
 import org.scantegrity.common.DrunkDriver;
 import org.scantegrity.common.Logging;
 import org.scantegrity.common.SysBeep;
+import org.scantegrity.scanner.ScannerConstants;
 
 import uk.org.jsane.JSane_Net.JSane_Net_Connection;
 import uk.org.jsane.JSane_Base.JSane_Base_Device;
@@ -51,7 +52,7 @@ import uk.org.jsane.JSane_Exceptions.JSane_Exception_NoDocs;
  * This class is essentially a wrapper
  * for the JSane library. 
  */
-public class ScannerInterface
+public class JSaneScannerInterface
 {
 	/* Sane Variables */
 	private JSane_Base_Device c_scannerDevice;
@@ -72,7 +73,7 @@ public class ScannerInterface
 	 * 
 	 * Initializes the connection to local host with default port of 6567
 	 */
-	public ScannerInterface(Logging p_log)
+	public JSaneScannerInterface(Logging p_log)
 	{
 		c_log = p_log; 
 		c_log.log(Level.INFO, "Setting up JSane Connection to Scanner using default settings.");
@@ -88,7 +89,7 @@ public class ScannerInterface
 	 * scanner connection with local host on the given port. 
 	 * @param p_port
 	 */
-	public ScannerInterface(Logging p_log, int p_port)
+	public JSaneScannerInterface(Logging p_log, int p_port)
 	{
 		c_log = p_log;
 		c_log.log(Level.INFO, "Setting up JSane Connection to Scanner using localhost and port "
@@ -104,7 +105,7 @@ public class ScannerInterface
 	 * @param p_hostname
 	 * @param p_port
 	 */
-	public ScannerInterface(Logging p_log, String p_hostname, int p_port)
+	public JSaneScannerInterface(Logging p_log, String p_hostname, int p_port)
 	{
 		c_log = p_log;
 		c_log.log(Level.INFO, "Setting up JSane Connection to Scanner using hostname "

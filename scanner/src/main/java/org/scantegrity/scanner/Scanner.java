@@ -42,6 +42,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
+import org.scantegrity.common.DrunkDriver;
 import org.scantegrity.common.FindFile;
 import org.scantegrity.common.Logging;
 import org.scantegrity.common.RandomBallotStore;
@@ -62,7 +63,7 @@ public class Scanner
 	private static Options c_opts;
 	private static ScannerConfig c_config; 
 	private static Logging c_log; 
-	private static ScannerInterface c_scanner; 
+	private static ScannerController c_scanner; 
 	private static RandomBallotStore[] c_store;
 	private static Vector<Integer> c_ballotIds; 
 	private static int c_numErrorFiles = 0; 
@@ -225,41 +226,27 @@ public class Scanner
 		return l_store; 
 	}
 	
-	private static BufferedImage getBallotImage()
+	private static BufferedImage[] getBallotImages()
 	{
-		BufferedImage l_ballotImg = null; 
+		BufferedImage l_ballotImgs[] = null; 
 		
 		//get a ballot image
 		try
 		{
-			c_log.log(Level.INFO, "Getting ballot image from scanner");
-			l_ballotImg = c_scanner.getImageFromScanner();
+			c_log.log(Level.FINE, "Getting ballot image from scanner");
+			l_ballotImgs = c_scanner.getImagesFromScanner();
 			
-			if(l_ballotImg == null)
+			if(l_ballotImgs == null)
 			{
-				c_log.log(Level.SEVERE, "Possibly Lost Ballot. Invalid image object returned.");  
+				c_log.log(Level.FINE, "Invalid image object returned.");  
 			}
 			
-			return l_ballotImg;
+			return l_ballotImgs;
 		}
-		catch (JSane_Exception_IoError e_jsio)
+		catch (Exception l_e)
 		{
-			c_log.log(Level.SEVERE, "Possibly Lost Ballot. JSane Connection Lost, renegotiating.");
-			
-			//try to reconnect
-			c_scanner.reconnect();
+			c_log.log(Level.SEVERE, "Possibly Lost Ballot:" + l_e.getMessage());			
 		}
-		catch (JSane_Exception e_jse)
-		{
-			c_log.log(Level.SEVERE, "Possibly Lost Ballot. JSane Connection Lost, renegotiating.");
-			
-			//try to reconnect
-			c_scanner.reconnect();
-		}
-		catch (IOException e_io)
-		{
-			c_log.log(Level.SEVERE, "Possibly Lost Ballot. I/O Error when retrieving ballot.");
-		}  
 
 		return null;
 	}
@@ -438,7 +425,7 @@ public class Scanner
 		
 		//check hardware devices
 		//register devices if any
-		c_scanner = new ScannerInterface(c_log); 
+		c_scanner = new ScannerController(c_log); 
 		
 		//grab all mounts points, log uuid, and setup scantegrity file struct
 		//grab mount points from config 
@@ -453,37 +440,52 @@ public class Scanner
 		//TODO: terminating condition, button, or special ballot???
 		while(true)
 		{
-			BufferedImage l_ballotImg = null;
+			BufferedImage l_ballotImg[] = null;
 			Ballot l_ballot = null;
 			
 			//process image into ballot
-			l_ballotImg = getBallotImage();
+			l_ballotImg = getBallotImages();
 			
-			if(l_ballotImg == null)
+			
+			if(l_ballotImg == null 
+					|| (l_ballotImg[0] == null && l_ballotImg[1] == null))
 				continue;
 			
-			l_ballot = getBallot(l_ballotImg); 
-			
-			if(l_ballot == null)
-				continue;
-
-			c_count++;
-			l_ballot.setScannerId(c_myId);
-			
-			if(isDuplicate(l_ballot))
+			for (int l_c = 0; l_c < l_ballotImg.length; l_c++)
 			{
-				c_log.log(Level.WARNING, "Duplicate Ballot detected. ID : " + l_ballot.getId());
-				l_ballot.setCounted(false); 
-				l_ballot.addNote("Duplicate Ballot");	
+				//Ignore empties
+				if (l_ballotImg[l_c] == null)
+				{
+					c_log.log(Level.WARNING, "Only 1 ballot object returned." 
+									+ " Make sure the scanner supports duplex");
+					continue;
+				}
+				//Ignore blank pages
+				if (DrunkDriver.isDrunk(l_ballotImg[l_c], 10))
+					continue;
+			
+				l_ballot = getBallot(l_ballotImg[l_c]); 
+				
+				if(l_ballot == null)
+					continue;
+	
+				c_count++;
+				l_ballot.setScannerId(c_myId);
+				
+				if(isDuplicate(l_ballot))
+				{
+					c_log.log(Level.WARNING, "Duplicate Ballot detected. ID : " + l_ballot.getId());
+					l_ballot.setCounted(false); 
+					l_ballot.addNote("Duplicate Ballot");	
+				}
+				
+				//check if the ballot is a "starting ballot"
+				
+				//check if the ballot is a "closing ballot"
+				
+				//else
+				saveBallot(l_ballot);
 			}
-			
-			//check if the ballot is a "starting ballot"
-			
-			//check if the ballot is a "closing ballot"
-			
-			//else
-			saveBallot(l_ballot);
-			
 			//resume scanning
 		}
 		
