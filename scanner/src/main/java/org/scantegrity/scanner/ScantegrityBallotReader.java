@@ -121,6 +121,7 @@ public class ScantegrityBallotReader extends BallotReader
 		}
 
 		//Set ballot ID number.
+		if (l_styleID != -1) l_id = Integer.parseInt(l_styleID + "" + l_id);
 		l_res.setId(l_id);
 		//Select the right Ballot Style, which gives a list of contest data		
 		BallotStyle l_style = null;
