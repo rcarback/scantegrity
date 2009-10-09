@@ -85,8 +85,8 @@ public abstract class BallotReader
 		if (l_off < 1-c_tolerance || l_off > 1+c_tolerance) {
 			//TODO:Needs to be logged, not printed. Maybe should 
 			//throw exception?
-			System.out.println("Warning, height is " + p_img.getHeight()
-					+ " not " + c_dimension.getHeight()*l_scale);
+			//System.out.println("Warning, height is " + p_img.getHeight()
+			//		+ " not " + c_dimension.getHeight()*l_scale);
 		}
 		
 		//Scale the alignment marks
@@ -113,7 +113,7 @@ public abstract class BallotReader
 		} catch(Exception e) {}
 		
 		if (l_foundMarks[0] == null || l_foundMarks[1] == null) {
-			System.out.println("Unable to find alignment marks, aborting!");
+			//System.out.println("Unable to find alignment marks, aborting!");
 			return null;
 		}
 		
