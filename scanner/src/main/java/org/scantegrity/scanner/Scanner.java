@@ -27,6 +27,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -40,6 +41,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.io.FileUtils;
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
 import org.scantegrity.common.DrunkDriver;
@@ -47,6 +49,9 @@ import org.scantegrity.common.FindFile;
 import org.scantegrity.common.Logging;
 import org.scantegrity.common.RandomBallotStore;
 import org.scantegrity.common.SysBeep;
+
+import com.google.zxing.ReaderException;
+
 import uk.org.jsane.JSane_Exceptions.JSane_Exception;
 import uk.org.jsane.JSane_Exceptions.JSane_Exception_IoError;
 
@@ -66,40 +71,234 @@ public class Scanner
 	private static ScannerController c_scanner; 
 	private static RandomBallotStore[] c_store;
 	private static Vector<Integer> c_ballotIds; 
+	private static Vector<String> c_outDirs;
 	private static int c_numErrorFiles = 0; 
 	private static int c_myId = -1;
 	private static int c_count = 0;
+	private static MessageDigest c_hash;
+	private static SecureRandom c_csprng; 
+
+	/**
+	 * Main Logic loop.
+	 * 
+	 * @param args CLI flags
+	 */
+	public static void main(String[] args)
+	{		
+		processCmdLine(args);		
+		
+		//Create the locations we should output files too
+		createOutputDirectories();
+		
+		//register logging handlers if any
+		c_myId = c_config.getPollID();
+		c_log = new Logging(c_outDirs, c_myId, Level.FINEST); 
+		c_log.log(Level.INFO, "Logging Intialized");
+    	c_log.log(Level.INFO, "Scanner ID Number: " + c_myId);		
+    	
+		c_log.log(Level.INFO, "Initializing Cryptographic hash and rng.");
+		try {
+			c_hash = MessageDigest.getInstance("SHA1");
+		} catch (NoSuchAlgorithmException l_e) {
+			l_e.printStackTrace();
+			c_hash = null;
+			c_log.log(Level.SEVERE, "Unable to initialize hash. Reason: " + l_e.getMessage());
+		}
+		try {
+			c_csprng = SecureRandom.getInstance("SHA1PRNG");
+		} catch (NoSuchAlgorithmException l_e) {
+			l_e.printStackTrace();
+			c_csprng = null;
+			c_log.log(Level.SEVERE, "Unable to initialize RNG. Reason: " + l_e.getMessage());
+		}		
+
+		//init ballot storage
+		c_ballotIds = new Vector<Integer>();
+		//TODO: Change this size to be variable...
+		c_store = initializeBallotStore(c_outDirs, 10*1024*1024); 
+		
+		//start the election
+		c_log.log(Level.SEVERE, "Election Started");
+
+		//main loop
+		//TODO: terminating condition, button, or special ballot???
+		while(true)
+		{
+			BufferedImage l_ballotImg[] = null;
+			Ballot l_ballot = null;
+			
+			//process image into ballot
+			l_ballotImg = getBallotImages();
+			
+			
+			if(l_ballotImg == null 
+					|| (l_ballotImg[0] == null && l_ballotImg[1] == null))
+				continue;
+			
+			for (int l_c = 0; l_c < l_ballotImg.length; l_c++)
+			{
+				//Ignore empties
+				if (l_ballotImg[l_c] == null)
+				{
+					c_log.log(Level.WARNING, "Only 1 ballot object returned." 
+									+ " Make sure the scanner supports duplex");
+					continue;
+				}
+				//Ignore blank pages
+				if (DrunkDriver.isDrunk(l_ballotImg[l_c], 10))
+					continue;
+			
+				l_ballot = getBallot(l_ballotImg[l_c]); 
+				
+				if(l_ballot == null)
+					continue;
+	
+				c_count++;
+				l_ballot.setScannerId(c_myId);
+				
+				if(isDuplicate(l_ballot))
+				{
+					c_log.log(Level.WARNING, "Duplicate Ballot detected. ID : " 
+									+ l_ballot.getId());
+					l_ballot.setCounted(false); 
+					l_ballot.addNote("Duplicate Ballot");	
+				}
+				
+				//check if the ballot is a "starting ballot"
+				
+				//check if the ballot is a "closing ballot"
+				
+				//else
+				saveBallot(l_ballot);
+			}
+			//resume scanning
+		}
+		
+		//end election (ballot handler)
+		
+		//turn off storage
+		
+		//disconnect devices 
+		
+		//turn off log 
+		
+		//quit
+		//endElection(); 
+	}
+
+	/**
+	 * Process command line arguments, filling in any configuration settings 
+	 * provided by the calling process.
+	 * @param args - CLI arguments.
+	 */
+	private static void processCmdLine(String args[])
+	{	
+		setOptions();
+
+		String l_args[] = null;
+		CommandLine l_cmdLine = null;
+		try {
+			CommandLineParser l_parser = new PosixParser();
+		    l_cmdLine = l_parser.parse(c_opts, args);
+		    l_args = l_cmdLine.getArgs();
+		}
+		catch( ParseException l_e ) 
+		{
+			l_e.printStackTrace();
+			System.exit(-1);
+		}
+		
+		//Invalid command line options.
+	    if (l_cmdLine == null || l_cmdLine.hasOption("help") || l_args == null)
+	    {
+	    	printUsage();
+	    	System.exit(0);
+	    }		
+
+	    //Custom configuration file.
+	    if (l_cmdLine.hasOption("config"))
+	    {
+		    c_config = getConfiguration(l_cmdLine.getOptionValue("config"));
+	    }
+	    else c_config = getConfiguration("ScannerConfig.xml");
+	    
+	    
+	    //ScannerController input/output locations.
+	    String l_bin, l_in, l_out;
+	    if (l_cmdLine.hasOption("in")) l_in = l_cmdLine.getOptionValue("in");
+	    else l_in = null;
+	    if (l_cmdLine.hasOption("out")) l_out = l_cmdLine.getOptionValue("out");
+	    else l_out = null;
+	    if(l_cmdLine.hasOption("bin")) l_bin = l_cmdLine.getOptionValue("bin");
+	    else l_bin = null;
+	    //The default error directory should be a subdirectory of the output
+	    //directory.
+	    if (l_out != null)
+	    {
+	    	c_errDir = l_out + File.separator + c_errDir;
+	    }
+		c_scanner = new ScannerController(c_log, l_bin, l_in, l_out, true);
+		
+		//Create error directory if it does not exist.
+		try
+		{
+			File l_e = new File(c_errDir);
+			if (!l_e.exists())
+			{
+				FileUtils.mkdir(l_e.getAbsolutePath());
+			}
+			else if (!l_e.isDirectory())
+			{
+				FileUtils.mkdir(l_e.getAbsolutePath());
+			}
+		}
+		catch (Exception l_e)
+		{
+			//Try to save errors to local directory.
+			c_errDir = "";
+		}
+	}
 	
 	/**
 	 * Create options for this application. Currently there is only 1, and 
 	 * that is if the user wants to include a contest information file.
 	 */
-	public static void setOptions()
+	private static void setOptions()
 	{
 		c_opts = new Options();
 		
 		Option l_help = new Option("help", "Print help message.");
 		Option l_verb = new Option("v", "Unimplemented verbosity setting, prints more info.");
+		Option l_in = new Option("in", "Input directory. This should be a "
+									+ " ramdisk mountpoint.");
+		Option l_out = new Option("out", "Output directory. Output images will "
+									+ "be stored here. NOTE: This is not an "
+									+ "override option for the scanner config."
+									+ " This option backs up ballot images, "
+									+ "which is typically not necessary.");
+		Option l_bin = new Option("bin", "Binaries directory. Where the " 
+									+ "scanner scripts are stored.");
+		Option l_config = new Option("config", "Configuration file path and name.");
 		
 		c_opts.addOption(l_help);	
 		c_opts.addOption(l_verb);	
-		
+		c_opts.addOption(l_in);	
+		c_opts.addOption(l_out);	
+		c_opts.addOption(l_bin);
+		c_opts.addOption(l_config);	
 	}
 	
 	/**
 	 * Prints the usage information for the application. 
 	 */
-	public static void printUsage()
+	private static void printUsage()
 	{
 		try {			
 			HelpFormatter l_form  = new HelpFormatter();
-			l_form.printHelp(80, "scanner [ScannerConfig.xml] [binpath] [inpath] [outpath]", 
+			l_form.printHelp(80, "scanner <OPTIONS>", 
 					"This is the scanner daemon for the scantegrity voting" +
 					"system. If you do not provide a configuration, the system" +
-					"will attempt to find one.\n\n"
-					+ "\t [binpath] - The path to binaries used by the scanner (e.g. scanimage)\n"
-					+ "\t [inpath] - The path to input files. This should be a ramdisk (tmpfs)\n"
-					+ "\t [outpath] - The path to save output images, if any.\n"
+					"will attempt to find one.\n"
 					+ "\nOPTIONS:", c_opts, "", false);
 		} 
 		catch (Exception l_e)
@@ -107,8 +306,16 @@ public class Scanner
 			l_e.printStackTrace();
 			System.exit(-1);
 		}
-	}
+	}	
 	
+	/**
+	 * Get and set up the configuration file data.
+	 * 
+	 * This file configures the election.
+	 * 
+	 * @param p_configPath - The path. 
+	 * @return
+	 */
 	private static ScannerConfig getConfiguration(String p_configPath)
 	{
 		ScannerConfig l_config = new ScannerConfig();
@@ -136,12 +343,14 @@ public class Scanner
 		{
 			System.err.println("Could not open file. File does not exist.");
 			e_npe.printStackTrace();
+			criticalExit(5);
 		}
 		
 		//TODO: make sure the file is found and is readable
 		if(c_loc == null)
 		{
-			System.err.println("Critical Error: Could not open configuration file. System Exiting.");
+			System.err.println("Critical Error: Could not open configuration "
+								+ "file. System Exiting.");
 			criticalExit(10);
 		}
 		
@@ -152,40 +361,122 @@ public class Scanner
 			l_config = (ScannerConfig)e.readObject();
 			e.close();	
 		}
-		catch(FileNotFoundException e_fnf)
+		catch(Exception e_e)
 		{
-			System.err.println("Could not open Configuration File. File not Found!");
+			System.err.println("Could not parse Configuration File!");
+			e_e.printStackTrace();
+			criticalExit(20);
 		}
 		
 		return l_config;
-	}
+	}	
 	
 	/**
-	 * This method sets up the logging for the scanner
+	 * Reads all the output directories in the configuration, creates a list
+	 * of every directory, and sets up any output directories if needed.
+	 * 
+	 * @return
 	 */
-	private static Logging initializeLogger()
-	{
-		String l_logName = c_config.getLogName(); 
+	private static void createOutputDirectories() {
+		Vector<String> l_locs = c_config.getOutputDirNames();
+		c_outDirs = new Vector<String>();
 		
-		if(l_logName == null)
+		//WE want to avoid failures at all costs in this function.
+		if (l_locs == null)
 		{
-			//TODO: add the date to the log file name
-			l_logName = "ScantegrityScannerLog-" + c_config.getScannerID() + ".xml";
+			System.err.println("Invalid output directory option! Using" +
+					" default /media.");
+			l_locs = new Vector<String>();
+			l_locs.add("/media");
 		}
-		
-		return new Logging(c_config.getLogName(), c_config.getLogLevel());
+		//Go through each directory name.
+		for (String l_loc : l_locs)
+		{
+			if (l_loc == null) continue;
+			File l_d = new File(l_loc);
+			int l_c = 0;
+			try 
+			{				
+				if (l_d.exists() && 
+						l_d.canExecute() && l_d.canRead() && l_d.isDirectory())
+				{
+					//Get a directory listing.
+					File[] l_subds = l_d.listFiles();
+					for (File l_subd : l_subds)
+					{
+						try
+						{
+							if (l_subd.canExecute() && l_subd.canRead() 
+									&& l_subd.canWrite() && l_subd.isDirectory())
+							{
+								if (!(new File(l_subd.getAbsolutePath() + File.separator
+										+ "scantegrity-scanner").exists()))
+								{
+									FileUtils.mkdir(l_subd.getAbsolutePath() + File.separator 
+											+ "scantegrity-scanner");									
+								}
+								c_outDirs.add(l_subd.getAbsolutePath() + File.separator 
+												+ "scantegrity-scanner");
+								l_c++;
+							}
+						}
+						catch (Exception l_e)
+						{
+							l_e.printStackTrace();
+							//ignore.
+						}
+					}
+					if (l_c == 0 && l_d.canWrite())
+					{
+						if (!(new File(l_d.getAbsolutePath() + File.separator
+								+ "scantegrity-scanner/").exists()))
+						{
+							FileUtils.mkdir(l_d.getAbsolutePath() + File.separator
+									+ "scantegrity-scanner");							
+						}
+						c_outDirs.add(l_d.getAbsolutePath() + File.separator
+								+ "scantegrity-scanner");
+					}
+					else if (l_c == 0)
+					{
+						System.err.println("Permissions error: could not use " 
+								+ l_d.getAbsolutePath());	
+					}
+				}
+			}
+			catch (Exception l_e)
+			{
+				System.err.println("Could not read " 
+							+ l_d.getAbsolutePath() + "\n Reason:" 
+							+ l_e.getMessage());
+			}
+		}
+		//If all else fails..
+		if (c_outDirs.size() <= 0)
+		{
+			System.err.println("Unable to use an output directory!");
+			try 
+			{
+				if (!(new File("scantegrity-scanner").exists()))
+				{
+					FileUtils.mkdir("scantegrity-scanner");
+				}
+				c_outDirs.add("scantegrity-scanner");
+			}
+			catch (Exception l_e)
+			{
+				System.err.println("Exiting.. could not create an output directory!");
+				criticalExit(15);
+			}
+		}		
 	}
 	
-	private static RandomBallotStore[] initializeBallotStore(Vector<String> p_storeLocs)
+	private static RandomBallotStore[] initializeBallotStore(Vector<String> p_storeLocs, int p_size)
 	{
 		RandomBallotStore[] l_store = null;
 		
 		try
-		{
-			c_log.log(Level.INFO, "Initializing Random Number Generator");
-			MessageDigest l_hash = MessageDigest.getInstance("SHA1");
-			SecureRandom l_csprng = SecureRandom.getInstance("SHA1PRNG");
-			
+		{	
 			c_log.log(Level.INFO, "Initializing the Random Ballot Stores");
 			l_store = new RandomBallotStore[p_storeLocs.size()];
 			int l_ret = -1;
@@ -193,11 +484,11 @@ public class Scanner
 			{
 				c_log.log(Level.INFO, "Creating Random Ballot Store : " + p_storeLocs.get(i));
 				l_store[i] = new RandomBallotStore(c_myId, 
-													10*1024*1024, 
+													p_size, 
 													512,
-													p_storeLocs.get(i), 
-													l_hash, 
-													l_csprng);
+													p_storeLocs.get(i) + File.separator + "ballots.sbr", 
+													c_hash, 
+													c_csprng);
 				l_ret = l_store[i].initializeStore();
 				c_count = Math.max(l_ret, c_count);				
 				
@@ -239,7 +530,8 @@ public class Scanner
 		}
 		
 		return l_store; 
-	}
+	}	
+
 	
 	private static BufferedImage[] getBallotImages()
 	{
@@ -287,9 +579,10 @@ public class Scanner
 		}
 		catch (Exception l_e) 
 		{
-			//do nothing...
+			//Nothing, handled below.
 		}
 		
+		c_log.log(Level.WARNING, "Could not read (possible) ballot image.");
 		saveErrorImage(p_ballotImg);
 		return null; 
 	}
@@ -312,8 +605,8 @@ public class Scanner
 		//Copy the bad image to the error directory
 		try 
 		{
-			ImageIO.write(p_ballotImg, "tiff", new File(c_config.getErrorDirectory() 
-														+ "error" 
+			ImageIO.write(p_ballotImg, "tiff", new File(c_errDir + File.separator 
+														+ "scanerror" 
 														+ c_numErrorFiles 
 														+ ".tiff"));
 			
@@ -392,142 +685,5 @@ public class Scanner
 		System.exit(-1);
 	}
 	
-	/**
-	 * This is the main to start the entire Scanner and run
-	 * The scanning methods
-	 * 
-	 * Flags: 
-	 * 	-c --config  The Configuration File Path
-	 * 
-	 * @param args CLI flags
-	 */
-	public static void main(String[] args)
-	{
-		c_ballotIds = new Vector<Integer>();
-		
-		//process command line arguments
-		setOptions();
-		
-		String l_args[] = null;
-		CommandLine l_cmdLine = null;
-		try {
-			CommandLineParser l_parser = new PosixParser();
-		    l_cmdLine = l_parser.parse(c_opts, args);
-		    l_args = l_cmdLine.getArgs();
-		}
-		catch( ParseException l_e ) 
-		{
-			l_e.printStackTrace();
-		    return;
-		}
-		
-	    if (l_cmdLine == null || l_cmdLine.hasOption("help") || l_args == null)
-	    {
-	    	printUsage();
-	    	return;
-	    }
-	    
-		//Get the config file
-	    if (l_args.length >= 2) c_config = getConfiguration(l_args[1]);
-	    else c_config = getConfiguration("ScannerConfig.xml");
-	    		    	
-		c_myId = c_config.getPollID();
-		
-		//register logging handlers if any
-		c_log = initializeLogger(); 
-		c_log.log(Level.INFO, "Logging Intialized");
-		
-		//check hardware devices
-		//register devices if any
-		String l_bin, l_in, l_out;
-	    //Binaries path.
-	    if (l_args.length >= 3) l_bin = l_args[2]; 
-	    else l_bin = null;	    
-	    //Infolder path.
-	    if (l_args.length >= 4) l_in = l_args[3]; 
-	    else l_in = null;	    
-		//Outfolder path.
-	    if (l_args.length >= 5) l_out = l_args[4]; 
-	    else l_out = null;
-	    
-	    if (l_out != null)
-	    {
-	    	c_errDir += l_out;
-	    }
-	    
-		c_scanner = new ScannerController(c_log, l_bin, l_in, l_out, true); 
 
-		//grab all mounts points, log uuid, and setup scantegrity file struct
-		//grab mount points from config 
-		
-		
-		//init ballot storage
-		c_store = initializeBallotStore(c_config.getOutputFileNames()); 
-		
-		//start the election
-		c_log.log(Level.SEVERE, "Election Started");
-		//main loop
-		//TODO: terminating condition, button, or special ballot???
-		while(true)
-		{
-			BufferedImage l_ballotImg[] = null;
-			Ballot l_ballot = null;
-			
-			//process image into ballot
-			l_ballotImg = getBallotImages();
-			
-			
-			if(l_ballotImg == null 
-					|| (l_ballotImg[0] == null && l_ballotImg[1] == null))
-				continue;
-			
-			for (int l_c = 0; l_c < l_ballotImg.length; l_c++)
-			{
-				//Ignore empties
-				if (l_ballotImg[l_c] == null)
-				{
-					c_log.log(Level.WARNING, "Only 1 ballot object returned." 
-									+ " Make sure the scanner supports duplex");
-					continue;
-				}
-				//Ignore blank pages
-				if (DrunkDriver.isDrunk(l_ballotImg[l_c], 10))
-					continue;
-			
-				l_ballot = getBallot(l_ballotImg[l_c]); 
-				
-				if(l_ballot == null)
-					continue;
-	
-				c_count++;
-				l_ballot.setScannerId(c_myId);
-				
-				if(isDuplicate(l_ballot))
-				{
-					c_log.log(Level.WARNING, "Duplicate Ballot detected. ID : " + l_ballot.getId());
-					l_ballot.setCounted(false); 
-					l_ballot.addNote("Duplicate Ballot");	
-				}
-				
-				//check if the ballot is a "starting ballot"
-				
-				//check if the ballot is a "closing ballot"
-				
-				//else
-				saveBallot(l_ballot);
-			}
-			//resume scanning
-		}
-		
-		//end election (ballot handler)
-		
-		//turn off storage
-		
-		//disconnect devices 
-		
-		//turn off log 
-		
-		//quit
-		//endElection(); 
-	}
 }
