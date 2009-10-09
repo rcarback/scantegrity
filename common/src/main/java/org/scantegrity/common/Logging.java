@@ -1,6 +1,7 @@
 package org.scantegrity.common; 
 
-import java.io.IOException;
+import java.io.File;
+import java.util.Vector;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -8,7 +9,7 @@ import java.util.logging.Logger;
 import java.util.logging.XMLFormatter;
 
 /**
- * This class is an extension of java.util.logging.Logger that
+ * This class is a wrapper of java.util.logging.Logger that
  * is customized for Scantegrity. The log methods have been overridden 
  * to provide for time and sequence information to always 
  * be set to 0 when the log is written to in order to preserve
@@ -19,63 +20,54 @@ import java.util.logging.XMLFormatter;
  * @author jconway
  *
  */
-public class Logging extends Logger
+public class Logging
 {
-	private FileHandler c_fileHandler; 
+	private Logger c_log = null;
 	private XMLFormatter c_formatter; 
-	private static String c_tmpFileName = "log1.txt";
+	private static String c_fname = "scanner-log-%d.txt";
 	
-	public Logging(String p_logName, String p_logFileName, Level p_level)
+	/**
+	 * Constructor for all logging classes.
+	 * 
+	 * Defines a global logger, called "org.scantegrity.loggger"
+	 * 
+	 * Adds a logfile to each directory path sent to it.
+	 * 
+	 * @param p_logDirs
+	 * @param p_id
+	 * @param p_level
+	 */
+	public Logging(Vector<String> p_logDirs, int p_id, Level p_level)
 	{
-		super(p_logName, null); 
-		
-		try {
-			c_fileHandler = new FileHandler(p_logFileName);
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		this.addHandler(c_fileHandler);
-		this.setLevel(p_level);
-		
-		//formatter? 
-		//the formatter is probably where we get rid of the log time.
+		c_log = Logger.getLogger("org.scantegrity.logger");
 		c_formatter = new XMLFormatter(); 
-		c_fileHandler.setFormatter(c_formatter);
+		FileHandler l_handler = null;
+		for (String l_dir : p_logDirs)
+		{
+			File l_d = new File(l_dir);
+			if (!(l_d.isDirectory())) continue;
+			try {
+				l_handler = new FileHandler(l_d.getAbsolutePath() + File.separator
+									+ String.format(c_fname, p_id));
+			} catch (Exception l_e) {
+				l_e.printStackTrace();
+			}
+			l_handler.setFormatter(c_formatter);
+			c_log.addHandler(l_handler);
+		}
+		c_log.setLevel(p_level);
 	}
 	
-	public Logging(String p_logName, Level p_level)
-	{
-		super(p_logName, null); 
-		
-		try {
-			c_fileHandler = new FileHandler(c_tmpFileName);
-		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		this.addHandler(c_fileHandler);
-		this.setLevel(p_level);
-		
-		//formatter? 
-		//the formatter is probably where we get rid of the log time.
-		c_formatter = new XMLFormatter(); 
-		c_fileHandler.setFormatter(c_formatter);
-	}
-	
+	/**
+	 * Log a record.
+	 * 
+	 * @param p_record
+	 */
 	public void log(LogRecord p_record)
 	{
 		p_record.setMillis(0);
 		p_record.setSequenceNumber(0);
-		super.log(p_record);
+		c_log.log(p_record);
 	}
 
 	/**
