@@ -73,10 +73,10 @@ public class QRCodeReader implements SerialNumberReader
 			//System.out.println("Serial Scan Time:" + (int)(System.currentTimeMillis()-l_start) + "ms");
 			return result.getText();
 		} catch (ReaderException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			return null;			
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			return null;
 		}
 	}
