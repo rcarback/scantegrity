@@ -199,7 +199,8 @@ public class Scanner
 													l_hash, 
 													l_csprng);
 				l_ret = l_store[i].initializeStore();
-				c_count = Math.max(l_ret, c_count);
+				c_count = Math.max(l_ret, c_count);				
+				
 				if(l_ret < 0)
 				{
 					c_log.log(Level.SEVERE, "Failed to open random ballot store " + p_storeLocs.get(i));
@@ -209,6 +210,16 @@ public class Scanner
 				else
 				{
 					c_log.log(Level.INFO, "Random Ballot Store Created.");
+					if (i == 0)
+					{
+						c_ballotIds = l_store[0].getBallotIds();
+						if (c_ballotIds.size() > 0)
+						{
+							c_log.log(Level.WARNING, "There are " + c_ballotIds.size()
+										+ " ballots in the store!");
+						}
+					}
+
 				}
 			}
 		}
