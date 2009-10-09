@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
 
@@ -36,6 +37,8 @@ import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
 import org.scantegrity.common.AffineCropper;
 import org.scantegrity.common.DetectBlack;
+
+import com.google.zxing.ReaderException;
 
 /**
  * Reads scantegrity ballots.
@@ -82,6 +85,10 @@ public class ScantegrityBallotReader extends BallotReader
 		{
 			l_serial = super.c_serial.readSerial(p_img, l_alignmentOp);
 		}
+		catch (ReaderException l_re)
+		{
+			return null;
+		}		
 		catch (Exception e)
 		{
 			// TODO Auto-generated catch block
@@ -156,8 +163,8 @@ public class ScantegrityBallotReader extends BallotReader
 					{
 						l_cid = l_style.getContestantIds().get(l_i).get(l_j);
 					} catch(Exception e) {
-						System.err.println("Warning: Contestant ID could not " +
-								"be found for rect " + l_i + ", " + l_j);
+						//System.err.println("Warning: Contestant ID could not " +
+						//		"be found for rect " + l_i + ", " + l_j);
 					}
 					try
 					{
