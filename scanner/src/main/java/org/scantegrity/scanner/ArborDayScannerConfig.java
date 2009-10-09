@@ -249,13 +249,11 @@ public class ArborDayScannerConfig
 		l_x.setContestants(l_can);
 		l_x.setMethod(new PluralityTally());
 		l_c.add(l_x);		
-		
-		Vector<String> l_locs = new Vector<String>();
-		l_locs.add("/home/scantegrity/");
-		l_locs.add("/media/disk/scantegrity/");
-		
-		Vector<String> l_outFileName = new Vector<String>();
-		l_outFileName.add("ballots.sbr");
+				
+		Vector<String> l_outDirNames = new Vector<String>();
+		l_outDirNames.add("./");
+		l_outDirNames.add("/home/scantegrity/");
+		l_outDirNames.add("/media/");
 		
 		
 		Vector<BallotStyle> l_s = new Vector<BallotStyle>();
@@ -266,8 +264,7 @@ public class ArborDayScannerConfig
 		l_config.setChiefJudges(l_j);
 		l_config.setLocation("Takoma Park Community Center Azalea Room");
 		l_config.setName("Arbor Day Mock Election at Takoma Park");
-		l_config.setOutputLocs(l_locs);
-		l_config.setOutputFileNames(l_outFileName);
+		l_config.setOutputDirNames(l_outDirNames);
 		l_config.setPollID(10);
 		l_config.setReader(l_reader);
 		l_config.setContests(l_c);

@@ -245,16 +245,15 @@ public class TakomaConfig
 		l_locs.add("/home/scantegrity/");
 		l_locs.add("/media/disk/scantegrity/");
 		
-		Vector<String> l_outFileName = new Vector<String>();
-		l_outFileName.add("/home/scantegrity/ballots.sbr");
+		Vector<String> l_outDirName = new Vector<String>();
+		l_outDirName.add("/home/scantegrity/");
 		
 		Vector<String> l_j = new Vector<String>();
 		l_j.add("Anne Sergeant");
 		l_config.setChiefJudges(l_j);
 		l_config.setLocation("Takoma Park Community Center Azalea Room");
 		l_config.setName("Arbor Day Mock Election at Takoma Park");
-		l_config.setOutputLocs(l_locs);
-		l_config.setOutputFileNames(l_outFileName);
+		l_config.setOutputDirNames(l_outDirName);
 		l_config.setPollID(10);
 		l_config.setReader(l_reader);
 		l_config.setContests(l_c);
