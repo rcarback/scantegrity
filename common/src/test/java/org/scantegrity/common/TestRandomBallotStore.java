@@ -45,7 +45,7 @@ public class TestRandomBallotStore
 	{
 		File l_x = new File("testballots.sbr");
 		l_x.delete();
-		RandomBallotStore l_store = new RandomBallotStore(314159, 10*1024*1024, 512, "testballots.sbr", null, null);
+		RandomBallotStore l_store = new RandomBallotStore(314159, 10*1024*1024, 512, "./ballots.sbr", null, null);
 		l_store.initializeStore();
 		RandomBallotCreator l_c = new RandomBallotCreator();
 		Vector<Ballot> l_ballots = new Vector<Ballot>();
