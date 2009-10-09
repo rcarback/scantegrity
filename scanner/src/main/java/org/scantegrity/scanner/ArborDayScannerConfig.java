@@ -251,8 +251,6 @@ public class ArborDayScannerConfig
 		l_c.add(l_x);		
 				
 		Vector<String> l_outDirNames = new Vector<String>();
-		l_outDirNames.add("./");
-		l_outDirNames.add("/home/scantegrity/");
 		l_outDirNames.add("/media/");
 		
 		
