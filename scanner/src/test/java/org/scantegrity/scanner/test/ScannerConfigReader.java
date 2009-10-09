@@ -84,7 +84,7 @@ public class ScannerConfigReader
 					}
 					System.out.println("\n\tRace Type: " + l_c.getMethod().getClass().getCanonicalName());
 				}
-				System.out.println("Output Locations: " + java.util.Arrays.toString(l_config.getOutputLocs().toArray()));
+				System.out.println("Output Locations: " + java.util.Arrays.toString(l_config.getOutputDirNames().toArray()));
 				Vector<BallotStyle> l_styles = l_config.getStyles();
 				System.out.println("Styles");
 				for (BallotStyle l_s : l_styles)
