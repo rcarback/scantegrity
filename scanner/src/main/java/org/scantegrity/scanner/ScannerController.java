@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -53,7 +54,7 @@ public class ScannerController {
 	private String c_sigcmd = "kill -0 %s";
 	private String c_killcmd = "kill -9 %s";
 	private String c_pgrep = "pgrep %s";
-	private Logger c_log = null;
+	private Logging c_log = null;
 	private long c_timeout = 3000;
 	private long c_hangup = 12000;
 	private boolean c_delete = true;
@@ -78,7 +79,7 @@ public class ScannerController {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public ScannerController(Logger p_log)
+	public ScannerController(Logging p_log)
 	{
 		this(p_log, null, null, null, false);
 	}
@@ -94,7 +95,7 @@ public class ScannerController {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public ScannerController(Logger p_log, String p_binpath, String p_inpath, 
+	public ScannerController(Logging p_log, String p_binpath, String p_inpath, 
 								String p_outpath, boolean p_delete)
 	{
 		if (p_binpath != null) c_binpath = p_binpath;
@@ -106,7 +107,9 @@ public class ScannerController {
 		c_log = p_log;		
 		if (c_log == null)
 		{
-			c_log = new Logging("log1.txt", Level.OFF);
+			Vector<String> l_out = new Vector<String>();
+			l_out.add("");
+			c_log = new Logging(l_out, -1,  Level.OFF);
 		}
 		
 		//Can I read/write to the paths?
@@ -472,14 +475,14 @@ public class ScannerController {
 	/**
 	 * @return the c_log
 	 */
-	public Logger getLog() {
+	public Logging getLog() {
 		return c_log;
 	}
 
 	/**
 	 * @param cLog the c_log to set
 	 */
-	public void setLog(Logger p_log) {
+	public void setLog(Logging p_log) {
 		c_log = p_log;
 	}
 
