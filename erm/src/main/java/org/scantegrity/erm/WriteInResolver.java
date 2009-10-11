@@ -2,8 +2,6 @@ package org.scantegrity.erm;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.Raster;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,13 +44,9 @@ import org.scantegrity.scanner.ScannerConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.lowagie.text.BadElementException;
 import com.lowagie.text.DocumentException;
-import com.lowagie.text.FontFactory;
-import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 /* This class loads in ballots and uses a queue to pull up all the write-in positions that need to be
  * resolved.
