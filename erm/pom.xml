@@ -35,4 +35,30 @@
   <groupId>org.scantegrity</groupId>
   <artifactId>erm</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <build>
+    <plugins>
+		<plugin> 
+			<artifactId>maven-assembly-plugin</artifactId> 
+			<configuration>
+				<descriptorRefs> 
+					<descriptorRef> 
+						jar-with-dependencies 
+					</descriptorRef> 
+				</descriptorRefs>
+				<formats>
+    				<format>jar</format>
+  				</formats> 
+				<archive> 
+					<manifest> 
+						<mainClass>org.scantegrity.erm.ERM</mainClass>
+						<packageName>org.scantegrity</packageName> 
+					</manifest>
+					<manifestEntries>
+						<SplashScreen-Image>images/LoadingScreen.png</SplashScreen-Image>
+					</manifestEntries> 
+				</archive>
+			</configuration>				 
+		</plugin> 
+    </plugins>
+  </build>    
 </project>
