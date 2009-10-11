@@ -245,11 +245,11 @@ public class Scanner
 			File l_e = new File(c_errDir);
 			if (!l_e.exists())
 			{
-				FileUtils.mkdir(l_e.getAbsolutePath());
+				FileUtils.forceMkdir(l_e);
 			}
 			else if (!l_e.isDirectory())
 			{
-				FileUtils.mkdir(l_e.getAbsolutePath());
+				FileUtils.forceMkdir(l_e);
 			}
 		}
 		catch (Exception l_e)
@@ -412,8 +412,8 @@ public class Scanner
 								if (!(new File(l_subd.getAbsolutePath() + File.separator
 										+ "scantegrity-scanner").exists()))
 								{
-									FileUtils.mkdir(l_subd.getAbsolutePath() + File.separator 
-											+ "scantegrity-scanner");									
+									FileUtils.forceMkdir(new File(l_subd.getAbsolutePath() + File.separator 
+											+ "scantegrity-scanner"));									
 								}
 								c_outDirs.add(l_subd.getAbsolutePath() + File.separator 
 												+ "scantegrity-scanner");
@@ -431,8 +431,8 @@ public class Scanner
 						if (!(new File(l_d.getAbsolutePath() + File.separator
 								+ "scantegrity-scanner/").exists()))
 						{
-							FileUtils.mkdir(l_d.getAbsolutePath() + File.separator
-									+ "scantegrity-scanner");							
+							FileUtils.forceMkdir(new File(l_d.getAbsolutePath() + File.separator
+									+ "scantegrity-scanner"));							
 						}
 						c_outDirs.add(l_d.getAbsolutePath() + File.separator
 								+ "scantegrity-scanner");
@@ -459,7 +459,7 @@ public class Scanner
 			{
 				if (!(new File("scantegrity-scanner").exists()))
 				{
-					FileUtils.mkdir("scantegrity-scanner");
+					FileUtils.forceMkdir(new File("scantegrity-scanner"));
 				}
 				c_outDirs.add("scantegrity-scanner");
 			}
