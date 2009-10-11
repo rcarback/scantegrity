@@ -45,7 +45,7 @@ public class TallyPanel extends JPanel {
 	private JButton getJButton() {
 		if (jButton == null) {
 			jButton = new JButton();
-			jButton.setText("Tally Ho!");
+			jButton.setText("Tally!");
 			jButton.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					c_resolver.Tally(c_path);

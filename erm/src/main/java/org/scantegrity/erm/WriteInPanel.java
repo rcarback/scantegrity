@@ -134,6 +134,7 @@ public class WriteInPanel extends JPanel {
 	private JTextField getTextCandidate() {
 		if (textCandidate == null) {
 			textCandidate = new JTextField();
+			textCandidate.setFont(new Font(null, Font.PLAIN, 22));
 			textCandidate.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					AddVote(textCandidate.getText());
