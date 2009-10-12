@@ -62,7 +62,7 @@ public class ScantegrityBallotReader extends BallotReader
 	 */
 	@Override
 	public Ballot scanBallot(Vector<BallotStyle> p_styles, 
-								BufferedImage p_img)
+								BufferedImage p_img) throws Exception
 	{
 		/*TODO: Need to return an "invalid" ballot instead of null, this ballot
 		 * does it's best to scan everything but when it messes up sets the
@@ -77,23 +77,22 @@ public class ScantegrityBallotReader extends BallotReader
 		AffineTransformOp l_alignmentOp = super.getAlignmentOp(p_img);
 		
 		if(l_alignmentOp == null)
-			return null; 
+			throw new Exception("Unable to get alignment transformation."); 
 		
 		//Read in the Serial Number
 		String l_serial = "";
 		try
 		{
 			l_serial = super.c_serial.readSerial(p_img, l_alignmentOp);
+			//System.out.println("Serial: " + l_serial);
 		}
 		catch (ReaderException l_re)
 		{
-			return null;
+			throw new NumberFormatException("Unable to read serial number.");
 		}		
 		catch (Exception e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+			throw new Exception("Exception reading Serial number - " + e.getMessage());
 		}		
 		
 		//Read in the Ballot Style, which is the digit before the "-"
@@ -125,6 +124,7 @@ public class ScantegrityBallotReader extends BallotReader
 			/** TODO: Is this appropriate to handle this error? */
 			l_id = -1;
 			l_styleID = -1;
+			throw new Exception("Unable to determine Ballot ID number.");
 		}
 
 		//Set ballot ID number.
@@ -134,6 +134,7 @@ public class ScantegrityBallotReader extends BallotReader
 		BallotStyle l_style = null;
 	
 		for (BallotStyle l_s : p_styles) {
+			//System.out.println(l_s.getId());
 			if (l_s.getId() == l_styleID) {
 				l_style = l_s;
 				break;
@@ -142,7 +143,10 @@ public class ScantegrityBallotReader extends BallotReader
 		
 		//System.out.println(l_style.getId());
 		
-		if (l_style == null) return null;
+		if (l_style == null)
+		{
+			throw new NumberFormatException("Could not parse ballot style!");
+		}
 		//Process each contest
 		Vector<Vector<Vector<Rectangle>>> l_rects = l_style.getContestRects();
 		TreeMap<Integer, TreeMap<Integer, Rectangle>> l_writeInRects = l_style.getWriteInRects();
@@ -187,14 +191,15 @@ public class ScantegrityBallotReader extends BallotReader
 				}
 				
 				//IS this a write-in position? (record it if marked or not!)
+				int l_conId = l_style.getContests().get(l_i);
 				if (l_writeInRects != null 
-						&& l_writeInRects.containsKey(l_i) 
-						&& l_writeInRects.get(l_i).containsKey(l_j))
+						&& l_writeInRects.containsKey(l_conId) 
+						&& l_writeInRects.get(l_conId).containsKey(l_j))
 				{
 					try {
-						l_res.addWriteIn(l_i, l_j, 
+						l_res.addWriteIn(l_conId, l_j, 
 								AffineCropper.crop(p_img, l_alignmentOp, 
-											l_writeInRects.get(l_i).get(l_j)));
+											l_writeInRects.get(l_conId).get(l_j)));
 					} catch (Exception e) {
 						//Don't add it if it fails..
 					}
