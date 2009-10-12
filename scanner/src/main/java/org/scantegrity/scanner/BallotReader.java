@@ -65,9 +65,10 @@ public abstract class BallotReader
 	 * @param p_serial
 	 * @param p_styles
 	 * @return
+	 * @throws Exception 
 	 */
 	abstract public Ballot scanBallot(Vector<BallotStyle> p_styles, 
-										BufferedImage p_img);
+										BufferedImage p_img) throws Exception;
 	
 	/**
 	 * Use the alignment marks and image data to renormalize the image so that
