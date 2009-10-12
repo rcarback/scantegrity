@@ -94,6 +94,17 @@ public class BallotStyle {
 		c_counted = p_counted;
 	}
 	
+	public BallotStyle(BallotStyle p_style)
+	{
+		super();
+		c_id = p_style.c_id;
+		c_contests = new Vector<Integer>(p_style.c_contests);
+		c_contestantIds = new Vector<Vector<Integer>>(p_style.c_contestantIds);
+		c_contestRects = new Vector<Vector<Vector<Rectangle>>>(p_style.c_contestRects);
+		c_counted = p_style.c_counted;
+		c_writeInRects = new TreeMap<Integer, TreeMap<Integer,Rectangle>>(p_style.c_writeInRects);
+	}
+
 	/**
 	 * @param id the id to set
 	 */
