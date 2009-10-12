@@ -1,0 +1,84 @@
+<xml>
+	<database>
+		<partition id="0">
+			<decrypt>
+				<instance id="0">
+					<row id="6" side="LEFT"/>
+					<row id="7" side="RIGHT"/>
+					<row id="8" side="RIGHT"/>
+					<row id="10" side="RIGHT"/>
+					<row id="14" side="RIGHT"/>
+					<row id="15" side="LEFT"/>
+				</instance>
+				<instance id="1">
+					<row id="2" side="RIGHT"/>
+					<row id="7" side="RIGHT"/>
+					<row id="8" side="RIGHT"/>
+					<row id="10" side="RIGHT"/>
+					<row id="12" side="RIGHT"/>
+					<row id="18" side="LEFT"/>
+				</instance>
+			</decrypt>
+		</partition>
+		<partition id="1">
+			<decrypt>
+				<instance id="0">
+					<row id="0" side="RIGHT"/>
+					<row id="3" side="RIGHT"/>
+					<row id="5" side="LEFT"/>
+					<row id="13" side="LEFT"/>
+					<row id="15" side="LEFT"/>
+					<row id="16" side="RIGHT"/>
+				</instance>
+				<instance id="1">
+					<row id="2" side="RIGHT"/>
+					<row id="4" side="RIGHT"/>
+					<row id="10" side="RIGHT"/>
+					<row id="11" side="RIGHT"/>
+					<row id="14" side="RIGHT"/>
+					<row id="15" side="LEFT"/>
+				</instance>
+			</decrypt>
+		</partition>
+		<partition id="2">
+			<decrypt>
+				<instance id="0">
+					<row id="5" side="RIGHT"/>
+					<row id="8" side="LEFT"/>
+					<row id="10" side="LEFT"/>
+					<row id="15" side="RIGHT"/>
+					<row id="16" side="RIGHT"/>
+					<row id="19" side="RIGHT"/>
+				</instance>
+				<instance id="1">
+					<row id="0" side="RIGHT"/>
+					<row id="1" side="RIGHT"/>
+					<row id="7" side="RIGHT"/>
+					<row id="10" side="RIGHT"/>
+					<row id="11" side="LEFT"/>
+					<row id="18" side="RIGHT"/>
+				</instance>
+			</decrypt>
+		</partition>
+		<partition id="3">
+			<decrypt>
+				<instance id="0">
+					<row id="0" side="RIGHT"/>
+					<row id="3" side="LEFT"/>
+					<row id="4" side="RIGHT"/>
+					<row id="7" side="RIGHT"/>
+					<row id="8" side="RIGHT"/>
+					<row id="16" side="RIGHT"/>
+				</instance>
+				<instance id="1">
+					<row id="2" side="LEFT"/>
+					<row id="3" side="LEFT"/>
+					<row id="5" side="RIGHT"/>
+					<row id="7" side="RIGHT"/>
+					<row id="10" side="RIGHT"/>
+					<row id="15" side="LEFT"/>
+				</instance>
+			</decrypt>
+		</partition>
+	</database>
+</xml>

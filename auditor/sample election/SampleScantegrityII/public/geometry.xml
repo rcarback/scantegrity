@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ballot heigth="14.000" holeDiameter="0.000" width="8.500">
+    <alignments>
+        <alignment x="8.265" y="1.547"/>
+        <alignment x="8.325" y="10.893"/>
+    </alignments>
+    <contests>
+        <contest id="0">
+            <top>
+                <row id="0">
+                    <candidate fromx="5.207" fromy="2.540" id="0"
+                        tox="5.603" toy="2.710" x="5.405" y="2.625"/>
+                    <candidate fromx="5.207" fromy="2.873" id="1"
+                        tox="5.603" toy="3.040" x="5.405" y="2.957"/>
+                    <candidate fromx="5.207" fromy="3.203" id="2"
+                        tox="5.603" toy="3.373" x="5.405" y="3.288"/>
+                    <candidate fromx="5.207" fromy="3.537" id="3"
+                        tox="5.603" toy="3.707" x="5.405" y="3.622"/>
+                    <candidate fromx="5.207" fromy="3.867" id="4"
+                        tox="5.603" toy="4.037" x="5.405" y="3.952"/>
+                </row>
+                <row id="1">
+                    <candidate fromx="5.870" fromy="2.540" id="0"
+                        tox="6.267" toy="2.710" x="6.068" y="2.625"/>
+                    <candidate fromx="5.870" fromy="2.873" id="1"
+                        tox="6.267" toy="3.040" x="6.068" y="2.957"/>
+                    <candidate fromx="5.870" fromy="3.203" id="2"
+                        tox="6.267" toy="3.373" x="6.068" y="3.288"/>
+                    <candidate fromx="5.870" fromy="3.537" id="3"
+                        tox="6.267" toy="3.707" x="6.068" y="3.622"/>
+                    <candidate fromx="5.870" fromy="3.867" id="4"
+                        tox="6.267" toy="4.037" x="6.068" y="3.952"/>
+                </row>
+                <row id="2">
+                    <candidate fromx="6.533" fromy="2.540" id="0"
+                        tox="6.930" toy="2.710" x="6.732" y="2.625"/>
+                    <candidate fromx="6.533" fromy="2.873" id="1"
+                        tox="6.930" toy="3.040" x="6.732" y="2.957"/>
+                    <candidate fromx="6.533" fromy="3.203" id="2"
+                        tox="6.930" toy="3.373" x="6.732" y="3.288"/>
+                    <candidate fromx="6.533" fromy="3.537" id="3"
+                        tox="6.930" toy="3.707" x="6.732" y="3.622"/>
+                    <candidate fromx="6.533" fromy="3.867" id="4"
+                        tox="6.930" toy="4.037" x="6.732" y="3.952"/>
+                </row>
+                <row id="3">
+                    <candidate fromx="7.193" fromy="2.540" id="0"
+                        tox="7.593" toy="2.710" x="7.393" y="2.625"/>
+                    <candidate fromx="7.193" fromy="2.873" id="1"
+                        tox="7.593" toy="3.040" x="7.393" y="2.957"/>
+                    <candidate fromx="7.193" fromy="3.203" id="2"
+                        tox="7.593" toy="3.373" x="7.393" y="3.288"/>
+                    <candidate fromx="7.193" fromy="3.537" id="3"
+                        tox="7.593" toy="3.707" x="7.393" y="3.622"/>
+                    <candidate fromx="7.193" fromy="3.867" id="4"
+                        tox="7.593" toy="4.037" x="7.393" y="3.952"/>
+                </row>
+                <row id="4">
+                    <candidate fromx="7.857" fromy="2.540" id="0"
+                        tox="8.257" toy="2.710" x="8.057" y="2.625"/>
+                    <candidate fromx="7.857" fromy="2.873" id="1"
+                        tox="8.257" toy="3.040" x="8.057" y="2.957"/>
+                    <candidate fromx="7.857" fromy="3.203" id="2"
+                        tox="8.257" toy="3.373" x="8.057" y="3.288"/>
+                    <candidate fromx="7.857" fromy="3.537" id="3"
+                        tox="8.257" toy="3.707" x="8.057" y="3.622"/>
+                    <candidate fromx="7.857" fromy="3.867" id="4"
+                        tox="8.257" toy="4.037" x="8.057" y="3.952"/>
+                </row>
+            </top>
+        </contest>
+        <contest id="1">
+            <top>
+                <row id="0">
+                    <candidate fromx="5.863" fromy="5.720" id="0"
+                        tox="6.273" toy="5.903" x="6.068" y="5.812"/>
+                    <candidate fromx="5.863" fromy="6.053" id="1"
+                        tox="6.273" toy="6.237" x="6.068" y="6.145"/>
+                    <candidate fromx="5.863" fromy="6.387" id="2"
+                        tox="6.273" toy="6.570" x="6.068" y="6.478"/>
+                    <candidate fromx="5.863" fromy="6.717" id="3"
+                        tox="6.273" toy="6.900" x="6.068" y="6.808"/>
+                </row>
+                <row id="1">
+                    <candidate fromx="6.527" fromy="5.720" id="0"
+                        tox="6.937" toy="5.903" x="6.732" y="5.812"/>
+                    <candidate fromx="6.527" fromy="6.053" id="1"
+                        tox="6.937" toy="6.237" x="6.732" y="6.145"/>
+                    <candidate fromx="6.527" fromy="6.387" id="2"
+                        tox="6.937" toy="6.570" x="6.732" y="6.478"/>
+                    <candidate fromx="6.527" fromy="6.717" id="3"
+                        tox="6.937" toy="6.900" x="6.732" y="6.808"/>
+                </row>
+                <row id="2">
+                    <candidate fromx="7.187" fromy="5.720" id="0"
+                        tox="7.600" toy="5.903" x="7.393" y="5.812"/>
+                    <candidate fromx="7.187" fromy="6.053" id="1"
+                        tox="7.600" toy="6.237" x="7.393" y="6.145"/>
+                    <candidate fromx="7.187" fromy="6.387" id="2"
+                        tox="7.600" toy="6.570" x="7.393" y="6.478"/>
+                    <candidate fromx="7.187" fromy="6.717" id="3"
+                        tox="7.600" toy="6.900" x="7.393" y="6.808"/>
+                </row>
+                <row id="3">
+                    <candidate fromx="7.850" fromy="5.720" id="0"
+                        tox="8.263" toy="5.903" x="8.057" y="5.812"/>
+                    <candidate fromx="7.850" fromy="6.053" id="1"
+                        tox="8.263" toy="6.237" x="8.057" y="6.145"/>
+                    <candidate fromx="7.850" fromy="6.387" id="2"
+                        tox="8.263" toy="6.570" x="8.057" y="6.478"/>
+                    <candidate fromx="7.850" fromy="6.717" id="3"
+                        tox="8.263" toy="6.900" x="8.057" y="6.808"/>
+                </row>
+            </top>
+        </contest>
+        <contest id="2">
+            <top>
+                <row id="0">
+                    <candidate fromx="5.223" fromy="9.090" id="0"
+                        tox="5.620" toy="9.260" x="5.422" y="9.175"/>
+                    <candidate fromx="5.223" fromy="9.423" id="1"
+                        tox="5.620" toy="9.590" x="5.422" y="9.507"/>
+                    <candidate fromx="5.223" fromy="9.753" id="2"
+                        tox="5.620" toy="9.923" x="5.422" y="9.838"/>
+                    <candidate fromx="5.223" fromy="10.087" id="3"
+                        tox="5.620" toy="10.257" x="5.422" y="10.172"/>
+                    <candidate fromx="5.223" fromy="10.417" id="4"
+                        tox="5.620" toy="10.587" x="5.422" y="10.502"/>						
+                </row>
+            </top>
+        </contest>
+        <contest id="3">
+            <top>
+                <row id="0">
+                    <candidate fromx="7.190" fromy="9.747" id="0"
+                        tox="7.600" toy="9.930" x="7.395" y="9.838"/>
+                    <candidate fromx="7.190" fromy="10.080" id="1"
+                        tox="7.600" toy="10.263" x="7.395" y="10.172"/>												
+                </row>
+            </top>
+        </contest>
+    </contests>
+    <serial>
+        <digit id="0" type="counter">
+            <top fromx="0.813" fromy="13.490" tox="1.583" toy="13.670"
+                x="1.198" y="13.580"/>
+        </digit>
+        <digit id="1" type="counter">
+            <top fromx="1.777" fromy="13.530" tox="2.360" toy="13.640"
+                x="2.068" y="13.585"/>
+        </digit>
+        <digit id="2" type="counter">
+            <top fromx="2.490" fromy="13.530" tox="3.073" toy="13.640"
+                x="2.782" y="13.585"/>
+        </digit>
+        <bulleted fromx="0.620" fromy="0.443" tox="1.857" toy="1.680"
+            x="1.238" y="1.062"/>
+    </serial>
+</ballot>

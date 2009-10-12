@@ -1,0 +1,16 @@
+<xml>
+	<codes numberOfLettersPerCode="2">
+		<code id="0" value="3"/>
+		<code id="1" value="4"/>
+		<code id="2" value="9"/>
+		<code id="3" value="C"/>
+		<code id="4" value="H"/>
+		<code id="5" value="I"/>
+		<code id="6" value="K"/>
+		<code id="7" value="L"/>
+		<code id="8" value="M"/>
+		<code id="9" value="N"/>
+		<code id="10" value="T"/>
+		<code id="11" value="W"/>
+	</codes>
+</xml>
