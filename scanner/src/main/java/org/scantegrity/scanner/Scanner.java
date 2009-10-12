@@ -565,7 +565,7 @@ public class Scanner
 		Ballot l_b = null;
 		BallotReader l_reader = c_config.getReader();
 		Vector<BallotStyle> l_styles = c_config.getStyles();
-		
+		String l_err = "Unknown";
 		try 
 		{
 			//scan the ballot
@@ -579,10 +579,11 @@ public class Scanner
 		}
 		catch (Exception l_e) 
 		{
-			//Nothing, handled below.
+			l_err = l_e.getMessage();
 		}
 		
-		c_log.log(Level.WARNING, "Could not read (possible) ballot image.");
+		c_log.log(Level.WARNING, "Could not read (possible) ballot image."
+				+ "Reason: " + l_err);
 		saveErrorImage(p_ballotImg);
 		return null; 
 	}
