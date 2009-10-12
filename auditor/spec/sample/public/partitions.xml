@@ -1,0 +1,14 @@
+<electionSpecification version="0.1">
+	<electionInfo id="PunchScanCounty">
+		<sections>
+			<section id="0">
+				<questions>
+				<question id="0" partitionNo="0"/>
+				<question id="1" partitionNo="1"/>
+				<question id="2" partitionNo="2"/>
+				<question id="3" partitionNo="3"/>
+				</questions>
+			</section>
+		</sections>
+	</electionInfo>
+</electionSpecification>

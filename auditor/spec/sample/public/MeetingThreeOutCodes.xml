@@ -1,0 +1,132 @@
+<xml>
+	<database>
+		<printCommitments>
+			<ballot pid="3" chitSerial="577610" chitSerialSalt="KVo+Imluyg5cxmAMQGV6HQ==" password1="168640" password1Salt="YbEZxk8jQms8TuHGw3BFPQ==" password2="545083" password2Salt="B4PeDE3PIIpKH4qursCU6Q==">
+				<question id="0">
+					<symbol id="10" code="4T" salt="R22Epmw6BNOhd/rpZfZO3A=="/>
+					<symbol id="1" code="CL" salt="6u6oIba46ur7xGsKUPqB7Q=="/>
+					<symbol id="7" code="MW" salt="eLfCgNugIJOMJlFF8gafOQ=="/>
+					<symbol id="23" code="34" salt="X5BPe3FZjzC1KJ/xtDj2BQ=="/>
+					<symbol id="19" code="C3" salt="Tmq0J48mGAbIqQXpqB2Xkg=="/>
+				</question>
+				<question id="1">
+					<symbol id="8" code="IT" salt="u3MO9qJud2eCZJW360AlNA=="/>
+					<symbol id="1" code="IC" salt="ahSPCkbPOWAxrxlLIndWxA=="/>
+					<symbol id="6" code="L3" salt="Ng+/W+03pJGA7trGFfKrrQ=="/>
+					<symbol id="15" code="4T" salt="bB4k8cFS2VnbAGVg88s2mA=="/>
+				</question>
+				<question id="2">
+					<symbol id="1" code="K9" salt="fqZ5O4R7cxNnX5IXqYpCtw=="/>
+				</question>
+				<question id="3">
+					<symbol id="0" code="99" salt="CKNaW43abgX8ZwreCiLKOQ=="/>
+				</question>
+			</ballot>
+			<ballot pid="4" chitSerial="598068" chitSerialSalt="odyN5FIbByroqBKgnHE0nw==" password1="359014" password1Salt="n6io4xw6IDXn+MKA5u+mEg==" password2="876983" password2Salt="nBhrDMiYfT9UG6dqUIKV2g==">
+				<question id="0">
+					<symbol id="0" code="L9" salt="tyUu+WO/Uu13rT/JiH4uHw=="/>
+					<symbol id="21" code="H4" salt="z5NDpBfFUFh5XiIWiaK1UA=="/>
+					<symbol id="7" code="CI" salt="qnCeEpCujRR2ih8+hoiT2w=="/>
+					<symbol id="18" code="3T" salt="e9eZabRmxHdTBkSj4dFrTQ=="/>
+					<symbol id="14" code="IM" salt="jdbY76GQ8dAt9s1mxfrXsg=="/>
+				</question>
+				<question id="1">
+					<symbol id="4" code="T4" salt="bNFHxVM/CysBiuxFeuk4Og=="/>
+					<symbol id="1" code="4T" salt="IGjC80HKlZHVxb/cNN4LFA=="/>
+					<symbol id="10" code="44" salt="kQ4OoBvMH23wYgIgaPjnoQ=="/>
+					<symbol id="15" code="NT" salt="33CZVftFqp93rvuD9qe6Jw=="/>
+				</question>
+				<question id="2">
+					<symbol id="1" code="34" salt="HKbG3iZk5Yxp4w4XZRwGjA=="/>
+				</question>
+				<question id="3">
+					<symbol id="0" code="MI" salt="wKA4GaijxsgG5iI4h+NOuQ=="/>
+				</question>
+			</ballot>
+			<ballot pid="5" chitSerial="962956" chitSerialSalt="1gBRxXz91PpkJNzUt1SneQ==" password1="488541" password1Salt="jvi/SBHscNc1JeRZ3As7jQ==" password2="344664" password2Salt="xBLeAbKTdOMkObQ9Lps3GQ==">
+				<question id="0">
+					<symbol id="15" code="93" salt="zt/EoDB9TQTvW6PfJzxktA=="/>
+					<symbol id="21" code="LM" salt="v/oWi3NWt0Ms/ut7/Xwa+Q=="/>
+					<symbol id="2" code="HM" salt="p/N6261CPoDX9uOMsvKBIA=="/>
+					<symbol id="8" code="NI" salt="YhKY4OgVooGoKWsNJ+Lrhg=="/>
+					<symbol id="14" code="LK" salt="/WbRx5HzrT0DWiKvigFbkA=="/>
+				</question>
+				<question id="1">
+					<symbol id="4" code="CK" salt="XjZxnbvcBwH3qugoJhi3nw=="/>
+					<symbol id="9" code="NC" salt="2n+xlI5taaSZyLPk9tj1tA=="/>
+					<symbol id="14" code="4C" salt="COqEWKRXx+gNeSv2knNT+Q=="/>
+					<symbol id="3" code="9W" salt="E570LSAw9lqktAJZ2Z71+Q=="/>
+				</question>
+				<question id="2">
+					<symbol id="3" code="C4" salt="V64QVwW7JBvbT//KlH/utQ=="/>
+				</question>
+				<question id="3">
+					<symbol id="0" code="K9" salt="tJJV9UwKxfZFWzOxhouIiQ=="/>
+				</question>
+			</ballot>
+			<ballot pid="6" chitSerial="897935" chitSerialSalt="s6F8WIaOEP3iMVxiXds6kA==" password1="789143" password1Salt="slgB5lvyAxZOEQfaJPWh5Q==" password2="904867" password2Salt="Q4egx/E+8WMI2V47kI1CFg==">
+				<question id="0">
+					<symbol id="20" code="C4" salt="x9GbMhqn/DGUN3JvUVrCuQ=="/>
+					<symbol id="6" code="HM" salt="F6wy1P47hdQlkyqgoFydRQ=="/>
+					<symbol id="2" code="KW" salt="aAS4HrfjokmtFR4FkcjUnw=="/>
+					<symbol id="18" code="MK" salt="pOGEI6InKZHcERZyH9ysww=="/>
+					<symbol id="14" code="KT" salt="csE2S24rCa7OTlYkJ9lGug=="/>
+				</question>
+				<question id="1">
+					<symbol id="8" code="H3" salt="1T0JZGoP87GRa14s2ZHdsw=="/>
+					<symbol id="5" code="NI" salt="x+YFhyA3loGDRPC4n0ZVJw=="/>
+					<symbol id="14" code="HL" salt="z10wkopN7l9y884bXoAS3g=="/>
+					<symbol id="3" code="LK" salt="jx/p974qAI+S+uXeqEIGDA=="/>
+				</question>
+				<question id="2">
+					<symbol id="3" code="3M" salt="J17LDa+Vek4sEuSybHFOtg=="/>
+				</question>
+				<question id="3">
+					<symbol id="0" code="44" salt="idbWMeipLA+hL56Z1iv06A=="/>
+				</question>
+			</ballot>
+			<ballot pid="8" chitSerial="643776" chitSerialSalt="K/dHDKZBAzNEJ5Tsf/h2Iw==" password1="612197" password1Salt="+rF7TNF4WjMNkL0bBufzgQ==" password2="643193" password2Salt="0IhS+wLXSu5h1SLoM7lIIw==">
+				<question id="0">
+					<symbol id="15" code="3H" salt="xY7hBHIESG+JWO8IALlDfg=="/>
+					<symbol id="21" code="MT" salt="ovz9STm06NqueZQ0AFP5/w=="/>
+					<symbol id="7" code="IK" salt="/Oh9w6/9YBDYmCnOwEmgYQ=="/>
+					<symbol id="13" code="CI" salt="zu5Hj8NRUoh/UkFVN96bAQ=="/>
+					<symbol id="4" code="KM" salt="I7qOC7WKtDEo+QDe3VzQpw=="/>
+				</question>
+				<question id="1">
+					<symbol id="12" code="99" salt="338HjIwaxRGzIrEOqwC1Bg=="/>
+					<symbol id="9" code="4I" salt="9YOLdMVmnHpd5NfF/NPurQ=="/>
+					<symbol id="6" code="34" salt="Mdt1V1LuTtq6mttw68z0iw=="/>
+					<symbol id="3" code="N4" salt="7kqzwpwbUNDFZaMlUjqmoA=="/>
+				</question>
+				<question id="2">
+					<symbol id="0" code="II" salt="A+e7SOXTuGL0vzU+lEjfMw=="/>
+				</question>
+				<question id="3">
+					<symbol id="0" code="3C" salt="4cuAWDinQy3XGmbaePMAgw=="/>
+				</question>
+			</ballot>
+			<ballot pid="9" chitSerial="316483" chitSerialSalt="zgR93djSBL1BaSWrmbvk8Q==" password1="362900" password1Salt="BLLyCNZNp99q185W5l2EIw==" password2="880065" password2Salt="WRObINXxMB2s+qey0Nqz7g==">
+				<question id="0">
+					<symbol id="0" code="N4" salt="GuD+T/iwEqfLpYAz5teBcw=="/>
+					<symbol id="6" code="T3" salt="+hzqdZqcljOEnEsfSPqi9g=="/>
+					<symbol id="17" code="LK" salt="FrCuuzhkaotJLDb1Jfmazw=="/>
+					<symbol id="23" code="39" salt="p5JqsH7kTU+U4v5y9M3g7Q=="/>
+					<symbol id="14" code="KN" salt="2B8gfFW8WcnDYY+YXj3i1g=="/>
+				</question>
+				<question id="1">
+					<symbol id="12" code="C4" salt="LGItTa6dbUugPYOcjrQ9CQ=="/>
+					<symbol id="9" code="3M" salt="fC5ggByrgdUSt3Cd5fTA/Q=="/>
+					<symbol id="6" code="4C" salt="gMCpX/DCtt2dkKnC9hiLhg=="/>
+					<symbol id="3" code="T9" salt="9JJuiv+UqCQjyL1MUq1JNA=="/>
+				</question>
+				<question id="2">
+					<symbol id="1" code="C4" salt="GH7JEJ+vQ01tCnfA2fXiNw=="/>
+				</question>
+				<question id="3">
+					<symbol id="1" code="TC" salt="dmcFggcZw+mwhP9fnPVLTA=="/>
+				</question>
+			</ballot>
+		</printCommitments>
+	</database>
+</xml>

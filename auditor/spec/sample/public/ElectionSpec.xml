@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<electionSpecification version="0.1">
+	<electionInfo id="PunchScan">
+		<sections>
+			<section id="0" possition="1">
+				<questions>
+					<question id="3" possition="4" typeOfAnswerChoice="one_answer" max_number_of_answers_selected="1">
+						<answers>
+							<answer id="1" possition="2" points="0.0"/>
+							<answer id="0" possition="1" points="0.0"/>
+						</answers>
+					</question>
+					<question id="2" possition="3" typeOfAnswerChoice="one_answer" max_number_of_answers_selected="1">
+						<answers>
+							<answer id="4" possition="5" points="0.0"/>
+							<answer id="3" possition="4" points="0.0"/>
+							<answer id="2" possition="3" points="0.0"/>						
+							<answer id="1" possition="2" points="0.0"/>
+							<answer id="0" possition="1" points="0.0"/>
+						</answers>
+					</question>
+					<question id="1" possition="2" typeOfAnswerChoice="rank" max_number_of_answers_selected="4">
+						<answers>
+							<answer id="3" possition="4" points="0.0"/>
+							<answer id="2" possition="3" points="0.0"/>
+							<answer id="1" possition="2" points="0.0"/>
+							<answer id="0" possition="1" points="0.0"/>
+						</answers>
+					</question>
+					<question id="0" possition="1" typeOfAnswerChoice="rank" max_number_of_answers_selected="5">
+						<answers>
+							<answer id="4" possition="5" points="0.0"/>
+							<answer id="3" possition="4" points="0.0"/>
+							<answer id="2" possition="3" points="0.0"/>
+							<answer id="1" possition="2" points="0.0"/>
+							<answer id="0" possition="1" points="0.0"/>
+						</answers>
+					</question>
+				</questions>
+			</section>
+		</sections>
+	</electionInfo>
+</electionSpecification>
