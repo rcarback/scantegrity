@@ -10,6 +10,19 @@ import java.io.IOException;
 import org.xml.sax.SAXException;
 import java.util.*;
 
+
+/**
+* This code was edited or generated using CloudGarden's Jigloo
+* SWT/Swing GUI Builder, which is free for non-commercial
+* use. If Jigloo is being used commercially (ie, by a corporation,
+* company or business for any purpose whatever) then you
+* should purchase a license for each developer using Jigloo.
+* Please visit www.cloudgarden.com for details.
+* Use of Jigloo implies acceptance of these licensing terms.
+* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+*/
 /**
  *
  * @author  rick
@@ -40,7 +53,8 @@ public class EnterPasswords extends javax.swing.JDialog {
         initComponents();
         if (meeting != 1)
         {
-        	jLabel4.setText("Threshold:");
+        	//jLabel4.setText("Threshold:");
+        	jLabel4.setText("Missing:");
             jTextThresh.setText((new Integer(edh.GetKeyFactor())).toString());
             jTextThresh.setEnabled(false);
         }
@@ -68,19 +82,19 @@ public class EnterPasswords extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 18));
-        jLabel1.setText("Enter User Information");
+        jLabel1.setText("Enter Trustee Information");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jLabel2.setText("Username:");
+        jLabel2.setText("Trustee Name:");
 
         jLabel3.setText("Password:");
 
         jPassword.setColumns(15);
-        jPassword.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ReturnPasswordList(evt);
-            }
-        });
+        //jPassword.addActionListener(new java.awt.event.ActionListener() {
+            //public void actionPerformed(java.awt.event.ActionEvent evt) {
+              //  ReturnPasswordList(evt);
+            //}
+        //});
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -137,7 +151,8 @@ public class EnterPasswords extends javax.swing.JDialog {
 
         jTextThresh.setText("0");
 
-        jLabel4.setText("Missing:");
+        //jLabel4.setText("Missing:");
+        jLabel4.setText("Threshold:");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);

@@ -36,44 +36,19 @@ public class ScannedBallotWithBarcodes extends ScannedBallot {
 		serial=parsedResult.getDisplayResult();	      
 	    //System.out.println("Detecting the serial number took "+(System.currentTimeMillis()-start)+" milisseconds");
 	}
+
+	public static String GetStringFromBarcode(BufferedImage img) throws Exception {		
+	    Hashtable<DecodeHintType, Object> hints = new Hashtable<DecodeHintType, Object>(3);
+	    hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+		MonochromeBitmapSource source = new BufferedImageMonochromeBitmapSource(img);
+		Result result = new MultiFormatReader().decode(source, hints);
+		ParsedResult parsedResult = ResultParser.parseResult(result);
+		return parsedResult.getDisplayResult();	      
+	}
 	
 	public static void main(String[] args) throws Exception {
-/*		
-		String dir="Elections/VoComp/scantegrity/";
-		BallotGeometry geom=new BallotGeometry(dir+"geometry.xml");
-		ElectionSpecification es= new ElectionSpecification(dir+"../ElectionSpec.xml");
-		ScannedBallot sb=new ScannedBallot(geom,es);
-		BufferedImage img=ImageIO.read(new File(dir+"scannes/ballot0004.JPG"));
-		sb.detect(img);
-		System.out.println(sb.toProw());
-*/		
-		String dir=InputConstants.publicFolder;
-		BallotGeometry geom=new BallotGeometry(dir+"geometry.xml");
-		ElectionSpecification es= new ElectionSpecification(dir+"ElectionSpec.xml");
-		ScannedBallotWithBarcodes sb=new ScannedBallotWithBarcodes(geom,es);
-	
-		File[] images=new File(dir+"../scannes/takomaMockBallot_apr2009draft1 150/").listFiles();
-/*		
-		long start=System.currentTimeMillis();
-		for (File f:images) { 
-		
-System.out.println(f);
-			BufferedImage img=ImageIO.read(f);
-			//System.out.println("Reading the image in memory took"+(System.currentTimeMillis()-start)+" milisseconds");
-			
-			sb.detect(img);
-
-			System.out.print(sb.toProw());
-		}
-	    System.out.println("Processing "+images.length+" took "+(System.currentTimeMillis()-start)+" miliseconds");
-*/		
-		long start=System.currentTimeMillis();
-		File f=new File(dir+"../scannes/tp training/Scan0001.jpg");
-		System.out.println(f);
-		BufferedImage img=ImageIO.read(f);
-		sb.detect(img);
-		System.out.println(sb.toProw());
-		System.out.println("All processing took "+(System.currentTimeMillis()-start)+" milisseconds");
-		
+		String dir="C:\\TP Nov 3 2009, mock PRIVATE\\ward1\\barcode.bmp";
+		BufferedImage bi=ImageIO.read(new File(dir));
+		System.out.println(ScannedBallotWithBarcodes.GetStringFromBarcode(bi));
 	}
 }

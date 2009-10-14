@@ -70,6 +70,8 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 	private JPanel jPanelRevealSpoiledBallots;
 	private JPanel jPanelShowAllConfirmationCodes;
 	private JPanel jPanelAuditConfirmationCodes;
+	private JPanel jPanel3;
+	private JPanel jPanelSpoiledBallots;
 	private JCheckBox jCheckBoxGenerateRandomlySpoiledBallots;
 	private JPanel jPanelGenerateRandomlySpoiledBallots;
 	private JTextField jTextFieldNoWards;
@@ -321,7 +323,7 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 						jPanelGenerateRandomlyVotedBallotsLayout.setVgap(5);
 						jPanelGenerateRandomlyVotedBallotsLayout.setColumns(1);
 						jPanelGenerateRandomlyVotedBallots.setLayout(jPanelGenerateRandomlyVotedBallotsLayout);
-						jPanelM3.add(jPanelGenerateRandomlyVotedBallots);
+						//jPanelM3.add(jPanelGenerateRandomlyVotedBallots);
 						{
 							jCheckBoxGenerateRandomlyVotedBallots = new JCheckBox();
 							jPanelGenerateRandomlyVotedBallots.add(jCheckBoxGenerateRandomlyVotedBallots);
@@ -383,42 +385,9 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 						jPanelGenerateRandomlySpoiledBallots.setLayout(jPanel3Layout);
 						{
 							jCheckBoxGenerateRandomlySpoiledBallots = new JCheckBox();
-							jPanelGenerateRandomlySpoiledBallots.add(jCheckBoxGenerateRandomlySpoiledBallots);
+							//jPanelGenerateRandomlySpoiledBallots.add(jCheckBoxGenerateRandomlySpoiledBallots);
 							jCheckBoxGenerateRandomlySpoiledBallots.setText("Generate Randomly Spoiled Ballots");
 							jCheckBoxGenerateRandomlySpoiledBallots.setForeground(new java.awt.Color(128,128,128));
-						}
-					}
-					{
-						jPanelRevealSpoiledBallots = new JPanel();
-						GridLayout jPanelRevealSpoiledBallotsLayout = new GridLayout(
-							1,
-							1);
-						jPanelRevealSpoiledBallotsLayout.setHgap(5);
-						jPanelRevealSpoiledBallotsLayout.setVgap(5);
-						jPanelRevealSpoiledBallotsLayout.setColumns(1);
-						jPanelRevealSpoiledBallots.setLayout(jPanelRevealSpoiledBallotsLayout);
-						jPanelM3.add(jPanelRevealSpoiledBallots);
-						{
-							jCheckBoxRevealSpoiledBallots = new JCheckBox();
-							jPanelRevealSpoiledBallots.add(jCheckBoxRevealSpoiledBallots);
-							jCheckBoxRevealSpoiledBallots
-								.setText("Print audit all the ballots except the voted ones and the spoiled ones");
-						}
-					}
-					{
-						jPanelCheckSpoiledBallots = new JPanel();
-						GridLayout jPanelCheckSpoiledBallotsLayout = new GridLayout(
-							1,
-							1);
-						jPanelCheckSpoiledBallotsLayout.setHgap(5);
-						jPanelCheckSpoiledBallotsLayout.setVgap(5);
-						jPanelCheckSpoiledBallotsLayout.setColumns(1);
-						jPanelCheckSpoiledBallots.setLayout(jPanelCheckSpoiledBallotsLayout);
-						jPanelM3.add(jPanelCheckSpoiledBallots);
-						{
-							jCheckBoxCheckSpoiledBallots = new JCheckBox();
-							jPanelCheckSpoiledBallots.add(jCheckBoxCheckSpoiledBallots);
-							jCheckBoxCheckSpoiledBallots.setText("Check All the Print Audited Ballots");
 						}
 					}
 					{
@@ -468,6 +437,61 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 							jPanelRunM4.add(jCheckBoxAuditM4);
 							jCheckBoxAuditM4
 								.setText("Check that the challenged ballots are correctly formed");
+						}
+					}
+					{
+						jPanelSpoiledBallots = new JPanel();
+						GridLayout jPanelSpoiledBallotsLayout = new GridLayout(
+							4,
+							1);
+						jPanelSpoiledBallotsLayout.setHgap(5);
+						jPanelSpoiledBallotsLayout.setVgap(5);
+						jPanelSpoiledBallotsLayout.setColumns(1);
+						jPanelSpoiledBallotsLayout.setRows(4);
+						jPanelSpoiledBallots.setLayout(jPanelSpoiledBallotsLayout);
+						jPanelM4.add(jPanelSpoiledBallots, BorderLayout.CENTER);
+						{
+							jPanelCheckSpoiledBallots = new JPanel();
+							jPanelSpoiledBallots.add(jPanelCheckSpoiledBallots);
+							GridLayout jPanelCheckSpoiledBallotsLayout = new GridLayout(
+								1,
+								1);
+							jPanelCheckSpoiledBallotsLayout.setHgap(5);
+							jPanelCheckSpoiledBallotsLayout.setVgap(5);
+							jPanelCheckSpoiledBallotsLayout.setColumns(1);
+							jPanelCheckSpoiledBallots
+								.setLayout(jPanelCheckSpoiledBallotsLayout);
+							{
+								jCheckBoxCheckSpoiledBallots = new JCheckBox();
+								jPanelCheckSpoiledBallots
+									.add(jCheckBoxCheckSpoiledBallots);
+								jCheckBoxCheckSpoiledBallots
+									.setText("Check All the Print Audited Ballots");
+							}
+						}
+						{
+							jPanelRevealSpoiledBallots = new JPanel();
+							jPanelSpoiledBallots.add(jPanelRevealSpoiledBallots);
+							GridLayout jPanelRevealSpoiledBallotsLayout = new GridLayout(
+								1,
+								1);
+							jPanelRevealSpoiledBallotsLayout.setHgap(5);
+							jPanelRevealSpoiledBallotsLayout.setVgap(5);
+							jPanelRevealSpoiledBallotsLayout.setColumns(1);
+							jPanelRevealSpoiledBallots
+								.setLayout(jPanelRevealSpoiledBallotsLayout);
+							{
+								jCheckBoxRevealSpoiledBallots = new JCheckBox();
+								jPanelRevealSpoiledBallots
+									.add(jCheckBoxRevealSpoiledBallots);
+								jCheckBoxRevealSpoiledBallots
+									.setText("Print audit all the ballots except the voted ones and the spoiled ones");
+							}
+						}
+						{
+							jPanel3 = new JPanel();
+							jPanelSpoiledBallots.add(jPanel3);
+							jPanel3.setPreferredSize(new java.awt.Dimension(787, 168));
 						}
 					}
 					{
@@ -557,7 +581,10 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 						jButtonPrivateFolder
 							.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent evt) {
-								selectFolder(JFileChooser.DIRECTORIES_ONLY,"Election Data Private Storage Location", InputConstants.privateFolder, jTextFieldPrivateFolder);
+								//selectFolder(JFileChooser.DIRECTORIES_ONLY,"Election Data Private Storage Location", InputConstants.privateFolder, jTextFieldPrivateFolder);
+								//selectFolder(JFileChooser.DIRECTORIES_ONLY,"Election Data Private Storage Location", "C:/TP Nov 3 2009, mock PRIVATE/", jTextFieldPrivateFolder);
+								selectFolder(JFileChooser.DIRECTORIES_ONLY,"Election Data Private Storage Location", "G:", jTextFieldPrivateFolder);
+								
 								InputConstants.setPrivateFolder(jTextFieldPrivateFolder.getText());
 								}
 							});

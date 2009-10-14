@@ -311,7 +311,7 @@ System.out.println(c);
 		
 		//add the serial bulleted
 		geom.setSerialBulleted(serialBulleted);
-		
+
 		OutputStream fos;
 		if (geometryFile!=null)
 		try {
@@ -348,7 +348,7 @@ System.out.println(c);
 	}
 	
 	public static void main(String args[]) throws Exception {
-		String dir=InputConstants.publicFolder+"ward1/";
+		String dir=InputConstants.publicFolder+"ward6/";
 		BmpToGeometry btg = new BmpToGeometry();
 		BufferedImage bi = ImageIO.read(new File(dir+"background.bmp"));
 		btg.createGeometry(bi, 300, 1, dir+"geometry.xml",dir+"ElectionSpec.xml");

@@ -1,27 +1,22 @@
 package software.authoring.invisibleink;
 
 import java.awt.Color;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.Raster;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
-import javax.swing.text.Position;
 
 import org.gwu.voting.standardFormat.electionSpecification.ElectionSpecification;
 
-import com.lowagie.text.BadElementException;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Image;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfGState;
 
 import software.common.BallotGeometry;
 import software.common.BallotRow;
@@ -31,6 +26,7 @@ import software.common.Util;
 public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 	
 	static InvisibleInkFactory iif=null;
+	Hashtable<String, Image> textToImage=new Hashtable<String, Image>();
 	
 	public PrintableBallotMakerWithBarcodes(ElectionSpecification es, BallotGeometry geom) throws Exception {
 		super(es, geom);
@@ -95,7 +91,7 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 			e.printStackTrace();
 		}
 	}
-
+	
 	protected void addSerialNumber(String serial,String prefixForFieldName) {
     	serialFontSize=getFontSize(geom.getSerialTop("0"), helv);//serialFont);
     	
@@ -105,7 +101,7 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
     	
     		BallotRow ballotRow=ballotRows.get(Integer.parseInt(serial));
     	if (true) {
-    		if ( ! mailIn) {
+//    		if ( ! mailIn) {
 	        	
     		
         	r=geom.getSerialTop("0");
@@ -116,7 +112,7 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
         	String webSerial=ballotRow.getWebSerial();
         	
         	drawRegularText(webSerial, r, this.helv, 12);
-    		}
+//    		}
 			//float width=r.getWidth();
 
 	        	r=geom.getSerialTop("1");
@@ -146,6 +142,9 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
         Image barcode=null;
         try {
         	BufferedImage bi=ImageIO.read(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl="+ballotRow.getBarcodeSerial()));
+  
+        	//BufferedImage bi=ImageIO.read(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl=123456"));
+        	
         	
 			barcode=Util.CMYKBufferedImageToCMYKImage(
 					Util.RGBBufferedImageToCMYKBufferedImage(bi));
@@ -159,8 +158,15 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 		
 		Rectangle rect=geom.makeRectangle(geom.getSerialBulletedNode());
 		barcode.setAbsolutePosition(rect.getLeft(),rect.getBottom());
+		float w=rect.getWidth()*1.05f; 
+		float h=rect.getHeight()*1.05f;
+		
+		//float w=barcode.getWidth(); 
+		//float h=barcode.getHeight();
+		
+		
 		try {
-			cb.addImage(barcode,rect.getWidth()*1.05f, 0, 0, rect.getHeight()*1.05f,rect.getLeft(),rect.getBottom()-0.5f);
+			cb.addImage(barcode, Math.max(w,h), 0, 0, Math.max(w,h), rect.getLeft(),rect.getBottom()-0.5f);
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}
@@ -179,7 +185,12 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 		
 		if (mailIn) return;
 		
-		Image l_img=Util.CMYKBufferedImageToCMYKImage(iif.getBufferedImage("  "+text+"  "));
+		//TODO this may eat too much memory
+		Image l_img=textToImage.get(text);
+		if (l_img==null) {
+			l_img=Util.CMYKBufferedImageToCMYKImage(iif.getBufferedImage("  "+text+"  "));
+			textToImage.put(text, l_img);
+		}
 		
 		//System.out.println("Adding image at "+ possition.getLeft()+" "+ possition.getBottom());
 		try {
@@ -203,15 +214,17 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-    	String publicFolder=InputConstants.publicFolder;
+    	InputConstants.setPublicFolder(InputConstants.publicFolder+"/ward1/");
+    	
 		ElectionSpecification es=new ElectionSpecification(InputConstants.ElectionSpec);
 		BallotGeometry geom=new BallotGeometry(InputConstants.Geometry);
 
-		String background=publicFolder+"/Final ii Ballot v4.pdf";
+		String background=InputConstants.PdfTemplate;
 		String pathToPrintsFile=InputConstants.MeetingTwoPrints;
 		
     	PrintableBallotMakerWithBarcodes pbm=new PrintableBallotMakerWithBarcodes(es,geom);
-    	pbm.init(background,pathToPrintsFile);
+    	//pbm.init(background,pathToPrintsFile);
+    	    	
     	int batchSize=10;
     	for (int i=0;i<200;i+=batchSize) {
     		pbm.makePrintableBallots(InputConstants.privateFolder+"", i,i+batchSize-1);

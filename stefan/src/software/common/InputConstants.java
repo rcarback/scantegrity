@@ -27,8 +27,9 @@ public class InputConstants {
 	public static int Dpi = 150;
 	public static int NoCols = 1;
 	
-	public static String folder="D:/PunchScan2.0/PunchScan2.0/Elections/TP Nov 3 2009, mock PUBLIC/";
+	//public static String folder="D:/PunchScan2.0/PunchScan2.0/Elections/TP Nov 3 2009, mock PUBLIC/";
 	//public static String folder="D:/PunchScan2.0/PunchScan2.0/Elections/BenDemo/";
+	public static String folder="C:/PUBLIC/";
 	
 	public static String privateFolder = folder+"private/";	
 	public static String publicFolder = folder;//+"public/";

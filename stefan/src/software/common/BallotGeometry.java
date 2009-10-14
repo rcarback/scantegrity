@@ -832,14 +832,14 @@ public class BallotGeometry {
 		section.setQuestions(questions);
 		sections.put(section.getId(), section);
 		
-		return new ElectionSpecification("PunchScan",sections);
+		return new ElectionSpecification("TakomaPark3Nov2009",sections);
 	}
 
 	public String getDefaultPartitions() {
 		StringBuffer sb=new StringBuffer();
 		
 		sb.append("<electionSpecification version=\"0.1\">\n");
-		sb.append("\t<electionInfo id=\"PunchScanCounty\">\n");
+		sb.append("\t<electionInfo id=\"TakomaPark3Nov2009\">\n");
 		sb.append("\t\t<sections>\n");
 		sb.append("\t\t\t<section id=\"0\">\n");
 		sb.append("\t\t\t\t<questions>\n");
