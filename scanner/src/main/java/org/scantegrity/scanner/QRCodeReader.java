@@ -22,9 +22,13 @@ package org.scantegrity.scanner;
 import java.awt.Rectangle;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import org.scantegrity.common.AffineCropper;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.DecodeHintType;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
@@ -50,35 +54,27 @@ public class QRCodeReader implements SerialNumberReader
 	throws Exception
 	{
 		BufferedImageMonochromeBitmapSource l_serial;
-		try {
-			//int l_start = (int) System.currentTimeMillis();
-			//System.out.println("Trying...");
-			
-			l_serial = new BufferedImageMonochromeBitmapSource(
-						AffineCropper.cropUnscaled(p_img, p_op, c_boundingBox));
-			//l_serial = new BufferedImageMonochromeBitmapSource(AffineCropper.crop(p_img, p_op, c_boundingBox));
-			
-			/*Vector<BarcodeFormat> l_formats = new Vector<BarcodeFormat>();
-			l_formats.add(BarcodeFormat.QR_CODE);
-			Hashtable<DecodeHintType, Object> hints = null;
-			hints = new Hashtable<DecodeHintType, Object>(3);
-			hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
-			//hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
-			hints.put(DecodeHintType.POSSIBLE_FORMATS, l_formats);*/
+		//int l_start = (int) System.currentTimeMillis();
+		//System.out.println("Trying...");
+		
+		l_serial = new BufferedImageMonochromeBitmapSource(
+					AffineCropper.cropUnscaled(p_img, p_op, c_boundingBox));
+		//l_serial = new BufferedImageMonochromeBitmapSource(AffineCropper.crop(p_img, p_op, c_boundingBox));
+		
+		Vector<BarcodeFormat> l_formats = new Vector<BarcodeFormat>();
+		l_formats.add(BarcodeFormat.QR_CODE);
+		Hashtable<DecodeHintType, Object> hints = null;
+		hints = new Hashtable<DecodeHintType, Object>(3);
+		hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+		hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
+		hints.put(DecodeHintType.POSSIBLE_FORMATS, l_formats);
 
-			Result result = new MultiFormatReader().decode(l_serial, null);
-			
-			
-			//System.out.println("The Result: " + result.getText());
-			//System.out.println("Serial Scan Time:" + (int)(System.currentTimeMillis()-l_start) + "ms");
-			return result.getText();
-		} catch (ReaderException e) {
-			//e.printStackTrace();
-			return null;			
-		} catch (Exception e) {
-			//e.printStackTrace();
-			return null;
-		}
+		Result result = new MultiFormatReader().decode(l_serial, null);
+		
+		
+		//System.out.println("The Result: " + result.getText());
+		//System.out.println("Serial Scan Time:" + (int)(System.currentTimeMillis()-l_start) + "ms");
+		return result.getText();
 	}
 	
 	public void setSerialBoundingBox(Rectangle p_boundingBox)

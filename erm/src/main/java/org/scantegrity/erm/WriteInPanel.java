@@ -146,6 +146,8 @@ public class WriteInPanel extends JPanel {
 	
 	public void AddVote(String p_name)
 	{
+		if( p_name.trim().isEmpty() )
+			return;
 		if( !c_candidateList.contains(p_name) )
 		{
 			int l_res = JOptionPane.NO_OPTION;
@@ -162,7 +164,7 @@ public class WriteInPanel extends JPanel {
 		
 		if( !c_candidateList.contains(p_name) )
 		{
-			int l_res = JOptionPane.showConfirmDialog(getParent(), "Candidate is not in list, would you like to add?", "Confirm Add", JOptionPane.YES_NO_OPTION);
+			int l_res = JOptionPane.showConfirmDialog(getParent(), "Candidate \"" + p_name + "\" is not in list, would you like to add?", "Confirm Add", JOptionPane.YES_NO_OPTION);
 			if( l_res != JOptionPane.YES_OPTION )
 				return;
 			else
@@ -205,7 +207,8 @@ public class WriteInPanel extends JPanel {
 			l_model.addElement(l_candidate);
 		}
 		jList.setModel(l_model);
-		headerLabel.setText("<HTML>Contest: " + c_contestName + "</HTML>");
+		headerLabel.setFont(new Font(null, Font.PLAIN, 22));
+		headerLabel.setText(c_contestName);
 		imageLabel.setIcon(new ImageIcon(c_writeInImage));
 	}
 	

@@ -23,15 +23,8 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.logging.Level;
-
-import javax.imageio.ImageIO;
 
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
@@ -249,7 +242,7 @@ public class ScantegrityBallotReader extends BallotReader
 		
 		//System.out.println("\n% Black: " + l_res);
 		
-		if (l_res > .5) return true;
+		if (l_res > .3) return true;
 		return false;
 	}
 

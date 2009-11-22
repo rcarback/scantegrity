@@ -30,6 +30,7 @@ public class ERM extends JFrame {
 	private LoadPanel loadPanel = null;
 	private SpoiledPanel spoiledPanel = null;
 	public WriteInResolver c_resolver = null;
+	public WriteInResolver c_spoiledResolver = null;
 	private String c_path = null;
 	
 	/**
@@ -42,8 +43,8 @@ public class ERM extends JFrame {
 			jTabbedPane = new JTabbedPane();
 			jTabbedPane.addTab("Load Ballots", null, getLoadPanel(), null);
 			jTabbedPane.addTab("Write-In Resolution", null, getWriteInPanel(), null);
-			jTabbedPane.addTab("Tally", null, getTallyPanel(), null);
 			jTabbedPane.addTab("Spoiled Ballots", null, getSpoiledPanel(), null);
+			jTabbedPane.addTab("Tally", null, getTallyPanel(), null);
 		}
 		return jTabbedPane;
 	}
@@ -67,7 +68,7 @@ public class ERM extends JFrame {
 	 */
 	private TallyPanel getTallyPanel() {
 		if (tallyPanel == null) {
-			tallyPanel = new TallyPanel(c_resolver, c_path);
+			tallyPanel = new TallyPanel(c_resolver, c_spoiledResolver, c_path);
 		}
 		return tallyPanel;
 	}
@@ -91,7 +92,7 @@ public class ERM extends JFrame {
 	 */
 	private SpoiledPanel getSpoiledPanel() {
 		if (spoiledPanel == null) {
-			spoiledPanel = new SpoiledPanel(c_resolver);
+			spoiledPanel = new SpoiledPanel(c_spoiledResolver, c_path + File.separator + "Audit");
 		}
 		return spoiledPanel;
 	}
@@ -152,7 +153,7 @@ public class ERM extends JFrame {
 			XMLDecoder l_dec = new XMLDecoder(new BufferedInputStream(new FileInputStream(c_scannerConfigFile)));
 			c_config = (ScannerConfig)l_dec.readObject();
 			l_dec.close();	
-			c_resolver = new WriteInResolver(c_config);
+			c_resolver = new WriteInResolver(c_config, this);
 		}
 		catch(FileNotFoundException e_fnf)
 		{
@@ -171,10 +172,11 @@ public class ERM extends JFrame {
 			{}
 			
 			File l_selected = l_chooser.getSelectedFile();
+			System.err.println("Path: " + l_selected.getPath());
 			l_canWrite = l_selected.canWrite();
 			if( !l_canWrite )
 			{
-				JOptionPane.showMessageDialog(getParent(),"Cannot write to chosen directory");
+				JOptionPane.showMessageDialog(getParent(),"Cannot write to chosen directory" );
 			}
 		}
 		c_path = l_chooser.getSelectedFile().getPath();
@@ -188,10 +190,17 @@ public class ERM extends JFrame {
 	 * @return void
 	 */
 	private void initialize() {
-		c_resolver = new WriteInResolver(c_config);
+		c_resolver = new WriteInResolver(c_config, this);
+		c_spoiledResolver = new WriteInResolver(c_config, false, this);
 		this.setSize(1024, 768);
 		this.setContentPane(getJTabbedPane());
 		this.setTitle("Election Resolution Manager");
+	}
+
+	public void disableTabs() {
+		jTabbedPane.setEnabledAt(jTabbedPane.indexOfTab("Load Ballots"), false);
+		jTabbedPane.setEnabledAt(jTabbedPane.indexOfTab("Write-In Resolution"), false);
+		
 	}
 
 }

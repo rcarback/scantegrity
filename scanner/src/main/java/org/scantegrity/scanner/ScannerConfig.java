@@ -66,6 +66,7 @@ public class ScannerConfig {
 	protected Vector<BallotStyle> c_styles = null;
 	private Vector<String> c_outputDirNames = null;
 	private String c_errDir = null;
+	private String c_countFileName = null;
 	
 	public ScannerConfig() {
 		c_pollID = -1;
@@ -85,6 +86,7 @@ public class ScannerConfig {
 		c_styles = new Vector<BallotStyle>();	
 		c_outputDirNames = new Vector<String>();
 		c_errDir = "";
+		c_countFileName = "";
 	}
 
 	/**
@@ -295,6 +297,15 @@ public class ScannerConfig {
 	 */
 	public void setErrDir(String p_errDir) {
 		c_errDir = p_errDir;
+	}
+
+	public void setCountFileName(String p_countFileName) {
+		c_countFileName = p_countFileName;
+	}
+	
+	public String getCountFileName()
+	{
+		return c_countFileName;
 	}
 
 

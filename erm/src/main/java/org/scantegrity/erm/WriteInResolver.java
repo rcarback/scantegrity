@@ -2,10 +2,12 @@ package org.scantegrity.erm;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.beans.XMLEncoder;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.security.NoSuchAlgorithmException;
@@ -65,6 +67,10 @@ public class WriteInResolver {
 	private Vector<WriteInResolution> c_resolutions = null;
 	private HashSet<Integer> c_usedIds = null;
 	private SecureRandom c_random = null;
+	private int c_writeInCount = 0;
+	private boolean c_enableResolve = true;
+	private ERM c_erm = null;
+	private HashMap<Integer, Contest> c_writeInContests;
 	
 	
 	//Represents a resolution that was done by the user.  Used for the resolution pdf.
@@ -111,9 +117,16 @@ public class WriteInResolver {
 		}
 	}
 	
-	public WriteInResolver(ScannerConfig p_config)
+	public WriteInResolver(ScannerConfig p_config, boolean p_enableResolve, ERM p_erm)
+	{
+		this(p_config, p_erm);
+		c_enableResolve = p_enableResolve;
+	}
+	
+	public WriteInResolver(ScannerConfig p_config, ERM p_erm)
 	{
 		c_config = p_config;
+		c_erm  = p_erm; 
 		Vector<BallotStyle> l_styles = c_config.getStyles();
 		c_contestChoices = new TreeMap<Integer, Vector<ContestChoice>>();
 		c_unalteredChoices = new TreeMap<Integer, Vector<ContestChoice>>();
@@ -131,9 +144,11 @@ public class WriteInResolver {
 		
 		Vector<Contest> l_contests = c_config.getContests();
 		c_contests = new HashMap<Integer, Contest>();
+		c_writeInContests = new HashMap<Integer, Contest>(); 
 		for( Contest l_contest : l_contests )
 		{
 			c_contests.put(l_contest.getId(), l_contest);
+			c_writeInContests.put(l_contest.getId(), new Contest(l_contest));
 		}
 		
 	}
@@ -141,17 +156,24 @@ public class WriteInResolver {
 	//1) Finds ballot stores on all removable disks
 	//2) Reads ballots from each store and figures out which ballot positions need to be resolved
 	//3) Adds each ballot position to a queue for the user to resolve
-	public void LoadBallots(RandomBallotStore p_store) throws IOException
+	public int LoadBallots(RandomBallotStore p_store) throws IOException
 	{
 			Vector<Ballot> l_ballots;
 			l_ballots = p_store.getBallots();
-			ParseBallots(l_ballots);
+			System.out.println("Loading " + l_ballots.size() + " ballots...");
+			return ParseBallots(l_ballots);
 	}
 	
-	//Search through each ballot to find positions where there are votes for a write-in candidate
-	private void ParseBallots(Vector<Ballot> p_ballots)
-	{
-		for( Ballot l_ballot : p_ballots )
+	public int unloadBallots(RandomBallotStore p_store) throws IOException {
+		Vector<Ballot> l_ballots;
+		l_ballots = p_store.getBallots();
+		System.out.println("Unloading " + l_ballots.size() + " ballots...");
+		
+		
+		
+
+		int l_x = 0;
+		for( Ballot l_ballot : l_ballots )
 		{
 			BallotStyle l_style = c_ballotStyles.get(l_ballot.getBallotStyleID());
 			Vector<Integer> l_contestIds = l_style.getContests();
@@ -159,6 +181,13 @@ public class WriteInResolver {
 			for( Integer l_contestId : l_contestIds )
 			{
 				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
+				if( l_contestData == null )
+				{
+					System.out.println("NULL BALLOT!");
+					System.out.println("ID: " + l_ballot.getId());
+					continue;
+				}
+				l_x++;
 				Contest l_contest = c_contests.get(l_contestId);
 				Vector<Contestant> l_contestants = l_contest.getContestants();
 				
@@ -182,8 +211,12 @@ public class WriteInResolver {
 				c_contestChoices.get(l_contestId).add(l_choice);
 				c_unalteredChoices.get(l_contestId).add(new ContestChoice(l_choice));
 				
+				if( !c_enableResolve )
+					continue;
+				
 				if( !l_style.getWriteInRects().containsKey(l_contestId))
 					continue;
+				
 				
 				TreeMap<Integer, Rectangle> l_writeInMap = l_style.getWriteInRects().get(l_contestId);
 				
@@ -209,11 +242,95 @@ public class WriteInResolver {
 								l_newQueue.queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
 								c_locations.put(l_contestId, l_newQueue);
 							}
+							c_writeInCount++;
 						}
 					}
 				}
 			}
 		}
+		return l_x;
+	}
+
+	//Search through each ballot to find positions where there are votes for a write-in candidate
+	private int ParseBallots(Vector<Ballot> p_ballots)
+	{
+		int l_x = 0;
+		for( Ballot l_ballot : p_ballots )
+		{
+			BallotStyle l_style = c_ballotStyles.get(l_ballot.getBallotStyleID());
+			Vector<Integer> l_contestIds = l_style.getContests();
+			//Look in each contest for write-ins
+			for( Integer l_contestId : l_contestIds )
+			{
+				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
+				if( l_contestData == null )
+				{
+					System.out.println("NULL BALLOT!");
+					System.out.println("ID: " + l_ballot.getId());
+					continue;
+				}
+				l_x++;
+				Contest l_contest = c_contests.get(l_contestId);
+				Vector<Contestant> l_contestants = l_contest.getContestants();
+				
+				int l_newId = Math.abs(c_random.nextInt());
+				while( c_usedIds.contains(l_newId) )
+				{
+					l_newId = Math.abs(c_random.nextInt());
+				}
+				
+				c_usedIds.add(l_newId);
+				
+				//Create contestchoice and add to vector
+				ContestChoice l_choice = new ContestChoice(l_newId, l_ballot, l_style, l_contest);
+				
+				if( !c_contestChoices.containsKey(l_contestId) )
+				{
+					c_contestChoices.put(l_contestId, new Vector<ContestChoice>());
+					c_unalteredChoices.put(l_contestId, new Vector<ContestChoice>());
+				}
+				
+				c_contestChoices.get(l_contestId).add(l_choice);
+				c_unalteredChoices.get(l_contestId).add(new ContestChoice(l_choice));
+				
+				if( !c_enableResolve )
+					continue;
+				
+				if( !l_style.getWriteInRects().containsKey(l_contestId))
+					continue;
+				
+				
+				TreeMap<Integer, Rectangle> l_writeInMap = l_style.getWriteInRects().get(l_contestId);
+				
+				//If it is a write in contestant, search the row for a vote
+				for(int x = 0; x < l_contestData.length; x++ )
+				{
+					if( l_writeInMap.containsKey(l_contestants.get(x).getId()) )
+					{
+						boolean l_voteFound = false;
+						for(int y = 0; y < l_contestData[x].length; y++ )
+						{
+							if( l_contestData[x][y] != 0 )
+								l_voteFound = true;
+						}
+						
+						if( l_voteFound )
+						{
+							if( c_locations.containsKey(l_contestId) )
+								c_locations.get(l_contestId).queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
+							else
+							{
+								ContestQueue l_newQueue = new ContestQueue(l_contestId, l_contest.getContestName());
+								l_newQueue.queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
+								c_locations.put(l_contestId, l_newQueue);
+							}
+							c_writeInCount++;
+						}
+					}
+				}
+			}
+		}
+		return l_x;
 	}
 
 	public void AddCandidate(String p_name) {
@@ -223,9 +340,9 @@ public class WriteInResolver {
 
 	public boolean next() {
 		c_currentLocation = null;
-		for( int x = 0; x < c_contests.size() && c_currentLocation == null; x++ )
+		for( int x = 0; x < c_writeInContests.size() && c_currentLocation == null; x++ )
 		{
-			int l_id = c_contests.get(x).getId();
+			int l_id = c_writeInContests.get(x).getId();
 			if( c_locations.containsKey(l_id) && c_locations.get(l_id).queue.peek() != null )
 			{
 				c_currentLocation = c_locations.get(l_id).queue.poll();
@@ -233,7 +350,7 @@ public class WriteInResolver {
 		}
 		if( c_currentLocation == null )
 			return false;
-		c_currentContest = c_contests.get(c_currentLocation.contestId);
+		c_currentContest = c_writeInContests.get(c_currentLocation.contestId);
 		return true;
 	}
 		
@@ -255,6 +372,8 @@ public class WriteInResolver {
 			if( !l_writeInMap.containsKey(l_contestant.getId() ) )
 				l_contestantList.add(l_contestant.getName());
 		}
+		
+		l_contestantList.add("Invalid");
 		return l_contestantList;
 	}
 
@@ -289,7 +408,9 @@ public class WriteInResolver {
 	@SuppressWarnings("unchecked")
 	public void WriteResults(String p_outDir)
 	{
-		Collection l_files = FileUtils.listFiles(new File(p_outDir), new String[]{"sbr"}, false);
+		File l_outDir = new File(p_outDir);
+		
+		Collection l_files = FileUtils.listFiles(l_outDir, new String[]{"sbr"}, false);
 		TreeMap<Integer, BufferedWriter> l_writers = new TreeMap<Integer, BufferedWriter>();
 		
 		Iterator l_iterator = l_files.iterator();
@@ -305,7 +426,10 @@ public class WriteInResolver {
 				{
 					if( !l_writers.containsKey(l_ballot.getBallotStyleID()) )
 					{
-						BufferedWriter l_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(p_outDir + File.separator + l_ballot.getBallotStyleID() + "M3in.xml")));
+						File l_newDir = new File(l_outDir, "Ward" + l_ballot.getBallotStyleID());
+						if( !l_newDir.exists() )
+							l_newDir.mkdir();
+						BufferedWriter l_writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(l_newDir, "MeetingThreeIn.xml"))));
 						l_writers.put(l_ballot.getBallotStyleID(), l_writer);
 						l_writer.write("<xml>\n\t<print>\n");
 					}
@@ -314,7 +438,9 @@ public class WriteInResolver {
 					
 					if (l_ballot.isCounted())
 					{
-						l_writer.write("\t\t<row id=\"" + l_ballot.getId() + "\" p3=\"");
+						String l_ballotId = l_ballot.getId().toString();
+						l_ballotId = l_ballotId.substring(1);
+						l_writer.write("\t\t<row id=\"" + Integer.parseInt(l_ballotId) + "\" p3=\"");
 						String l_tmp = "";
 						
 						BallotStyle l_style = c_ballotStyles.get(l_ballot.getBallotStyleID());
@@ -367,6 +493,37 @@ public class WriteInResolver {
 	
 	public void Tally(String p_outDir)
 	{
+		//if( c_enableResolve )
+		//	return;
+		System.out.println("Tallying " + c_contestChoices.size() + " mappings...");
+		
+		try {
+			File l_siteDir = new File(new File(p_outDir), "Website");
+			
+			if( !l_siteDir.exists() )
+				l_siteDir.mkdir();
+			
+			XMLEncoder l_enc = new XMLEncoder(new FileOutputStream(new File(l_siteDir, "ContestChoices.xml")));
+			l_enc.writeObject(c_contestChoices);
+			l_enc.close();
+			
+			l_enc = new XMLEncoder(new FileOutputStream(new File(l_siteDir, "NonResolvedContestChoices.xml")));
+			l_enc.writeObject(c_unalteredChoices);
+			l_enc.close();
+			
+			l_enc = new XMLEncoder(new FileOutputStream(new File(l_siteDir, "ScannerConfig.xml")));
+			l_enc.writeObject(c_config);
+			l_enc.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		File l_newDir = new File(new File(p_outDir), "Results");
+		if( !l_newDir.exists() )
+			l_newDir.mkdir();
+		
+		
 		while( !c_contestChoices.isEmpty() )
 		{
 			Integer l_key = c_contestChoices.firstKey();
@@ -379,17 +536,52 @@ public class WriteInResolver {
 			Collections.shuffle(l_choices, new SecureRandom());
 			c_unalteredChoices.remove(l_key);
 			
+			//Tally without Write-Ins
 			Contest l_curContest = c_contests.get(l_key);
-			WriteContestResults(l_choices, l_curContest, p_outDir + File.separator + l_curContest.getShortName() + ".xml");
-			WriteContestResults(l_shortChoices, l_curContest, p_outDir + File.separator + l_curContest.getShortName() + "Short.xml");
+			
+			TallyMethod l_method = l_curContest.getTallyMethod();
+			ContestResult l_result = l_method.tally(l_curContest, l_shortChoices);
+			
+			//print out results to file
+			FileWriter l_outStream = null;
+			try {
+				l_outStream = new FileWriter(new File(l_newDir, "results.txt"), true);
+				l_outStream.write(l_curContest.getContestName()+ "\n\n");
+				l_outStream.write(l_result.toString());
+				l_outStream.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			WriteContestResults(l_result, l_curContest, l_shortChoices, new File(l_newDir, l_curContest.getShortName() + ".xml").getPath());
+			
+			
+			//Tally with Write-Ins
+			Contest l_writeInContest = c_writeInContests.get(l_key);
+			
+			TallyMethod l_writeInMethod = l_writeInContest.getTallyMethod();
+			ContestResult l_writeInResult = l_writeInMethod.tally(l_writeInContest, l_choices);
+			
+			//print out results to file
+			l_outStream = null;
+			try {
+				l_outStream = new FileWriter(new File(l_newDir, "writein-results.txt"), true);
+				l_outStream.write(l_writeInContest.getContestName()+ "\n\n");
+				l_outStream.write(l_writeInResult.toString());
+				l_outStream.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			WriteContestResults(l_writeInResult, l_writeInContest, l_choices, new File(l_newDir, l_writeInContest.getShortName() + "Short.xml").getPath());
 		}
 	}
 	
-	private void WriteContestResults(Vector<ContestChoice> p_choices, Contest p_contest, String p_out)
-	{
-		TallyMethod l_method = p_contest.getTallyMethod();
-		ContestResult l_result = l_method.tally(p_contest, p_choices);
-		TreeMap<Integer, Vector<Contestant>> l_rankings = l_result.getRanking();
+	private void WriteContestResults(ContestResult p_result, Contest p_contest, Vector<ContestChoice> p_choices, String p_out)
+	{		
+		TreeMap<Integer, Vector<Contestant>> l_rankings = p_result.getRanking();
 
 		DocumentBuilderFactory l_factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder l_builder = null;
@@ -560,6 +752,15 @@ public class WriteInResolver {
 	public String getContestName()
 	{
 		return c_currentContest.getContestName();
+	}
+	
+	public int getWriteInCount()
+	{
+		return c_writeInCount;
+	}
+
+	public void disableTabs() {
+		c_erm.disableTabs();
 	}
 
 }

@@ -1157,7 +1157,7 @@ public class Inkerator {
 	private JSpinner getFontSpinner() {
 		if (FontSpinner == null) {
 			FontSpinner = new JSpinner();
-			FontSpinner.setValue(96);
+			FontSpinner.setValue(12);
 			FontSpinner.addChangeListener(new javax.swing.event.ChangeListener() {
 				public void stateChanged(javax.swing.event.ChangeEvent e) {
 					UpdateImage();
@@ -1328,7 +1328,7 @@ public class Inkerator {
 	private JTextField getPadding() {
 		if (Padding == null) {
 			Padding = new JTextField();
-			Padding.setText("10");
+			Padding.setText("2");
 		}
 		return Padding;
 	}

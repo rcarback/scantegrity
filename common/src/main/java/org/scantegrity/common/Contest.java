@@ -48,6 +48,26 @@ public class Contest
 	private TreeSet<Integer> c_resolved = new TreeSet<Integer>(); //Indices in c_contestants that are resolved write-in candidates (i.e. candidates that were not on the ballot)
 	private String c_shortName = null;
 	
+	public Contest() {
+		
+	}
+
+	/**
+	 * Copy Constructor
+	 * @param p_contest
+	 */
+	@SuppressWarnings("unchecked")
+	public Contest(Contest p_contest) {
+		c_contestName = new String(p_contest.getContestName());
+		c_id = new Integer(p_contest.getId()); 
+		c_nextId = new Integer(p_contest.getNextId());
+		c_contestants = (Vector<Contestant>) p_contest.getContestants().clone();
+		c_method = p_contest.getTallyMethod();
+		c_writeIns = (TreeSet<Integer>) p_contest.c_writeIns.clone();
+		c_resolved = (TreeSet<Integer>) p_contest.c_resolved.clone(); 
+		c_shortName = new String(p_contest.getShortName());
+	}
+
 	public TallyMethod getTallyMethod()
 	{
 		return c_method;

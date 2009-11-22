@@ -138,12 +138,16 @@ public class CircleAlignmentMarkReader extends AlignmentMarkReader
 				} catch (ArrayIndexOutOfBoundsException l_e) {}
 			}
 			/* BEGIN DEBUG * / 
+		//NOTE: This will sometimes break scanning, because the square created
+		// will be in the right spot to make it think it's in a big blob o'black  
 			try {
-				Graphics2D l_out = p_img.createGraphics();
-				l_out.setColor(Color.black);
+				BufferedImage l_img = p_img.getSubimage(0, 0, p_img.getWidth(),
+														p_img.getHeight());
+				Graphics2D l_out = l_img.createGraphics();
+				l_out.setColor(Color.BLACK);
 				l_out.fillRect(l_inv.x, l_inv.y, 5, 5);
 				l_out.fillRect(l_cur.x, l_cur.y, 5, 5);
-				ImageIO.write(p_img,"png",new File("test.png"));
+				ImageIO.write(l_img,"png",new File("test.png"));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}						

@@ -34,8 +34,11 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.TreeMap;
 import java.util.Vector;
 import org.scantegrity.common.CMYKColorSpace;
+
+import com.lowagie.text.pdf.CMYKColor;
  
 /**
  * Generates images to print text in reactive (yellow) and dummy (magenta) ink.
@@ -45,29 +48,40 @@ import org.scantegrity.common.CMYKColorSpace;
  * make the printed ink harder to read under various lights and types of 
  * paper. 
  * 
+ * CHANGELOG:
+ * 	0.5.0 
+ * 		- The sampling and painting method to add a grid has been replaced by 
+ * 		  symbol mappings of the smallest font-size for that font.
+ * 
  * @author Richard Carback
- * @version 0.4.2 
- * @date 26/11/08
+ * @version 0.5.0 
+ * @date 10/16/09
  */
 public class InvisibleInkFactory {
 
-	static final String DEFAULT_SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";	
+	static final String DEFAULT_SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";	
 	
 	private Font c_font;
 	private int c_padding;
+	private int c_fontSize = 12;
 	private SecureRandom c_csprng;
 	private CMYKColorSpace c_cs = new CMYKColorSpace();
 	private Color c_defFontColor = null;
 	private Color c_defBgColor = null;
+	private boolean c_cache = false;
+	
 	
 	private float[] c_minFontColor = {0,0,0,0};
 	private float[] c_maxFontColor = {0,1,0,0};
 	private float[] c_minBgColor = {0,0,0,0};
 	private float[] c_maxBgColor = {0,0,1,0};
 	private float[] c_minMaskColor = {0,0,0,0};
-	private float[] c_maxMaskColor = {1,0,0,0};
-
+	private float[] c_maxMaskColor = {1,0,0,0};	
 	
+	//The maps for each symbol.
+	TreeMap<Character, boolean[][]> c_symbolMap = null; 
+	//Cache of strings
+	TreeMap<String, BufferedImage> c_stringCache = null;
 	
 	//The True ascent of the current font.
 	private int c_txtAscent;
@@ -87,7 +101,7 @@ public class InvisibleInkFactory {
 	 * Font, 10 pixel padding, and block mode without any csprng stuff.   
 	 */
 	public InvisibleInkFactory () {
-		this ("SanSerif", 96, 10, null);
+		this ("SanSerif", 10, 2, null);
 	}
 	
 	/**
@@ -112,9 +126,11 @@ public class InvisibleInkFactory {
 			SecureRandom p_csprng) {
 
 		c_font = new Font(p_fontName, Font.BOLD, p_fontSize);
+		c_fontSize = p_fontSize;
 		c_padding = p_pad;
 		c_csprng = p_csprng;
 		SetTrueAscent(DEFAULT_SYMBOLS);
+		c_symbolMap = new TreeMap<Character, boolean[][]>();
 		float[][] l_defColors = { {0,1,0,0}, {0,0,1,0} };
 		c_defFontColor = new Color(c_cs, l_defColors[0], 1);
 		c_defBgColor = new Color(c_cs, l_defColors[1], 1);
@@ -126,7 +142,185 @@ public class InvisibleInkFactory {
 	 * @param p_txt
 	 * @return A BufferedImage object with the specified text and padding.
 	 */
-	public BufferedImage getBufferedImage(String p_txt) {
+	public BufferedImage getBufferedImage(String p_txt) 
+	{
+		if (p_txt.length() <= 0) return null; 
+		
+		if (isCache())
+		{
+			if (c_stringCache.containsKey(p_txt))
+			{
+				return c_stringCache.get(p_txt);
+			}
+		}
+		//Get a map of combined symbols.
+		boolean[][] l_map = getSuperMap(p_txt);
+		
+		if (l_map == null) return null;
+		
+		int l_mapWidth = l_map.length;
+		int l_mapHeight = l_map[0].length;
+		
+		//Use the unit-dimensions to generate an image width/height.
+		int l_imgWidth = 0;
+		for (int l_i = 0; l_i < l_mapWidth; l_i++)
+		{
+			l_imgWidth += c_hGridSize[l_i%c_hGridSize.length];
+			if (l_i+1 != l_mapWidth) 
+				l_imgWidth += c_hGridSpace[l_i%c_hGridSpace.length];
+		}
+		int l_imgHeight = 0;
+		for (int l_i = 0; l_i < l_mapHeight; l_i++)
+		{
+			l_imgHeight += c_vGridSize[l_i%c_vGridSize.length];
+			if (l_i+1 != l_mapHeight)
+				l_imgHeight += c_vGridSpace[l_i%c_vGridSpace.length];
+		}
+		
+		//Create the image, use the map to determine magenta or cyan colors.
+		BufferedImage l_ret;
+		Graphics2D l_g2d;
+		l_ret = createCMYKImage(Math.round(l_imgWidth), Math.round(l_imgHeight));		
+		l_g2d = l_ret.createGraphics();
+		//imgx/imgy represent the current x and y offsets for the whole image.
+		int l_imgx = 0;
+		int l_imgy = 0;
+		for (int l_x = 0; l_x < l_mapWidth; l_x++)
+		{
+			//Reset imgy to top of image.
+			l_imgy = 0;
+			for (int l_y = 0; l_y < l_mapHeight; l_y++)
+			{
+				float[] l_color = null;
+				//The default is the background, we will try to find font colors.
+				if (l_map[l_x][l_y])
+				{
+					l_color = getRandomFontColor();					
+				}
+				else
+				{
+					l_color = getRandomBgColor();
+				}
+				
+				l_color = AddMask(l_color);
+				
+				//Draw the box
+				int l_width = c_hGridSize[l_x%c_hGridSize.length];
+				int l_height = c_vGridSize[l_y%c_vGridSize.length];
+				CMYKColor l_c = new CMYKColor(l_color[0], l_color[1], 
+												l_color[2], l_color[3]);
+				l_g2d.setColor(l_c);
+				l_g2d.fillRect(l_imgx, l_imgy, l_width, l_height);
+				//Update imgy with SIZE
+				l_imgy += c_vGridSize[l_y%c_vGridSize.length];
+				//Draw Horizontal Line (on the first run of this loop)
+				if (l_x == 0 && l_y+1 != l_mapHeight)
+				{
+					l_g2d.setColor(c_gridColor);
+					l_g2d.fillRect(0, l_imgy, l_imgWidth, c_vGridSpace[l_y%c_vGridSpace.length]);					
+				}
+				//update imgy with SPACE
+				l_imgy += c_vGridSpace[l_y%c_vGridSpace.length];	
+			}
+			//update imgx with SIZE
+			l_imgx += c_hGridSize[l_x%c_hGridSize.length];
+			//Draw Vertical Line (we are doing the next column)
+			if (l_x+1 != l_mapWidth)
+			{
+				l_g2d.setColor(c_gridColor);
+				l_g2d.fillRect(l_imgx, 0, c_hGridSpace[l_x%c_hGridSpace.length], l_imgHeight);
+			}
+			//update imgx with SPACE
+			l_imgx += c_hGridSpace[l_x%c_hGridSpace.length];
+		}		
+		
+		if (isCache())
+		{
+			c_stringCache.put(p_txt, l_ret);
+		}
+		
+		return l_ret;
+	}
+	
+	private boolean[][] getSuperMap(String p_txt)
+	{
+		Vector<boolean[][]> l_symbols = new Vector<boolean[][]>();
+		int l_mapHeight = 0;
+		int l_mapWidth = 0;
+		for (int l_i = 0; l_i < p_txt.length(); l_i++)
+		{
+			boolean[][] l_map = getMapForSymbol((p_txt.charAt(l_i)));
+			if (l_map != null)
+			{
+				l_symbols.add(l_map);
+				l_mapWidth += l_symbols.get(l_i).length;
+				if (l_symbols.get(l_i).length > 0)
+				{
+					l_mapHeight = Math.max(l_symbols.get(l_i)[0].length, l_mapHeight);
+				}				
+			}
+		}
+		
+		if (l_symbols.size() == 0) return null;
+		
+		//Add the padding
+		l_mapWidth += c_padding*2;
+		l_mapHeight += c_padding*2;
+		
+		//Build a combined symbol map.
+		int l_curMapX = 0;
+		int l_curMapY = 0;
+		int l_curMapIndex = 1;
+		boolean[][] l_curMap = l_symbols.get(0);
+		boolean[][] l_superMap = new boolean[l_mapWidth][l_mapHeight];
+		for (int l_i = 0; l_i < l_mapWidth; l_i++)
+		{
+			//Reset curMapY
+			l_curMapY = 0;
+			for (int l_j = 0; l_j < l_mapHeight; l_j++)
+			{
+				boolean l_res = false;
+				//If we have a current map, we are past the padding
+				//and it is true, then set this supermap cell to true.
+				if (l_i >= c_padding && l_j >= c_padding)
+				{
+					if (l_curMapX < l_curMap.length 
+							&& l_curMapY < l_curMap[l_curMapX].length)
+					{
+						l_res = l_curMap[l_curMapX][l_curMapY];
+						l_curMapY++;
+					}
+				}
+
+				l_superMap[l_i][l_j] = l_res; 					
+			}
+			
+			//Reset curMapX if we reach the end.
+			if (l_i >= c_padding)
+			{
+				l_curMapX++;
+				if (l_curMapX == l_curMap.length)
+				{
+					if (l_curMapIndex < l_symbols.size())
+					{
+						l_curMap = l_symbols.get(l_curMapIndex);
+						l_curMapX = 0;
+						l_curMapIndex++;
+					}
+					//If the index has passed, all the blocks should be background blocks..
+				}
+			}
+		}
+		
+		return l_superMap;
+	}
+	
+	/**
+	 * Legacy function. Generate an image using the current settings and specified text.
+	 * @param p_txt
+	 * @return A BufferedImage object with the specified text and padding.
+	 */
+	public BufferedImage getOldBufferedImage(String p_txt) {
 		float l_height, l_width;
 		BufferedImage l_ret;
 		Graphics2D l_g2d;
@@ -158,7 +352,7 @@ public class InvisibleInkFactory {
 		l_ret = GenBlockGrid(l_ret);
 		
 		return l_ret;
-	}
+	}	
 	
 	/**
 	 * setCSPRNG - Sets the CSPRNG (if not set by Constructor).
@@ -174,6 +368,8 @@ public class InvisibleInkFactory {
 	 */
 	public void setFont(Font p_font) {
 		c_font = p_font;
+		c_fontSize = p_font.getSize();
+		c_symbolMap = new TreeMap<Character, boolean[][]>();
 		SetTrueAscent(DEFAULT_SYMBOLS);
 	}
 	
@@ -253,6 +449,63 @@ public class InvisibleInkFactory {
 			//If any errors occur, set it to default of "height".
 			c_txtAscent = (int) l_height;
 		}
+	}
+	
+	private boolean[][] getMapForSymbol(Character p_symbol)
+	{
+		if (c_symbolMap.containsKey(p_symbol)) return c_symbolMap.get(p_symbol);
+		
+		BufferedImage l_img = getSymbolImage(p_symbol);
+		int l_ascentStart = l_img.getHeight()-c_txtAscent;
+		boolean[][] l_map = new boolean[l_img.getWidth()][l_img.getHeight()-l_ascentStart];
+		int l_cyan = Color.CYAN.getRGB();
+		for (int l_x = 0; l_x < l_img.getWidth(); l_x++)
+		{
+			for (int l_y = 0; l_y < l_img.getHeight(); l_y++)
+			{
+				if (l_y >= l_ascentStart)
+				{
+					int l_tmp = l_img.getRGB(l_x, l_y);
+					if (l_tmp == l_cyan)
+					{
+						l_map[l_x][l_y - l_ascentStart] = true;
+					}
+					else
+					{
+						l_map[l_x][l_y - l_ascentStart] = false;
+					}
+				}
+			}
+		}
+
+		c_symbolMap.put(p_symbol, l_map);
+		
+		return l_map;
+	}
+	
+	private BufferedImage getSymbolImage(Character p_symbol)
+	{
+		float l_height, l_width;
+		BufferedImage l_img;
+		Graphics2D l_g2d;
+		
+		//Get the size of the string
+		FontRenderContext l_frc = new FontRenderContext(null, false, true);
+		Font l_font =  new Font(c_font.getFontName(), Font.BOLD, c_fontSize);
+		l_height = (int)l_font.getLineMetrics(p_symbol.toString(), l_frc).getAscent();
+		l_width = (int)l_font.getStringBounds(p_symbol.toString(), l_frc).getWidth();	
+		//Generate image and set colors
+		l_img = new BufferedImage((int)l_width, (int)l_height, BufferedImage.TYPE_INT_RGB);
+		l_g2d = l_img.createGraphics();
+		
+		//Draw Text
+		l_g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, 
+								RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+		l_g2d.setFont(l_font);
+		l_g2d.setColor(Color.CYAN);	
+		l_g2d.drawString(p_symbol.toString(), 0, l_height); 				
+		
+		return l_img;
 	}
 	
 	/**
@@ -609,6 +862,38 @@ public class InvisibleInkFactory {
 	
 	public void setPadding(int p_padding) {
 		c_padding = Math.abs(p_padding);
+	}
+
+	/**
+	 * @param gridColor the gridColor to set
+	 */
+	public void setGridColor(Color gridColor) {
+		c_gridColor = gridColor;
+	}
+
+	/**
+	 * @return the gridColor
+	 */
+	public Color getGridColor() {
+		return c_gridColor;
+	}
+
+	/**
+	 * @param cache the cache to set
+	 */
+	public void setCache(boolean cache) {
+		c_cache = cache;
+		if (isCache())
+		{
+			c_stringCache = new TreeMap<String, BufferedImage>();
+		}
+	}
+
+	/**
+	 * @return the cache
+	 */
+	public boolean isCache() {
+		return c_cache;
 	}
 }
  

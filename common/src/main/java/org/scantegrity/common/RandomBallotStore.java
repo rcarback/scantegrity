@@ -189,7 +189,7 @@ public class RandomBallotStore
 			throw new IOException(INVALID_FORMAT);
 		}
 		//If valid, read the next long for the file size.
-		c_fsize = c_file.readLong();
+		c_fsize = c_file.readInt();
 		if (c_fsize < 0)
 		{
 			throw new IOException(INVALID_SIZE);
@@ -202,8 +202,9 @@ public class RandomBallotStore
 		}
 		//Read the scannerId
 		c_scannerId = c_file.readInt();		
-		
-		c_btab = new byte[getTabSize(c_fsize, c_blksize)];
+		//Read the scannerId
+		c_numBlks = c_file.readInt();		
+		c_btab = new byte[c_numBlks];
 		int l_numBallots = 0;
 		for (int i = 0; i < c_btab.length; i++)
 		{
@@ -213,10 +214,10 @@ public class RandomBallotStore
 			}
 		}
 		
-		c_numBlks = c_btab.length;
 		/*
 		System.out.println("File Size: " + c_fsize);
 		System.out.println("Block Size: " + c_blksize);
+		System.out.println("NumBlks: " + c_numBlks);
 		*/
 		
 		return l_numBallots;
@@ -251,11 +252,14 @@ public class RandomBallotStore
 		c_btab = new byte[l_tabSize];
 		c_numBlks = l_tabSize;
 		
-		c_file.setLength(l_evenSize);
+		int l_size = FILESTART.getBytes().length + 16 + l_tabSize + c_numBlks*c_blksize;
+		
+		c_file.setLength(l_size);
 		c_file.write(FILESTART.getBytes());
-		c_file.writeLong(l_evenSize);
+		c_file.writeInt(l_size);
 		c_file.writeInt(p_blksize);
 		c_file.writeInt(c_scannerId);
+		c_file.writeInt(c_numBlks);
 		c_file.getFD().sync();
 		
 		/*
@@ -275,10 +279,10 @@ public class RandomBallotStore
 		l_enc.close();
 		
 		byte l_arr[] = l_ballot.toByteArray();
-		for (int l_i = 0; l_i < l_arr.length; l_i++)
+		/*for (int l_i = 0; l_i < l_arr.length; l_i++)
 		{
 			//l_arr[l_i] = (byte)('A');
-		}
+		}*/
 		
 		Vector<Block> l_blks = generateBlks(l_arr);
 		
@@ -292,9 +296,14 @@ public class RandomBallotStore
 				l_numLeft++;
 			}
 		}
+		//Throw exception if we are out of room.
+		if (l_blks.size() > l_numLeft) 
+		{
+			throw new IOException(OOM);
+		}
 		
-		int l_prevPos = 0;
-		int l_blkPos = 0;
+		int l_prevPos = -1;
+		int l_blkPos = -1;
 		for (int l_i = 0; l_i < l_blks.size(); l_i++)
 		{
 			//hash each block to find it's position.
@@ -334,7 +343,7 @@ public class RandomBallotStore
 			else c_btab[l_blkPos] = CNTBLK;
 			
 			//If there is a previous block
-			if (l_prevPos != 0)
+			if (l_prevPos != -1)
 			{
 				l_blks.get(l_i).setPrev(l_prevPos);
 				l_blks.get(l_i-1).setNext(l_blkPos);
@@ -479,12 +488,13 @@ public class RandomBallotStore
 	private byte[] getBlk(int p_blkId) throws IOException
 	{
 		byte l_res[] = new byte[c_blksize];
-		long l_offset = FILESTART.getBytes().length + 16;
+		long l_offset = FILESTART.getBytes().length + 16 + c_numBlks;
 
 		//System.out.println("Reading Block: " + p_blkId);
-		//System.out.println("Offset: " + (l_offset+c_numBlks+p_blkId*c_blksize));
+		//System.out.println("Offset: " + (l_offset + p_blkId*c_blksize));
+		//System.out.println(c_numBlks);
 		//read the block		
-		c_file.seek(l_offset+c_numBlks+p_blkId*c_blksize);
+		c_file.seek(l_offset+p_blkId*c_blksize);
 		c_file.read(l_res);	
 		
 		//System.out.println("Block Data:");
@@ -508,6 +518,8 @@ public class RandomBallotStore
 	{
 		long l_offset = FILESTART.getBytes().length + 16;
 		
+		//System.out.println(l_offset+c_numBlks+p_pos*c_blksize);
+		//System.out.println(c_numBlks);
 		c_file.seek(l_offset+c_numBlks+p_pos*c_blksize);
 		c_file.write(p_blk);
 		
@@ -536,8 +548,10 @@ public class RandomBallotStore
 		//How many blks are possible?
 		long l_numBlks = (p_fsize - FILESTART.length() - 16)/p_blksize;
 		//How many will I need to lose for the table?
-		long l_numLost = l_numBlks/p_blksize;
-				
+		long l_numLost = (long)Math.ceil((double)l_numBlks/(double)p_blksize);
+
+		//System.out.println(l_numBlks + ", " + l_numLost);
+		
 		return (int)(l_numBlks-l_numLost);
 	}
 	

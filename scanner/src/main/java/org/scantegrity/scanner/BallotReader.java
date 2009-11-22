@@ -45,7 +45,6 @@ import org.scantegrity.common.DetectBlack;
  * own detection algorithm) are stored as circles. with a point at the center
  * and a radius.
  * 
- * TODO: Needs constructors.
  * 
  * @author Richard Carback
  *
@@ -75,8 +74,9 @@ public abstract class BallotReader
 	 * any x,y coordinate matches any x,y in the scanner configuration.
 	 * @param p_img
 	 * @return
+	 * @throws Exception 
 	 */
-	protected AffineTransformOp getAlignmentOp(BufferedImage p_img) {
+	protected AffineTransformOp getAlignmentOp(BufferedImage p_img) throws Exception {
 		//According to image data, is this bigger or smaller?
 		Double l_scale = p_img.getWidth()/c_dimension.getWidth();
 		//Double l_yScale = p_img.getHeight()/c_dimensions.getHeight();
@@ -84,11 +84,11 @@ public abstract class BallotReader
 		//Print a warning if the height is off by more than 5%.
 		Double l_off = p_img.getHeight()/(c_dimension.getHeight()*l_scale);
 		if (l_off < 1-c_tolerance || l_off > 1+c_tolerance) {
-			//TODO:Needs to be logged, not printed. Maybe should 
-			//throw exception?
 			//System.out.println("Warning, height is " + p_img.getHeight()
 			//		+ " not " + c_dimension.getHeight()*l_scale);
 		}
+		
+		if (c_alignment.length < 2) throw new Exception("Not enough alignment marks in configuration!");
 		
 		//Scale the alignment marks
 		Point[] l_alignment = new Point[2];
@@ -96,7 +96,6 @@ public abstract class BallotReader
 		l_alignment[1] = new Point (c_alignment[1]);
 		for (Point l_mark : l_alignment) {
 			l_mark.setLocation(l_mark.getX()*l_scale, l_mark.getY()*l_scale);
-			//TODO: Logging!
 		//	System.out.println("Scaling Alignment Mark: " + l_mark.getX() + ", "
 			//					+ l_mark.getY());
 		}
@@ -268,27 +267,110 @@ public abstract class BallotReader
 		
 	}
 	
+	/**
+	 * Run along the edges of the image and clip it down to approximately 5 pixels
+	 * within the actual image size. 
+	 * @param p_img
+	 * @return
+	 */
 	protected BufferedImage cutEmptySpace(BufferedImage p_img)
 	{
-		Point2D.Double l_p = new Point2D.Double(p_img.getWidth()/2, p_img.getHeight() - 20);
-		
-		while(DetectBlack.isBlack((int)l_p.getX(), (int)l_p.getY(), p_img))
+		int l_left, l_right, l_top, l_bot;
+		int l_s = 1;
+		//Get the leftmost point.
+		Point2D.Double l_p = new Point2D.Double(p_img.getWidth()/2, 0);
+		try
 		{
-			//System.out.println(l_p.getX() + " " + l_p.getY());
-			l_p.setLocation(l_p.getX(), l_p.getY() - 5);
+			while (l_p.getY() < p_img.getHeight())
+			{
+				while (l_p.getX() >= 0 
+						&& !DetectBlack.isBlack(l_p, p_img))
+				{
+					l_p.setLocation(l_p.getX()-l_s, l_p.getY());
+				}
+				l_p.setLocation(l_p.getX(), l_p.getY()+l_s);
+			}
+		}
+		catch (Exception l_e)
+		{
+			l_e.printStackTrace();
+		}
+		l_left = Math.max((int)Math.round(l_p.getX()),0);
+		
+		//Rightmost point
+		l_p = new Point2D.Double(p_img.getWidth()/2, p_img.getHeight()-1);
+		try
+		{
+			while (l_p.getY() >= 0)
+			{
+				while (l_p.getX() < p_img.getWidth() 
+						&& !DetectBlack.isBlack(l_p, p_img))
+				{
+					l_p.setLocation(l_p.getX()+l_s, l_p.getY());
+				}
+				l_p.setLocation(l_p.getX(), l_p.getY()-l_s);
+			}
+		}
+		catch (Exception l_e)
+		{
+			l_e.printStackTrace();
 		}
 		
-		p_img = p_img.getSubimage(0, 0, p_img.getWidth(),(int)l_p.getY());
+		l_right = Math.min((int)Math.round(l_p.getX()), p_img.getWidth()-1);
+
+		//Top most
+		l_p = new Point2D.Double(0, p_img.getHeight()/2);
+		try
+		{
+			while (l_p.getX() < p_img.getWidth())
+			{
+				while (l_p.getY() >= 0 
+						&& !DetectBlack.isBlack(l_p, p_img))
+				{
+					l_p.setLocation(l_p.getX(), l_p.getY()-l_s);
+				}
+				l_p.setLocation(l_p.getX()+l_s, l_p.getY());
+			}
+		}
+		catch (Exception l_e)
+		{
+			l_e.printStackTrace();
+		}
+		l_top = Math.max((int)Math.round(l_p.getY()), 0);
+		
+		//Bottom most
+		l_p = new Point2D.Double(p_img.getWidth()-1, p_img.getHeight()/2);
+		try
+		{
+			while (l_p.getX() >= 0)
+			{
+				while (l_p.getY() < p_img.getHeight() 
+						&& !DetectBlack.isBlack(l_p, p_img))
+				{
+					l_p.setLocation(l_p.getX(), l_p.getY()+l_s);
+				}
+				l_p.setLocation(l_p.getX()-l_s, l_p.getY());
+			}
+		}
+		catch (Exception l_e)
+		{
+			l_e.printStackTrace();
+		}
+		l_bot = Math.min((int)Math.round(l_p.getY()), p_img.getHeight()-1);
+		
+		int l_h = l_bot-l_top;
+		int l_w = l_right-l_left;
+		
+		p_img = p_img.getSubimage(l_left, l_top, l_w, l_h);
 		
 		/*Debug* /
 		try
 		{
 			System.out.println("Writing Image");
-			ImageIO.write(p_img, "tiff", new File("test.tiff"));
+			ImageIO.write(p_img, "png", new File("test.png"));
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		/*END DEBUG*/

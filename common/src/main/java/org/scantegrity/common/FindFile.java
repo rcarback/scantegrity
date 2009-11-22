@@ -32,7 +32,7 @@ import org.scantegrity.common.constants.FindFileConst;
  *
  * Using regex, will find a file on any OS
  */
-public class FindFile implements Runnable
+public class FindFile extends Thread
 {
 	//String variables
 	private String c_filename;
@@ -58,6 +58,12 @@ public class FindFile implements Runnable
 	private boolean c_findMultiple = false;
 	
 	private Pattern c_pattern = null;
+	private AsyncFindListener c_finder = null;
+	
+	public interface AsyncFindListener
+	{
+		public void report(File p_file);
+	}
 	
 	class SearchDirectory
 	{
@@ -205,6 +211,15 @@ public class FindFile implements Runnable
 			return null;
 	}
 	
+	public Thread findAsync(AsyncFindListener p_finder)
+	{
+		c_finder = p_finder;
+		c_findMultiple = true;
+		
+		this.start();
+		return this;
+	}
+	
 	public synchronized void setFileFound(File p_fileFound)
 	{
 		c_filesFound.add(p_fileFound);
@@ -229,7 +244,7 @@ public class FindFile implements Runnable
 	 */
 	public void run()
 	{
-		while(c_dirToSearch.size() != 0 && (c_findMultiple || !c_isConfigFound))
+		/*while(c_dirToSearch.size() != 0 && (c_findMultiple || !c_isConfigFound))
 		{
 			searchNextDir(); 
 			
@@ -243,7 +258,9 @@ public class FindFile implements Runnable
 				else
 					c_dirToSearch.add(new SearchDirectory(l_search.depth, l_dir));
 			}
-		}
+		}*/
+		while( c_dirToSearch.size() != 0 )
+			searchNextDir();
 	}
 	
 	private void determineOS()
@@ -301,7 +318,10 @@ public class FindFile implements Runnable
 				{
 					if( c_pattern.matcher(l_tempFile.getName()).matches() )
 					{
-						setFileFound(l_tempFile);
+						if( c_finder != null )
+							c_finder.report(l_tempFile);
+						else
+							setFileFound(l_tempFile);
 						if( !c_findMultiple )
 							return;
 					}

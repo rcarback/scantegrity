@@ -21,18 +21,29 @@ package org.scantegrity.scanner;
 
 import java.awt.image.BufferedImage;
 import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.ListIterator;
 import java.util.Vector;
 import java.util.logging.Level;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -50,11 +61,6 @@ import org.scantegrity.common.Logging;
 import org.scantegrity.common.RandomBallotStore;
 import org.scantegrity.common.SysBeep;
 
-import com.google.zxing.ReaderException;
-
-import uk.org.jsane.JSane_Exceptions.JSane_Exception;
-import uk.org.jsane.JSane_Exceptions.JSane_Exception_IoError;
-
 /**
  * @author John Conway
  *
@@ -64,7 +70,7 @@ import uk.org.jsane.JSane_Exceptions.JSane_Exception_IoError;
  */
 public class Scanner
 {	
-	private static String c_errDir = "error/"; 
+	private static String c_errDir = "error"; 
 	private static Options c_opts;
 	private static ScannerConfig c_config; 
 	private static Logging c_log; 
@@ -72,11 +78,14 @@ public class Scanner
 	private static RandomBallotStore[] c_store;
 	private static Vector<Integer> c_ballotIds; 
 	private static Vector<String> c_outDirs;
-	private static int c_numErrorFiles = 0; 
 	private static int c_myId = -1;
-	private static int c_count = 0;
 	private static MessageDigest c_hash;
 	private static SecureRandom c_csprng; 
+	private static Integer c_scanCount; 
+	private static Integer c_errorCount;
+	private static Integer c_ballotCount;
+	private static String c_soundFileName = "/opt/scantegrity/sound/KenbeepLoud.wav";
+	//private static Thread c_audioThread = null;
 
 	/**
 	 * Main Logic loop.
@@ -112,13 +121,22 @@ public class Scanner
 			c_log.log(Level.SEVERE, "Unable to initialize RNG. Reason: " + l_e.getMessage());
 		}		
 
+		//init counters
+		c_scanCount = new Integer(0);
+		c_ballotCount = new Integer(0);
+		c_errorCount = new Integer(0);
+		checkForPreviousCounters(); 	
+		writeCounters();
+		
 		//init ballot storage
 		c_ballotIds = new Vector<Integer>();
 		//TODO: Change this size to be variable...
-		c_store = initializeBallotStore(c_outDirs, 10*1024*1024); 
+		c_store = initializeBallotStore(c_outDirs, 100*1024*1024); 
 		
 		//start the election
 		c_log.log(Level.SEVERE, "Election Started");
+
+		playAudioClip(2); 
 
 		//main loop
 		//TODO: terminating condition, button, or special ballot???
@@ -130,10 +148,15 @@ public class Scanner
 			//process image into ballot
 			l_ballotImg = getBallotImages();
 			
-			
 			if(l_ballotImg == null 
 					|| (l_ballotImg[0] == null && l_ballotImg[1] == null))
 				continue;
+			
+			//scan count
+			c_scanCount++; 
+			writeCounters();
+
+			playAudioClip(0); 
 			
 			for (int l_c = 0; l_c < l_ballotImg.length; l_c++)
 			{
@@ -153,7 +176,10 @@ public class Scanner
 				if(l_ballot == null)
 					continue;
 	
-				c_count++;
+				//update ballot counter
+				c_ballotCount++;
+				writeCounters();
+				
 				l_ballot.setScannerId(c_myId);
 				
 				if(isDuplicate(l_ballot))
@@ -415,6 +441,14 @@ public class Scanner
 									FileUtils.forceMkdir(new File(l_subd.getAbsolutePath() + File.separator 
 											+ "scantegrity-scanner"));									
 								}
+								
+								if (!(new File(l_subd.getAbsolutePath() + File.separator
+										+ "scantegrity-scanner" + File.separator + c_errDir).exists()))
+								{
+									FileUtils.forceMkdir(new File(l_subd.getAbsolutePath() + File.separator 
+											+ "scantegrity-scanner" + File.separator + c_errDir));									
+								}
+								
 								c_outDirs.add(l_subd.getAbsolutePath() + File.separator 
 												+ "scantegrity-scanner");
 								l_c++;
@@ -434,6 +468,14 @@ public class Scanner
 							FileUtils.forceMkdir(new File(l_d.getAbsolutePath() + File.separator
 									+ "scantegrity-scanner"));							
 						}
+						
+						if (!(new File(l_d.getAbsolutePath() + File.separator
+								+ "scantegrity-scanner" + File.separator + c_errDir).exists()))
+						{
+							FileUtils.forceMkdir(new File(l_d.getAbsolutePath() + File.separator 
+									+ "scantegrity-scanner" + File.separator + c_errDir));									
+						}
+						
 						c_outDirs.add(l_d.getAbsolutePath() + File.separator
 								+ "scantegrity-scanner");
 					}
@@ -461,6 +503,11 @@ public class Scanner
 				{
 					FileUtils.forceMkdir(new File("scantegrity-scanner"));
 				}
+				
+				if (!(new File("scantegrity-scanner" + File.separator + c_errDir).exists()))
+				{
+					FileUtils.forceMkdir(new File("scantegrity-scanner" + File.separator + c_errDir));
+				}
 				c_outDirs.add("scantegrity-scanner");
 			}
 			catch (Exception l_e)
@@ -485,12 +532,12 @@ public class Scanner
 				c_log.log(Level.INFO, "Creating Random Ballot Store : " + p_storeLocs.get(i));
 				l_store[i] = new RandomBallotStore(c_myId, 
 													p_size, 
-													512,
+													32 * 1024,
 													p_storeLocs.get(i) + File.separator + "ballots.sbr", 
 													c_hash, 
 													c_csprng);
 				l_ret = l_store[i].initializeStore();
-				c_count = Math.max(l_ret, c_count);				
+				c_ballotCount = Math.max(l_ret, c_ballotCount);				
 				
 				if(l_ret < 0)
 				{
@@ -570,6 +617,7 @@ public class Scanner
 		{
 			//scan the ballot
 			l_b = l_reader.scanBallot(l_styles, p_ballotImg);
+			//saveErrorImage(p_ballotImg);
 			
 			//couldn't find alignment marks or couldn't read serial number 
 			if(l_b != null && l_b.getId() != null)
@@ -603,16 +651,21 @@ public class Scanner
 	{
 		c_log.log(Level.SEVERE, "Bad Ballot. Saving to Error Directory.");
 		
+		//increment bad image count
+		c_errorCount++;
+		writeCounters(); 
+		
 		//Copy the bad image to the error directory
 		try 
 		{
-			ImageIO.write(p_ballotImg, "tiff", new File(c_errDir + File.separator 
+			ListIterator<String> it = c_outDirs.listIterator(); 
+			while(it.hasNext()) {
+				ImageIO.write(p_ballotImg, "png", new File(it.next() + File.separator
+														+ c_errDir + File.separator 
 														+ "scanerror" 
-														+ c_numErrorFiles 
-														+ ".tiff"));
-			
-			//increment bad image count
-			c_numErrorFiles++;
+														+ c_errorCount 
+														+ ".png"));
+			}
 			
 			return; 
 		} 
@@ -633,7 +686,7 @@ public class Scanner
 		{
 			try 
 			{
-				c_log.log(Level.INFO, "Saving to ballot " + c_count + " store: " + l_store.getLocation());
+				c_log.log(Level.INFO, "Saving to ballot " + c_ballotCount + " store: " + l_store.getLocation());
 				l_store.addBallot(p_ballot);
 			} 
 			catch (IOException e) 
@@ -644,28 +697,124 @@ public class Scanner
 		}
 	}
 	
-	private static void endElection()
-	{
-		//add date
-		c_log.log(Level.SEVERE, "Ending Election ");
-		
-		//get shutdown type
-		
-		//shutdown logging. 
-		c_log = null; 
-		
-		try
-		{
-			//shutdown system
-			System.exit(0);
-		}
-		catch (Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private static void writeCounters() {
+		ListIterator<String> it = c_outDirs.listIterator(); 
+		while(it.hasNext()) {
+			try {
+				XMLEncoder l_countFile = new XMLEncoder(
+						new BufferedOutputStream(
+								new FileOutputStream(it.next() + File.separator +  "count.xml")));
+	
+				l_countFile.writeObject("Scan Count");
+				l_countFile.writeObject(c_scanCount);
+				l_countFile.writeObject("Ballot Count");
+				l_countFile.writeObject(c_ballotCount);
+				l_countFile.writeObject("Error Count");
+				l_countFile.writeObject(c_errorCount);
+				l_countFile.close();
+			} catch (FileNotFoundException e) {
+				c_log.log(Level.SEVERE, "Unable to create count.xml");
+			}
 		}
 	}
+
+	private static void checkForPreviousCounters() {
+		ListIterator<String> it = c_outDirs.listIterator(); 
+		while(it.hasNext()) {
+			try {
+				String l_path = it.next() + File.separator + "count.xml";
+				File l_file = new File(l_path);
+				
+				if(l_file.exists())
+				{
+					c_log.log(Level.WARNING, "count.xml exists. Updating counters.");
+					
+					//copy the file
+					try {
+						FileUtils.copyFile(l_file, new File(l_path + "_bak"), true);
+					} catch (IOException e) {
+						c_log.log(Level.WARNING, "Could not backup previous counter file.");
+					}
+					
+					XMLDecoder l_countFile = new XMLDecoder(new BufferedInputStream(new FileInputStream(l_path)));
 	
+					l_countFile.readObject();
+					c_scanCount = (Integer) l_countFile.readObject();
+					l_countFile.readObject();
+					c_ballotCount = (Integer) l_countFile.readObject(); 
+					l_countFile.readObject();
+					c_errorCount = (Integer) l_countFile.readObject(); 
+					l_countFile.close();
+					
+					c_log.log(Level.WARNING, "Previous counts: ScanCount=" + c_scanCount 
+							+ " BallotCount=" + c_ballotCount 
+							+ " ErrorCount=" + c_errorCount);
+					
+					
+				}
+			} catch (FileNotFoundException e) {
+				c_log.log(Level.SEVERE, "Unable to open count.xml");
+			}
+		}
+	}
+
+	private static void playAudioClip(int p_numTimes) {
+		/*
+		 * Threaded Code....sigsegv when run
+		 * /
+		if(c_audioThread != null && c_audioThread.isAlive()) {
+			try {
+				c_audioThread.join(2000);
+			} catch (InterruptedException e) {
+				c_log.log(Level.SEVERE, "Could not wait for previous sound thread.");
+			}
+		}
+		
+		c_audioThread = new Thread(new AudioFile(c_soundFile, p_numTimes));
+		c_audioThread.start();
+		/* 
+		 * End threaded Code
+		 */
+		
+		AudioInputStream l_stream = null;
+		try {
+			l_stream = AudioSystem.getAudioInputStream(new File(c_soundFileName));
+		} catch (UnsupportedAudioFileException e_uaf) {
+			c_log.log(Level.WARNING, "Unsupported Audio File");
+			return;
+		} catch (IOException e1) {
+			c_log.log(Level.WARNING, "Could not Open Audio File");
+			return;
+		}
+ 
+		AudioFormat l_format = l_stream.getFormat();
+		Clip l_dataLine = null;
+		DataLine.Info l_info = new DataLine.Info(Clip.class, l_format); 
+		
+		if (!AudioSystem.isLineSupported(l_info)) {
+			c_log.log(Level.WARNING, "Audio Line is not supported");
+		}
+		
+		try {
+			l_dataLine = (Clip) AudioSystem.getLine(l_info);
+		    l_dataLine.open(l_stream);
+		} catch (LineUnavailableException ex) {
+			c_log.log(Level.WARNING, "Audio Line is unavailable.");
+		} catch (IOException e) {
+			c_log.log(Level.WARNING, "Cannot playback Audio, IO Exception.");
+		}
+
+		l_dataLine.loop(p_numTimes);
+		
+		try {
+			Thread.sleep(160 * (p_numTimes + 1));
+		} catch (InterruptedException e) {
+			c_log.log(Level.WARNING, "Could not sleep the audio player thread.");
+		}
+		
+		l_dataLine.close();
+	}
+
 	/**
 	 * Beeps p_numBeeps times and then exits the system
 	 * 
