@@ -1,7 +1,0 @@
-<xml>
-	<electionSpec>D:\PunchScan2.0\PunchScan2.0\Elections\SampleScantegrityII\public\ElectionSpec.xml</electionSpec>
-	<noBallots>20</noBallots>
-	<noDs>2</noDs>
-	<constant>UHJpbmNldG9uRWxlY3Rpbw==</constant>
-	<partitions>D:\PunchScan2.0\PunchScan2.0\Elections\SampleScantegrityII\public\partitions.xml</partitions>
-</xml>
