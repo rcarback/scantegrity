@@ -3,12 +3,12 @@
   <groupId>org.scantegrity</groupId>
   <artifactId>common</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <parent>
+  <!--<parent>
   	<artifactId>Scantegrity</artifactId>
   	<groupId>org.scantegrity</groupId>
   	<version>0.0.1-SNAPSHOT</version>
   	<relativePath>../</relativePath>
-  </parent>
+  </parent>-->
   <dependencies>
   	<dependency>
   		<groupId>com.lowagie</groupId>
