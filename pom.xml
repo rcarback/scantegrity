@@ -28,11 +28,11 @@
   	<module>authoring</module>
   	<module>auditor</module>
   	<module>engine</module>
-  	<module>emws</module>
   	<module>jsane</module>
   	<module>zxing</module>
   	<module>Inkerator</module>
 	<module>erm</module>
+	<module>sws</module>
   </modules>
   <build>
     <plugins>
