@@ -5,7 +5,7 @@
 <h1>Database Query</h1>
 
 <p>Input database query text below</p>
-<stripes:form beanclass="org.scantegrity.emws.action.DatabaseQueryActionBean">
+<stripes:form beanclass="org.scantegrity.sws.action.DatabaseQueryActionBean">
 <p>
 	<label for="name">Query:</label>
 	<input type="text" id="query" name="query" value="${actionBean.query}" />

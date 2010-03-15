@@ -5,7 +5,7 @@
 <h1>Login</h1>
 
 <p>The page you were trying to access is restricted, please enter your user name and password below:</p>
-<stripes:form beanclass="org.scantegrity.emws.action.LoginActionBean">
+<stripes:form beanclass="org.scantegrity.sws.action.LoginActionBean">
 
 	<label for="username">User Name:</label>
 	<input type="text" id="username" name="username" value="${actionBean.username}" /> <br/>

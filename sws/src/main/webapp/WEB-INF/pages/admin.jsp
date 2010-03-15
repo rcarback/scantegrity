@@ -7,10 +7,10 @@
     <p>
     	<a href="fileupload">Upload files</a><br/><br/>
     	<a href="useradd">Manage users</a>
-    	<stripes:form beanclass="org.scantegrity.emws.action.AdminActionBean">
+    	<stripes:form beanclass="org.scantegrity.sws.action.AdminActionBean">
     		<stripes:submit name="deleteDatabase" value="Delete Database" />
     	</stripes:form>
-    	<stripes:form beanclass="org.scantegrity.emws.action.AdminActionBean">
+    	<stripes:form beanclass="org.scantegrity.sws.action.AdminActionBean">
     		<stripes:submit name="logout" value="Logout" />
     	</stripes:form>
     </p>

@@ -5,7 +5,7 @@
 
 <h1>File Upload</h1>
 
-<stripes:form beanclass="org.scantegrity.emws.action.FileuploadActionBean">
+<stripes:form beanclass="org.scantegrity.sws.action.FileuploadActionBean">
 <div>
 	<stripes:file name="file" /></br>
 	<label for="name">Style ID (for codes only):</label>

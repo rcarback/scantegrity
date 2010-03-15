@@ -11,7 +11,7 @@ window.location = "checkcodes"
     <stripes:layout-component name="contents">
     <h2>On-Line Verification Process and Survey</h2>
     
-    <stripes:form beanclass="org.scantegrity.emws.action.BallotCheckActionBean">
+    <stripes:form beanclass="org.scantegrity.sws.action.BallotCheckActionBean">
     <c:if test="${!actionBean.ballots }">
     <p>Confirmation Numbers for the election should be available around 
     9pm on Tuesday, November 3rd 2009. Please check back at that time!</p>

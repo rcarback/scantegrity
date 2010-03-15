@@ -6,7 +6,7 @@
 <h1>User Management</h1>
 
 <p>Enter user name and password below to add new user:</p>
-<stripes:form beanclass="org.scantegrity.emws.action.UserAddActionBean">
+<stripes:form beanclass="org.scantegrity.sws.action.UserAddActionBean">
 
 	<label for="username">User Name:</label>
 	<input type="text" id="username" name="username" value="${actionBean.username}" /> <br/>
@@ -22,7 +22,7 @@
 	
 </stripes:form> 
 
-<stripes:form beanclass="org.scantegrity.emws.action.LoginActionBean">
+<stripes:form beanclass="org.scantegrity.sws.action.LoginActionBean">
 <table style="width: 80%">
 <tr><th>User Name</th><th></th></tr>
 	<c:forEach items="${actionBean.allUsers}" var="user">
