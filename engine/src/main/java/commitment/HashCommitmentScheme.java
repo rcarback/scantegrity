@@ -14,7 +14,7 @@ public class HashCommitmentScheme implements CommitmentScheme {
 	public HashCommitmentScheme()
 	{
 		try {
-			c_digest = MessageDigest.getInstance("SHA");
+			c_digest = MessageDigest.getInstance("SHA-512");
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,10 +1,16 @@
 package e2e;
 import java.io.FileInputStream;
+import java.security.Provider;
 import java.security.SecureRandom;
+import java.security.SecureRandomSpi;
+import java.security.Security;
 import java.util.Properties;
+import java.util.Set;
 
 import commitment.Commitment;
+import commitment.HashCommitmentScheme;
 import commitment.PRNGCommitmentScheme;
+import commitment.SymmetricCommitmentScheme;
 
 /**
  * Hello world!
@@ -33,14 +39,14 @@ public class App
 			l_rand = new SecureRandom();
 		}
 		
-		//SymmetricCommitmentScheme l_commitScheme = new SymmetricCommitmentScheme();
-		//l_commitScheme.setup("AES","SHA1PRNG");
+		SymmetricCommitmentScheme l_commitScheme = new SymmetricCommitmentScheme();
+		l_commitScheme.setup("AES","SHA1PRNG");
 		//HashCommitmentScheme l_commitScheme = new HashCommitmentScheme();
-		//l_commitScheme.setup("SHA", 256, "SHA1PRNG");
-		PRNGCommitmentScheme l_commitScheme = new PRNGCommitmentScheme();
+		//l_commitScheme.setup("SHA-512", 256, "SHA1PRNG");
+		//PRNGCommitmentScheme l_commitScheme = new PRNGCommitmentScheme();
 		System.out.println("Generating test data...");
 		
-		byte[][] l_test = new byte[2000][4096];
+		byte[][] l_test = new byte[2][4096];
 		for( int x = 0; x < l_test.length; x++ )
 		{
 			l_rand.nextBytes(l_test[x]);

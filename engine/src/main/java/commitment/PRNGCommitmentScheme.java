@@ -21,6 +21,7 @@ public class PRNGCommitmentScheme implements CommitmentScheme {
 		c_challenge = p_challenge.clone();
 	}
 	
+	//http://www.springerlink.com/index/N615G60560417356.pdf
 	
 	@Override
 	public Commitment commit(byte[] data) throws Exception {

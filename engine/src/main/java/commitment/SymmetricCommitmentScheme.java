@@ -5,7 +5,9 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 public class SymmetricCommitmentScheme implements CommitmentScheme {
@@ -44,14 +46,16 @@ public class SymmetricCommitmentScheme implements CommitmentScheme {
 	@Override
 	public Commitment commit(byte[] data) throws Exception{
 		//Generate random key
-		byte[] l_rand = new byte[c_cipher.getBlockSize()];
-		c_rand.nextBytes(l_rand);
+		KeyGenerator l_kgen = KeyGenerator.getInstance(c_cipher.getAlgorithm());
+	    l_kgen.init(128);
+	    
+	    SecretKey l_skey = l_kgen.generateKey();
 		
 		//Encrypt data
-		c_cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(l_rand, c_cipher.getAlgorithm()));
+		c_cipher.init(Cipher.ENCRYPT_MODE, l_skey);
 		byte[] l_commitData = c_cipher.doFinal(data);
 		//Return commitment
-		return new Commitment(l_commitData, l_rand);
+		return new Commitment(l_commitData, l_skey.getEncoded());
 	}
 
 	@Override
