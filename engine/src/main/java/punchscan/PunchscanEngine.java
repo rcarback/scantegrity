@@ -50,6 +50,9 @@ public class PunchscanEngine {
 		
 		numBallots = Integer.parseInt(l_prop.getProperty("NumBallots", DEFAULT_NUM_BALLOTS));
 		maxCandidates = Integer.parseInt(l_prop.getProperty("MaxCandidates", DEFAULT_MAX_CANDIDATES)); 
+		
+		//TODO: eventually this needs to be like App.java where the random number gen is loaded with 
+		//params from the .properties file. This will do for testing now though
 		seed = Integer.parseInt(l_prop.getProperty("Seed", DEFAULT_SEED)); 
 		
 		//set up the permutation engine
@@ -67,10 +70,11 @@ public class PunchscanEngine {
 		//for each ballot, generate each row
 		for(int i = 0; i < candidatePermutations.length; i++)
 		{
-			int permA[][] = new int[candidatePermutations[i].length][maxCandidates];
+			int inputPerm[][] = candidatePermutations[i];
+			int permA[][] = new int[inputPerm.length][maxCandidates];
 			
 			//for each contest, grab a permutation
-			for(int j = 0; j < candidatePermutations[i].length; j++)
+			for(int j = 0; j < inputPerm.length; j++)
 			{
 				permA[j] = sperm.getPerm();
 			}
@@ -79,7 +83,16 @@ public class PunchscanEngine {
 			int permB[][] = new int[candidatePermutations[i].length][maxCandidates];
 			
 			//TODO: find the inverse
-			
+			//based on what I have seen, it appears the inverse is the same as the input.
+			for(int j = 0; j < inputPerm.length; j++)
+			{
+				int I[] = inputPerm[j]; 
+				
+				for(int k = 0; k < I.length; k++)
+				{
+					permB[j][permA[j][I[k]]] = I[k]; ;
+				}
+			} 
 		}
 	}
 	
@@ -88,10 +101,31 @@ public class PunchscanEngine {
 	 * an initial Ballot ID and Vector of Candidate Orders
 	 */
 	public void generateRow(int ballotID, int candidatePermutations[][])
-	{
-		int perm[] = sperm.getPerm(ballotID);
-		
-		printArray(perm);
+	{	
+		for(int i = 0; i < candidatePermutations.length; i++)
+		{
+			int inputPerm[] = candidatePermutations[i];
+			int permA[] = new int[maxCandidates];
+			
+			//for each contest, grab a permutation
+			for(int j = 0; j < inputPerm.length; j++)
+			{
+				permA = sperm.getPerm();
+			}
+			
+			//ok now create the inverse perm
+			int permB[] = new int[maxCandidates];
+						
+			for(int j = 0; j < inputPerm.length; j++)
+			{
+				permB[permA[inputPerm[j]]] = inputPerm[j];
+			}
+			
+			System.out.println("Printing Input, PermA and PermB");
+			printArray(inputPerm);
+			printArray(permA);
+			printArray(permB);
+		}
 	}
 	
 	public void Test()
