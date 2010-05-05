@@ -9,24 +9,22 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
-import java.util.Random;
 
 public class PunchscanEngine {
 	static final String DEFAULT_NUM_BALLOTS = "100"; 
-	static final String DEFAULT_MAX_CANDIDATES = "100"; 
-	static final String DEFAULT_SEED = "13"; 
+	static final String DEFAULT_MAX_CANDIDATES = "100";
+	static final boolean DEBUG = true; 
 	
-	SimplePermutation sperm; 
-	int numBallots; 
-	int maxCandidates; 
-	Random rand; 
+	SimplePermutation c_sperm; 
+	int c_numBallots; 
+	int c_maxCandidates; 
 	
 	/**
 	 * The constructor for the Punchscan Engine. This will look at the 
-	 * .properties file and determine the number of candidates, initialize 
-	 * the random number generator, and handle all other setup information. 
+	 * .properties file and determine the number of candidates,
+	 *  and handle all other setup information. 
 	 */
-	public PunchscanEngine(long seed) {
+	public PunchscanEngine() {
 		//load the properties from the properties file
 		FileInputStream l_propxml = null;
 		try {
@@ -48,49 +46,48 @@ public class PunchscanEngine {
 			e.printStackTrace();
 		}
 		
-		numBallots = Integer.parseInt(l_prop.getProperty("NumBallots", DEFAULT_NUM_BALLOTS));
-		maxCandidates = Integer.parseInt(l_prop.getProperty("MaxCandidates", DEFAULT_MAX_CANDIDATES)); 
-		
-		//TODO: eventually this needs to be like App.java where the random number gen is loaded with 
-		//params from the .properties file. This will do for testing now though
-		seed = Integer.parseInt(l_prop.getProperty("Seed", DEFAULT_SEED)); 
+		c_numBallots = Integer.parseInt(l_prop.getProperty("NumBallots", DEFAULT_NUM_BALLOTS));
+		c_maxCandidates = Integer.parseInt(l_prop.getProperty("MaxCandidates", DEFAULT_MAX_CANDIDATES)); 
 		
 		//set up the permutation engine
-		sperm = new SimplePermutation(maxCandidates);
-		
-		//create the random num generator 
-		rand = new Random(seed);
+		c_sperm = new SimplePermutation(c_maxCandidates);
 	}
 	
 	/**
 	 * This method generates the entire backend table.
+	 * 
+	 * @param candidatePermutations[][][] - These are the initial permutations 
+	 * 	from the frontend. The lowest level array is the array of indexes for the 
+	 * 	actual permutation put into an array of contests for each ballot, put into the 
+	 *  last array of ballots. 
+	 * @return ArrayList<Rows> The representation of the row TODO
 	 */
-	public void generate(int candidatePermutations[][][])
+	public void generate(int p_candidatePermutations[][][])
 	{
 		//for each ballot, generate each row
-		for(int i = 0; i < candidatePermutations.length; i++)
+		for(int i = 0; i < p_candidatePermutations.length; i++)
 		{
-			int inputPerm[][] = candidatePermutations[i];
-			int permA[][] = new int[inputPerm.length][maxCandidates];
+			int l_inputPerm[][] = p_candidatePermutations[i];
+			int l_permA[][] = new int[l_inputPerm.length][c_maxCandidates];
 			
 			//for each contest, grab a permutation
-			for(int j = 0; j < inputPerm.length; j++)
+			for(int j = 0; j < l_inputPerm.length; j++)
 			{
-				permA[j] = sperm.getPerm();
+				l_permA[j] = c_sperm.getPerm();
 			}
 			
 			//ok now create the inverse perm
-			int permB[][] = new int[candidatePermutations[i].length][maxCandidates];
+			int l_permB[][] = new int[p_candidatePermutations[i].length][c_maxCandidates];
 			
 			//TODO: find the inverse
 			//based on what I have seen, it appears the inverse is the same as the input.
-			for(int j = 0; j < inputPerm.length; j++)
+			for(int j = 0; j < l_inputPerm.length; j++)
 			{
-				int I[] = inputPerm[j]; 
+				int I[] = l_inputPerm[j]; 
 				
 				for(int k = 0; k < I.length; k++)
 				{
-					permB[j][permA[j][I[k]]] = I[k]; ;
+					l_permB[j][l_permA[j][I[k]]] = I[k]; ;
 				}
 			} 
 		}
@@ -99,58 +96,85 @@ public class PunchscanEngine {
 	/**
 	 * This method will generate one row of the table given 
 	 * an initial Ballot ID and Vector of Candidate Orders
+	 * 
+	 * @param candidatePermutations[][]: This is an array of permutations per contest
+	 * @return ArrayList<Rows> The representation of the row TODO
 	 */
-	public void generateRow(int ballotID, int candidatePermutations[][])
+	public void generateRow(int p_ballotID, int p_candidatePermutations[][])
 	{	
-		for(int i = 0; i < candidatePermutations.length; i++)
+		for(int i = 0; i < p_candidatePermutations.length; i++)
 		{
-			int inputPerm[] = candidatePermutations[i];
-			int permA[] = new int[maxCandidates];
+			int l_inputPerm[] = p_candidatePermutations[i];
+			int l_permA[] = new int[c_maxCandidates];
 			
 			//for each contest, grab a permutation
-			for(int j = 0; j < inputPerm.length; j++)
+			for(int j = 0; j < l_inputPerm.length; j++)
 			{
-				permA = sperm.getPerm();
+				l_permA = c_sperm.getPerm(p_ballotID);
 			}
 			
 			//ok now create the inverse perm
-			int permB[] = new int[maxCandidates];
+			int l_permB[] = new int[c_maxCandidates];
 						
-			for(int j = 0; j < inputPerm.length; j++)
+			for(int j = 0; j < l_inputPerm.length; j++)
 			{
-				permB[permA[inputPerm[j]]] = inputPerm[j];
+				l_permB[l_permA[l_inputPerm[j]]] = l_inputPerm[j];
 			}
 			
-			System.out.println("Printing Input, PermA and PermB");
-			printArray(inputPerm);
-			printArray(permA);
-			printArray(permB);
+			if(DEBUG)
+			{
+				System.out.println("Printing Input, PermA and PermB");
+				printArray(l_inputPerm);
+				printArray(l_permA);
+				printArray(l_permB);
+			}
 		}
 	}
 	
-	public void Test()
+	public void preElectionAudit()
 	{
-		int numContests = 1;
+		
+	}
+	
+	public void postElectionAudit()
+	{
+		
+	}
+	
+	public void results(int p_results[][])
+	{
+		
+	}
+	
+	
+	/* *******************************************************
+	 * 
+	 * All Methods Below For Testing only
+	 * 
+	 *********************************************************/
+	public void Test()
+	{	
+		int l_numContests = 1;
 		
 		//create the initial candidate list
-		int initial[][] = new int[numContests][maxCandidates];
-		for(int i = 0; i < numContests; i++)
+		int l_initial[][] = new int[l_numContests][c_maxCandidates];
+		for(int i = 0; i < l_numContests; i++)
 		{
-			for(int j = 0; j < maxCandidates; j++)
+			for(int j = 0; j < c_maxCandidates; j++)
 			{
-				initial[i][j] = j;
+				l_initial[i][j] = j;
 			}
 		}
 		
 		//test just the first row
-		for(int i = 0; i < numBallots; i++)
+		for(int i = 0; i < c_numBallots; i++)
 		{
-			generateRow(i, initial);
+			generateRow(i, l_initial);
 		}
 		
-		generateRow(4,initial);
-		generateRow(2,initial);
-		generateRow(6,initial); 
+		generateRow(4,l_initial);
+		generateRow(2,l_initial);
+		generateRow(6,l_initial); 
 	}
 	
 	/*
@@ -159,28 +183,29 @@ public class PunchscanEngine {
 	public static void main(String args[])
 	{	
 		//create the engine
-		PunchscanEngine engine = new PunchscanEngine(0);
-		engine.Test(); 
+		PunchscanEngine l_engine = new PunchscanEngine();
+		l_engine.Test(); 
 	}
 	
-	private void printArray(int array[])
+	private void printArray(int p_array[])
 	{
 		System.out.println("Dumping array:");
-		for(int i = 0; i < array.length; i++)
+		for(int i = 0; i < p_array.length; i++)
 		{
-			System.out.print(array[i]); 
+			System.out.print(p_array[i]); 
 		}
 		System.out.println(); 
 	}
 	
-	private void printArray(int array[][])
+	@SuppressWarnings("unused")
+	private void printArray(int p_array[][])
 	{
 		System.out.println("Dumping array:");
-		for(int i = 0; i < array.length; i++)
+		for(int i = 0; i < p_array.length; i++)
 		{
-			for(int j = 0; j < array[i].length; j++)
+			for(int j = 0; j < p_array[i].length; j++)
 			{
-				System.out.print(array[i][j]);	
+				System.out.print(p_array[i][j]);	
 			} 
 			System.out.println(); 
 		}

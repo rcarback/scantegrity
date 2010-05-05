@@ -1,15 +1,9 @@
 package e2e;
 import java.io.FileInputStream;
-import java.security.Provider;
 import java.security.SecureRandom;
-import java.security.SecureRandomSpi;
-import java.security.Security;
 import java.util.Properties;
-import java.util.Set;
 
 import commitment.Commitment;
-import commitment.HashCommitmentScheme;
-import commitment.PRNGCommitmentScheme;
 import commitment.SymmetricCommitmentScheme;
 
 /**
