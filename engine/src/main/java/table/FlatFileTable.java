@@ -6,27 +6,38 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class FlatFileTable implements EngineTable {
 
 	ArrayList<ArrayList<Object>> c_list;
-	ArrayList<Class<?>> c_typeDef;
 	
 	//Creates a new table with columns defined by the types in p_typeDef
 	public FlatFileTable( ArrayList<Class<?>> p_typeDef )
 	{
 		c_list = new ArrayList<ArrayList<Object>>();
-		c_typeDef = p_typeDef;
 	}
 	
-	//Reads in a table from a file
+	//Reads in a table from a binary (serialized objects) file
 	public FlatFileTable( String p_path ) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		ObjectInputStream l_in = new ObjectInputStream(new FileInputStream(p_path));
 		int l_size = l_in.read();
-		for( int x = 0; x < l_size; x++ )
-			c_typeDef.add((Class<?>)l_in.readObject());
 		
 		c_list = new ArrayList<ArrayList<Object>>();
 		
@@ -53,34 +64,122 @@ public class FlatFileTable implements EngineTable {
 	}
 
 	@Override
-	public ArrayList<Class<?>> getTypes() {
-		return c_typeDef;
-	}
-
-	@Override
 	public ArrayList<ArrayList<Object>> getAllRows() {
 		return c_list;
 	}
 
 	@Override
 	public void insertRow(ArrayList<Object> row) {
-		if( row.size() != c_typeDef.size() )
-			throw new IllegalArgumentException("Row length does not match number of table columns");
 		c_list.add(row);
 	}
 
-	public void saveFile(String p_path ) throws FileNotFoundException, IOException
+	//Saves serialized data to a binary file
+	public void saveSerializedFile(String p_path ) throws FileNotFoundException, IOException
 	{
 		ObjectOutputStream l_out = new ObjectOutputStream(new FileOutputStream(p_path));
-		//Write out the number of columns
-		l_out.write( c_typeDef.size() );
-		//Write out the type definitions
-		for( int x = 0; x < c_typeDef.size(); x++ )
-			l_out.writeObject( c_typeDef.get(x) );
+
 		//Write out table data
 		for( int x = 0; x < c_list.size(); x++ )
 			for( int y = 0; y < c_list.get(x).size(); y++ )
 				l_out.writeObject(c_list.get(x).get(y));
 	}
 	
+	//Saves to XML
+	public void saveXmlFile(String p_path)
+	{
+		try
+		{
+			DocumentBuilder l_b = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document l_doc = l_b.newDocument();
+			
+			Element l_root = l_doc.createElement("table");
+			
+			for( int x = 0; x < c_list.size(); x++ )
+			{
+				Element l_row = l_doc.createElement("row");
+				for( int y = 0; x < c_list.get(y).size(); y++ )
+				{
+					Object l_obj = c_list.get(x).get(y);
+					Element l_cell = l_doc.createElement("cell");
+					
+					l_row.appendChild(getXmlRepresentation(l_doc, l_obj));
+				}
+				l_root.appendChild(l_row);
+			}
+
+			Transformer l_trans = TransformerFactory.newInstance().newTransformer();
+			DOMSource l_source = new DOMSource(l_doc);
+			StreamResult l_res = new StreamResult(new FileOutputStream(p_path));
+			
+			l_trans.transform(l_source, l_res);
+		}
+		catch( ParserConfigurationException e )
+		{
+			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerFactoryConfigurationError e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private Element getXmlRepresentation(Document p_doc, Object p_obj)
+	{
+		return getXmlRepresentation(p_doc, p_obj, "cell");
+	}
+
+	private Element getXmlRepresentation(Document p_doc, Object p_obj, String p_nodeName)
+	{
+		if( p_obj.getClass() == ArrayList.class )
+		{
+			Element l_node = p_doc.createElement("list");
+			ArrayList<Object> l_list = (ArrayList<Object>)p_obj;
+			for( int x = 0; x < l_list.size(); x++ )
+			{
+				l_node.appendChild(getXmlRepresentation(p_doc, l_list.get(x), "listdata"));
+			}
+			return l_node;
+		}
+		else if( p_obj.getClass().isArray() )
+		{
+			Element l_node = p_doc.createElement("list");
+			for( int x = 0; x < Array.getLength(p_obj); x++ )
+			{
+				l_node.appendChild(getXmlRepresentation(p_doc, Array.get(p_obj, x), "listdata"));
+			}
+			return l_node;
+		}
+		else
+		{
+			Element l_node = p_doc.createElement(p_nodeName);
+			l_node.setTextContent(getStringRepresentation(p_obj));
+			return l_node;
+		}
+	}
+	
+	private String getStringRepresentation(Object p_obj)
+	{
+		String l_ret = "";
+		if( p_obj.getClass() == String.class )
+		{
+			l_ret = p_obj.toString();
+		}
+		else if( p_obj.getClass() == Integer.class || p_obj.getClass() == Double.class )
+		{
+			l_ret = p_obj.toString();
+		}
+		else if( p_obj.getClass() == byte[].class )
+		{
+			l_ret = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString((byte[])p_obj);
+		}
+		return l_ret;
+	}
 }
