@@ -22,8 +22,11 @@ public class ScantegrityEngine {
 	
 	public void generateQ(String[][] p_confCodes)
 	{
-		c_tableR = new RTable(p_confCodes.length, p_confCodes[0].length);
-		c_tableQ = new String[p_confCodes.length][p_confCodes[0].length];
+		int l_ballots = p_confCodes.length;
+		int l_columns = p_confCodes[0].length;
+		
+		c_tableR = new RTable(l_ballots, l_columns);
+		c_tableQ = new String[l_ballots][l_columns];
 		
 		for( int x = 0; x < p_confCodes.length; x++ )
 		{
@@ -33,8 +36,10 @@ public class ScantegrityEngine {
 			for( int y = 1; y < p_confCodes[x].length; y++ )
 			{
 				int index = c_rand.nextInt(y + 1);
+				
 				c_tableQ[x][y] = c_tableQ[x][index];
 				c_tableQ[x][index] = p_confCodes[x][y];
+				c_tableR.SwitchQ(y * l_columns + x, index * l_columns + x);
 			}
 		}
 	}
