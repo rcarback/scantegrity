@@ -1,6 +1,11 @@
 package scantegrity;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+
+import commitment.CommitmentScheme;
+
+import table.FlatFileTable;
 
 
 public class ScantegrityEngine {	
@@ -50,6 +55,19 @@ public class ScantegrityEngine {
 		
 		c_tableR.Shuffle();
 		//c_tableR.Test(c_tableQ);
+	}
+	
+	public void commitQ(String p_fileName, CommitmentScheme p_cs) throws Exception
+	{
+		FlatFileTable l_table = new FlatFileTable();
+		for( int x = 0; x < c_tableQ.length; x++ )
+		{
+			ArrayList<Object> l_row = new ArrayList<Object>();
+			for( int y = 0; y < c_tableQ[x].length; y++ )
+				l_row.add(p_cs.commit(c_tableQ[x][y].getBytes()).c_commitment);
+			l_table.insertRow(l_row);
+		}
+		l_table.saveXmlFile(p_fileName);
 	}
 	
 }

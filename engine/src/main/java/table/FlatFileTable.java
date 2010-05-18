@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -28,7 +29,7 @@ public class FlatFileTable implements EngineTable {
 	ArrayList<ArrayList<Object>> c_list;
 	
 	//Creates a new table with columns defined by the types in p_typeDef
-	public FlatFileTable( ArrayList<Class<?>> p_typeDef )
+	public FlatFileTable(  )
 	{
 		c_list = new ArrayList<ArrayList<Object>>();
 	}
@@ -97,17 +98,20 @@ public class FlatFileTable implements EngineTable {
 			for( int x = 0; x < c_list.size(); x++ )
 			{
 				Element l_row = l_doc.createElement("row");
-				for( int y = 0; x < c_list.get(y).size(); y++ )
+				for( int y = 0; y < c_list.get(x).size(); y++ )
 				{
 					Object l_obj = c_list.get(x).get(y);
-					Element l_cell = l_doc.createElement("cell");
-					
 					l_row.appendChild(getXmlRepresentation(l_doc, l_obj));
 				}
 				l_root.appendChild(l_row);
 			}
+			
+			l_doc.appendChild(l_root);
 
 			Transformer l_trans = TransformerFactory.newInstance().newTransformer();
+			l_trans.setOutputProperty(OutputKeys.INDENT, "yes");
+            l_trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+	
 			DOMSource l_source = new DOMSource(l_doc);
 			StreamResult l_res = new StreamResult(new FileOutputStream(p_path));
 			
@@ -148,7 +152,7 @@ public class FlatFileTable implements EngineTable {
 			}
 			return l_node;
 		}
-		else if( p_obj.getClass().isArray() )
+		else if( p_obj.getClass().isArray() && p_obj.getClass() != byte[].class )
 		{
 			Element l_node = p_doc.createElement("list");
 			for( int x = 0; x < Array.getLength(p_obj); x++ )

@@ -71,5 +71,11 @@ public class App
 		l_codes[2] = new String[]{"0", "1", "2"};
 		ScantegrityEngine l_scantegrity = new ScantegrityEngine(l_rand);
 		l_scantegrity.generate(l_codes);
+		try {
+			l_scantegrity.commitQ("/Users/Travis/Desktop/tableQ.xml", l_commitScheme);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
