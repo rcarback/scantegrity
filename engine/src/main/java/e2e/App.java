@@ -73,6 +73,7 @@ public class App
 		l_scantegrity.generate(l_codes);
 		try {
 			l_scantegrity.commitQ("/Users/Travis/Desktop/tableQ.xml", l_commitScheme);
+			l_scantegrity.commitR("/Users/Travis/Desktop/tableR.xml", l_commitScheme);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

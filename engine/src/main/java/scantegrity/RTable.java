@@ -1,7 +1,12 @@
 package scantegrity;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Random;
+
+import table.FlatFileTable;
+
+import commitment.CommitmentScheme;
 
 
 
@@ -106,6 +111,23 @@ import java.util.Random;
 					System.out.println("FAILED: " + rowIndex + " " + columnIndex + " : " + finalColumn);
 				}
 			}
+		}
+		
+		public void Commit(String p_fileName, CommitmentScheme p_cs) throws Exception
+		{
+			FlatFileTable l_table = new FlatFileTable();
+			for( int x = 0; x < c_tableRpointersS.size(); x++ )
+			{
+				ArrayList<Object> l_row = new ArrayList<Object>();
+				Pointer<Integer, Integer> l_p = c_tableRpointersQ.get(x);
+				l_row.add(p_cs.commit(ByteBuffer.allocate(4).putInt(l_p.row).array()).c_commitment);
+				l_row.add(p_cs.commit(ByteBuffer.allocate(4).putInt(l_p.column).array()).c_commitment);
+				l_p = c_tableRpointersQ.get(x);
+				l_row.add(p_cs.commit(ByteBuffer.allocate(4).putInt(l_p.row).array()).c_commitment);
+				l_row.add(p_cs.commit(ByteBuffer.allocate(4).putInt(l_p.column).array()).c_commitment);
+				l_table.insertRow(l_row);
+			}
+			l_table.saveXmlFile(p_fileName);
 		}
 		
 	}

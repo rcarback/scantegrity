@@ -70,4 +70,9 @@ public class ScantegrityEngine {
 		l_table.saveXmlFile(p_fileName);
 	}
 	
+	public void commitR(String p_fileName, CommitmentScheme p_cs) throws Exception
+	{
+		c_tableR.Commit(p_fileName, p_cs);
+	}
+	
 }
