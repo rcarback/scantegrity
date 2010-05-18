@@ -3,6 +3,8 @@ import java.io.FileInputStream;
 import java.security.SecureRandom;
 import java.util.Properties;
 
+import scantegrity.ScantegrityEngine;
+
 import commitment.Commitment;
 import commitment.SymmetricCommitmentScheme;
 
@@ -62,5 +64,11 @@ public class App
 		System.out.println("DONE");
 		
 		System.out.println(System.currentTimeMillis() - l_start);
+		
+		String[][] l_codes = new String[3][3];
+		l_codes[0] = new String[]{"One", "Two", "Three"};
+		l_codes[1] = new String[]{"Four", "Five", "Six"};
+		ScantegrityEngine l_scantegrity = new ScantegrityEngine(l_rand);
+		l_scantegrity.generate(l_codes);
     }
 }
