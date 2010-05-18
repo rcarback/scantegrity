@@ -37,6 +37,10 @@ import java.util.Random;
 					c_tableRpointersS.add(new Pointer<Integer, Integer>(y, x));
 				}
 			}
+			for( int x = 0; x < c_columns; x++ )
+			{
+				ShuffleRange(x * c_ballots, (x+1) * c_ballots);
+			}
 		}
 		
 		//Switches column pointers when permuting rows in table Q
@@ -44,21 +48,12 @@ import java.util.Random;
 		{
 			Pointer<Integer, Integer> l_p1 = c_tableRpointersQ.get(p_index1);
 			Pointer<Integer, Integer> l_p2 = c_tableRpointersQ.get(p_index2);
-			int temp = l_p1.rightPointer;
-			l_p1.rightPointer = l_p2.rightPointer;
-			l_p2.rightPointer = temp;
+			int temp = l_p1.column;
+			l_p1.column = l_p2.column;
+			l_p2.column = temp;
 		}
 		
 		public void Shuffle()
-		{
-			for( int x = 0; x < c_columns; x++ )
-			{
-				ShuffleRange(x * c_ballots, (x+1) * c_ballots);
-			}
-			ShuffleFull();
-		}
-		
-		private void ShuffleFull()
 		{
 		    for (int i = c_tableRpointersS.size(); i > 1; i--) {
 		        int j = c_rand.nextInt(i);
@@ -78,12 +73,40 @@ import java.util.Random;
 		    // i is the number of items remaining to be shuffled.
 		    for (int i = y; i > x + 1; i--) {
 		        // Pick a random element to swap with the i-th element.
-		        int j = c_rand.nextInt(i);  // 0 <= j <= i-1 (0-based array)
+		        int j = c_rand.nextInt(i - x) + x;  // 0 <= j <= i-1 (0-based array)
 		        // Swap array elements.
 		        Pointer<Integer, Integer> temp = c_tableRpointersS.get(j);
 		        c_tableRpointersS.set(j, c_tableRpointersS.get(i-1));
 		        c_tableRpointersS.set(i-1, temp);
 		    }
+		}
+		
+		public void Print()
+		{
+			for( int x = 0; x < c_tableRpointersQ.size(); x++ )
+			{
+				Pointer<Integer, Integer> l_p = c_tableRpointersQ.get(x);
+				System.out.println("Q: " + l_p.row + " " + l_p.column);
+				l_p = c_tableRpointersS.get(x);
+				System.out.println("S: " + l_p.row + " " + l_p.column);
+			}
+		}
+
+		//Will test table sanity if each row of confirmation codes is 0 1 2 3 etc.
+		public void Test(String[][] p_tableQ) {
+			for( int x = 0; x < c_tableRpointersS.size(); x++ )
+			{
+				Pointer<Integer, Integer> l_p = c_tableRpointersQ.get(x);
+				int rowIndex = l_p.row;
+				int columnIndex = l_p.column;
+				l_p = c_tableRpointersS.get(x);
+				int finalColumn = l_p.column;
+				
+				if(Integer.parseInt(p_tableQ[rowIndex][columnIndex]) != finalColumn)
+				{
+					System.out.println("FAILED: " + rowIndex + " " + columnIndex + " : " + finalColumn);
+				}
+			}
 		}
 		
 	}

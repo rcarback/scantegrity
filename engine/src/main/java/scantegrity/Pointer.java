@@ -4,9 +4,9 @@ public class Pointer<T, S>
 {
 	public Pointer(T left, S right)
 	{
-		leftPointer = left;
-		rightPointer = right;
+		row = left;
+		column = right;
 	}
-	public T leftPointer;
-	public S rightPointer;
+	public T row;
+	public S column;
 }

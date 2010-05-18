@@ -25,23 +25,31 @@ public class ScantegrityEngine {
 		int l_ballots = p_confCodes.length;
 		int l_columns = p_confCodes[0].length;
 		
-		c_tableR = new RTable(l_ballots, l_columns);
+		c_tableR = new RTable(l_ballots, l_columns, c_rand);
 		c_tableQ = new String[l_ballots][l_columns];
 		
 		for( int x = 0; x < p_confCodes.length; x++ )
 		{
 			//Initialize with a shuffled version of the confirmation codes
-			c_tableQ[x][0] = p_confCodes[x][0];
-
-			for( int y = 1; y < p_confCodes[x].length; y++ )
+			for( int y = 0;  y < p_confCodes[x].length; y++ )
 			{
-				int index = c_rand.nextInt(y + 1);
+				c_tableQ[x][y] = p_confCodes[x][y];
+			}
+
+			for( int y = c_tableQ[x].length - 1; y > 1; y-- )
+			{
+				int index = c_rand.nextInt(y+1);
 				
-				c_tableQ[x][y] = c_tableQ[x][index];
-				c_tableQ[x][index] = p_confCodes[x][y];
+				String temp = c_tableQ[x][index];
+				c_tableQ[x][index] = c_tableQ[x][y];
+				c_tableQ[x][y] = temp;
+				
 				c_tableR.SwitchQ(y * l_columns + x, index * l_columns + x);
 			}
 		}
+		
+		c_tableR.Shuffle();
+		//c_tableR.Test(c_tableQ);
 	}
 	
 }
