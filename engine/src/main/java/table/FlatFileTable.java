@@ -185,6 +185,10 @@ public class FlatFileTable implements EngineTable {
 		{
 			l_ret = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString((byte[])p_obj);
 		}
+		else if( p_obj.getClass() == Boolean.class )
+		{
+			l_ret = p_obj == Boolean.TRUE ? "1" : "0";
+		}
 		return l_ret;
 	}
 }

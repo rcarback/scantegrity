@@ -13,9 +13,9 @@ import commitment.CommitmentScheme;
 
 	public class RTable
 	{
-		ArrayList<Pointer<Integer, Integer>> c_tableRpointersQ;
-		ArrayList<Pointer<Integer, Integer>> c_tableRpointersS;
-		ArrayList<Boolean> c_tableRflags;
+		ArrayList<Pointer<Integer, Integer>> c_pointersQ;
+		ArrayList<Pointer<Integer, Integer>> c_pointersS;
+		boolean[] c_flags;
 		
 		int c_ballots;
 		int c_columns;
@@ -24,12 +24,13 @@ import commitment.CommitmentScheme;
 		
 		public RTable(int p_ballots, int p_columns, Random p_rand)
 		{
-			c_tableRpointersQ = new ArrayList<Pointer<Integer, Integer>>();
-			c_tableRpointersS = new ArrayList<Pointer<Integer, Integer>>();
-			c_tableRflags = new ArrayList<Boolean>();
-			
 			c_ballots = p_ballots;
 			c_columns = p_columns;
+			
+			c_pointersQ = new ArrayList<Pointer<Integer, Integer>>();
+			c_pointersS = new ArrayList<Pointer<Integer, Integer>>();
+			
+			c_flags = new boolean[p_ballots * p_columns];
 			
 			c_rand = p_rand;
 			
@@ -38,8 +39,8 @@ import commitment.CommitmentScheme;
 			{
 				for( int y = 0; y < p_ballots; y++ )
 				{
-					c_tableRpointersQ.add(new Pointer<Integer, Integer>(y, x));
-					c_tableRpointersS.add(new Pointer<Integer, Integer>(y, x));
+					c_pointersQ.add(new Pointer<Integer, Integer>(y, x));
+					c_pointersS.add(new Pointer<Integer, Integer>(y, x));
 				}
 			}
 			for( int x = 0; x < c_columns; x++ )
@@ -51,8 +52,8 @@ import commitment.CommitmentScheme;
 		//Switches column pointers when permuting rows in table Q
 		public void switchQ(int p_index1, int p_index2)
 		{
-			Pointer<Integer, Integer> l_p1 = c_tableRpointersQ.get(p_index1);
-			Pointer<Integer, Integer> l_p2 = c_tableRpointersQ.get(p_index2);
+			Pointer<Integer, Integer> l_p1 = c_pointersQ.get(p_index1);
+			Pointer<Integer, Integer> l_p2 = c_pointersQ.get(p_index2);
 			int temp = l_p1.column;
 			l_p1.column = l_p2.column;
 			l_p2.column = temp;
@@ -60,16 +61,16 @@ import commitment.CommitmentScheme;
 		
 		public void shuffle()
 		{
-		    for (int i = c_tableRpointersS.size(); i > 1; i--) {
+		    for (int i = c_pointersS.size(); i > 1; i--) {
 		        int j = c_rand.nextInt(i);
 		        
-		        Pointer<Integer, Integer> temp = c_tableRpointersS.get(j);
-		        c_tableRpointersS.set(j, c_tableRpointersS.get(i-1));
-		        c_tableRpointersS.set(i-1, temp);
+		        Pointer<Integer, Integer> temp = c_pointersS.get(j);
+		        c_pointersS.set(j, c_pointersS.get(i-1));
+		        c_pointersS.set(i-1, temp);
 		        
-		        temp = c_tableRpointersQ.get(j);
-		        c_tableRpointersQ.set(j, c_tableRpointersQ.get(i-1));
-		        c_tableRpointersQ.set(i-1, temp);
+		        temp = c_pointersQ.get(j);
+		        c_pointersQ.set(j, c_pointersQ.get(i-1));
+		        c_pointersQ.set(i-1, temp);
 		    }
 		}
 		
@@ -80,55 +81,80 @@ import commitment.CommitmentScheme;
 		        // Pick a random element to swap with the i-th element.
 		        int j = c_rand.nextInt(i - x) + x;  // 0 <= j <= i-1 (0-based array)
 		        // Swap array elements.
-		        Pointer<Integer, Integer> temp = c_tableRpointersS.get(j);
-		        c_tableRpointersS.set(j, c_tableRpointersS.get(i-1));
-		        c_tableRpointersS.set(i-1, temp);
+		        Pointer<Integer, Integer> temp = c_pointersS.get(j);
+		        c_pointersS.set(j, c_pointersS.get(i-1));
+		        c_pointersS.set(i-1, temp);
 		    }
 		}
 		
 		public void print()
 		{
-			for( int x = 0; x < c_tableRpointersQ.size(); x++ )
+			for( int x = 0; x < c_pointersQ.size(); x++ )
 			{
-				Pointer<Integer, Integer> l_p = c_tableRpointersQ.get(x);
+				Pointer<Integer, Integer> l_p = c_pointersQ.get(x);
 				System.out.println("Q: " + l_p.row + " " + l_p.column);
-				l_p = c_tableRpointersS.get(x);
+				l_p = c_pointersS.get(x);
 				System.out.println("S: " + l_p.row + " " + l_p.column);
 			}
 		}
 
 		//Will test table sanity if each row of confirmation codes is 0 1 2 3 etc.
-		public void test(String[][] p_tableQ) {
-			for( int x = 0; x < c_tableRpointersS.size(); x++ )
+		public void test(String[][] p_tableQ, short[][] p_perms) {
+			System.out.print("Testing table sanity...");
+			for( int x = 0; x < c_pointersS.size(); x++ )
 			{
-				Pointer<Integer, Integer> l_p = c_tableRpointersQ.get(x);
+				Pointer<Integer, Integer> l_p = c_pointersQ.get(x);
 				int rowIndex = l_p.row;
 				int columnIndex = l_p.column;
-				l_p = c_tableRpointersS.get(x);
+				l_p = c_pointersS.get(x);
 				int finalColumn = l_p.column;
 				
 				if(Integer.parseInt(p_tableQ[rowIndex][columnIndex]) != finalColumn)
 				{
 					System.out.println("FAILED: " + rowIndex + " " + columnIndex + " : " + finalColumn);
 				}
+				if(p_perms[rowIndex][columnIndex] != Integer.parseInt(p_tableQ[rowIndex][columnIndex]))
+				{
+					System.out.println("FAILED: " + Integer.parseInt(p_tableQ[rowIndex][columnIndex]) + " " + columnIndex);
+				}
 			}
+			System.out.println("DONE");
 		}
 		
 		public void commit(File p_directory, CommitmentScheme p_cs) throws Exception
 		{
 			FlatFileTable l_table = new FlatFileTable();
-			for( int x = 0; x < c_tableRpointersS.size(); x++ )
+			for( int x = 0; x < c_pointersS.size(); x++ )
 			{
 				ArrayList<Object> l_row = new ArrayList<Object>();
-				Pointer<Integer, Integer> l_p = c_tableRpointersQ.get(x);
+				Pointer<Integer, Integer> l_p = c_pointersQ.get(x);
 				l_row.add(p_cs.commit(ByteBuffer.allocate(4).putInt(l_p.row).array()).c_commitment);
 				l_row.add(p_cs.commit(ByteBuffer.allocate(4).putInt(l_p.column).array()).c_commitment);
-				l_p = c_tableRpointersQ.get(x);
+				l_p = c_pointersQ.get(x);
 				l_row.add(p_cs.commit(ByteBuffer.allocate(4).putInt(l_p.row).array()).c_commitment);
 				l_row.add(p_cs.commit(ByteBuffer.allocate(4).putInt(l_p.column).array()).c_commitment);
 				l_table.insertRow(l_row);
 			}
 			l_table.saveXmlFile(p_directory, "TableR");
+		}
+		
+		public boolean[][] tally(boolean[][] p_votes, short[][] p_perms)
+		{
+			boolean[][] l_tableS = new boolean[c_ballots][c_columns];
+			
+			for( int x = 0; x < c_pointersQ.size(); x++ )
+			{
+				Pointer<Integer, Integer> l_p = c_pointersQ.get(x);
+				short columnIndex = p_perms[l_p.row][l_p.column];
+				if( p_votes[l_p.row][columnIndex] )
+				{
+					c_flags[x] = true;
+					Pointer<Integer, Integer> l_sp = c_pointersS.get(x);
+					l_tableS[l_sp.row][l_sp.column] = true; 
+				}
+			}
+			
+			return l_tableS;
 		}
 		
 	}

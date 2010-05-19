@@ -66,14 +66,20 @@ public class App
 		
 		System.out.println(System.currentTimeMillis() - l_start);
 		
+		//Test data
 		String[][] l_codes = new String[3][3];
 		l_codes[0] = new String[]{"0", "1", "2"};
 		l_codes[1] = new String[]{"0", "1", "2"};
 		l_codes[2] = new String[]{"0", "1", "2"};
-		ScantegrityEngine l_scantegrity = new ScantegrityEngine(l_rand);
-		l_scantegrity.generate(l_codes);
+		boolean[][] l_votes = new boolean[3][3];
+		l_votes[0] = new boolean[]{true, false, false};
+		l_votes[1] = new boolean[]{false, true, false};
+		l_votes[2] = new boolean[]{false, false, true};
+		
+		ScantegrityEngine l_scantegrity = new ScantegrityEngine(l_rand, new File("/Users/Travis/Desktop/"), l_commitScheme);
 		try {
-			l_scantegrity.commit(new File("/Users/Travis/Desktop/"), l_commitScheme);
+			l_scantegrity.preElection(l_codes);
+			l_scantegrity.postElection(l_votes);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
