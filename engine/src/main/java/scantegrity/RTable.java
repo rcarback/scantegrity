@@ -2,6 +2,7 @@ package scantegrity;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -184,6 +185,38 @@ import commitment.CommitmentScheme;
 					
 					l_table.insertRow(l_row);
 				}
+			}
+			
+			l_table.saveXmlFile(p_directory, p_name);
+		}
+
+		public void randomAudit(Random c_rand, File p_directory, String p_name)
+		{
+			FlatFileTable l_table = new FlatFileTable();
+			for( int x = 0; x < c_pointersQ.size(); x++ )
+			{
+				//Which side of the table will be revealed
+				boolean l_side = c_rand.nextBoolean();
+				
+				ArrayList<Object> l_row = new ArrayList<Object>();
+				
+				if( l_side ) //Q pointer
+				{
+					Pointer<Integer, Integer> l_p = c_pointersQ.get(x);
+					l_row.add(l_p.row);
+					l_row.add(l_p.column);
+					l_row.add("");
+					l_row.add("");
+				}
+				else //S pointer
+				{
+					Pointer<Integer, Integer> l_p = c_pointersS.get(x);
+					l_row.add("");
+					l_row.add("");
+					l_row.add(l_p.row);
+					l_row.add(l_p.column);
+				}
+				l_table.insertRow(l_row);
 			}
 			
 			l_table.saveXmlFile(p_directory, p_name);

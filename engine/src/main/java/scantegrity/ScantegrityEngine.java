@@ -3,6 +3,7 @@ package scantegrity;
 import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Random;
 
 import commitment.CommitmentScheme;
 
@@ -144,6 +145,16 @@ public class ScantegrityEngine {
 	public void fullAudit( int[] p_ballotNums, String p_name )
 	{
 		c_tableR.fullAudit( p_ballotNums, c_directory, p_name );
+	}
+	
+	public void randomAudit( String p_name )
+	{
+		c_tableR.randomAudit( c_rand, c_directory, p_name );
+	}
+	
+	public void randomAudit( String p_name, Random p_rand )
+	{
+		c_tableR.randomAudit( p_rand, c_directory, p_name );
 	}
 	
 }
