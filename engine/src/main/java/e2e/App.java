@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 import java.util.Properties;
 
 import scantegrity.ScantegrityEngine;
+import scantegrity.ScantegrityFrontEnd;
 
 import commitment.Commitment;
 import commitment.SymmetricCommitmentScheme;
@@ -76,7 +77,7 @@ public class App
 		l_votes[1] = new boolean[]{false, true, false};
 		l_votes[2] = new boolean[]{false, false, true};
 		
-		ScantegrityEngine l_scantegrity = new ScantegrityEngine(l_rand, new File("/Users/Travis/Desktop/"), l_commitScheme);
+		/*ScantegrityEngine l_scantegrity = new ScantegrityEngine(l_rand, new File("/Users/Travis/Desktop/"), l_commitScheme);
 		try {
 			l_scantegrity.preElection(l_codes);
 			System.out.print("Print audit...");
@@ -91,6 +92,17 @@ public class App
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}*/
+		System.out.print("Generating ballots...");
+		ScantegrityFrontEnd l_frontEnd = new ScantegrityFrontEnd(l_rand, 5000, 4, new File("/Users/Travis/Desktop"), l_commitScheme);
+		try
+		{
+			l_frontEnd.preElection();
 		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		System.out.println("DONE");
     }
 }

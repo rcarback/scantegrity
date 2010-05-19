@@ -14,7 +14,7 @@ public class ScantegrityEngine {
 	int c_ballots; 
 	int c_columns;
 	int c_maxCandidates; 
-	SecureRandom c_rand;
+	Random c_rand;
 	RTable c_tableR;
 	String[][] c_tableQ;	
 	short[][] c_tableQPerms;
@@ -23,7 +23,7 @@ public class ScantegrityEngine {
 	CommitmentScheme c_cs;
 	
 	
-	public ScantegrityEngine(SecureRandom p_rand, File p_directory, CommitmentScheme p_cs)
+	public ScantegrityEngine(Random p_rand, File p_directory, CommitmentScheme p_cs)
 	{
 		c_rand = p_rand;
 		c_directory = p_directory;
@@ -89,7 +89,7 @@ public class ScantegrityEngine {
 		}
 		
 		c_tableR.shuffle();
-		c_tableR.test(c_tableQ, c_tableQPerms);
+		//c_tableR.test(c_tableQ, c_tableQPerms);
 	}
 	
 	public boolean commit(File p_directory, CommitmentScheme p_cs) throws Exception
