@@ -3,6 +3,7 @@ package scantegrity;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 import table.FlatFileTable;
@@ -155,6 +156,37 @@ import commitment.CommitmentScheme;
 			}
 			
 			return l_tableS;
+		}
+
+		//Fully reveals the pointers for the ballot IDs contained in p_ballotNums.  Saves
+		//pointers to p_directory in a file named p_name
+		public void fullAudit(int[] p_ballotNums, File p_directory, String p_name) {
+			FlatFileTable l_table = new FlatFileTable();
+			
+			HashSet<Integer> l_ballotSet = new HashSet<Integer>();
+			
+			for( int x = 0; x < p_ballotNums.length; x++ )
+				l_ballotSet.add(p_ballotNums[x]);
+			
+			for( int x = 0; x < c_pointersQ.size(); x++ )
+			{
+				ArrayList<Object> l_row = new ArrayList<Object>();
+				
+				Pointer<Integer, Integer> l_p = c_pointersQ.get(x);
+				
+				if( l_ballotSet.contains(l_p.row) )
+				{
+					l_row.add(l_p.row);
+					l_row.add(l_p.column);
+					l_p = c_pointersS.get(x);
+					l_row.add(l_p.row);
+					l_row.add(l_p.column);
+					
+					l_table.insertRow(l_row);
+				}
+			}
+			
+			l_table.saveXmlFile(p_directory, p_name);
 		}
 		
 	}

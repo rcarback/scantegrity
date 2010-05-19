@@ -79,6 +79,7 @@ public class App
 		ScantegrityEngine l_scantegrity = new ScantegrityEngine(l_rand, new File("/Users/Travis/Desktop/"), l_commitScheme);
 		try {
 			l_scantegrity.preElection(l_codes);
+			l_scantegrity.fullAudit(new int[]{0,1}, "PrintAudit");
 			l_scantegrity.postElection(l_votes);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

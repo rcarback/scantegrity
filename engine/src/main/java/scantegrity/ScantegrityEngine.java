@@ -21,6 +21,7 @@ public class ScantegrityEngine {
 	File c_directory;
 	CommitmentScheme c_cs;
 	
+	
 	public ScantegrityEngine(SecureRandom p_rand, File p_directory, CommitmentScheme p_cs)
 	{
 		c_rand = p_rand;
@@ -138,6 +139,11 @@ public class ScantegrityEngine {
 			l_table.insertRow(l_row);
 		}
 		l_table.saveXmlFile(p_directory, "TableS");
+	}
+	
+	public void fullAudit( int[] p_ballotNums, String p_name )
+	{
+		c_tableR.fullAudit( p_ballotNums, c_directory, p_name );
 	}
 	
 }
