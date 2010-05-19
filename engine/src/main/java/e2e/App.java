@@ -1,4 +1,5 @@
 package e2e;
+import java.io.File;
 import java.io.FileInputStream;
 import java.security.SecureRandom;
 import java.util.Properties;
@@ -72,8 +73,7 @@ public class App
 		ScantegrityEngine l_scantegrity = new ScantegrityEngine(l_rand);
 		l_scantegrity.generate(l_codes);
 		try {
-			l_scantegrity.commitQ("/Users/Travis/Desktop/tableQ.xml", l_commitScheme);
-			l_scantegrity.commitR("/Users/Travis/Desktop/tableR.xml", l_commitScheme);
+			l_scantegrity.commit(new File("/Users/Travis/Desktop/"), l_commitScheme);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

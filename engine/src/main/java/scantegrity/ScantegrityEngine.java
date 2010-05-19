@@ -1,5 +1,6 @@
 package scantegrity;
 
+import java.io.File;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
@@ -49,15 +50,26 @@ public class ScantegrityEngine {
 				c_tableQ[x][index] = c_tableQ[x][y];
 				c_tableQ[x][y] = temp;
 				
-				c_tableR.SwitchQ(y * l_columns + x, index * l_columns + x);
+				c_tableR.switchQ(y * l_columns + x, index * l_columns + x);
 			}
 		}
 		
-		c_tableR.Shuffle();
+		c_tableR.shuffle();
 		//c_tableR.Test(c_tableQ);
 	}
 	
-	public void commitQ(String p_fileName, CommitmentScheme p_cs) throws Exception
+	public boolean commit(File p_directory, CommitmentScheme p_cs) throws Exception
+	{
+		if( p_directory.isDirectory() && p_directory.canWrite() )
+		{
+			commitQ(p_directory, p_cs);
+			commitR(p_directory, p_cs);
+			return true;
+		}
+		return false;
+	}
+	
+	private void commitQ(File p_directory, CommitmentScheme p_cs) throws Exception
 	{
 		FlatFileTable l_table = new FlatFileTable();
 		for( int x = 0; x < c_tableQ.length; x++ )
@@ -67,12 +79,12 @@ public class ScantegrityEngine {
 				l_row.add(p_cs.commit(c_tableQ[x][y].getBytes()).c_commitment);
 			l_table.insertRow(l_row);
 		}
-		l_table.saveXmlFile(p_fileName);
+		l_table.saveXmlFile(p_directory, "TableQ");
 	}
 	
-	public void commitR(String p_fileName, CommitmentScheme p_cs) throws Exception
+	private void commitR(File p_directory, CommitmentScheme p_cs) throws Exception
 	{
-		c_tableR.Commit(p_fileName, p_cs);
+		c_tableR.commit(p_directory, p_cs);
 	}
 	
 }

@@ -1,5 +1,6 @@
 package scantegrity;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Random;
@@ -43,12 +44,12 @@ import commitment.CommitmentScheme;
 			}
 			for( int x = 0; x < c_columns; x++ )
 			{
-				ShuffleRange(x * c_ballots, (x+1) * c_ballots);
+				shuffleRange(x * c_ballots, (x+1) * c_ballots);
 			}
 		}
 		
 		//Switches column pointers when permuting rows in table Q
-		public void SwitchQ(int p_index1, int p_index2)
+		public void switchQ(int p_index1, int p_index2)
 		{
 			Pointer<Integer, Integer> l_p1 = c_tableRpointersQ.get(p_index1);
 			Pointer<Integer, Integer> l_p2 = c_tableRpointersQ.get(p_index2);
@@ -57,7 +58,7 @@ import commitment.CommitmentScheme;
 			l_p2.column = temp;
 		}
 		
-		public void Shuffle()
+		public void shuffle()
 		{
 		    for (int i = c_tableRpointersS.size(); i > 1; i--) {
 		        int j = c_rand.nextInt(i);
@@ -72,7 +73,7 @@ import commitment.CommitmentScheme;
 		    }
 		}
 		
-		private void ShuffleRange(int x, int y)
+		private void shuffleRange(int x, int y)
 		{
 		    // i is the number of items remaining to be shuffled.
 		    for (int i = y; i > x + 1; i--) {
@@ -85,7 +86,7 @@ import commitment.CommitmentScheme;
 		    }
 		}
 		
-		public void Print()
+		public void print()
 		{
 			for( int x = 0; x < c_tableRpointersQ.size(); x++ )
 			{
@@ -97,7 +98,7 @@ import commitment.CommitmentScheme;
 		}
 
 		//Will test table sanity if each row of confirmation codes is 0 1 2 3 etc.
-		public void Test(String[][] p_tableQ) {
+		public void test(String[][] p_tableQ) {
 			for( int x = 0; x < c_tableRpointersS.size(); x++ )
 			{
 				Pointer<Integer, Integer> l_p = c_tableRpointersQ.get(x);
@@ -113,7 +114,7 @@ import commitment.CommitmentScheme;
 			}
 		}
 		
-		public void Commit(String p_fileName, CommitmentScheme p_cs) throws Exception
+		public void commit(File p_directory, CommitmentScheme p_cs) throws Exception
 		{
 			FlatFileTable l_table = new FlatFileTable();
 			for( int x = 0; x < c_tableRpointersS.size(); x++ )
@@ -127,7 +128,7 @@ import commitment.CommitmentScheme;
 				l_row.add(p_cs.commit(ByteBuffer.allocate(4).putInt(l_p.column).array()).c_commitment);
 				l_table.insertRow(l_row);
 			}
-			l_table.saveXmlFile(p_fileName);
+			l_table.saveXmlFile(p_directory, "TableR");
 		}
 		
 	}

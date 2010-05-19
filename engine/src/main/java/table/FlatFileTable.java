@@ -1,5 +1,6 @@
 package table;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -86,7 +87,7 @@ public class FlatFileTable implements EngineTable {
 	}
 	
 	//Saves to XML
-	public void saveXmlFile(String p_path)
+	public void saveXmlFile(File p_directory, String p_name)
 	{
 		try
 		{
@@ -113,7 +114,7 @@ public class FlatFileTable implements EngineTable {
             l_trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 	
 			DOMSource l_source = new DOMSource(l_doc);
-			StreamResult l_res = new StreamResult(new FileOutputStream(p_path));
+			StreamResult l_res = new StreamResult(new FileOutputStream(p_directory.getAbsolutePath() + File.separatorChar + p_name + ".xml"));
 			
 			l_trans.transform(l_source, l_res);
 		}
