@@ -9,9 +9,9 @@ import java.security.SecureRandom;
 import java.util.Properties;
 
 public class SimplePermutation implements Permutation { 
-	int c_initial[];
-	int  c_numObjs; 
-	SecureRandom c_rand;
+	private int c_initial[];
+	private int  c_numObjs; 
+	private SecureRandom c_rand;
 	
 	static final String DEFAULT_RAND_PROVIDER = "SUN";
 	static final String DEFAULT_RAND_ALG = "SHA1PRNG";
