@@ -148,7 +148,10 @@ public class PunchscanEngine {
 		//rebuild the table
 		generateTables(p_candidatePermutations);
 		
-		//TODO
+		for(int i = 0; i < p_results.length; i++)
+		{
+			c_dTable.getRow(i).sendResult(p_results[i]);
+		}
 	} 
 	
 	

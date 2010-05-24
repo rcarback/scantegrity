@@ -23,7 +23,7 @@ public class DRow {
 		c_permA = p_permA; 
 		c_permB = p_permB; 
 		c_intermediate = null; 
-		c_resPtr = new RRow(p_permA.length, p_ballotID); 
+		c_resPtr = new RRow(p_ballotID); 
 		c_commit = null; 
 	}
 	
@@ -149,6 +149,18 @@ public class DRow {
 		}
 		
 		return l_permString; 
+	}
+
+	public void sendResult(int[] p_results) 
+	{
+		int [] l_finalResults = new int[p_results.length];
+		for(int i = 0; i < p_results.length; i++)
+		{
+			c_intermediate[i] = c_permA[i][p_results[i]];
+			l_finalResults[i] = c_permB[i][c_intermediate[i]];
+		}
+		
+		c_resPtr.setResult(l_finalResults); 
 	}
 
 }

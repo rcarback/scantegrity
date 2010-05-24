@@ -43,11 +43,6 @@ public class DTable {
 	    }	
 	}
 
-	public Byte[] colToByte(int p_col)
-	{
-		return null;
-	}
-
 	public void add(DRow p_row, int p_ballotID) 
 	{
 		c_dTable[p_ballotID] = p_row; 
@@ -91,29 +86,25 @@ public class DTable {
 	public Commitment[] commitCols(CommitmentScheme p_cs)
 	{
 		//we are commiting to two columns. 
-		Commitment l_commits[] = new Commitment[4]; 
+		Commitment l_commits[] = new Commitment[2]; 
 	
-		String l_ballotID = "";
 		String l_permA = ""; 
-		String l_permB = ""; 
-		String l_resPtr = ""; 
+		String l_permB = "";  
 		
 		for(int i = 0; i < c_dTable.length; i++)
 		{
 			DRow l_row = c_dTable[i]; 
 			
-			l_ballotID += String.valueOf(l_row.getBallotID());
+			l_permA += String.valueOf(l_row.getBallotID());
 			l_permA += l_row.permToString(l_row.getPermA()); 
 			l_permB += l_row.permToString(l_row.getPermB());
-			//TODO get resPTr String
+			l_permB += String.valueOf(l_row.getResPtr());
 		}
 		
 		//commit to all the columns
 		try {
-			l_commits[0] = p_cs.commit(l_ballotID.getBytes());
-			l_commits[1] = p_cs.commit(l_permA.getBytes()); 
-			l_commits[2] = p_cs.commit(l_permB.getBytes()); 
-			l_commits[3] = p_cs.commit(l_resPtr.getBytes()); 
+			l_commits[0] = p_cs.commit(l_permA.getBytes()); 
+			l_commits[1] = p_cs.commit(l_permB.getBytes());  
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
