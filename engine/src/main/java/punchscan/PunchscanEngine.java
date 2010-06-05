@@ -1,3 +1,24 @@
+/*
+ * @(#)PunchscanEngine.java
+ *  
+ * Copyright (C) 2008 Scantegrity Project
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+
 /**
  * @author John L. Conway IV 
  */
@@ -163,7 +184,7 @@ public class PunchscanEngine {
 	
 	private void generateTables(int p_candidatePermutations[][][])
 	{
-		c_rTable = new RTable(c_numBallots, (Random)c_sr);
+		c_rTable = new RTable(c_numBallots, c_sr);
 		c_dTable = generateDTable(p_candidatePermutations, c_rTable);
 		
 		//shuffle rTable
@@ -181,7 +202,7 @@ public class PunchscanEngine {
 	 */
 	private DTable generateDTable(int p_candidatePermutations[][][], RTable p_rTable)
 	{
-		DTable l_table = new DTable(p_candidatePermutations.length, (Random)c_sr);
+		DTable l_table = new DTable(p_candidatePermutations.length, c_sr);
 		//for each ballot, generate each row
 		for(int i = 0; i < p_candidatePermutations.length; i++)
 		{
