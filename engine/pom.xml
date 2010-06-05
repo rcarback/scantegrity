@@ -1,12 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>E2E</groupId>
-  <artifactId>E2E</artifactId>
+  <groupId>engine</groupId>
+  <artifactId>org.scantegrity</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>E2E</name>
-  <url>http://maven.apache.org</url>
+  <name>Scantegrity Cryptographic Engine</name>
+  <description>The cryptographic engines for Scantegrity. Will implement the Punchscanian Mix, the Scantegrity Mix, and the Eperio Mix systems.
+</description>
+  <url>http://scantegrity.org/svn/</url>
   <dependencies>
   	<dependency>
   		<groupId>junit</groupId>
