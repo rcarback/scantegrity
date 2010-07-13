@@ -54,7 +54,6 @@ public class HashCommitmentScheme implements CommitmentScheme {
 		c_saltLength = p_saltLength;
 	}
 	
-	@Override
 	public Commitment commit(byte[] data) throws Exception {
 		c_digest.reset();
 		c_digest.update(data);
@@ -67,7 +66,6 @@ public class HashCommitmentScheme implements CommitmentScheme {
 		return l_commit;
 	}
 
-	@Override
 	public boolean decommit(byte[] data, Commitment commit) {
 		c_digest.reset();
 		c_digest.update(data);

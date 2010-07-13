@@ -62,7 +62,6 @@ public class SymmetricCommitmentScheme implements CommitmentScheme {
 		}
 	}
 	
-	@Override
 	public Commitment commit(byte[] data) throws Exception{
 		//Generate random key
 		KeyGenerator l_kgen = KeyGenerator.getInstance(c_cipher.getAlgorithm());
@@ -77,7 +76,6 @@ public class SymmetricCommitmentScheme implements CommitmentScheme {
 		return new Commitment(l_commitData, l_skey.getEncoded());
 	}
 
-	@Override
 	public boolean decommit(byte[] data, Commitment commit) {
 		try {
 			c_cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(commit.c_randSeed, c_cipher.getAlgorithm()));

@@ -43,7 +43,6 @@ public class PRNGCommitmentScheme implements CommitmentScheme {
 	
 	//http://www.springerlink.com/index/N615G60560417356.pdf
 	
-	@Override
 	public Commitment commit(byte[] data) throws Exception {
 		if( c_challenge == null )
 		{
@@ -79,7 +78,6 @@ public class PRNGCommitmentScheme implements CommitmentScheme {
 		
 	}
 
-	@Override
 	public boolean decommit(byte[] data, Commitment comm) {
 		//Generate the random bits to XOR with the data
 		SecureRandom l_rand = null;
