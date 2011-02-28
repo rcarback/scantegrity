@@ -31,10 +31,12 @@ public class CodesReaderSax extends DefaultHandler {
 	TreeMap<Byte,TreeMap<Byte,SymbolRow>> questions=new TreeMap<Byte, TreeMap<Byte,SymbolRow>>();
 	TreeMap<Byte,SymbolRow> symbols=new TreeMap<Byte, SymbolRow>();
 	
+	TreeMap<Integer,BallotRow> serials=new TreeMap<Integer, BallotRow>();
+	
 	boolean doneParsing=false;
 	
 	
-	int printedSerial=-1;
+	int pid=-1;
 	byte questionId=-1;
 	
 	byte smid=0;
@@ -50,11 +52,18 @@ public class CodesReaderSax extends DefaultHandler {
 			for (int i = 0; i < attrs.getLength(); i++) {
                 String aName = attrs.getLocalName(i); // Attr name 
                 if ("".equals(aName)) aName = attrs.getQName(i);				
-				if (aName.equals("printedSerial")) {
-					printedSerial = Integer.parseInt(attrs.getValue(i));;		
+				if (aName.equals(BallotRow.pidAttr)) {
+					pid = Integer.parseInt(attrs.getValue(i));		
 				}
 			}
 			questions=new TreeMap<Byte, TreeMap<Byte,SymbolRow>>();
+			
+			try {
+				BallotRow ballotRow=new BallotRow(attrs);
+				serials.put(pid, ballotRow);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			return;
 		}
     	if (eName.compareTo("question")==0) {
@@ -86,7 +95,7 @@ public class CodesReaderSax extends DefaultHandler {
     		questions.put(questionId, symbols);
     	else
     	if (qName.equals("ballot"))
-    		rows.put(printedSerial, questions);
+    		rows.put(pid, questions);
     	else
     	if (qName.equals("xml"))
     		doneParsing=true;    	
@@ -99,4 +108,9 @@ public class CodesReaderSax extends DefaultHandler {
 	public TreeMap<Integer, TreeMap<Byte, TreeMap<Byte, SymbolRow>>> getRows() {
 		return rows;
 	}
+
+	public TreeMap<Integer, BallotRow> getSerials() {
+		return serials;
+	}
+	
 }

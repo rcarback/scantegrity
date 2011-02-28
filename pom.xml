@@ -25,14 +25,16 @@
   	<module>scanner</module>
   	<module>common</module>
   	<module>OpenSTV</module>
-  	<module>authoring</module>
-  	<module>auditor</module>
-  	<module>engine</module>
-  	<module>jsane</module>
   	<module>zxing</module>
   	<module>Inkerator</module>
 	<module>erm</module>
 	<module>sws</module>
+	<module>engine</module>
+	<module>authoring</module>
+	<module>auditor</module>
+	<module>IRVTally</module>
+	<module>new-engine</module>
+	<module>crypto</module>
   </modules>
   <build>
     <plugins>
@@ -56,7 +58,7 @@
   	</dependency>
   </dependencies>
   <repositories>
-  	<repository>
+   	<repository>
   		<id>mvnsearch.org</id>
   		<name>mvnsearch</name>
   		<url>http://www.mvnsearch.org/maven2</url>
@@ -86,8 +88,8 @@
         <checksumPolicy>warn</checksumPolicy>
       </snapshots>
     </repository>
-    <repository>
-	  <id>central</id>
+	<repository>
+      <id>jboss</id>
       <url>http://repository.jboss.com/maven2</url>
       <layout>default</layout>
       <releases>
@@ -101,6 +103,20 @@
         <checksumPolicy>warn</checksumPolicy>
       </snapshots>
     </repository>
-    
+    <repository>
+      <id>jboss-nexus</id>
+      <url>https://repository.jboss.org/nexus/</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </snapshots>
+    </repository>
   </repositories>  
 </project>

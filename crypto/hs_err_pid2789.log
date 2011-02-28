@@ -1,0 +1,176 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0xfee03a0b, pid=2789, tid=7
+#
+# JRE version: 6.0_21-b06
+# Java VM: Java HotSpot(TM) Server VM (17.0-b16 mixed mode solaris-x86 )
+# Problematic frame:
+# C  [libc.so.1+0x33a0b]  memcpy+0x1b
+#
+# If you would like to submit a bug report, please visit:
+#   http://java.sun.com/webapps/bugreport/crash.jsp
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x08142800):  VMThread [stack: 0xb5fe6000,0xb6066000] [id=7]
+
+siginfo:si_signo=SIGSEGV: si_errno=0, si_code=1 (SEGV_MAPERR), si_addr=0x0031d828
+
+Registers:
+EAX=0x0031d828, EBX=0xe63d0808, ECX=0x00000006, EDX=0x00000018
+ESP=0xb6065afc, EBP=0xb6065b3c, ESI=0xe63d0808, EDI=0x0031d828
+EIP=0xfee03a0b, EFLAGS=0x00010216
+
+Top of Stack: (sp=0xb6065afc)
+0xb6065afc:   00000006 0031d828 fe9aaa3d 0031d828
+0xb6065b0c:   e63d0808 00000018 080751d0 08075180
+0xb6065b1c:   08075180 c89ffff0 080751d0 08075180
+0xb6065b2c:   b6065b70 fea2dbde e9f5ffe0 00000001
+0xb6065b3c:   b6065b58 fe59f3c1 08074248 00000000
+0xb6065b4c:   b6065b70 b6065b70 feb535b0 b6065bac
+0xb6065b5c:   fe59f880 08075180 08075180 08074928
+0xb6065b6c:   00000000 fe010100 00000000 00000000 
+
+Instructions: (pc=0xfee03a0b)
+0xfee039fb:   10 8b 4c 24 14 90 83 f9 3f 77 25 8b d1 c1 e9 02
+0xfee03a0b:   f3 a5 83 e2 03 74 16 8a 0e 88 0f 4a 74 0f 8a 4e 
+
+Stack: [0xb5fe6000,0xb6066000],  sp=0xb6065afc,  free space=1fefec1d074k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [libc.so.1+0x33a0b]  memcpy+0x1b
+V  [libjvm.so+0x19f3c1]
+V  [libjvm.so+0x19f880]
+V  [libjvm.so+0x5a9ea7]
+V  [libjvm.so+0x5b0e18]
+V  [libjvm.so+0x59a26c]
+V  [libjvm.so+0x15bfec]
+V  [libjvm.so+0x14f5be]
+V  [libjvm.so+0x14f43c]
+V  [libjvm.so+0x1d7752]
+V  [libjvm.so+0x1d806c]
+V  [libjvm.so+0x58bd1d]
+C  [libc.so.1+0xbd783]  _thrp_setup+0x9b
+C  [libc.so.1+0xbda30]  _lwp_start+0x0
+
+VM_Operation (0xfe2fdf34): ParallelGCFailedAllocation, mode: safepoint, requested by thread 0x08071400
+
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x08264000 JavaThread "ReaderThread" [_thread_in_native, id=18, stack(0xb5bef000,0xb5c3f000)]
+  0x0817a800 JavaThread "Low Memory Detector" daemon [_thread_blocked, id=16, stack(0xb5d4f000,0xb5d9f000)]
+  0x08178400 JavaThread "CompilerThread1" daemon [_thread_blocked, id=15, stack(0xb5da0000,0xb5e20000)]
+  0x08175800 JavaThread "CompilerThread0" daemon [_thread_blocked, id=14, stack(0xb5e21000,0xb5ea1000)]
+  0x08169c00 JavaThread "JDWP Command Reader" daemon [_thread_in_native, id=13, stack(0xb5ea2000,0xb5ef2000)]
+  0x08167c00 JavaThread "JDWP Event Helper Thread" daemon [_thread_blocked, id=12, stack(0xb5ef3000,0xb5f43000)]
+  0x08165800 JavaThread "JDWP Transport Listener: dt_socket" daemon [_thread_blocked, id=11, stack(0xb5f44000,0xb5f94000)]
+  0x0815ac00 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=10, stack(0xb5f95000,0xb5fe5000)]
+  0x08146c00 JavaThread "Finalizer" daemon [_thread_blocked, id=9, stack(0xb645c000,0xb64ac000)]
+  0x08145400 JavaThread "Reference Handler" daemon [_thread_blocked, id=8, stack(0xb64ad000,0xb64fd000)]
+  0x08071400 JavaThread "main" [_thread_blocked, id=2, stack(0xfe2af000,0xfe2ff000)]
+
+Other Threads:
+=>0x08142800 VMThread [stack: 0xb5fe6000,0xb6066000] [id=7]
+  0x08185000 WatcherThread [stack: 0xb5cce000,0xb5d4e000] [id=17]
+
+VM state:at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x08070618] Threads_lock - owner thread: 0x08142800
+[0x08070a28] Heap_lock - owner thread: 0x08071400
+
+Heap
+ PSYoungGen      total 136256K, used 136240K [0xe5200000, 0xf4c00000, 0xfa800000)
+  eden space 79232K, 100% used [0xe5200000,0xe9f60000,0xe9f60000)
+  from space 57024K, 99% used [0xee850000,0xf1ffc010,0xf2000000)
+  to   space 74688K, 0% used [0xe9f60000,0xe9f60000,0xee850000)
+ PSOldGen        total 233472K, used 233471K [0xba600000, 0xc8a00000, 0xe5200000)
+  object space 233472K, 99% used [0xba600000,0xc89ffff0,0xc8a00000)
+ PSPermGen       total 16384K, used 4264K [0xb6600000, 0xb7600000, 0xba600000)
+  object space 16384K, 26% used [0xb6600000,0xb6a2a240,0xb7600000)
+
+Dynamic libraries:
+0x08050000 	/usr/jdk/instances/jdk1.6.0/bin/java
+0xfef70000 	/lib/libthread.so.1
+0xfef40000 	/usr/jdk/instances/jdk1.6.0/bin/../jre/lib/i386/jli/libjli.so
+0xfef30000 	/lib/libdl.so.1
+0xfedd0000 	/lib/libc.so.1
+0xfe400000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/server/libjvm.so
+0xfed90000 	/lib/libsocket.so.1
+0xfed80000 	/usr/lib/libsched.so.1
+0xfed50000 	/lib/libm.so.1
+0xfed20000 	/usr/lib/libCrun.so.1
+0xfed00000 	/lib/libdoor.so.1
+0xfec80000 	/lib/libm.so.2
+0xfe370000 	/lib/libnsl.so.1
+0xfec50000 	/lib/libmd.so.1
+0xfe340000 	/lib/libmp.so.2
+0xfe270000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/libverify.so
+0xfe220000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/libjava.so
+0xfe1e0000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/native_threads/libhpi.so
+0xfe180000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/libjdwp.so
+0xfe150000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/libnpt.so
+0xfdc00000 	/usr/lib/locale/en_US.UTF-8/en_US.UTF-8.so.3
+0xfdbd0000 	/usr/lib/locale/en_US.UTF-8/methods_unicode.so.3
+0xfdb70000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/libzip.so
+0xb6440000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/libdt_socket.so
+0xb5c40000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/libnet.so
+0xb5bc0000 	/usr/jdk/instances/jdk1.6.0/jre/lib/i386/libj2pkcs11.so
+0xb5b80000 	/usr/lib/libpkcs11.so
+0xb5b40000 	/lib/libcryptoutil.so.1
+0xb5a50000 	/usr/lib/security/pkcs11_softtoken.so
+0xb5a10000 	/usr/lib/libsoftcrypto.so.1
+0xb59f0000 	/lib/libgen.so.1
+
+VM Arguments:
+jvm_args: -agentlib:jdwp=transport=dt_socket,suspend=y,address=localhost:55790 -Dfile.encoding=UTF-8 
+java_command: org.eclipse.jdt.internal.junit.runner.RemoteTestRunner -version 3 -port 63118 -testLoaderClass org.eclipse.jdt.internal.junit4.runner.JUnit4TestLoader -loaderpluginname org.eclipse.jdt.junit4.runtime -classNames org.scantegrity.crypto.SymbolFactoryTests
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+PATH=/usr/gnu/bin:/usr/bin:/usr/sbin:/sbin
+USERNAME=carback1
+LD_LIBRARY_PATH=/usr/jdk/instances/jdk1.6.0/jre/lib/i386/server:/usr/jdk/instances/jdk1.6.0/jre/lib/i386:/usr/jdk/instances/jdk1.6.0/jre/../lib/i386:/usr/jdk/instances/jdk1.6.0/jre/lib/i386/client:/usr/jdk/instances/jdk1.6.0/jre/lib/i386:/usr/lib/firefox/:/usr/lib/firefox/
+SHELL=/bin/bash
+DISPLAY=:0.0
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0x662a30], sa_mask[0]=0xffbffeff, sa_flags=0x0000000c
+SIGBUS: [libjvm.so+0x662a30], sa_mask[0]=0xffbffeff, sa_flags=0x0000000c
+SIGFPE: [libjvm.so+0x131158], sa_mask[0]=0xffbffeff, sa_flags=0x0000000c
+SIGPIPE: [libjvm.so+0x131158], sa_mask[0]=0xffbffeff, sa_flags=0x0000000c
+SIGXFSZ: [libjvm.so+0x131158], sa_mask[0]=0xffbffeff, sa_flags=0x0000000c
+SIGILL: [libjvm.so+0x131158], sa_mask[0]=0xffbffeff, sa_flags=0x0000000c
+SIGUSR1: SIG_DFL, sa_mask[0]=0x00000000, sa_flags=0x00000000
+SIGUSR2: SIG_DFL, sa_mask[0]=0x00000000, sa_flags=0x00000000
+SIGQUIT: [libjvm.so+0x58d800], sa_mask[0]=0xffbffeff, sa_flags=0x00000004
+SIGHUP: [libjvm.so+0x58d800], sa_mask[0]=0xffbffeff, sa_flags=0x00000004
+SIGINT: [libjvm.so+0x58d800], sa_mask[0]=0xffbffeff, sa_flags=0x00000004
+SIGTERM: [libjvm.so+0x58d800], sa_mask[0]=0xffbffeff, sa_flags=0x00000004
+SIG39: [libjvm.so+0x58f4e4], sa_mask[0]=0x00000000, sa_flags=0x00000008
+SIG40: [libjvm.so+0x131158], sa_mask[0]=0xffbffeff, sa_flags=0x0000000c
+
+
+---------------  S Y S T E M  ---------------
+
+OS:                      OpenIndiana Development oi_148 X86
+        Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+                        Use is subject to license terms.
+                           Assembled 29 November 2010
+
+uname:SunOS 5.11 oi_148 i86pc  (T2 libthread)
+rlimit: STACK 10240k, CORE infinity, NOFILE 65536, AS infinity
+load average:0.56 0.43 0.38
+
+CPU:total 4 (4 cores per cpu, 1 threads per core) family 16 model 4 stepping 3, cmov, cx8, fxsr, mmx, sse, sse2, sse3, popcnt, mmxext, 3dnow, 3dnowext, lzcnt, sse4a
+
+Memory: 4k page, physical 4191740k(113184k free)
+
+vm_info: Java HotSpot(TM) Server VM (17.0-b16) for solaris-x86 JRE (1.6.0_21-b06), built on Jun 22 2010 01:24:03 by "" with Workshop 5.8
+
+time: Sun Feb 27 22:37:40 2011
+elapsed time: 3 seconds
+

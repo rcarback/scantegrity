@@ -21,99 +21,132 @@
 package org.scantegrity.common;
 
 public class InputConstants {
+	public static enum BallotType {PUNCHSCAN,SCANTEGRITY,SCANTEGRITY_II,NONE}
+	
+	
+	public static BallotType FrontEnd=BallotType.SCANTEGRITY_II;	
+
 	public static byte[] MK1 = "G7S-)bj^l;q1800]".getBytes();
 	public static byte[] MK2 = "K*dst>p9H6c38?[!".getBytes();
 	public static byte[] C = "LinuxUsersGroup ".getBytes();		
 	
-	public static int NoBallots = 200;
-	public static int NoDs = 1;
+	public static int NoBallots = 100;
+	public static int NoDs = 4;
 	public static double PercentCheck = 0.5;
-	public static double PercentVoted = 0.5;
-
+	public static double PercentVoted = 0.2;///38f;//0.5;
+	public static int PrintBatchSize = 100;
+	
 	public static int Dpi = 150;
 	public static int NoCols = 1;
 	
-	//public static String tempDir = "D:/PunchScan2.0/PunchScan2.0/Elections/InvisibleInk/PolkCounty/";
-	//public static String tempDir = "D:/PunchScan2.0/PunchScan2.0/Elections/POLK COUNTY, FLORIDA NOVEMBER 7, 2000/version6letter/";
-	//public static String tempDir = "D:/PunchScan2.0/PunchScan2.0/Elections/Crypto08/Captcha/";
-	public static String tempDir = "D:/PunchScan2.0/PunchScan2.0/Elections/InvisibleInk/WOTE08/";
-	//public static String tempDir = "D:/PunchScan2.0/PunchScan2.0/Elections/InvisibleInk/lettersONLY/";
+	//public static String folder="D:/PunchScan2.0/PunchScan2.0/Elections/TP Nov 3 2009, mock PUBLIC/";
+	//public static String folder="D:/PunchScan2.0/PunchScan2.0/Elections/BenDemo/";
+	public static String folder="PUBLIC/";
 	
-	//public static String tempDir = "D:/PunchScan2.0/PunchScan2.0/Elections/InvisibleInk/TakomaParkDemo/rick/";	
-	public static String ElectionSpec = tempDir+"ElectionSpec.xml";
-	public static String Partitions = tempDir+"partitions.xml";
-	
-	public static String MeetingOneIn = tempDir+"MeetingOneIn.xml";
-	public static String MeetingTwoIn = tempDir+"MeetingTwoIn.xml";
-	public static String MeetingThreeIn = tempDir+"MeetingThreeIn.xml";
-	public static String MeetingFourIn = tempDir+"MeetingFourIn.xml";
-	
-	public static String MeetingOneOut = tempDir+"MeetingOneOut.xml";
-	public static String MeetingTwoOut = tempDir+"MeetingTwoOut.xml";
-	public static String MeetingThreeOut = tempDir+"MeetingThreeOut.xml";
-	public static String MeetingThreeOutCodes = tempDir+"MeetingThreeOutCodes.xml";
-	public static String MeetingFourOut = tempDir+"MeetingFourOut.xml";
-	public static String MeetingThreeAndAHalfOut = tempDir+"MeetingThreeAndAHalfOut.xml";
-	
-	public static String MeetingTwoPrints = tempDir+"MeetingTwoPrints.xml";
-	public static String Codes = tempDir+"PrintCodes.xml";
-	public static String SeedForCodes = tempDir+"SeedForCodes.xml";
-	public static String MeetingTwoCodesCommitments = tempDir+"MeetingTwoOutCommitments.xml";	
-	public static String SerialMap = tempDir+"SerialMap.xml";
-	public static String ClearTextBallots=tempDir+"ballots/";//"clearBallots.txt";
-	
-	public static String ContestedCodes = tempDir+"ContestedCodes.xml";
-	public static String ReplyToContestedCodes = tempDir+"ReplyToContestedCodes.xml";
-	public static String BallotsToBeRetrievedFromTheWarehouse = tempDir+"BallotsToBeRetrievedFromTheWarehouse.xml";
-	
-	public static String Geometry = tempDir+"geometry.xml";
-	public static String PdfTemplate = tempDir+"template.pdf";
-	public static String ImageTemplate = tempDir+"background.bmp";
-	
-	public static String Background = tempDir+"background.pdf";
-	public static String JavaCreatedForm = tempDir+"javaCreatedForm.pdf";
-	
-	public static String PdfFormsDir = tempDir+"pdfBallots/";	
-	
-	public static String BallotsDir = tempDir+"ballots/";
-	public static String BallotsBackupDir = tempDir+"backup/";
-	public static String ScannesDir = tempDir+"scannes/";
-	
-	public static void setTempDir(String tempDir) {
-		InputConstants.tempDir=tempDir;
-	
-		InputConstants.ElectionSpec = tempDir+"ElectionSpec.xml";
-		InputConstants.Partitions = tempDir+"partitions.xml";
+	public static String privateFolder = folder+"private/";	
+	public static String publicFolder = folder;//+"public/";
 		
-		InputConstants.MeetingOneIn = tempDir+"MeetingOneIn.xml";
-		InputConstants.MeetingTwoIn = tempDir+"MeetingTwoIn.xml";
-		InputConstants.MeetingThreeIn = tempDir+"MeetingThreeIn.xml";
-		InputConstants.MeetingFourIn = tempDir+"MeetingFourIn.xml";
+	public static String ElectionSpec = publicFolder+"ElectionSpec.xml";
+	public static String Partitions = publicFolder+"partitions.xml";
+	
+	public static String MeetingOneIn = publicFolder+"MeetingOneIn.xml";
+	public static String MeetingTwoIn = publicFolder+"MeetingTwoIn.xml";
+	public static String MeetingThreeIn = publicFolder+"MeetingThreeIn.xml";
+	public static String MeetingFourIn = publicFolder+"MeetingFourIn.xml";
+	
+	public static String MeetingOneOut = publicFolder+"MeetingOneOut.xml";
+	public static String MeetingTwoOut = publicFolder+"MeetingTwoOut.xml";
+	public static String MeetingThreeOut = publicFolder+"MeetingThreeOut.xml";
+	public static String MeetingThreeOutCodes = publicFolder+"MeetingThreeOutCodes.xml";
+	public static String MeetingFourOut = publicFolder+"MeetingFourOut.xml";
+	public static String MeetingThreeAndAHalfOut = publicFolder+"MeetingThreeAndAHalfOut.xml";
+	
+	public static String MeetingTwoPrints = privateFolder+"MeetingTwoPrints.xml";
+	
+	public static String Codes = publicFolder+"PrintCodes.xml";
+	public static String MeetingTwoCodesCommitments = publicFolder+"MeetingTwoOutCommitments.xml";	
+	public static String SerialMap = publicFolder+"SerialMap.xml";
+	
+//	public static String ClearTextBallots=privateFolder+"ballots/";//.xml";
+	
+	public static String ContestedCodes = publicFolder+"ContestedCodes.xml";
+	public static String ReplyToContestedBallots = publicFolder+"ReplyToContestedCodes.xml";
+	public static String BallotsToBeRetrievedFromTheWarehouse = publicFolder+"BallotsToBeRetrievedFromTheWarehouse.xml";
+	
+	public static String SpoiledBallotsFromScanner=publicFolder+"SpoiledBallotsFromScanner.xml";
+	public static String SpoiledBallotsPid=publicFolder+"SpoiledBallotsPid.xml";
+	
+	public static String PrintAuditCodes=publicFolder+"PrintAuditCodes.xml";
+	public static String PrintAuditCodesMixnet =publicFolder+"PrintAuditMixnet.xml";
+	
+	public static String Geometry = publicFolder+"geometry.xml";
+	public static String PdfTemplate = publicFolder+"background.pdf";
+	
+	public static String JavaCreatedForm = publicFolder+"javaCreatedForm.pdf";
+	
+	public static String PdfFormsDir = publicFolder+"pdfBallots/";	
+	
+	public static String BallotsDir = privateFolder+"ballots";
+	public static String BallotsBackupDir = privateFolder+"backup";
+	public static String ScannesDir = privateFolder+"scannes";
+	public static String WriteinsDir = privateFolder+"write-ins";
+	
+	public static void setFolder(String tempDir) {
+		folder=tempDir;
 		
-		InputConstants.MeetingOneOut = tempDir+"MeetingOneOut.xml";
-		InputConstants.MeetingTwoOut = tempDir+"MeetingTwoOut.xml";
-		InputConstants.MeetingThreeOut = tempDir+"MeetingThreeOut.xml";
-		InputConstants.MeetingThreeOutCodes = tempDir+"MeetingThreeOutCodes.xml";
-		InputConstants.MeetingFourOut = tempDir+"MeetingFourOut.xml";
-		InputConstants.MeetingThreeAndAHalfOut = tempDir+"MeetingThreeAndAHalfOut.xml";
+		setPublicFolder(folder+"public/");	
+		setPrivateFolder(folder+"private/");
+	}
+	
+	public static void setPublicFolder(String tempDir) {	
+		publicFolder = tempDir;
+			
+		ElectionSpec = publicFolder+"ElectionSpec.xml";
+		Partitions = publicFolder+"partitions.xml";
 		
-		InputConstants.MeetingTwoPrints = tempDir+"MeetingTwoPrints.xml";
-		InputConstants.Codes = tempDir+"PrintCodes.xml";
-		InputConstants.MeetingTwoCodesCommitments = tempDir+"MeetingOneOutCodes.xml";		
-		InputConstants.SeedForCodes = tempDir+"SeedForCodes.xml";
-		InputConstants.SerialMap = tempDir+"SerialMap.xml";
-		InputConstants.ClearTextBallots=tempDir+"clearBallots.txt";
+		MeetingOneIn = publicFolder+"MeetingOneIn.xml";
+		MeetingTwoIn = publicFolder+"MeetingTwoIn.xml";
+		MeetingThreeIn = publicFolder+"MeetingThreeIn.xml";
+		MeetingFourIn = publicFolder+"MeetingFourIn.xml";
 		
-		InputConstants.ContestedCodes = tempDir+"ContestedCodes.xml";
-		InputConstants.ReplyToContestedCodes = tempDir+"ReplyToContestedCodes.xml";		
-		InputConstants.BallotsToBeRetrievedFromTheWarehouse = tempDir+"BallotsToBeRetrievedFromTheWarehouse.xml";
+		MeetingOneOut = publicFolder+"MeetingOneOut.xml";
+		MeetingTwoOut = publicFolder+"MeetingTwoOut.xml";
+		MeetingThreeOut = publicFolder+"MeetingThreeOut.xml";
+		MeetingThreeOutCodes = publicFolder+"MeetingThreeOutCodes.xml";
+		MeetingFourOut = publicFolder+"MeetingFourOut.xml";
+		MeetingThreeAndAHalfOut = publicFolder+"MeetingThreeAndAHalfOut.xml";
 		
-		InputConstants.Geometry = tempDir+"geometry.xml";
-		InputConstants.PdfTemplate = tempDir+"template.pdf";
 		
-		InputConstants.Background = tempDir+"background.pdf";
-		InputConstants.JavaCreatedForm = tempDir+"javaCreatedForm.pdf";
+		Codes = publicFolder+"PrintCodes.xml";
+		MeetingTwoCodesCommitments = publicFolder+"MeetingTwoOutCommitments.xml";	
+		SerialMap = publicFolder+"SerialMap.xml";
 		
-		InputConstants.PdfFormsDir = tempDir+"pdfBallots/";
+		ContestedCodes = publicFolder+"ContestedCodes.xml";
+		ReplyToContestedBallots = publicFolder+"ReplyToContestedCodes.xml";
+		BallotsToBeRetrievedFromTheWarehouse = publicFolder+"BallotsToBeRetrievedFromTheWarehouse.xml";
+		
+		PrintAuditCodes=publicFolder+"PrintAuditBallots.xml";
+		PrintAuditCodesMixnet =publicFolder+"PrintAuditMixnet.xml";
+		
+		SpoiledBallotsFromScanner=publicFolder+"SpoiledBallotsFromScanner.xml";
+		SpoiledBallotsPid=publicFolder+"SpoiledBallotsPid.xml";
+		
+		Geometry = publicFolder+"geometry.xml";
+		PdfTemplate = publicFolder+"background.pdf";
 	}	
+	
+	public static void setPrivateFolder(String tempDir) {
+		privateFolder = tempDir;	
+					
+		MeetingTwoPrints = privateFolder+"MeetingTwoPrints.xml";
+
+		BallotsDir = privateFolder+"ballots";
+		
+		BallotsBackupDir = privateFolder+"backup";
+		ScannesDir = privateFolder+"scannes";
+		WriteinsDir = privateFolder+"write-ins";
+		
+//		ClearTextBallots=privateFolder+"ballots.xml";		
+	}	
+
 }
