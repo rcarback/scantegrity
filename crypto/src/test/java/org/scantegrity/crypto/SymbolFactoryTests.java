@@ -40,14 +40,17 @@ public class SymbolFactoryTests {
 	    String l_seed = "Hello there, Stranger!";
 	    l_prng.setSeed(l_seed.getBytes());
 	    
-	    l_sf.setSymbols("0123456789");
+	    l_sf.initialize();
+	    String[] l_tmp = { "" };
 	    long l_start = System.currentTimeMillis();
-	    for (int i = 0; i < 10; i++)
+	    for (int i = 0; i < 100; i++)
 	    {
-	    	String[] l_tmp = l_sf.getCodes(l_prng, 10);
+	    	l_tmp = l_sf.getCodes(l_prng, 10);
 	    	System.out.println(Arrays.toString(l_tmp));
 	    }
 	    long l_end = System.currentTimeMillis();
+	    //System.out.println(Arrays.toString(l_tmp));
+	    
 	    System.out.println("Completed in " + (l_end - l_start) + "ms.");
 	    
 	}

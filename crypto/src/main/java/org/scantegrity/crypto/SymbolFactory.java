@@ -20,7 +20,6 @@
 package org.scantegrity.crypto;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -40,7 +39,6 @@ import java.util.Vector;
  * settings causes us to dip below, say 10, possible elements, then throw an 
  * exception.
  * 
- * TODO: Remove error msgs to constants at the top of the class.
  * 
  * @author Richard Carback
  * @version 0.0.1
@@ -50,11 +48,82 @@ import java.util.Vector;
 public enum SymbolFactory {
 	INSTANCE;
 	
+	// TODO: Move these to a constants folder, assuming more than one class can use them?
+	private final static String EXUNIQUE = "SymbolGenerator: Cannot produce {0} unique codes with current settings!";
+	private final static String EXNOWORDS = "SymbolGenerator: cannot produce any code words.";
+	private final static String EXZEROSTR = "SymbolGenerator: Cannot use a zero-length string.";
+	
 	private String c_symbols = "0123456789";
 	private Integer c_codeLen = 3;
 	private String[] c_forbidden = { "" };
 	private String[] c_codeList = null;
-		
+
+	/**
+	 * This function initializes the symbol factory to use the defaults. By default, 
+	 * this class should work, so it does almost nothing, but it will pre-generate
+	 * the code list which could speed up return time from the first call.
+	 * 
+	 * This function has the effect of checking the validity of your current setup.
+	 * 
+	 * @param p_codeLen
+	 * @param p_symbols
+	 * @return
+	 */
+	public boolean initialize()
+	{
+		return initialize(c_codeLen, c_symbols, c_forbidden);
+	}
+
+	/**
+	 * This function initializes the symbol factory to use the defaults and return
+	 * p_codeLen sized words. 
+	 * 
+	 * @param p_codeLen
+	 * @param p_symbols
+	 * @return
+	 */
+	public boolean initialize(Integer p_codeLen)
+	{
+		return initialize(p_codeLen, c_symbols, c_forbidden);
+	}
+
+	/**
+	 * This function initializes the symbol factory with the given parameters. It
+	 * uses the default for forbidden strings.
+	 * 
+	 * @param p_codeLen
+	 * @param p_symbols
+	 * @return
+	 */
+	public boolean initialize(Integer p_codeLen, String p_symbols)
+	{
+		return initialize(p_codeLen, p_symbols, c_forbidden);
+	}
+
+	/**
+	 * This function initializes the symbol factory with the given parameters. 
+	 * 
+	 * @param p_codeLen
+	 * @param p_symbols
+	 * @param p_forbidden
+	 * @return
+	 */
+	public boolean initialize(Integer p_codeLen, String p_symbols, String[] p_forbidden)
+	{
+		try 
+		{
+			setCodeLen(p_codeLen);
+			setSymbols(p_symbols);
+			setForbidden(p_forbidden);
+			genCodeList();
+		} catch (Exception e)
+		{
+			System.err.println(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * Use the given SPRNG to generate p_numCodes unique code words. 
 	 * 
@@ -68,22 +137,27 @@ public enum SymbolFactory {
 	 */ 
 	public String[] getCodes(SecureRandom p_sprng, int p_num) throws Exception
 	{
-		//Could potentially make this unsafe and not use these check conditions 
-		//(save overhead if necessary)
 		if (c_codeList == null) genCodeList();		
-		if (p_num > c_codeList.length) throw new Exception("SymbolGenerator: Cannot produce " + p_num + " unique codes with current settings!");
-		
+
 		// Note: this gets called a lot, it needs to be fast, and it can't introduce bias!
 		//Current implementation is probably not as fast as it could be...
 		
 		//TODO: Not sure if 2*p_num is the best idea.
 		HashMap<Integer, Integer> l_shuf = new HashMap<Integer, Integer>(2*p_num);
 		String[] l_codes = new String[p_num];
+		int i;
 		int l_t = 0;
-		for (int i = 0; i < p_num; i++)
+		int l_last = c_codeList.length;
+
+		if (p_num > l_last)
+		{
+			throw new Exception(String.format(EXUNIQUE, p_num));
+		}
+		
+		for (i = p_num; --i >= 0; ) // this is awful, but faster than the status quo
 		{
 			//"nextInt" claims to be uniformly distributed...
-			l_t = p_sprng.nextInt(c_codeList.length-i);
+			l_t = p_sprng.nextInt(l_last);
 			
 			//If it exists in the hashmap, take the index in the hasmap, this is
 			// an old "max" value.
@@ -95,15 +169,16 @@ public enum SymbolFactory {
 			{
 				l_codes[i] = c_codeList[l_t];
 			}
+
 			//Set this position to the current max, if the alg already selected max this
 			//doesn't do anything since max won't come up again.
-			if (l_shuf.get(c_codeList.length-i-1) == null) 
+			if (l_shuf.get(--l_last) == null) 
 			{
-				l_shuf.put(l_t, c_codeList.length-i-1);
+				l_shuf.put(l_t, l_last);
 			}
 			else
 			{
-				l_shuf.put(l_t, l_shuf.get(c_codeList.length-i-1));
+				l_shuf.put(l_t, l_shuf.get(l_last));
 			}
 		}
 		
@@ -162,7 +237,7 @@ public enum SymbolFactory {
 			l_tmp.remove(c_forbidden[i]);			
 		}
 		
-		if (l_tmp.size() <= 0) throw new Exception("SymbolGenerator: cannot produce any code words.");
+		if (l_tmp.size() <= 0) throw new Exception(EXNOWORDS);
 		
 		c_codeList = l_tmp.toArray(new String[l_tmp.size()]);
 	}
@@ -193,7 +268,7 @@ public enum SymbolFactory {
 		}
 		else
 		{
-			throw new Exception("SymbolGenerator: Cannot use a zero-length string.");
+			throw new Exception(EXZEROSTR);
 		}
 	}
 	
