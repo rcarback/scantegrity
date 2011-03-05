@@ -17,13 +17,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package scantegrity;
+package org.scantegrity.crypto.scantegrity;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 
-import commitment.CommitmentScheme;
+import org.scantegrity.crypto.CommitmentScheme;
+
 
 import table.FlatFileTable;
 

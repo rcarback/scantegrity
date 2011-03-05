@@ -1,5 +1,5 @@
 /*
- * @(#)CommitmentScheme.java
+ * @(#)Pointer.java
  *  
  * Copyright (C) 2008 Scantegrity Project
  * 
@@ -17,17 +17,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package commitment;
+package org.scantegrity.crypto.scantegrity;
 
-/**
- * Interface for commitment schemes 
- * 
- * @author Travis Mayberry
- * @version 0.0.1
- * @date June 5th, 2010
- **/
-public interface CommitmentScheme {
-
-	public Commitment commit(byte[] data) throws Exception;
-	public boolean decommit(byte[] data, Commitment commit);
+public class Pointer<T, S>
+{
+	public Pointer(T left, S right)
+	{
+		row = left;
+		column = right;
+	}
+	public T row;
+	public S column;
 }

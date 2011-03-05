@@ -22,12 +22,13 @@
 /**
  * This is the DTable for the punchscan backend. 
  */
-package punchscan;
+package org.scantegrity.crypto.punchscan;
 
 import java.util.Random;
 
-import commitment.Commitment;
-import commitment.CommitmentScheme;
+import org.scantegrity.crypto.Commitment;
+import org.scantegrity.crypto.CommitmentScheme;
+
 
 /**
  * @author jay12701

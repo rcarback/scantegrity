@@ -23,7 +23,7 @@
  * @author John L. Conway IV 
  */
 
-package punchscan;
+package org.scantegrity.crypto.punchscan;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,9 +33,10 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.Properties;
 import java.util.Random;
 
-import commitment.Commitment;
-import commitment.CommitmentScheme;
-import commitment.PRNGCommitmentScheme;
+import org.scantegrity.crypto.Commitment;
+import org.scantegrity.crypto.CommitmentScheme;
+import org.scantegrity.crypto.PRNGCommitmentScheme;
+
 
 public class PunchscanEngine {
 	static final String DEFAULT_NUM_BALLOTS = "100"; 

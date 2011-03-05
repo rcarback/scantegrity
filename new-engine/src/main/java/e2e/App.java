@@ -23,10 +23,11 @@ import java.io.FileInputStream;
 import java.security.SecureRandom;
 import java.util.Properties;
 
-import scantegrity.ScantegrityFrontEnd;
+import org.scantegrity.crypto.Commitment;
+import org.scantegrity.crypto.SymmetricCommitmentScheme;
+import org.scantegrity.crypto.scantegrity.ScantegrityFrontEnd;
 
-import commitment.Commitment;
-import commitment.SymmetricCommitmentScheme;
+
 
 /**
  * Hello world!

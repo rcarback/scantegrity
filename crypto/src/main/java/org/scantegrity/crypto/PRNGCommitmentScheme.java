@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package commitment;
+package org.scantegrity.crypto;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;

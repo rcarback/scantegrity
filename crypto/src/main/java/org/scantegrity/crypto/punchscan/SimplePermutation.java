@@ -22,7 +22,7 @@
  * This class gives permutations based on a Fisher-Yates Shuffle. 
  */
 
-package punchscan;
+package org.scantegrity.crypto.punchscan;
 
 import java.io.FileInputStream;
 import java.security.SecureRandom;

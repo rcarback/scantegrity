@@ -21,9 +21,9 @@
 /**
  * This is a row in the DTable
  */
-package punchscan;
+package org.scantegrity.crypto.punchscan;
 
-import commitment.Commitment;
+import org.scantegrity.crypto.Commitment;
 
 /**
  * @author jay12701

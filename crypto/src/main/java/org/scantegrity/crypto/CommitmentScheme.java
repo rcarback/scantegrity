@@ -1,5 +1,5 @@
 /*
- * @(#)Commitment.java
+ * @(#)CommitmentScheme.java
  *  
  * Copyright (C) 2008 Scantegrity Project
  * 
@@ -17,27 +17,17 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
-package commitment;
-
+package org.scantegrity.crypto;
 
 /**
- * Commitment is a container class for holding the cryptographic data generated 
- * by a commitment scheme.
+ * Interface for commitment schemes 
  * 
  * @author Travis Mayberry
  * @version 0.0.1
  * @date June 5th, 2010
- */
-public class Commitment {
+ **/
+public interface CommitmentScheme {
 
-	public byte[] c_commitment;
-	public byte[] c_randSeed;
-	
-	public Commitment(byte[] p_commitment, byte[] p_randSeed)
-	{
-		c_commitment = p_commitment;
-		c_randSeed = p_randSeed;
-	}
-	
+	public Commitment commit(byte[] data) throws Exception;
+	public boolean decommit(byte[] data, Commitment commit);
 }

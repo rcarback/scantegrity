@@ -1,5 +1,5 @@
 /*
- * @(#)RRow.java
+ * @(#)Permutation.java
  *  
  * Copyright (C) 2008 Scantegrity Project
  * 
@@ -20,26 +20,26 @@
 
 
 /**
- * This is a row in the results table
+ * 
  */
-package punchscan;
+package org.scantegrity.crypto.punchscan;
 
 /**
  * @author jay12701
  *
  */
-public class RRow {
-	int c_results[]; 
-	int c_ballotID; 
+public interface Permutation {
 	
-	public RRow(int p_ballotID)
-	{
-		c_ballotID = p_ballotID;
-		c_results = null;
-	}
-
-	public void setResult(int[] p_results) {
-		c_results = p_results;
-	}
-
+	/** 
+	 * Returns the next permutation in the sequence. 
+	 * @return The next permutation
+	 */
+	int [] getPerm();
+	
+	/** 
+	 * Returns the permutation at the given location. 
+	 * @param location 
+	 * @return The given permutation 
+	 */
+	int [] getPerm(int location);
 }

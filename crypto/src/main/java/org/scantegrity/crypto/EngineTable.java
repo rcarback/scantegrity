@@ -1,5 +1,5 @@
 /*
- * @(#)Pointer.java
+ * @(#)EngineTable.java
  *  
  * Copyright (C) 2008 Scantegrity Project
  * 
@@ -17,15 +17,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package scantegrity;
+package org.scantegrity.crypto;
 
-public class Pointer<T, S>
-{
-	public Pointer(T left, S right)
-	{
-		row = left;
-		column = right;
-	}
-	public T row;
-	public S column;
+import java.util.ArrayList;
+
+public interface EngineTable {
+
+	public ArrayList<Object> getRow(int index);
+	public ArrayList<Object> getRow(Object key);
+	public void insertRow(ArrayList<Object> row);
+	public ArrayList<ArrayList<Object>> getAllRows();
 }
