@@ -15,12 +15,12 @@
   	<dependency>
   		<groupId>org.scantegrity</groupId>
   		<artifactId>common</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>${project.version}</version>
   	</dependency>
   	<dependency>
   		<groupId>org.scantegrity</groupId>
   		<artifactId>authoring</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>${project.version}</version>
   	</dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -56,8 +56,8 @@
   				</formats> 
 				<archive> 
 					<manifest> 
-						<mainClass>org.scantegrity.Inkerator</mainClass>
-						<packageName>org.scantegrity</packageName> 
+						<mainClass>org.scantegrity.engine.gui.ElectionConsole</mainClass>
+						<packageName>org.scantegrity.engine.gui</packageName> 
 					</manifest> 
 				</archive>
 			</configuration>				 
