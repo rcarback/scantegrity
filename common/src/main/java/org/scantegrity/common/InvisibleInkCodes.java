@@ -187,12 +187,14 @@ public class InvisibleInkCodes {
 			int l_pz = l_d;
 			for (int i = 0; i < enc.length; i++)
 			{
-				ret ^= ((int)enc[i]) << l_pz;
+				int l_b = (((int)enc[i]) << (24)) >>> (24);
+				System.out.format("%s\n", Integer.toBinaryString(l_b));
+				ret ^= l_b << l_pz;
 				// Uncomment next line to stop loop at noBits.
 				//if (l_pz >= (noBits-8)) break; 
 				if (l_pz > (noBits-8))
 				{
-					ret ^= ((int)enc[i]) >> (noBits-l_pz);
+					ret ^= l_b >>> (noBits-l_pz);
 				}
 				l_pz = (l_pz+l_d) % noBits; 
 			}
