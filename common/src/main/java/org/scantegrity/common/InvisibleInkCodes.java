@@ -144,29 +144,68 @@ public class InvisibleInkCodes {
 		}
 	}
 	
-	public static int getCode(int printedSerial, int qno,int rank, int ano,SecretKeySpec key,int noBits, TreeSet<Integer> codesAlreadyGenerated) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-		//TODO improve this into single bytes
+	/**
+	 * getCode returns one confirmation code that is to be printed on a Ballot.
+	 * It creates a PRNG from the serial, question number, rank, and answer
+	 * number encrypted with a key generated from entropy provided by election
+	 * trustees. The 128 Ciphertext bytes are then reduce into noBits bits to 
+	 * produce a confirmation number whose maximum value is less that the max 
+	 * number of possible codes.  
+	 * 
+	 * Because there are 128 bits, we take advantage of that fact, assuming
+	 * the RNG is not entirely uniformly distributed, by xor'ing all the 
+	 * noBits-sized chunks with each other to mitigate this problem.
+	 * 
+	 * For many reasons, this code is not a great way to generate confirmation
+	 * codes, but we wanted to make minimal changes from the 2009 codebase. It
+	 * should provide slightly less than noBits of entropy instead of the 8.5
+	 * bits of entropy from the 2009 election. 
+	 * 
+	 * @param printedSerial
+	 * @param qno - question number
+	 * @param rank - the rank (column) from IRV, usually 0
+	 * @param ano - the answer number (candidate choice)
+	 * @param key - the key generated from trustee entropy
+	 * @param noBits - number of bits
+	 * @param codesAlreadyGenerated - list of codes we can't use.
+	 * @return
+	 * @throws InvalidKeyException
+	 * @throws IllegalBlockSizeException
+	 * @throws BadPaddingException
+	 */
+	public static int getCode(int printedSerial, int qno,int rank, int ano,
+								SecretKeySpec key,int noBits, 
+								TreeSet<Integer> codesAlreadyGenerated) 
+	throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		String m=printedSerial+" "+qno+" "+rank+" "+ano;
 		SecurityUtil.cipherPkcs5Padding.init(Cipher.ENCRYPT_MODE, key);
-		byte[] enc=m.getBytes();		
+		byte[] enc=m.getBytes();
 		int ret=0;
 		do {
 			enc=SecurityUtil.cipherPkcs5Padding.doFinal(enc);
-//Util.print(enc);			
-			//from the last noBits bits, make a positive integer
-			ret=enc[15];
-			ret |=enc[14]<<8;
-			ret |=enc[13]<<16;
-			ret |=enc[12]<<24;
-			//now ret has the last 32 bits
-//System.out.println();
-//System.out.println(ret+" " +Integer.toBinaryString(ret));			
-//System.out.println(Integer.toBinaryString((1<<noBits) -1));
-			//take only the last noBits
-			ret &= ((1<<noBits) -1);
-//System.out.println(ret+" "+Integer.toBinaryString(ret));			
+			int l_d = Math.max(0, noBits-8);
+			int l_pz = l_d;
+			for (int i = 0; i < enc.length; i++)
+			{
+				ret ^= ((int)enc[i]) << l_pz;
+				// Uncomment next line to stop loop at noBits.
+				//if (l_pz >= (noBits-8)) break; 
+				if (l_pz > (noBits-8))
+				{
+					ret ^= ((int)enc[i]) >> (noBits-l_pz);
+				}
+				l_pz = (l_pz+l_d) % noBits; 
+			}
+			
+			//Remove the bits we don't need.
+			ret <<= (32-noBits);
+			ret >>>= (32-noBits);
+			//System.out.println("----");
+			//System.out.format("%s\n", Integer.toBinaryString(ret));
+			//System.out.println("----");
 		}
-		while (ret>=NumberOfPossibleCodes || codesAlreadyGenerated.contains(ret));
+		while (ret>=NumberOfPossibleCodes 
+				|| codesAlreadyGenerated.contains(ret));
 		
 		return ret;
 	}
