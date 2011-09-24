@@ -34,7 +34,7 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 		
 		try {
 			SecureRandom c_csprng = SecureRandom.getInstance("SHA1PRNG");
-			iif=new InvisibleInkFactory("Tenacity HR192", 144, 10, c_csprng);
+			iif=new InvisibleInkFactory("Tenacity HR192", 18, 10, c_csprng);
 /*Rick's settings			
 			float[] minMaskColor={0.0f, 0.0f, 0.0f, 0.0f};
 			iif.setMinMaskColor(minMaskColor);
