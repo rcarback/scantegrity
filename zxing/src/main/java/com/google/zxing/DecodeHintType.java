@@ -23,7 +23,7 @@ package com.google.zxing;
  *
  * @author Sean Owen
  * @author dswitkin@google.com (Daniel Switkin)
- * @see Reader#decode(MonochromeBitmapSource, java.util.Hashtable)
+ * @see Reader#decode(BinaryBitmap,java.util.Hashtable)
  */
 public final class DecodeHintType {
 
@@ -53,9 +53,25 @@ public final class DecodeHintType {
   public static final DecodeHintType TRY_HARDER = new DecodeHintType();
 
   /**
-   * Allowed lengths of encoded data -- reject anything else. Maps to an {@link int[]}.
+   * Specifies what character encoding to use when decoding, where applicable (type String)
+   */
+  public static final DecodeHintType CHARACTER_SET = new DecodeHintType();
+
+  /**
+   * Allowed lengths of encoded data -- reject anything else. Maps to an int[].
    */
   public static final DecodeHintType ALLOWED_LENGTHS = new DecodeHintType();
+
+  /**
+   * Assume Code 39 codes employ a check digit. Maps to {@link Boolean}.
+   */
+  public static final DecodeHintType ASSUME_CODE_39_CHECK_DIGIT = new DecodeHintType();
+
+  /**
+   * The caller needs to be notified via callback when a possible {@link ResultPoint}
+   * is found. Maps to a {@link ResultPointCallback}.
+   */
+  public static final DecodeHintType NEED_RESULT_POINT_CALLBACK = new DecodeHintType();
 
   private DecodeHintType() {
   }

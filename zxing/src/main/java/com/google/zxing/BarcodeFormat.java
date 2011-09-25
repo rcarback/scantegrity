@@ -16,6 +16,8 @@
 
 package com.google.zxing;
 
+import java.util.Hashtable;
+
 /**
  * Enumerates barcode formats known to this package.
  *
@@ -24,6 +26,8 @@ package com.google.zxing;
 public final class BarcodeFormat {
 
   // No, we can't use an enum here. J2ME doesn't support it.
+
+  private static final Hashtable VALUES = new Hashtable();
 
   /** QR Code 2D barcode format. */
   public static final BarcodeFormat QR_CODE = new BarcodeFormat("QR_CODE");
@@ -52,14 +56,33 @@ public final class BarcodeFormat {
   /** ITF (Interleaved Two of Five) 1D format. */
   public static final BarcodeFormat ITF = new BarcodeFormat("ITF");
 
+  /** RSS 14 */
+  public static final BarcodeFormat RSS14 = new BarcodeFormat("RSS14");
+
+  /** PDF417 format. */
+  public static final BarcodeFormat PDF417 = new BarcodeFormat("PDF417");
+  
   private final String name;
 
   private BarcodeFormat(String name) {
     this.name = name;
+    VALUES.put(name, this);
+  }
+
+  public String getName() {
+    return name;
   }
 
   public String toString() {
     return name;
+  }
+
+  public static BarcodeFormat valueOf(String name) {
+    BarcodeFormat format = (BarcodeFormat) VALUES.get(name);
+    if (format == null) {
+      throw new IllegalArgumentException();
+    }
+    return format;
   }
 
 }

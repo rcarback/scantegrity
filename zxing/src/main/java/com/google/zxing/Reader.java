@@ -37,21 +37,28 @@ public interface Reader {
    *
    * @param image image of barcode to decode
    * @return String which the barcode encodes
-   * @throws ReaderException if the barcode cannot be located or decoded for any reason
+   * @throws NotFoundException if the barcode cannot be located or decoded for any reason
    */
-  Result decode(MonochromeBitmapSource image) throws ReaderException;
+  Result decode(BinaryBitmap image) throws NotFoundException, ChecksumException, FormatException;
 
   /**
    * Locates and decodes a barcode in some format within an image. This method also accepts
    * hints, each possibly associated to some data, which may help the implementation decode.
    *
    * @param image image of barcode to decode
-   * @param hints passed as a {@link Hashtable} from {@link DecodeHintType} to aribtrary data. The
+   * @param hints passed as a {@link java.util.Hashtable} from {@link com.google.zxing.DecodeHintType}
+   * to arbitrary data. The
    * meaning of the data depends upon the hint type. The implementation may or may not do
    * anything with these hints.
    * @return String which the barcode encodes
-   * @throws ReaderException if the barcode cannot be located or decoded for any reason
+   * @throws NotFoundException if the barcode cannot be located or decoded for any reason
    */
-  Result decode(MonochromeBitmapSource image, Hashtable hints) throws ReaderException;
+  Result decode(BinaryBitmap image, Hashtable hints) throws NotFoundException, ChecksumException, FormatException;
+
+  /**
+   * Resets any internal state the implementation has after a decode, to prepare it
+   * for reuse.
+   */
+  void reset();
 
 }

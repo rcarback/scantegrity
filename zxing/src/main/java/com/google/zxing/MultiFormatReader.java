@@ -16,7 +16,9 @@
 
 package com.google.zxing;
 
+import com.google.zxing.datamatrix.DataMatrixReader;
 import com.google.zxing.oned.MultiFormatOneDReader;
+import com.google.zxing.pdf417.PDF417Reader;
 import com.google.zxing.qrcode.QRCodeReader;
 
 import java.util.Hashtable;
@@ -36,15 +38,15 @@ public final class MultiFormatReader implements Reader {
   private Vector readers;
 
   /**
-   * This version of decode honors the intent of Reader.decode(MonochromeBitmapSource) in that it
+   * This version of decode honors the intent of Reader.decode(BinaryBitmap) in that it
    * passes null as a hint to the decoders. However, that makes it inefficient to call repeatedly.
    * Use setHints() followed by decodeWithState() for continuous scan applications.
    *
    * @param image The pixel data to decode
    * @return The contents of the image
-   * @throws ReaderException Any errors which occurred
+   * @throws NotFoundException Any errors which occurred
    */
-  public Result decode(MonochromeBitmapSource image) throws ReaderException {
+  public Result decode(BinaryBitmap image) throws NotFoundException {
     setHints(null);
     return decodeInternal(image);
   }
@@ -55,9 +57,9 @@ public final class MultiFormatReader implements Reader {
    * @param image The pixel data to decode
    * @param hints The hints to use, clearing the previous state.
    * @return The contents of the image
-   * @throws ReaderException Any errors which occurred
+   * @throws NotFoundException Any errors which occurred
    */
-  public Result decode(MonochromeBitmapSource image, Hashtable hints) throws ReaderException {
+  public Result decode(BinaryBitmap image, Hashtable hints) throws NotFoundException {
     setHints(hints);
     return decodeInternal(image);
   }
@@ -68,9 +70,9 @@ public final class MultiFormatReader implements Reader {
    *
    * @param image The pixel data to decode
    * @return The contents of the image
-   * @throws ReaderException Any errors which occurred
+   * @throws NotFoundException Any errors which occurred
    */
-  public Result decodeWithState(MonochromeBitmapSource image) throws ReaderException {
+  public Result decodeWithState(BinaryBitmap image) throws NotFoundException {
     // Make sure to set up the default state so we don't crash
     if (readers == null) {
       setHints(null);
@@ -89,28 +91,31 @@ public final class MultiFormatReader implements Reader {
     this.hints = hints;
 
     boolean tryHarder = hints != null && hints.containsKey(DecodeHintType.TRY_HARDER);
-    Vector possibleFormats = hints == null ? null : (Vector) hints.get(DecodeHintType.POSSIBLE_FORMATS);
+    Vector formats = hints == null ? null : (Vector) hints.get(DecodeHintType.POSSIBLE_FORMATS);
     readers = new Vector();
-    if (possibleFormats != null) {
+    if (formats != null) {
       boolean addOneDReader =
-          possibleFormats.contains(BarcodeFormat.UPC_A) ||
-              possibleFormats.contains(BarcodeFormat.UPC_E) ||
-              possibleFormats.contains(BarcodeFormat.EAN_13) ||
-              possibleFormats.contains(BarcodeFormat.EAN_8) ||
-              possibleFormats.contains(BarcodeFormat.CODE_39) ||
-              possibleFormats.contains(BarcodeFormat.CODE_128) ||
-              possibleFormats.contains(BarcodeFormat.ITF);
+          formats.contains(BarcodeFormat.UPC_A) ||
+              formats.contains(BarcodeFormat.UPC_E) ||
+              formats.contains(BarcodeFormat.EAN_13) ||
+              formats.contains(BarcodeFormat.EAN_8) ||
+              formats.contains(BarcodeFormat.CODE_39) ||
+              formats.contains(BarcodeFormat.CODE_128) ||
+              formats.contains(BarcodeFormat.ITF) ||
+              formats.contains(BarcodeFormat.RSS14);
       // Put 1D readers upfront in "normal" mode
       if (addOneDReader && !tryHarder) {
         readers.addElement(new MultiFormatOneDReader(hints));
       }
-      if (possibleFormats.contains(BarcodeFormat.QR_CODE)) {
+      if (formats.contains(BarcodeFormat.QR_CODE)) {
         readers.addElement(new QRCodeReader());
       }
-      // TODO re-enable once Data Matrix is ready
-      //if (possibleFormats.contains(BarcodeFormat.DATAMATRIX)) {
-      //  readers.addElement(new DataMatrixReader());
-      //}
+      if (formats.contains(BarcodeFormat.DATAMATRIX)) {
+        readers.addElement(new DataMatrixReader());
+      }
+      if (formats.contains(BarcodeFormat.PDF417)) {
+         readers.addElement(new PDF417Reader());
+       }
       // At end in "try harder" mode
       if (addOneDReader && tryHarder) {
         readers.addElement(new MultiFormatOneDReader(hints));
@@ -121,15 +126,28 @@ public final class MultiFormatReader implements Reader {
         readers.addElement(new MultiFormatOneDReader(hints));
       }
       readers.addElement(new QRCodeReader());
+      
       // TODO re-enable once Data Matrix is ready
       // readers.addElement(new DataMatrixReader());
+      
+      // TODO: Enable once PDF417 has passed QA
+      //readers.addElement(new PDF417Reader());
+      
       if (tryHarder) {
         readers.addElement(new MultiFormatOneDReader(hints));
       }
     }
   }
 
-  private Result decodeInternal(MonochromeBitmapSource image) throws ReaderException {
+  public void reset() {
+    int size = readers.size();
+    for (int i = 0; i < size; i++) {
+      Reader reader = (Reader) readers.elementAt(i);
+      reader.reset();
+    }
+  }
+
+  private Result decodeInternal(BinaryBitmap image) throws NotFoundException {
     int size = readers.size();
     for (int i = 0; i < size; i++) {
       Reader reader = (Reader) readers.elementAt(i);
@@ -140,7 +158,7 @@ public final class MultiFormatReader implements Reader {
       }
     }
 
-    throw ReaderException.getInstance();
+    throw NotFoundException.getNotFoundInstance();
   }
 
 }
