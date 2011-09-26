@@ -13,6 +13,11 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>authoring</name>
   <dependencies>
+   	<dependency>
+  		<groupId>com.google.zxing</groupId>
+  		<artifactId>zxing</artifactId>
+  		<version>${project.version}</version>
+  	</dependency>
   	<dependency>
   		<groupId>org.scantegrity</groupId>
   		<artifactId>common</artifactId>

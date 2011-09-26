@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
@@ -23,6 +24,16 @@ import org.scantegrity.common.BallotRow;
 import org.scantegrity.common.InputConstants;
 import org.scantegrity.common.Util;
 import org.scantegrity.common.InvisibleInkFactory;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.ByteMatrix;
+
 
 public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 	
@@ -142,7 +153,8 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
         //add the 2D barcode
         Image barcode=null;
         try {
-        	BufferedImage bi=ImageIO.read(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl="+ballotRow.getBarcodeSerial()));
+        	BufferedImage bi=GetSerialImage(ballotRow.getBarcodeSerial());
+        	//ImageIO.read(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl="+ballotRow.getBarcodeSerial()));
   
         	//BufferedImage bi=ImageIO.read(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl=123456"));
         	
@@ -151,9 +163,8 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 					Util.RGBBufferedImageToCMYKBufferedImage(bi));
 			
 			//barcode=Image.getInstance(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl="+ballotRow.getBarcodeSerial()));
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (WriterException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 		
@@ -175,6 +186,41 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
     }	
 	
 	
+	/**
+	 * @param p_barcodeSerial
+	 * @return
+	 * @throws WriterException 
+	 */
+	private BufferedImage GetSerialImage(String p_barcodeSerial) 
+	throws WriterException {
+	    QRCodeWriter l_writer = new QRCodeWriter();    
+
+	    // Level H is the highest level of error correction. 
+	    Hashtable<EncodeHintType, ErrorCorrectionLevel> l_hints = 
+	    				new Hashtable<EncodeHintType, ErrorCorrectionLevel>();
+	    l_hints.put( EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H );
+	    
+	    ByteMatrix l_bm = l_writer.encode(p_barcodeSerial, 
+											BarcodeFormat.QR_CODE, 
+											240, 
+											240, 
+											l_hints 
+										    );
+	    
+	    // There's a bug here, where we need to bitflip everything...otherwise
+	    // white is black and black is white.
+	    for (int i = 0; i < l_bm.getHeight(); i++)
+	    {
+	    	for (int j = 0; j < l_bm.getWidth(); j++)
+	    	{
+	    		if ( l_bm.get(i, j) == 0 ) l_bm.set(i, j, 255);
+	    		else l_bm.set(i, j, 0);
+	    	}
+	    }
+	    
+	    return MatrixToImageWriter.toBufferedImage(l_bm);
+	}
+
 	public void addTextCentered(PdfContentByte cb, Rectangle possition, BaseFont font, int XXXfontSize,Color textColor,String text) {
 		//draw a white background		
 		cb.saveState();
@@ -187,11 +233,11 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 		if (mailIn) return;
 		
 		//TODO this may eat too much memory
-		Image l_img=textToImage.get(text);
-		if (l_img==null) {
-			l_img=Util.CMYKBufferedImageToCMYKImage(iif.getBufferedImage("  "+text+"  "));
-			textToImage.put(text, l_img);
-		}
+		//Image l_img=textToImage.get(text);
+		//if (l_img==null) {
+			Image l_img=Util.CMYKBufferedImageToCMYKImage(iif.getBufferedImage("  "+text+"  "));
+		//	textToImage.put(text, l_img);
+		//}
 		
 		//System.out.println("Adding image at "+ possition.getLeft()+" "+ possition.getBottom());
 		try {

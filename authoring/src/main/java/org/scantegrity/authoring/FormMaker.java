@@ -2,10 +2,12 @@ package org.scantegrity.authoring;
 
 import java.awt.Color;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import org.scantegrity.common.ballotstandards.Constants;
 import org.scantegrity.common.ballotstandards.basic.Question;
@@ -111,9 +113,11 @@ public class FormMaker {
 		//load the JavaScript Functions
 		loadJavaScript();
 		
+		//System.out.print(Arrays.deepToString(new File(getClass().getResource(".").toURI()).list()));
+		
 		//helv = BaseFont.createFont("Helvetica", "winansi", BaseFont.EMBEDDED);
 		helv = BaseFont.createFont("Courier", BaseFont.CP1252, BaseFont.EMBEDDED);
-//System.out.println(getClass().getResource(serialFontPath).toString());		
+		//System.out.println(getClass().getResource(serialFontPath).toString());		
 		serialFont = BaseFont.createFont(getClass().getResource(serialFontPath).toString(), BaseFont.CP1252, BaseFont.EMBEDDED);
 		
 		ContestSymbols cs=new ContestSymbols(null,es,ContestSymbols.alphabet,false);
