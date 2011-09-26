@@ -28,11 +28,12 @@ import java.util.Vector;
 import org.scantegrity.common.AffineCropper;
 
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.BinaryBitmap;
 import com.google.zxing.DecodeHintType;
 import com.google.zxing.MultiFormatReader;
-import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
-import com.google.zxing.client.j2se.BufferedImageMonochromeBitmapSource;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
 
 /**
  * @author Richard Carback
@@ -53,13 +54,16 @@ public class QRCodeReader implements SerialNumberReader
 	public String readSerial(BufferedImage p_img, AffineTransformOp p_op) 
 	throws Exception
 	{
-		BufferedImageMonochromeBitmapSource l_serial;
+		BufferedImageLuminanceSource l_serialImg;
 		//int l_start = (int) System.currentTimeMillis();
 		//System.out.println("Trying...");
 		
-		l_serial = new BufferedImageMonochromeBitmapSource(
+		l_serialImg = new BufferedImageLuminanceSource(
 					AffineCropper.cropUnscaled(p_img, p_op, c_boundingBox));
 		//l_serial = new BufferedImageMonochromeBitmapSource(AffineCropper.crop(p_img, p_op, c_boundingBox));
+		
+		BinaryBitmap l_serialBitMap = new BinaryBitmap(
+										new HybridBinarizer(l_serialImg));
 		
 		Vector<BarcodeFormat> l_formats = new Vector<BarcodeFormat>();
 		l_formats.add(BarcodeFormat.QR_CODE);
@@ -69,7 +73,7 @@ public class QRCodeReader implements SerialNumberReader
 		hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
 		hints.put(DecodeHintType.POSSIBLE_FORMATS, l_formats);
 
-		Result result = new MultiFormatReader().decode(l_serial, null);
+		Result result = new MultiFormatReader().decode(l_serialBitMap, hints);
 		
 		
 		//System.out.println("The Result: " + result.getText());
