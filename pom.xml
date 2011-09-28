@@ -50,13 +50,12 @@
     </plugins>
    </build>
   <dependencies>
-  	<dependency>
-  		<groupId>com.lowagie</groupId>
-  		<artifactId>itext</artifactId>
-  		<version>2.1.4</version>
-  		<type>jar</type>
-  		<scope>compile</scope>
-  	</dependency>
+	<dependency>
+      <groupId>com.itextpdf</groupId>
+      <artifactId>itextpdf</artifactId>
+      <version>5.1.2</version>
+      <type>jar</type>
+    </dependency>
   </dependencies>
   <repositories>
    	<repository>

@@ -15,7 +15,7 @@ import org.scantegrity.common.ContestSymbols;
 import org.scantegrity.common.Prow;
 
 
-import com.lowagie.text.DocumentException;
+import com.itextpdf.text.DocumentException;
 
 public class CreateFakeBallots extends FillInPdfForm {
 

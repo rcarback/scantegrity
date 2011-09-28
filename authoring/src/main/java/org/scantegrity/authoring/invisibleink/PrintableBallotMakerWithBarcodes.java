@@ -13,11 +13,12 @@ import javax.imageio.ImageIO;
 
 import org.scantegrity.common.ballotstandards.electionSpecification.ElectionSpecification;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Image;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfContentByte;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
 
 import org.scantegrity.common.BallotGeometry;
 import org.scantegrity.common.BallotRow;
@@ -45,7 +46,7 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 		
 		try {
 			SecureRandom c_csprng = SecureRandom.getInstance("SHA1PRNG");
-			iif=new InvisibleInkFactory("Tenacity HR192", 18, 10, c_csprng);
+			iif=new InvisibleInkFactory("Tenacity HR192", 16, 3, c_csprng);
 /*Rick's settings			
 			float[] minMaskColor={0.0f, 0.0f, 0.0f, 0.0f};
 			iif.setMinMaskColor(minMaskColor);
@@ -84,6 +85,8 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 			float[] maxMaskColor={0.0f, 0.0f, 0.6f, 0.0f};
 			iif.setMaxMaskColor(maxMaskColor);
 			
+			//Caution: This can eat up memory quickly.
+			iif.setCache(true);
 			
 			Integer[] p_vGridSize=new Integer[1];
 			p_vGridSize[0]=11;
@@ -162,6 +165,8 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 			barcode=Util.CMYKBufferedImageToCMYKImage(
 					Util.RGBBufferedImageToCMYKBufferedImage(bi));
 			
+			barcode.setCompressionLevel(9);
+			
 			//barcode=Image.getInstance(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl="+ballotRow.getBarcodeSerial()));
 		} catch (WriterException e) {
 			// TODO Auto-generated catch block
@@ -202,8 +207,8 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 	    
 	    ByteMatrix l_bm = l_writer.encode(p_barcodeSerial, 
 											BarcodeFormat.QR_CODE, 
-											240, 
-											240, 
+											120, 
+											120, 
 											l_hints 
 										    );
 	    
@@ -221,28 +226,42 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 	    return MatrixToImageWriter.toBufferedImage(l_bm);
 	}
 
-	public void addTextCentered(PdfContentByte cb, Rectangle possition, BaseFont font, int XXXfontSize,Color textColor,String text) {
+	public void addTextCentered(PdfContentByte cb, Rectangle possition, BaseFont font, int XXXfontSize,BaseColor textColor,String text) {
 		//draw a white background		
 		cb.saveState();
-		cb.setColorFill(Color.WHITE);
-		cb.setColorStroke(Color.WHITE);
+		cb.setColorFill(white);
+		cb.setColorStroke(white);
 		cb.rectangle(possition.getLeft(), possition.getBottom(), possition.getWidth(), possition.getHeight());
 		cb.fillStroke();
 		cb.restoreState();
 		
 		if (mailIn) return;
 		
+		//System.out.format("%f, %f, %f, %f\n", possition.getLeft(), 
+		//										possition.getBottom(), 
+		//										possition.getWidth(), 
+		//										possition.getHeight());
+		
 		//TODO this may eat too much memory
 		//Image l_img=textToImage.get(text);
 		//if (l_img==null) {
-			Image l_img=Util.CMYKBufferedImageToCMYKImage(iif.getBufferedImage("  "+text+"  "));
+		Image l_img=Util.CMYKBufferedImageToCMYKImage(iif.getBufferedImage(" "+text+" "));
+		//The previous call is memory intensive...
+        //System.gc();
+		//l_img.setCompressionLevel(9);
+			
 		//	textToImage.put(text, l_img);
 		//}
 		
 		//System.out.println("Adding image at "+ possition.getLeft()+" "+ possition.getBottom());
 		try {
 			//cb.addImage(l_img, img.getWidth(), 0, 0, img.getHeight(), possition.getLeft(), possition.getBottom());
-			cb.addImage(l_img, possition.getWidth(), 0, 0, possition.getHeight(), possition.getLeft(), possition.getBottom());
+			l_img.setDpi(300, 300);
+			l_img.setAbsolutePosition(possition.getLeft(), possition.getBottom());
+			l_img.scaleAbsolute(possition.getWidth(), possition.getHeight());
+			//long l_d = System.currentTimeMillis();
+			cb.addImage(l_img);
+			//System.out.format ("addImage: %d\n", System.currentTimeMillis()-l_d);
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}

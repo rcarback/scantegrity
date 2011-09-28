@@ -17,16 +17,17 @@ import org.scantegrity.common.InputConstants;
 import org.scantegrity.common.InvisibleInkCodes;
 import org.scantegrity.common.Util;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfGState;
-import com.lowagie.text.pdf.PdfImportedPage;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfGState;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.PrintableBallotMaker {
 	
@@ -41,7 +42,7 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 	//static Color dummyInvisibleInkColor=new Color(230,255,102);//60% Yellow 10%Cyan	
 	//static Color dummyInvisibleInkColor=new Color(153,255,102);//60% Yellow 40%Cyan
 	//static Color dummyInvisibleInkColor=new Color(0,255,0);//100% Yellow 100%Cyan
-	static Color ovalColor=new Color(255,0,255);//100% Yellow
+	static BaseColor ovalColor=new BaseColor(255,0,255);//100% Yellow
 	//static Color dummyInvisibleInkColor=new Color(255,255,128);//50% Yellow
 	//static Color dummyInvisibleInkColor=new Color(255,255,204);//20% Yellow
 	//static Color dummyInvisibleInkColor=new Color(255,255,102);//60% Yellow
@@ -56,7 +57,7 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 	static float opacity=1f;//0.8f;//0.4f;
 	
 	//static Color decoyCodesColor=new Color(0,255,255);
-	static Color decoyCodesColor=new Color(255,0,255);//Magenta
+	static BaseColor decoyCodesColor=new BaseColor(255,0,255);//Magenta
 	//static Color decoyCodesColor=new Color(0,255,255);//Cyan
 	static float decoyOpacity=0.14f;
 	
@@ -75,7 +76,7 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 		//symbolColor=new Color(230,102,255);//60% Magenta 10%Cyan
 		//symbolColor=new Color(153,102,255);//60% Magenta 40%Cyan
 		//symbolColor=new Color(0,0,255);//100% Magenta 100%Cyan
-		symbolColor=new Color(0,255,255);//100% Magenta
+		symbolColor=new BaseColor(0,255,255);//100% Magenta
 		//symbolColor=new Color(255,255,0);//100% Yellow
 		//symbolColor=new Color(255,128,255);//50% Magenta
 		//symbolColor=new Color(255,102,255);//60% Magenta
@@ -133,7 +134,8 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 	}
 	
 	public void makePrintableBallots(String outputDir,int start,int stop) throws Exception {
-
+		//We are going to need all available memory.
+        System.gc();
 		Rectangle pdfPageSize = backgroundReader.getPageSize(1);
 		//double scalling = pdfPageSize.getWidth() / ballotMap.getW();
 		
@@ -142,6 +144,7 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 		writer = PdfWriter.getInstance(document,new FileOutputStream(f));
 		writer.setPdfVersion(PdfWriter.VERSION_1_4);
 		writer.setPDFXConformance(PdfWriter.PDFXNONE);//.PDFX32002);
+		writer.setFullCompression();
 		
 		document.open();
         cb = writer.getDirectContent();
@@ -156,11 +159,11 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 		//stop--;
 		
 		for (int i=start;i<=stop;i++) {
-			
 			addAlignment(i+"");
 			addSerialNumber(i+"",i+"");			
+			//long l_d1 = System.currentTimeMillis();
 			addContests(ballotRows.get(i).getBarcodeSerial());
-
+			//System.out.format("GenTime %d\n", System.currentTimeMillis()-l_d1);
 			if (i!=stop) {
 				document.newPage();
 				cb.addTemplate(page1,0,0);
@@ -171,7 +174,8 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 		document.add(new Paragraph("The decoy codes are: "));
 		document.add(new Paragraph(allDecoyCodes));
 		*/
-		document.close();		
+		document.close();
+        System.gc();
 	}
 	
 	protected void addOval(PdfContentByte cb, Rectangle possition) {
@@ -270,14 +274,16 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
         }
     }
 
-	public void addTextCentered(PdfContentByte cb, Rectangle possition, BaseFont font, int XXXfontSize,Color textColor,String text) {
+	public void addTextCentered(PdfContentByte cb, Rectangle possition, BaseFont font, int XXXfontSize,BaseColor p_symbolColor,String text) {
 		//draw a white background
 		//FIXME - now we have a fixed size font, based on the size of the oval 0.38 X 0.13 inches in the definition file
 		int fontSize=XXXfontSize;//11;//getFontSize(possition,text,font);
 		
+		BaseColor l_white = new BaseColor(Color.WHITE);
+		
 		cb.saveState();
-		cb.setColorFill(Color.WHITE);
-		cb.setColorStroke(Color.WHITE);
+		cb.setColorFill(l_white);
+		cb.setColorStroke(l_white);
 		cb.rectangle(possition.getLeft(), possition.getBottom(), possition.getWidth(), possition.getHeight());
 		cb.fillStroke();
 		cb.restoreState();
@@ -375,7 +381,7 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 				cb.setGState(state);
 			}
 			cb.beginText();
-			cb.setColorFill(Color.WHITE);
+			cb.setColorFill(white);
 			cb.moveText(x, y);
 			cb.setFontAndSize(font,fontSize);
 			cb.showText(t);
@@ -391,7 +397,7 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 				cb.setGState(state);
 			}
 			cb.beginText();
-			cb.setColorFill(textColor);
+			cb.setColorFill(p_symbolColor);
 			cb.moveText(x, y);
 			cb.setFontAndSize(font,fontSize);
 			cb.showText(t);
@@ -594,7 +600,7 @@ System.out.println("xBar="+xBar+" yBar="+yBar+" xCode="+xCode+" yCode="+yCode+" 
 	}
 */
 	private void createBlankBackgroundPage(float w,float h) {
-		com.lowagie.text.Document document = new com.lowagie.text.Document(new Rectangle(w,h));
+		com.itextpdf.text.Document document = new com.itextpdf.text.Document(new Rectangle(w,h));
 		try {
 			PdfWriter.getInstance(document,
 					new FileOutputStream("__BlankPdf.pdf"));
@@ -666,8 +672,8 @@ System.out.println("xBar="+xBar+" yBar="+yBar+" xCode="+xCode+" yCode="+yCode+" 
         		drawWhiteRectangle(r);
         		
         		if (Character.toString(serial.charAt(row)).equals(digit+"")) {
-        			Color temp=symbolColor;//new Color(symbolColor.getRGB());
-        			symbolColor=Color.BLACK;
+        			BaseColor temp=symbolColor;//new Color(symbolColor.getRGB());
+        			symbolColor=black;
     	        	pdfFormField = makeText(
     	        			r, 
     	            		prefixForFieldName+"serialBulleted_"+row+"_"+digit,

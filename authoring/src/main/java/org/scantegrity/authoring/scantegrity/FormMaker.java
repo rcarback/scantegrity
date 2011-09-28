@@ -7,13 +7,14 @@ import java.io.IOException;
 import org.scantegrity.common.ballotstandards.Constants;
 import org.scantegrity.common.ballotstandards.electionSpecification.ElectionSpecification;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfAction;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfAction;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
 
 import org.scantegrity.common.BallotGeometry;
 import org.scantegrity.common.InputConstants;
@@ -116,8 +117,8 @@ public class FormMaker extends org.scantegrity.authoring.FormMaker {
         		drawWhiteRectangle(r);
         		
         		if (Character.toString(serial.charAt(row)).equals(digit+"")) {
-        			Color temp=symbolColor;//new Color(symbolColor.getRGB());
-        			symbolColor=Color.BLACK;
+        			BaseColor temp=symbolColor;//new Color(symbolColor.getRGB());
+        			symbolColor=black;
     	        	pdfFormField = makeText(
     	        			r, 
     	            		prefixForFieldName+"serialBulleted_"+row+"_"+digit,

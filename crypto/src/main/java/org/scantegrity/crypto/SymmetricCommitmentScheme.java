@@ -62,7 +62,7 @@ public class SymmetricCommitmentScheme implements CommitmentScheme {
 		}
 	}
 	
-	public Commitment commit(byte[] data) throws Exception{
+	public byte[] commit(byte[] p_key, byte[] p_msg) throws Exception{
 		//Generate random key
 		KeyGenerator l_kgen = KeyGenerator.getInstance(c_cipher.getAlgorithm());
 	    l_kgen.init(128);
@@ -70,10 +70,10 @@ public class SymmetricCommitmentScheme implements CommitmentScheme {
 	    SecretKey l_skey = l_kgen.generateKey();
 		
 		//Encrypt data
-		c_cipher.init(Cipher.ENCRYPT_MODE, l_skey);
-		byte[] l_commitData = c_cipher.doFinal(data);
+		c_cipher.init(Cipher.ENCRYPT_MODE, p_key);
+		byte[] l_commitData = c_cipher.doFinal(p_msg);
 		//Return commitment
-		return new Commitment(l_commitData, l_skey.getEncoded());
+		return l_commitData;
 	}
 
 	public boolean decommit(byte[] data, Commitment commit) {

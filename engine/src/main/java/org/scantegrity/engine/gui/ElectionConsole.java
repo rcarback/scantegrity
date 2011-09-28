@@ -794,7 +794,7 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
         	}
     		//System.out.println("Finished generating "+(Integer.parseInt(jTextFieldPDFTo.getText())-Integer.parseInt(jTextFieldPDFFrom.getText()))+" polling place ballots. Time "+(System.currentTimeMillis())+" meaning "+new Date());		
         	
-    		System.out.println("generating "+(Integer.parseInt(jTextFieldPDFTo.getText())-Integer.parseInt(jTextFieldPDFFrom.getText()))+" polling place ballots took "+((System.currentTimeMillis()-start)/1000)+" seconds");		
+    		System.out.println("generating "+(Integer.parseInt(jTextFieldPDFTo.getText())-Integer.parseInt(jTextFieldPDFFrom.getText()))+" polling place ballots took "+((System.currentTimeMillis()-start))+" mseconds");		
 
     	}
 

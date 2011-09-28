@@ -12,13 +12,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfImportedPage;
-import com.lowagie.text.pdf.PdfLayer;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfLayer;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import org.scantegrity.common.BallotGeometry;
 import org.scantegrity.common.Cluster;
@@ -216,7 +217,7 @@ public class Drills {
 		
 		Rectangle pageSize=new Rectangle(pageWidth,pageHeight);
 		
-		com.lowagie.text.Document document = new com.lowagie.text.Document(pageSize);		
+		com.itextpdf.text.Document document = new com.itextpdf.text.Document(pageSize);		
         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(outFile));        
         document.open();
         PdfContentByte cb = writer.getDirectContent();
@@ -239,8 +240,8 @@ public class Drills {
         
         cb.setLineWidth(0.2f);
         
-        cb.setColorFill(Color.BLACK);
-		cb.setColorStroke(Color.BLACK);
+        cb.setColorFill(new BaseColor(Color.BLACK));
+		cb.setColorStroke(new BaseColor(Color.BLACK));
 		float sqrt2r=holeDiameter/2/(float)Math.sqrt(2);
 				
     	cb.beginLayer(new PdfLayer("layer" + Math.random(), writer));

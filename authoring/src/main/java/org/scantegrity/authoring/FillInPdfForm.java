@@ -14,11 +14,11 @@ import org.scantegrity.common.ballotstandards.electionSpecification.exceptions.E
 import org.scantegrity.common.ContestSymbols;
 import org.scantegrity.common.Util;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfFormField;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PdfFormField;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
 
 public class FillInPdfForm {
 

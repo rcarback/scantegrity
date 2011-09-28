@@ -22,12 +22,12 @@ package org.scantegrity.crypto;
 /**
  * Interface for commitment schemes 
  * 
- * @author Travis Mayberry
- * @version 0.0.1
- * @date June 5th, 2010
+ * @author Travis Mayberry, Rick Carback
+ * @version 0.0.2
+ * @date June 17, 2011
  **/
 public interface CommitmentScheme {
 
-	public Commitment commit(byte[] data) throws Exception;
-	public boolean decommit(byte[] data, Commitment commit);
+	public byte[] commit(byte[] p_key, byte[] p_msg) throws Exception;
+	public boolean verify(byte[] p_commit, byte[] p_key, byte[] p_msg);
 }

@@ -25,6 +25,7 @@ import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKeyFactory;
@@ -85,19 +86,15 @@ public enum PunchscanCommitmentScheme implements CommitmentScheme {
 	 * 
 	 * @param p_cipher The cipher to use.
 	 * @param p_digest The digest algorithm to use. 
-	 * @param p_sprng The generator for the salt.
 	 * @param p_const A public constant
 	 * @throws NoSuchAlgorithmException 
 	 */
-	public boolean initialize(Cipher p_cipher, MessageDigest p_digest, SecureRandom p_sprng, byte[] p_const) throws NoSuchAlgorithmException
+	public boolean initialize(Cipher p_cipher, MessageDigest p_digest, 
+			byte[] p_const)
 	{
 		c_cipher = p_cipher;
 		c_digest = p_digest;
-		c_sprng = p_sprng;
 		c_const = p_const;
-		//TODO: Find a better way to do this. This may cause issues if the max 
-		//keylen is different under a weird transformation. 
-		c_keylen = Cipher.getMaxAllowedKeyLength(c_cipher.getAlgorithm());
 		c_alg = p_cipher.getAlgorithm();
 		return true;
 	}
@@ -112,25 +109,29 @@ public enum PunchscanCommitmentScheme implements CommitmentScheme {
 	 * the commitment is h1h2 (h1 concatenated with h2)
 	 * where E stands for Encrypt.
 	 * The encryption scheme used is AES/ECB/NoPadding
+	 * 
+	 * @see org.scantegrity.crypto.CommitmentScheme#commit(byte[], byte[])
+	 *  
+	 * @param p_key the salt
+	 * @param p_msg the message to commit
 	 */
 	@Override
-	public Commitment commit(byte[] p_data) throws Exception {
+	public byte[] commit(byte[] p_key, byte[] p_msg) throws Exception {
 		byte[] h1, h2, l_ret;
-		byte[] l_salt = new byte[c_keylen];
-		c_sprng.nextBytes(l_salt);
+		c_sprng.nextBytes(p_key);
 				
 		//sak=Encrypt C with salt
-		c_cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(l_salt, c_alg));
+		c_cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(p_key, c_alg));
 		byte[] l_sak = c_cipher.doFinal(c_const);
 		
 		//h1 = SHA256(m, sak).
 		c_digest.reset();
-		c_digest.update(p_data);
+		c_digest.update(p_msg);
 		h1 = c_digest.digest(l_sak);
 		
 		//h2 = SHA256(m, Encrypt h1 with sak)
 		c_digest.reset();
-		c_digest.update(p_data);
+		c_digest.update(p_msg);
 		c_cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(l_sak, c_alg));
 		h2 = c_digest.digest(c_cipher.doFinal(h1));
 		
@@ -139,16 +140,22 @@ public enum PunchscanCommitmentScheme implements CommitmentScheme {
 		System.arraycopy(h1, 0, l_ret, 0, h1.length);
 		System.arraycopy(h2, 0, l_ret, h1.length, h2.length);
 		
-		
-		return new Commitment(l_ret, l_salt);
+		return l_ret;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.scantegrity.crypto.CommitmentScheme#decommit(byte[], org.scantegrity.crypto.Commitment)
+	 * @see org.scantegrity.crypto.CommitmentScheme#verify(byte[], byte[], byte[])
 	 */
 	@Override
-	public boolean decommit(byte[] p_data, Commitment p_commit) {
-		// TODO Auto-generated method stub
+	public boolean verify(byte[] p_commit, byte[] p_key, byte[] p_msg) {
+		try {
+			byte[] l_tst = commit(p_key, p_msg);
+			if (Arrays.equals(l_tst, p_commit)) return true;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		return false;
 	}
 

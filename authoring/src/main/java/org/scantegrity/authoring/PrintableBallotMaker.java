@@ -15,15 +15,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfImportedPage;
-import com.lowagie.text.pdf.PdfLayer;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfLayer;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import org.scantegrity.common.BallotGeometry;
 import org.scantegrity.common.Cluster;
@@ -63,7 +64,7 @@ public class PrintableBallotMaker {
 	}
 		
 	private void createBlankBackgroundPage(float w,float h) {
-		com.lowagie.text.Document document = new com.lowagie.text.Document(new Rectangle(w,h));
+		com.itextpdf.text.Document document = new com.itextpdf.text.Document(new Rectangle(w,h));
 		pdfPageheight=h;
 		try {
 			PdfWriter.getInstance(document,new FileOutputStream("__BlankPdf.pdf"));
@@ -106,7 +107,7 @@ public class PrintableBallotMaker {
 	
 	
 	private void make(String outputDir,int start,int stop,Prow.ChosenPage page,boolean withVotes) throws Exception {       
-		com.lowagie.text.Document document = new com.lowagie.text.Document(pdfPageSize);
+		com.itextpdf.text.Document document = new com.itextpdf.text.Document(pdfPageSize);
 		pdfPageheight=pdfPageSize.getHeight();
 		File f= new File(outputDir+"/"+fileNamePrefix+page+"_"+start+".pdf");
 		PdfWriter writer = PdfWriter.getInstance(document,new FileOutputStream(f));
@@ -130,7 +131,7 @@ public class PrintableBallotMaker {
         		document.close();
                 batchNumber++;
                 numberOfPrintedBallotsInThisBatch=0;
-        		document = new com.lowagie.text.Document(pdfPageSize);
+        		document = new com.itextpdf.text.Document(pdfPageSize);
         		f= new File(outputDir+"/"+fileNamePrefix+page+"_"+(start+batchNumber*batchSize)+".pdf");
         		writer = PdfWriter.getInstance(document, new FileOutputStream(f));
         		document.open();      
@@ -203,8 +204,8 @@ public class PrintableBallotMaker {
     }
 
 	private void drawAlignmentMarks(Rectangle rect) {
-			cb.setColorStroke(Color.BLACK);
-			cb.setColorFill(Color.BLACK);
+			cb.setColorStroke(new BaseColor(Color.BLACK));
+			cb.setColorFill(new BaseColor(Color.BLACK));
 			
 			float hh = rect.getHeight();
 			float w = rect.getWidth();
@@ -275,16 +276,16 @@ public class PrintableBallotMaker {
 	
 	private void drawVote(Cluster serialDigit,Prow.ChosenPage page) {
 		Point2D p = serialDigit.getCenterOfMass();	
-		cb.setColorFill(Color.ORANGE);
-		cb.setColorStroke(Color.ORANGE);
+		cb.setColorFill(new BaseColor(Color.ORANGE));
+		cb.setColorStroke(new BaseColor(Color.ORANGE));
 		float radius = (float)((Math.max((serialDigit.getXmax()-serialDigit.getXmin()),(serialDigit.getYmax()-serialDigit.getYmin()))*1.1 / 2));
 		if (page.equals(Prow.ChosenPage.BOTTOM))
 			radius*=0.7;
 		cb.circle((float)(p.getX()*72),(float)(pdfPageheight-p.getY()*72),radius*72);
 		cb.fillStroke();
 		if (page.equals(Prow.ChosenPage.TOP)) {
-			cb.setColorFill(Color.WHITE);
-			cb.setColorStroke(Color.WHITE);
+			cb.setColorFill(new BaseColor(Color.WHITE));
+			cb.setColorStroke(new BaseColor(Color.WHITE));
 			radius*=0.7;
 			cb.circle((float)(p.getX()*72),(float)(pdfPageheight-p.getY()*72),radius*72);
 			cb.fillStroke();
@@ -311,7 +312,7 @@ public class PrintableBallotMaker {
 
 	private String coverAllColor(String getPathToWatermark) throws Exception {
 		String cleanBackground=getPathToWatermark+".temp";
-		com.lowagie.text.Document document = new com.lowagie.text.Document(pdfPageSize);
+		com.itextpdf.text.Document document = new com.itextpdf.text.Document(pdfPageSize);
 
 		File f= new File(cleanBackground);
 		PdfWriter writer = PdfWriter.getInstance(document,new FileOutputStream(f));

@@ -2,13 +2,10 @@ package org.scantegrity.authoring;
 
 import java.awt.Color;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
-
 import org.scantegrity.common.ballotstandards.Constants;
 import org.scantegrity.common.ballotstandards.basic.Question;
 import org.scantegrity.common.ballotstandards.electionSpecification.ElectionSpecification;
@@ -19,20 +16,21 @@ import org.scantegrity.common.BallotGeometry;
 import org.scantegrity.common.ContestSymbols;
 import org.scantegrity.common.Util;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfAction;
-import com.lowagie.text.pdf.PdfAnnotation;
-import com.lowagie.text.pdf.PdfAppearance;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfFormField;
-import com.lowagie.text.pdf.PdfGState;
-import com.lowagie.text.pdf.PdfImportedPage;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfAction;
+import com.itextpdf.text.pdf.PdfAnnotation;
+import com.itextpdf.text.pdf.PdfAppearance;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfFormField;
+import com.itextpdf.text.pdf.PdfGState;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
 
 /**
  * It generates a pdf form as a blank ballot.
@@ -56,8 +54,13 @@ public class FormMaker {
 	protected PdfContentByte cb;
 	protected PdfWriter writer;
 	
-	Color orange=Color.BLACK;
-	Color green=Color.GREEN;
+	protected static final BaseColor orange = new BaseColor(Color.BLACK);
+	protected static final BaseColor green = new BaseColor(Color.GREEN);
+	protected static final BaseColor white = new BaseColor(Color.WHITE);
+	protected static final BaseColor black = new BaseColor(Color.BLACK);	
+	protected static final BaseColor red = new BaseColor(Color.RED);
+	protected static final BaseColor gray = new BaseColor(Color.GRAY);
+	protected static final BaseColor yellow = new BaseColor(Color.YELLOW);
 	
 	protected BallotGeometry geom=null;
 	protected Question[] qs=null;
@@ -67,7 +70,7 @@ public class FormMaker {
     
     protected static String serialFontPath="TENHB192.TTF";
 
-    protected Color symbolColor=Color.BLACK;
+    protected BaseColor symbolColor=new BaseColor(Color.BLACK);
     
     String[] canonicalSymbols=null;
     
@@ -513,7 +516,7 @@ public class FormMaker {
         normal.setColorFill(orange);
         normal.circle(w/2,h/2,l/2);
         normal.fill();
-        normal.setColorFill(Color.WHITE);
+        normal.setColorFill(white);
         normal.circle(w/2,h/2,(float)geom.getHoleDiameter()/2*72);
         normal.fill();
         pushbutton.setFieldName(name);
@@ -547,7 +550,7 @@ public class FormMaker {
         normal.circle(w/2,h/2,l*0.5f);
         normal.fill();
         
-        normal.setColorFill(Color.WHITE);
+        normal.setColorFill(white);
         normal.circle(w/2,h/2,l*0.4f);
         normal.fill();
         
@@ -629,7 +632,7 @@ public class FormMaker {
         normal.circle(w/2,h/2,l*0.5f);
         normal.fill();
         
-        normal.setColorFill(Color.WHITE);
+        normal.setColorFill(white);
         normal.circle(w/2,h/2,l*0.4f);
         normal.fill();
 
@@ -677,7 +680,7 @@ public class FormMaker {
         cb.moveTo(0, 0);
         float l=w>h?h:w;
         PdfAppearance normal = cb.createAppearance(w,h);
-        normal.setColorFill(Color.BLACK);
+        normal.setColorFill(black);
         normal.circle(w/2,h/2,l/2);
         normal.fill();
         pushbutton.setFieldName(name);
@@ -700,11 +703,11 @@ public class FormMaker {
         PdfAppearance normal = cb.createAppearance(w,h);
         
         
-        normal.setColorFill(Color.RED);
+        normal.setColorFill(red);
         normal.rectangle(0,0,w,h);
         normal.fill();
         
-        normal.setColorFill(Color.GRAY);
+        normal.setColorFill(gray);
         
         normal.setFontAndSize(helv, 12);
         normal.moveTo(0,0);
@@ -724,11 +727,11 @@ public class FormMaker {
         PdfAppearance normal = cb.createAppearance(w,h);
         
         
-        normal.setColorFill(Color.GREEN);
+        normal.setColorFill(green);
         normal.rectangle(0,0,w,h);
         normal.fill();
         
-        normal.setColorFill(Color.GRAY);
+        normal.setColorFill(gray);
         
         normal.setFontAndSize(helv, 11);
         normal.moveTo(0,0);
@@ -748,11 +751,11 @@ public class FormMaker {
         PdfAppearance normal = cb.createAppearance(w,h);
         
         
-        normal.setColorFill(Color.YELLOW);
+        normal.setColorFill(yellow);
         normal.rectangle(0,0,w,h);
         normal.fill();
         
-        normal.setColorFill(Color.GREEN);
+        normal.setColorFill(green);
         
         normal.setFontAndSize(helv, 12);
         normal.moveTo(0,0);
@@ -844,8 +847,8 @@ public class FormMaker {
 
 	public static void drawWhiteRectangleStatic(PdfContentByte cb,Rectangle r) {
 		cb.saveState();
-		cb.setColorFill(Color.WHITE);
-		cb.setColorStroke(Color.WHITE);
+		cb.setColorFill(white);
+		cb.setColorStroke(white);
 		
 		//cb.setColorFill(Color.RED);
 		//cb.setColorStroke(Color.RED);
