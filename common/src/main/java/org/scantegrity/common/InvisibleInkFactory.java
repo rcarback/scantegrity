@@ -32,13 +32,13 @@ import java.awt.image.DataBuffer;
 import java.awt.image.PixelInterleavedSampleModel;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.awt.image.DataBufferFloat;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.Vector;
 import org.scantegrity.common.CMYKColorSpace;
 
-import com.lowagie.text.pdf.CMYKColor;
+import com.itextpdf.text.pdf.CMYKColor;
  
 /**
  * Generates images to print text in reactive (yellow) and dummy (magenta) ink.
@@ -49,6 +49,16 @@ import com.lowagie.text.pdf.CMYKColor;
  * paper. 
  * 
  * CHANGELOG:
+ *  0.6.0
+ *  	- Symbol Map is now configurable. It is still not checked to make sure
+ *  	  all calls use these symbols, but it will pregenerate bitmaps, and
+ *  	  perform other tasks. 
+ *  	- Cacheing is a bit smarter now, cacheing each symbol possibility
+ *  	  in each position. This grants a performance benefit without a huge
+ *        memory hit. 
+ *      - The fixed-width property of fonts required for the inkerator is 
+ *        now enforced, which can cause oddities with some fonts (effectively,
+ *        extra space between characters). 
  * 	0.5.0 
  * 		- The sampling and painting method to add a grid has been replaced by 
  * 		  symbol mappings of the smallest font-size for that font.
@@ -66,9 +76,10 @@ public class InvisibleInkFactory {
 	private int c_fontSize = 12;
 	private SecureRandom c_csprng;
 	private CMYKColorSpace c_cs = new CMYKColorSpace();
-	private Color c_defFontColor = null;
-	private Color c_defBgColor = null;
+	private CMYKColor c_defFontColor = null;
+	private CMYKColor c_defBgColor = null;
 	private boolean c_cache = false;
+	private String c_symbols = DEFAULT_SYMBOLS;
 	
 	
 	private float[] c_minFontColor = {0,0,0,0};
@@ -94,8 +105,11 @@ public class InvisibleInkFactory {
 	private Integer[] c_vGridSpace = { 1 };
 	private Integer[] c_hGridSize = { 5 };
 	private Integer[] c_vGridSize = { 5 };
-	private Color c_gridColor = Color.WHITE;
-
+	private CMYKColor c_gridColor = new CMYKColor(0,0,0,0);
+	
+	private Integer c_maxMapWidth = 0;
+	private Integer c_maxMapHeight = 0;
+	
 	/**
 	 * Default constructor for the class, which uses a 18pt Serif
 	 * Font, 10 pixel padding, and block mode without any csprng stuff.   
@@ -131,9 +145,9 @@ public class InvisibleInkFactory {
 		c_csprng = p_csprng;
 		SetTrueAscent(DEFAULT_SYMBOLS);
 		c_symbolMap = new TreeMap<Character, boolean[][]>();
-		float[][] l_defColors = { {0,1,0,0}, {0,0,1,0} };
-		c_defFontColor = new Color(c_cs, l_defColors[0], 1);
-		c_defBgColor = new Color(c_cs, l_defColors[1], 1);
+		c_defFontColor = new CMYKColor(0, 1, 0, 0);
+		c_defBgColor = new CMYKColor(0, 0, 1, 0);
+		generateSymbolMap();
 	}
 	
 	
@@ -145,28 +159,122 @@ public class InvisibleInkFactory {
 	public BufferedImage getBufferedImage(String p_txt) 
 	{
 		if (p_txt.length() <= 0) return null; 
+		BufferedImage[] l_syms = new BufferedImage[p_txt.length()];
 		
-		if (isCache())
+		//Top, right, bottom left padding.
+		int l_imgWidth = 0;
+		int l_imgHeight = 0;
+		String l_prefix = "";
+		for (int i = 0; i < p_txt.length(); i++)
 		{
-			if (c_stringCache.containsKey(p_txt))
+			if (i == 0) l_prefix = "first-";
+			else if (i > 0 && i < p_txt.length()) l_prefix = "mid-";
+			else l_prefix = "left-";
+			if (isCache() 
+					&& c_stringCache.containsKey(l_prefix+p_txt.charAt(i)))
 			{
-				return c_stringCache.get(p_txt);
+				l_syms[i] = c_stringCache.get(l_prefix+p_txt.charAt(i));
 			}
+			else 
+			{
+				int t,r,b,l;
+				t = c_padding;
+				r = (i == p_txt.length()-1) ? c_padding : 0;  
+				b = c_padding;
+				l = (i == 0) ? c_padding : 0;
+				
+				boolean[][] l_map = getMapForSymbol(p_txt.charAt(i));
+				l_map = addPaddingToBitMap(l_map, t, r, b, l);			
+				l_syms[i] = createImageFromBitMap(l_map);
+				if (isCache())
+				{
+					c_stringCache.put(l_prefix+p_txt.charAt(i), l_syms[i]);
+				}
+			}
+
+			l_imgWidth += l_syms[i].getWidth();
 		}
+		l_imgHeight = l_syms[0].getHeight();
+		
+
+		//Draw the symbol images into this image.
+		BufferedImage l_ret = createCMYKImage(l_imgWidth, l_imgHeight);
+		int l_cWidth = 0;
+	    float[] l_dbuf = ((DataBufferFloat) 
+	    				   l_ret.getRaster().getDataBuffer()).getData();
+		for (int i = 0; i < l_syms.length; i++)
+		{
+		    float[] l_sbuf = ((DataBufferFloat) 
+		    				   l_syms[i].getRaster().getDataBuffer()).getData();
+		    
+		    int l_width = l_syms[i].getWidth();
+		    int l_height = l_syms[i].getHeight();
+		    // Note, add offset height * width if you want to offset on y axis.
+		    int l_doff = l_cWidth*4;
+		    int l_soff = 0;
+		    for (int y = 0 ; y < l_height; y++) 
+		    {
+		        System.arraycopy(l_sbuf, l_soff , l_dbuf, l_doff, 
+		        					l_syms[i].getWidth()*4);
+		    	l_doff += l_ret.getWidth()*4;
+		    	l_soff += l_width*4; 
+		    }
+			
+			//l_g2d.drawImage(l_syms[i], null, l_cWidth, 0);
+			l_cWidth += l_syms[i].getWidth();
+		}
+		
 		//Get a map of combined symbols.
-		boolean[][] l_map = getSuperMap(p_txt);
+		//boolean[][] l_map = getSuperMap(p_txt);
+				
+		return l_ret;
+	}
+	
+	
+	/**
+	 * Adds padding to an nxn bitmap of a symbol.
+	 * 
+	 * @param p_map
+	 * @param p_t
+	 * @param p_r
+	 * @param p_b
+	 * @param p_l
+	 * @return
+	 */
+	private boolean[][] addPaddingToBitMap(boolean[][] p_map, int p_top, 
+			int p_right,int p_bottom, int p_left) 
+	{
+		int l_newWidth = c_maxMapWidth + p_right + p_left;
+		int l_newHeight = c_maxMapHeight + p_top + p_bottom;
+		boolean[][] l_ret = new boolean[l_newWidth][l_newHeight];
 		
-		if (l_map == null) return null;
+		int l_wStrt = (int) (Math.round((c_maxMapWidth-p_map.length)/2.0)
+							+ p_left);
+		int l_hStrt = (int) (Math.round((c_maxMapHeight-p_map[0].length)))
+							+ p_top;
 		
-		int l_mapWidth = l_map.length;
-		int l_mapHeight = l_map[0].length;
+		for (int i = 0; i < p_map.length; i++)
+		{
+			System.arraycopy(p_map[i], 0, l_ret[i+l_wStrt], l_hStrt, 
+															p_map[0].length);
+		}
+		
+		return l_ret;
+	}
+	
+	private BufferedImage createImageFromBitMap(boolean[][] p_map)
+	{
+		if (p_map == null) return null;
+		
+		int l_mapWidth = p_map.length;
+		int l_mapHeight = p_map[0].length;
 		
 		//Use the unit-dimensions to generate an image width/height.
 		int l_imgWidth = 0;
 		for (int l_i = 0; l_i < l_mapWidth; l_i++)
 		{
 			l_imgWidth += c_hGridSize[l_i%c_hGridSize.length];
-			if (l_i+1 != l_mapWidth) 
+			if (l_i+1 != l_mapWidth+1) 
 				l_imgWidth += c_hGridSpace[l_i%c_hGridSpace.length];
 		}
 		int l_imgHeight = 0;
@@ -179,9 +287,9 @@ public class InvisibleInkFactory {
 		
 		//Create the image, use the map to determine magenta or cyan colors.
 		BufferedImage l_ret;
-		Graphics2D l_g2d;
+		//Graphics2D l_g2d;
 		l_ret = createCMYKImage(Math.round(l_imgWidth), Math.round(l_imgHeight));		
-		l_g2d = l_ret.createGraphics();
+		//l_g2d = l_ret.createGraphics();
 		//imgx/imgy represent the current x and y offsets for the whole image.
 		int l_imgx = 0;
 		int l_imgy = 0;
@@ -193,7 +301,7 @@ public class InvisibleInkFactory {
 			{
 				float[] l_color = null;
 				//The default is the background, we will try to find font colors.
-				if (l_map[l_x][l_y])
+				if (p_map[l_x][l_y])
 				{
 					l_color = getRandomFontColor();					
 				}
@@ -209,15 +317,18 @@ public class InvisibleInkFactory {
 				int l_height = c_vGridSize[l_y%c_vGridSize.length];
 				CMYKColor l_c = new CMYKColor(l_color[0], l_color[1], 
 												l_color[2], l_color[3]);
-				l_g2d.setColor(l_c);
-				l_g2d.fillRect(l_imgx, l_imgy, l_width, l_height);
+				//l_g2d.setColor(l_c);
+				//l_g2d.fillRect(l_imgx, l_imgy, l_width, l_height);
+				fillRect(l_ret, l_c, l_imgx, l_imgy, l_width, l_height);
 				//Update imgy with SIZE
 				l_imgy += c_vGridSize[l_y%c_vGridSize.length];
 				//Draw Horizontal Line (on the first run of this loop)
 				if (l_x == 0 && l_y+1 != l_mapHeight)
 				{
-					l_g2d.setColor(c_gridColor);
-					l_g2d.fillRect(0, l_imgy, l_imgWidth, c_vGridSpace[l_y%c_vGridSpace.length]);					
+					//l_g2d.setColor(c_gridColor);
+					//l_g2d.fillRect(0, l_imgy, l_imgWidth, c_vGridSpace[l_y%c_vGridSpace.length]);
+					fillRect(l_ret, c_gridColor, 0, l_imgy, l_imgWidth, 
+							 			c_vGridSpace[l_y%c_vGridSpace.length]);
 				}
 				//update imgy with SPACE
 				l_imgy += c_vGridSpace[l_y%c_vGridSpace.length];	
@@ -225,94 +336,46 @@ public class InvisibleInkFactory {
 			//update imgx with SIZE
 			l_imgx += c_hGridSize[l_x%c_hGridSize.length];
 			//Draw Vertical Line (we are doing the next column)
-			if (l_x+1 != l_mapWidth)
+			if (l_x+1 != l_mapWidth+1)
 			{
-				l_g2d.setColor(c_gridColor);
-				l_g2d.fillRect(l_imgx, 0, c_hGridSpace[l_x%c_hGridSpace.length], l_imgHeight);
+				//l_g2d.setColor(c_gridColor);
+				//l_g2d.fillRect(l_imgx, 0, c_hGridSpace[l_x%c_hGridSpace.length], l_imgHeight);
+				fillRect(l_ret, c_gridColor, l_imgx, 0, 
+							c_hGridSpace[l_x%c_hGridSpace.length], l_imgHeight);
+
 			}
 			//update imgx with SPACE
 			l_imgx += c_hGridSpace[l_x%c_hGridSpace.length];
 		}		
 		
-		if (isCache())
-		{
-			c_stringCache.put(p_txt, l_ret);
-		}
-		
 		return l_ret;
 	}
 	
-	private boolean[][] getSuperMap(String p_txt)
+	private static void fillRect(BufferedImage p_img, CMYKColor p_color, 
+								 int p_x, int p_y, int p_width, int p_height)
 	{
-		Vector<boolean[][]> l_symbols = new Vector<boolean[][]>();
-		int l_mapHeight = 0;
-		int l_mapWidth = 0;
-		for (int l_i = 0; l_i < p_txt.length(); l_i++)
+		/*if (p_x + p_width > p_img.getWidth() 
+				|| p_y + p_height > p_img.getHeight())
 		{
-			boolean[][] l_map = getMapForSymbol((p_txt.charAt(l_i)));
-			if (l_map != null)
-			{
-				l_symbols.add(l_map);
-				l_mapWidth += l_symbols.get(l_i).length;
-				if (l_symbols.get(l_i).length > 0)
-				{
-					l_mapHeight = Math.max(l_symbols.get(l_i)[0].length, l_mapHeight);
-				}				
-			}
-		}
+			System.err.println("Array index out of bounds on fillrect!");
+			return;
+		}*/
 		
-		if (l_symbols.size() == 0) return null;
-		
-		//Add the padding
-		l_mapWidth += c_padding*2;
-		l_mapHeight += c_padding*2;
-		
-		//Build a combined symbol map.
-		int l_curMapX = 0;
-		int l_curMapY = 0;
-		int l_curMapIndex = 1;
-		boolean[][] l_curMap = l_symbols.get(0);
-		boolean[][] l_superMap = new boolean[l_mapWidth][l_mapHeight];
-		for (int l_i = 0; l_i < l_mapWidth; l_i++)
-		{
-			//Reset curMapY
-			l_curMapY = 0;
-			for (int l_j = 0; l_j < l_mapHeight; l_j++)
-			{
-				boolean l_res = false;
-				//If we have a current map, we are past the padding
-				//and it is true, then set this supermap cell to true.
-				if (l_i >= c_padding && l_j >= c_padding)
-				{
-					if (l_curMapX < l_curMap.length 
-							&& l_curMapY < l_curMap[l_curMapX].length)
-					{
-						l_res = l_curMap[l_curMapX][l_curMapY];
-						l_curMapY++;
-					}
-				}
-
-				l_superMap[l_i][l_j] = l_res; 					
-			}
-			
-			//Reset curMapX if we reach the end.
-			if (l_i >= c_padding)
-			{
-				l_curMapX++;
-				if (l_curMapX == l_curMap.length)
-				{
-					if (l_curMapIndex < l_symbols.size())
-					{
-						l_curMap = l_symbols.get(l_curMapIndex);
-						l_curMapX = 0;
-						l_curMapIndex++;
-					}
-					//If the index has passed, all the blocks should be background blocks..
-				}
-			}
-		}
-		
-		return l_superMap;
+		float[] l_c = { p_color.getCyan(), p_color.getMagenta(), 
+						p_color.getYellow(), p_color.getBlack() };
+	    float[] l_dbuf = ((DataBufferFloat) 
+	    				   p_img.getRaster().getDataBuffer()).getData();
+	    int l_doff = 0;	    
+	    for (int y = 0; y < p_height; y++)
+	    {
+	    	//            ROW                   X offset
+	    	l_doff = ((y+p_y)*p_img.getWidth() + p_x)*4;
+	    	for (int x = 0; x < p_width; x++)
+	    	{
+		    	System.arraycopy(l_c, 0, l_dbuf, l_doff, 4);
+		    	l_doff += 4;
+	    	}
+	    }	    
 	}
 	
 	/**
@@ -341,12 +404,12 @@ public class InvisibleInkFactory {
 		//Draw Background
 		l_g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, 
 								RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-		l_g2d.setColor(c_defBgColor);
+		l_g2d.setColor(new Color(c_defBgColor.getRGB()));
 		l_g2d.fillRect(0, 0, (int)l_width, (int)l_height);
 		
 		//Draw Text
 		l_g2d.setFont(c_font);
-		l_g2d.setColor(c_defFontColor);
+		l_g2d.setColor(new Color(c_defFontColor.getRGB()));
 		l_g2d.drawString(p_txt, c_padding, c_txtAscent+c_padding);
 		
 		l_ret = GenBlockGrid(l_ret);
@@ -370,6 +433,7 @@ public class InvisibleInkFactory {
 		c_font = p_font;
 		c_fontSize = p_font.getSize();
 		c_symbolMap = new TreeMap<Character, boolean[][]>();
+		generateSymbolMap();
 		SetTrueAscent(DEFAULT_SYMBOLS);
 	}
 	
@@ -449,6 +513,22 @@ public class InvisibleInkFactory {
 			//If any errors occur, set it to default of "height".
 			c_txtAscent = (int) l_height;
 		}
+	}
+	
+	private void generateSymbolMap()
+	{
+		for (int i = 0; i < c_symbols.length(); i++)
+		{
+			boolean[][] l_map = getMapForSymbol((c_symbols.charAt(i)));
+			if (l_map != null)
+			{
+				c_maxMapWidth = Math.max(l_map.length, c_maxMapWidth);
+				if (l_map.length > 0)
+				{
+					c_maxMapHeight = Math.max(l_map[0].length, c_maxMapHeight);
+				}				
+			}
+		}		
 	}
 	
 	private boolean[][] getMapForSymbol(Character p_symbol)
@@ -867,14 +947,14 @@ public class InvisibleInkFactory {
 	/**
 	 * @param gridColor the gridColor to set
 	 */
-	public void setGridColor(Color gridColor) {
+	public void setGridColor(CMYKColor gridColor) {
 		c_gridColor = gridColor;
 	}
 
 	/**
 	 * @return the gridColor
 	 */
-	public Color getGridColor() {
+	public CMYKColor getGridColor() {
 		return c_gridColor;
 	}
 
@@ -894,6 +974,21 @@ public class InvisibleInkFactory {
 	 */
 	public boolean isCache() {
 		return c_cache;
+	}
+
+	/**
+	 * @return the symbols
+	 */
+	public String getSymbols() {
+		return c_symbols;
+	}
+
+	/**
+	 * @param p_symbols the symbols to set
+	 */
+	public void setSymbols(String p_symbols) {
+		c_symbols = p_symbols;
+		generateSymbolMap();
 	}
 }
  
