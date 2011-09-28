@@ -16,12 +16,14 @@
 
 package com.google.zxing.qrcode.decoder;
 
-import com.google.zxing.ReaderException;
+import com.google.zxing.DecodeHintType;
+import com.google.zxing.FormatException;
 import com.google.zxing.common.BitSource;
 import com.google.zxing.common.CharacterSetECI;
 import com.google.zxing.common.DecoderResult;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Hashtable;
 import java.util.Vector;
 
 /**
@@ -57,9 +59,10 @@ final class DecodedBitStreamParser {
   private DecodedBitStreamParser() {
   }
 
-  static DecoderResult decode(byte[] bytes, Version version) throws ReaderException {
+  static DecoderResult decode(byte[] bytes, Version version, ErrorCorrectionLevel ecLevel, Hashtable hints)
+      throws FormatException {
     BitSource bits = new BitSource(bytes);
-    StringBuffer result = new StringBuffer();
+    StringBuffer result = new StringBuffer(50);
     CharacterSetECI currentCharacterSetECI = null;
     boolean fc1InEffect = false;
     Vector byteSegments = new Vector(1);
@@ -73,7 +76,7 @@ final class DecodedBitStreamParser {
         try {
           mode = Mode.forBits(bits.readBits(4)); // mode is encoded by 4 bits
         } catch (IllegalArgumentException iae) {
-          throw ReaderException.getInstance();
+          throw FormatException.getFormatInstance();
         }
       }
       if (!mode.equals(Mode.TERMINATOR)) {
@@ -89,7 +92,7 @@ final class DecodedBitStreamParser {
           int value = parseECIValue(bits);
           currentCharacterSetECI = CharacterSetECI.getCharacterSetECIByValue(value);
           if (currentCharacterSetECI == null) {
-            throw ReaderException.getInstance();
+            throw FormatException.getFormatInstance();
           }
         } else {
           // How many characters will follow, encoded in this mode?
@@ -99,22 +102,22 @@ final class DecodedBitStreamParser {
           } else if (mode.equals(Mode.ALPHANUMERIC)) {
             decodeAlphanumericSegment(bits, result, count, fc1InEffect);
           } else if (mode.equals(Mode.BYTE)) {
-            decodeByteSegment(bits, result, count, currentCharacterSetECI, byteSegments);
+            decodeByteSegment(bits, result, count, currentCharacterSetECI, byteSegments, hints);
           } else if (mode.equals(Mode.KANJI)) {
             decodeKanjiSegment(bits, result, count);
           } else {
-            throw ReaderException.getInstance();
+            throw FormatException.getFormatInstance();
           }
         }
       }
     } while (!mode.equals(Mode.TERMINATOR));
 
-    return new DecoderResult(bytes, result.toString(), byteSegments.isEmpty() ? null : byteSegments);
+    return new DecoderResult(bytes, result.toString(), byteSegments.isEmpty() ? null : byteSegments, ecLevel);
   }
 
   private static void decodeKanjiSegment(BitSource bits,
                                          StringBuffer result,
-                                         int count) throws ReaderException {
+                                         int count) throws FormatException {
     // Each character will require 2 bytes. Read the characters as 2-byte pairs
     // and decode as Shift_JIS afterwards
     byte[] buffer = new byte[2 * count];
@@ -139,7 +142,7 @@ final class DecodedBitStreamParser {
     try {
       result.append(new String(buffer, SHIFT_JIS));
     } catch (UnsupportedEncodingException uee) {
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
   }
 
@@ -147,10 +150,11 @@ final class DecodedBitStreamParser {
                                         StringBuffer result,
                                         int count,
                                         CharacterSetECI currentCharacterSetECI,
-                                        Vector byteSegments) throws ReaderException {
+                                        Vector byteSegments,
+                                        Hashtable hints) throws FormatException {
     byte[] readBytes = new byte[count];
     if (count << 3 > bits.available()) {
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
     for (int i = 0; i < count; i++) {
       readBytes[i] = (byte) bits.readBits(8);
@@ -162,14 +166,14 @@ final class DecodedBitStreamParser {
     // upon decoding. I have seen ISO-8859-1 used as well as
     // Shift_JIS -- without anything like an ECI designator to
     // give a hint.
-      encoding = guessEncoding(readBytes);
+      encoding = guessEncoding(readBytes, hints);
     } else {
       encoding = currentCharacterSetECI.getEncodingName();
     }
     try {
       result.append(new String(readBytes, encoding));
     } catch (UnsupportedEncodingException uce) {
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
     byteSegments.addElement(readBytes);
   }
@@ -209,13 +213,13 @@ final class DecodedBitStreamParser {
 
   private static void decodeNumericSegment(BitSource bits,
                                            StringBuffer result,
-                                           int count) throws ReaderException {
+                                           int count) throws FormatException {
     // Read three digits at a time
     while (count >= 3) {
       // Each 10 bits encodes three digits
       int threeDigitsBits = bits.readBits(10);
       if (threeDigitsBits >= 1000) {
-        throw ReaderException.getInstance();
+        throw FormatException.getFormatInstance();
       }
       result.append(ALPHANUMERIC_CHARS[threeDigitsBits / 100]);
       result.append(ALPHANUMERIC_CHARS[(threeDigitsBits / 10) % 10]);
@@ -226,7 +230,7 @@ final class DecodedBitStreamParser {
       // Two digits left over to read, encoded in 7 bits
       int twoDigitsBits = bits.readBits(7);
       if (twoDigitsBits >= 100) {
-        throw ReaderException.getInstance();
+        throw FormatException.getFormatInstance();
       }
       result.append(ALPHANUMERIC_CHARS[twoDigitsBits / 10]);
       result.append(ALPHANUMERIC_CHARS[twoDigitsBits % 10]);
@@ -234,13 +238,19 @@ final class DecodedBitStreamParser {
       // One digit left over to read
       int digitBits = bits.readBits(4);
       if (digitBits >= 10) {
-        throw ReaderException.getInstance();
+        throw FormatException.getFormatInstance();
       }
       result.append(ALPHANUMERIC_CHARS[digitBits]);
     }
   }
 
-  private static String guessEncoding(byte[] bytes) {
+  private static String guessEncoding(byte[] bytes, Hashtable hints) {
+    if (hints != null) {
+      String characterSet = (String) hints.get(DecodeHintType.CHARACTER_SET);
+      if (characterSet != null) {
+        return characterSet;
+      }
+    }
     if (ASSUME_SHIFT_JIS) {
       return SHIFT_JIS;
     }
@@ -258,13 +268,13 @@ final class DecodedBitStreamParser {
     int length = bytes.length;
     boolean canBeISO88591 = true;
     boolean canBeShiftJIS = true;
-    boolean sawDoubleByteStart = false;
+    int maybeDoubleByteCount = 0;
     int maybeSingleByteKatakanaCount = 0;
     boolean sawLatin1Supplement = false;
     boolean lastWasPossibleDoubleByteStart = false;
     for (int i = 0; i < length && (canBeISO88591 || canBeShiftJIS); i++) {
       int value = bytes[i] & 0xFF;
-      if (value == 0xC2 || value == 0xC3 && i < length - 1) {
+      if ((value == 0xC2 || value == 0xC3) && i < length - 1) {
         // This is really a poor hack. The slightly more exotic characters people might want to put in
         // a QR Code, by which I mean the Latin-1 supplement characters (e.g. u-umlaut) have encodings
         // that start with 0xC2 followed by [0xA0,0xBF], or start with 0xC3 followed by [0x80,0xBF].
@@ -285,10 +295,9 @@ final class DecodedBitStreamParser {
       if (!lastWasPossibleDoubleByteStart && ((value >= 0xF0 && value <= 0xFF) || value == 0x80 || value == 0xA0)) {
         canBeShiftJIS = false;
       }
-      if (((value >= 0x81 && value <= 0x9F) || (value >= 0xE0 && value <= 0xEF)) && i < length - 1) {
+      if (((value >= 0x81 && value <= 0x9F) || (value >= 0xE0 && value <= 0xEF))) {
         // These start double-byte characters in Shift_JIS. Let's see if it's followed by a valid
         // second byte.
-        sawDoubleByteStart = true;
         if (lastWasPossibleDoubleByteStart) {
           // If we just checked this and the last byte for being a valid double-byte
           // char, don't check starting on this byte. If this and the last byte
@@ -299,12 +308,18 @@ final class DecodedBitStreamParser {
           // ... otherwise do check to see if this plus the next byte form a valid
           // double byte pair encoding a character.
           lastWasPossibleDoubleByteStart = true;
-          int nextValue = bytes[i + 1] & 0xFF;
-          if (nextValue < 0x40 || nextValue > 0xFC) {
+          if (i >= bytes.length - 1) {
             canBeShiftJIS = false;
+          } else {
+            int nextValue = bytes[i + 1] & 0xFF;
+            if (nextValue < 0x40 || nextValue > 0xFC) {
+              canBeShiftJIS = false;
+            } else {
+              maybeDoubleByteCount++;
+            }
+            // There is some conflicting information out there about which bytes can follow which in
+            // double-byte Shift_JIS characters. The rule above seems to be the one that matches practice.
           }
-          // There is some conflicting information out there about which bytes can follow which in
-          // double-byte Shift_JIS characters. The rule above seems to be the one that matches practice.
         }
       } else {
         lastWasPossibleDoubleByteStart = false;
@@ -312,10 +327,10 @@ final class DecodedBitStreamParser {
     }
     // Distinguishing Shift_JIS and ISO-8859-1 can be a little tough. The crude heuristic is:
     // - If we saw
-    //   - at least one byte that starts a double-byte value (bytes that are rare in ISO-8859-1), or
+    //   - at least three byte that starts a double-byte value (bytes that are rare in ISO-8859-1), or
     //   - over 5% of bytes that could be single-byte Katakana (also rare in ISO-8859-1),
     // - and, saw no sequences that are invalid in Shift_JIS, then we conclude Shift_JIS
-    if (canBeShiftJIS && (sawDoubleByteStart || 20 * maybeSingleByteKatakanaCount > length)) {
+    if (canBeShiftJIS && (maybeDoubleByteCount >= 3 || 20 * maybeSingleByteKatakanaCount > length)) {
       return SHIFT_JIS;
     }
     // Otherwise, we default to ISO-8859-1 unless we know it can't be

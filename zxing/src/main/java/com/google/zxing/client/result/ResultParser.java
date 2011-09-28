@@ -117,7 +117,7 @@ public abstract class ResultParser {
     return escaped;
   }
 
-  static String urlDecode(String escaped) {
+  private static String urlDecode(String escaped) {
 
     // No we can't use java.net.URLDecoder here. JavaME doesn't have it.
     if (escaped == null) {
@@ -200,6 +200,24 @@ public abstract class ResultParser {
       return false;
     }
     for (int i = 0; i < length; i++) {
+      char c = value.charAt(i);
+      if (c < '0' || c > '9') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  protected static boolean isSubstringOfDigits(String value, int offset, int length) {
+    if (value == null) {
+      return false;
+    }
+    int stringLength = value.length();
+    int max = offset + length;
+    if (stringLength < max) {
+      return false;
+    }
+    for (int i = offset; i < max; i++) {
       char c = value.charAt(i);
       if (c < '0' || c > '9') {
         return false;

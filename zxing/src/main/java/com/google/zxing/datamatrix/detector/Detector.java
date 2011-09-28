@@ -16,14 +16,12 @@
 
 package com.google.zxing.datamatrix.detector;
 
-import com.google.zxing.MonochromeBitmapSource;
-import com.google.zxing.ReaderException;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.Collections;
 import com.google.zxing.common.Comparator;
 import com.google.zxing.common.DetectorResult;
-import com.google.zxing.common.GenericResultPoint;
 import com.google.zxing.common.GridSampler;
 import com.google.zxing.common.detector.MonochromeRectangleDetector;
 
@@ -39,17 +37,18 @@ import java.util.Vector;
  */
 public final class Detector {
 
-  private static final int MAX_MODULES = 32;
+  //private static final int MAX_MODULES = 32;
 
   // Trick to avoid creating new Integer objects below -- a sort of crude copy of
   // the Integer.valueOf(int) optimization added in Java 5, not in J2ME
   private static final Integer[] INTEGERS =
       { new Integer(0), new Integer(1), new Integer(2), new Integer(3), new Integer(4) };
+  // No, can't use valueOf()
 
-  private final MonochromeBitmapSource image;
+  private final BitMatrix image;
   private final MonochromeRectangleDetector rectangleDetector;
 
-  public Detector(MonochromeBitmapSource image) {
+  public Detector(BitMatrix image) {
     this.image = image;
     rectangleDetector = new MonochromeRectangleDetector(image);
   }
@@ -58,9 +57,9 @@ public final class Detector {
    * <p>Detects a Data Matrix Code in an image.</p>
    *
    * @return {@link DetectorResult} encapsulating results of detecting a QR Code
-   * @throws ReaderException if no Data Matrix Code can be found
+   * @throws NotFoundException if no Data Matrix Code can be found
    */
-  public DetectorResult detect() throws ReaderException {
+  public DetectorResult detect() throws NotFoundException {
 
     ResultPoint[] cornerPoints = rectangleDetector.detect();
     ResultPoint pointA = cornerPoints[0];
@@ -111,13 +110,13 @@ public final class Detector {
     }
 
     if (maybeTopLeft == null || bottomLeft == null || maybeBottomRight == null) {
-      throw ReaderException.getInstance();
+      throw NotFoundException.getNotFoundInstance();
     }
 
     // Bottom left is correct but top left and bottom right might be switched
     ResultPoint[] corners = { maybeTopLeft, bottomLeft, maybeBottomRight };
     // Use the dot product trick to sort them out
-    GenericResultPoint.orderBestPatterns(corners);
+    ResultPoint.orderBestPatterns(corners);
 
     // Now we know which is which:
     ResultPoint bottomRight = corners[0];
@@ -143,15 +142,14 @@ public final class Detector {
 
     // The top right point is actually the corner of a module, which is one of the two black modules
     // adjacent to the white module at the top right. Tracing to that corner from either the top left
-    // or bottom right should work here, but, one will be more reliable since it's traced straight
-    // up or across, rather than at a slight angle. We use dot products to figure out which is
-    // better to use:
-    int dimension;
-    if (GenericResultPoint.crossProductZ(bottomLeft, bottomRight, topRight) <
-        GenericResultPoint.crossProductZ(topRight, topLeft, bottomLeft)) {
-      dimension = transitionsBetween(topLeft, topRight).getTransitions();
-    } else {
-      dimension = transitionsBetween(bottomRight, topRight).getTransitions();
+    // or bottom right should work here. The number of transitions could be higher than it should be
+    // due to noise. So we try both and take the min.
+
+    int dimension = Math.min(transitionsBetween(topLeft, topRight).getTransitions(), 
+                             transitionsBetween(bottomRight, topRight).getTransitions());
+    if ((dimension & 0x01) == 1) {
+      // it can't be odd, so, round... up?
+      dimension++;
     }
     dimension += 2;
 
@@ -167,11 +165,11 @@ public final class Detector {
     table.put(key, value == null ? INTEGERS[1] : INTEGERS[value.intValue() + 1]);
   }
 
-  private static BitMatrix sampleGrid(MonochromeBitmapSource image,
+  private static BitMatrix sampleGrid(BitMatrix image,
                                       ResultPoint topLeft,
                                       ResultPoint bottomLeft,
                                       ResultPoint bottomRight,
-                                      int dimension) throws ReaderException {
+                                      int dimension) throws NotFoundException {
 
     // We make up the top right point for now, based on the others.
     // TODO: we actually found a fourth corner above and figured out which of two modules
@@ -228,15 +226,18 @@ public final class Detector {
     int ystep = fromY < toY ? 1 : -1;
     int xstep = fromX < toX ? 1 : -1;
     int transitions = 0;
-    boolean inBlack = image.isBlack(steep ? fromY : fromX, steep ? fromX : fromY);
+    boolean inBlack = image.get(steep ? fromY : fromX, steep ? fromX : fromY);
     for (int x = fromX, y = fromY; x != toX; x += xstep) {
-      boolean isBlack = image.isBlack(steep ? y : x, steep ? x : y);
+      boolean isBlack = image.get(steep ? y : x, steep ? x : y);
       if (isBlack != inBlack) {
         transitions++;
         inBlack = isBlack;
       }
       error += dy;
       if (error > 0) {
+        if (y == toY) {
+          break;
+        }
         y += ystep;
         error -= dx;
       }

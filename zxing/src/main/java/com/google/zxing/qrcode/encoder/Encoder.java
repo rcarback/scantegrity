@@ -16,8 +16,8 @@
 
 package com.google.zxing.qrcode.encoder;
 
-import com.google.zxing.WriterException;
 import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
 import com.google.zxing.common.ByteArray;
 import com.google.zxing.common.ByteMatrix;
 import com.google.zxing.common.CharacterSetECI;
@@ -27,9 +27,9 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.decoder.Mode;
 import com.google.zxing.qrcode.decoder.Version;
 
-import java.util.Vector;
-import java.util.Hashtable;
 import java.io.UnsupportedEncodingException;
+import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * @author satorux@google.com (Satoru Takabayashi) - creator
@@ -63,26 +63,6 @@ public final class Encoder {
     return penalty;
   }
 
-  private static final class BlockPair {
-
-    private final ByteArray dataBytes;
-    private final ByteArray errorCorrectionBytes;
-
-    BlockPair(ByteArray data, ByteArray errorCorrection) {
-      dataBytes = data;
-      errorCorrectionBytes = errorCorrection;
-    }
-
-    public ByteArray getDataBytes() {
-      return dataBytes;
-    }
-
-    public ByteArray getErrorCorrectionBytes() {
-      return errorCorrectionBytes;
-    }
-
-  }
-
   /**
    *  Encode "bytes" with the error correction level "ecLevel". The encoding mode will be chosen
    * internally by chooseMode(). On success, store the result in "qrCode".
@@ -99,20 +79,20 @@ public final class Encoder {
     encode(content, ecLevel, null, qrCode);
   }
 
-  public static void encode(String content, ErrorCorrectionLevel ecLevel, Hashtable hints, QRCode qrCode)
-      throws WriterException {
+  public static void encode(String content, ErrorCorrectionLevel ecLevel, Hashtable hints,
+      QRCode qrCode) throws WriterException {
 
-    String characterEncoding = hints == null ? null : (String) hints.get(EncodeHintType.CHARACTER_SET);
-    if (characterEncoding == null) {
-      characterEncoding = DEFAULT_BYTE_MODE_ENCODING;
+    String encoding = hints == null ? null : (String) hints.get(EncodeHintType.CHARACTER_SET);
+    if (encoding == null) {
+      encoding = DEFAULT_BYTE_MODE_ENCODING;
     }
 
     // Step 1: Choose the mode (encoding).
-    Mode mode = chooseMode(content);
+    Mode mode = chooseMode(content, encoding);
 
     // Step 2: Append "bytes" into "dataBits" in appropriate encoding.
     BitVector dataBits = new BitVector();
-    appendBytes(content, mode, dataBits, characterEncoding);
+    appendBytes(content, mode, dataBits, encoding);
     // Step 3: Initialize QR code that can contain "dataBits".
     int numInputBytes = dataBits.sizeInBytes();
     initQRCode(numInputBytes, ecLevel, mode, qrCode);
@@ -121,16 +101,17 @@ public final class Encoder {
     BitVector headerAndDataBits = new BitVector();
 
     // Step 4.5: Append ECI message if applicable
-    /*
-    if (mode == Mode.BYTE && !DEFAULT_BYTE_MODE_ENCODING.equals(characterEncoding)) {
-      CharacterSetECI eci = CharacterSetECI.getCharacterSetECIByName(characterEncoding);
+    if (mode == Mode.BYTE && !DEFAULT_BYTE_MODE_ENCODING.equals(encoding)) {
+      CharacterSetECI eci = CharacterSetECI.getCharacterSetECIByName(encoding);
       if (eci != null) {
         appendECI(eci, headerAndDataBits);
       }
     }
-     */
+
     appendModeInfo(mode, headerAndDataBits);
-    appendLengthInfo(content.length(), qrCode.getVersion(), mode, headerAndDataBits);
+
+    int numLetters = mode.equals(Mode.BYTE) ? dataBits.sizeInBytes() : content.length();
+    appendLengthInfo(numLetters, qrCode.getVersion(), mode, headerAndDataBits);
     headerAndDataBits.appendBitVector(dataBits);
 
     // Step 5: Terminate the bits properly.
@@ -167,14 +148,19 @@ public final class Encoder {
     return -1;
   }
 
-  /**
-   * Choose the best mode by examining the content.
-   *
-   * Note that this function does not return MODE_KANJI, as we cannot distinguish Shift_JIS from
-   * other encodings such as ISO-8859-1, from data bytes alone. For example "\xE0\xE0" can be
-   * interpreted as one character in Shift_JIS, but also two characters in ISO-8859-1.
-   */
   public static Mode chooseMode(String content) {
+    return chooseMode(content, null);
+  }
+
+  /**
+   * Choose the best mode by examining the content. Note that 'encoding' is used as a hint;
+   * if it is Shift_JIS, and the input is only double-byte Kanji, then we return {@link Mode#KANJI}.
+   */
+  public static Mode chooseMode(String content, String encoding) {
+    if ("Shift_JIS".equals(encoding)) {
+      // Choose Kanji mode if all input are double-byte characters
+      return isOnlyDoubleByteKanji(content) ? Mode.KANJI : Mode.BYTE;
+    }
     boolean hasNumeric = false;
     boolean hasAlphanumeric = false;
     for (int i = 0; i < content.length(); ++i) {
@@ -195,6 +181,26 @@ public final class Encoder {
     return Mode.BYTE;
   }
 
+  private static boolean isOnlyDoubleByteKanji(String content) {
+    byte[] bytes;
+    try {
+      bytes = content.getBytes("Shift_JIS");
+    } catch (UnsupportedEncodingException uee) {
+      return false;
+    }
+    int length = bytes.length;
+    if (length % 2 != 0) {
+      return false;
+    }
+    for (int i = 0; i < length; i += 2) {
+      int byte1 = bytes[i] & 0xFF;
+      if ((byte1 < 0x81 || byte1 > 0x9F) && (byte1 < 0xE0 || byte1 > 0xEB)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   private static int chooseMaskPattern(BitVector bits, ErrorCorrectionLevel ecLevel, int version,
       ByteMatrix matrix) throws WriterException {
 
@@ -213,10 +219,11 @@ public final class Encoder {
   }
 
   /**
-   * Initialize "qrCode" according to "numInputBytes", "ecLevel", and "mode". On success, modify "qrCode".
+   * Initialize "qrCode" according to "numInputBytes", "ecLevel", and "mode". On success,
+   * modify "qrCode".
    */
-  private static void initQRCode(int numInputBytes, ErrorCorrectionLevel ecLevel, Mode mode, QRCode qrCode)
-      throws WriterException {
+  private static void initQRCode(int numInputBytes, ErrorCorrectionLevel ecLevel, Mode mode,
+      QRCode qrCode) throws WriterException {
     qrCode.setECLevel(ecLevel);
     qrCode.setMode(mode);
 
@@ -257,11 +264,13 @@ public final class Encoder {
   static void terminateBits(int numDataBytes, BitVector bits) throws WriterException {
     int capacity = numDataBytes << 3;
     if (bits.size() > capacity) {
-      throw new WriterException("data bits cannot fit in the QR Code" + bits.size() + " > " + capacity);
+      throw new WriterException("data bits cannot fit in the QR Code" + bits.size() + " > " +
+          capacity);
     }
     // Append termination bits. See 8.4.8 of JISX0510:2004 (p.24) for details.
-    // TODO srowen says we can remove this for loop, since the 4 terminator bits are optional if the last byte
-    // has less than 4 bits left. So it amounts to padding the last byte with zeroes either way.
+    // TODO: srowen says we can remove this for loop, since the 4 terminator bits are optional if
+    // the last byte has less than 4 bits left. So it amounts to padding the last byte with zeroes
+    // either way.
     for (int i = 0; i < 4 && bits.size() < capacity; ++i) {
       bits.appendBit(0);
     }
@@ -405,8 +414,8 @@ public final class Encoder {
       }
     }
     if (numTotalBytes != result.sizeInBytes()) {  // Should be same.
-      throw new WriterException("Interleaving error: " + numTotalBytes + " and " + result.sizeInBytes() +
-        " differ.");
+      throw new WriterException("Interleaving error: " + numTotalBytes + " and " +
+          result.sizeInBytes() + " differ.");
     }
   }
 
@@ -436,7 +445,8 @@ public final class Encoder {
   /**
    * Append length info. On success, store the result in "bits".
    */
-  static void appendLengthInfo(int numLetters, int version, Mode mode, BitVector bits) throws WriterException {
+  static void appendLengthInfo(int numLetters, int version, Mode mode, BitVector bits)
+      throws WriterException {
     int numBits = mode.getCharacterCountBits(Version.getVersionForNumber(version));
     if (numLetters > ((1 << numBits) - 1)) {
       throw new WriterException(numLetters + "is bigger than" + ((1 << numBits) - 1));
@@ -447,7 +457,8 @@ public final class Encoder {
   /**
    * Append "bytes" in "mode" mode (encoding) into "bits". On success, store the result in "bits".
    */
-  static void appendBytes(String content, Mode mode, BitVector bits, String encoding) throws WriterException {
+  static void appendBytes(String content, Mode mode, BitVector bits, String encoding)
+      throws WriterException {
     if (mode.equals(Mode.NUMERIC)) {
       appendNumericBytes(content, bits);
     } else if (mode.equals(Mode.ALPHANUMERIC)) {
@@ -509,7 +520,8 @@ public final class Encoder {
     }
   }
 
-  static void append8BitBytes(String content, BitVector bits, String encoding) throws WriterException {
+  static void append8BitBytes(String content, BitVector bits, String encoding)
+      throws WriterException {
     byte[] bytes;
     try {
       bytes = content.getBytes(encoding);
@@ -547,9 +559,10 @@ public final class Encoder {
     }
   }
 
-  static void appendECI(CharacterSetECI eci, BitVector bits) {
+  private static void appendECI(CharacterSetECI eci, BitVector bits) {
     bits.appendBits(Mode.ECI.getBits(), 4);
-    bits.appendBits(eci.getValue(), 8); // This is correct for values up to 127, which is all we need now
+    // This is correct for values up to 127, which is all we need now.
+    bits.appendBits(eci.getValue(), 8);
   }
 
 }

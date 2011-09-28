@@ -16,7 +16,7 @@
 
 package com.google.zxing.qrcode.decoder;
 
-import com.google.zxing.ReaderException;
+import com.google.zxing.FormatException;
 import com.google.zxing.common.BitMatrix;
 
 /**
@@ -91,13 +91,17 @@ public final class Version {
    *
    * @param dimension dimension in modules
    * @return {@link Version} for a QR Code of that dimension
-   * @throws ReaderException if dimension is not 1 mod 4
+   * @throws FormatException if dimension is not 1 mod 4
    */
-  public static Version getProvisionalVersionForDimension(int dimension) throws ReaderException {
+  public static Version getProvisionalVersionForDimension(int dimension) throws FormatException {
     if (dimension % 4 != 1) {
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
-    return getVersionForNumber((dimension - 17) >> 2);
+    try {
+      return getVersionForNumber((dimension - 17) >> 2);
+    } catch (IllegalArgumentException iae) {
+      throw FormatException.getFormatInstance();
+    }
   }
 
   public static Version getVersionForNumber(int versionNumber) {
@@ -121,6 +125,7 @@ public final class Version {
       int bitsDifference = FormatInformation.numBitsDiffering(versionBits, targetVersion);
       if (bitsDifference < bestDifference) {
         bestVersion = i + 7;
+        bestDifference = bitsDifference;
       }
     }
     // We can tolerate up to 3 bits of error since no two version info codewords will
@@ -142,9 +147,9 @@ public final class Version {
     // Top left finder pattern + separator + format
     bitMatrix.setRegion(0, 0, 9, 9);
     // Top right finder pattern + separator + format
-    bitMatrix.setRegion(0, dimension - 8, 9, 8);
-    // Bottom left finder pattern + separator + format
     bitMatrix.setRegion(dimension - 8, 0, 8, 9);
+    // Bottom left finder pattern + separator + format
+    bitMatrix.setRegion(0, dimension - 8, 9, 8);
 
     // Alignment patterns
     int max = alignmentPatternCenters.length;
@@ -155,20 +160,20 @@ public final class Version {
           // No alignment patterns near the three finder paterns
           continue;
         }
-        bitMatrix.setRegion(i, alignmentPatternCenters[y] - 2, 5, 5);
+        bitMatrix.setRegion(alignmentPatternCenters[y] - 2, i, 5, 5);
       }
     }
 
     // Vertical timing pattern
-    bitMatrix.setRegion(9, 6, dimension - 17, 1);
-    // Horizontal timing pattern
     bitMatrix.setRegion(6, 9, 1, dimension - 17);
+    // Horizontal timing pattern
+    bitMatrix.setRegion(9, 6, dimension - 17, 1);
 
     if (versionNumber > 6) {
       // Version info, top right
-      bitMatrix.setRegion(0, dimension - 11, 6, 3);
-      // Version info, bottom left
       bitMatrix.setRegion(dimension - 11, 0, 3, 6);
+      // Version info, bottom left
+      bitMatrix.setRegion(0, dimension - 11, 6, 3);
     }
 
     return bitMatrix;
@@ -184,12 +189,12 @@ public final class Version {
     private final int ecCodewordsPerBlock;
     private final ECB[] ecBlocks;
 
-    private ECBlocks(int ecCodewordsPerBlock, ECB ecBlocks) {
+    ECBlocks(int ecCodewordsPerBlock, ECB ecBlocks) {
       this.ecCodewordsPerBlock = ecCodewordsPerBlock;
       this.ecBlocks = new ECB[]{ecBlocks};
     }
 
-    private ECBlocks(int ecCodewordsPerBlock, ECB ecBlocks1, ECB ecBlocks2) {
+    ECBlocks(int ecCodewordsPerBlock, ECB ecBlocks1, ECB ecBlocks2) {
       this.ecCodewordsPerBlock = ecCodewordsPerBlock;
       this.ecBlocks = new ECB[]{ecBlocks1, ecBlocks2};
     }

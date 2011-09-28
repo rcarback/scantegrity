@@ -16,8 +16,7 @@
 
 package com.google.zxing.common;
 
-import com.google.zxing.MonochromeBitmapSource;
-import com.google.zxing.ReaderException;
+import com.google.zxing.NotFoundException;
 
 /**
  * Implementations of this class can, given locations of finder patterns for a QR code in an
@@ -34,7 +33,7 @@ import com.google.zxing.ReaderException;
  */
 public abstract class GridSampler {
 
-  private static GridSampler gridSampler = null;
+  private static GridSampler gridSampler = new DefaultGridSampler();
 
   /**
    * Sets the implementation of {@link GridSampler} used by the library. One global
@@ -43,7 +42,7 @@ public abstract class GridSampler {
    * in the whole lifetime of the JVM. For instance, an Android activity can swap in
    * an implementation that takes advantage of native platform libraries.
    * 
-   * @param newGridSampler
+   * @param newGridSampler The platform-specific object to install.
    */
   public static void setGridSampler(GridSampler newGridSampler) {
     if (newGridSampler == null) {
@@ -56,38 +55,33 @@ public abstract class GridSampler {
    * @return the current implementation of {@link GridSampler}
    */
   public static GridSampler getInstance() {
-    // No real point in trying to make this thread-safe;
-    // doesn't matter if a second instance is created
-    if (gridSampler == null) {
-      gridSampler = new DefaultGridSampler();
-    }
     return gridSampler;
   }
 
   /**
-   * <p>Samples an image for a square matrix of bits of the given dimension. This is used to extract the
-   * black/white modules of a 2D barcode like a QR Code found in an image. Because this barcode may be
-   * rotated or perspective-distorted, the caller supplies four points in the source image that define
-   * known points in the barcode, so that the image may be sampled appropriately.</p>
+   * <p>Samples an image for a square matrix of bits of the given dimension. This is used to extract
+   * the black/white modules of a 2D barcode like a QR Code found in an image. Because this barcode
+   * may be rotated or perspective-distorted, the caller supplies four points in the source image
+   * that define known points in the barcode, so that the image may be sampled appropriately.</p>
    *
    * <p>The last eight "from" parameters are four X/Y coordinate pairs of locations of points in
    * the image that define some significant points in the image to be sample. For example,
    * these may be the location of finder pattern in a QR Code.</p>
    *
    * <p>The first eight "to" parameters are four X/Y coordinate pairs measured in the destination
-   * {@link BitMatrix}, from the top left, where the known points in the image given by the "from" parameters
-   * map to.</p>
+   * {@link BitMatrix}, from the top left, where the known points in the image given by the "from"
+   * parameters map to.</p>
    *
    * <p>These 16 parameters define the transformation needed to sample the image.</p>
    *
    * @param image image to sample
-   * @param dimension width/height of {@link BitMatrix} to sample from iamge
+   * @param dimension width/height of {@link BitMatrix} to sample from image
    * @return {@link BitMatrix} representing a grid of points sampled from the image within a region
-   *  defined by the "from" parameters
-   * @throws ReaderException if image can't be sampled, for example, if the transformation defined by
-   *  the given points is invalid or results in sampling outside the image boundaries
+   *   defined by the "from" parameters
+   * @throws NotFoundException if image can't be sampled, for example, if the transformation defined
+   *   by the given points is invalid or results in sampling outside the image boundaries
    */
-  public abstract BitMatrix sampleGrid(MonochromeBitmapSource image,
+  public abstract BitMatrix sampleGrid(BitMatrix image,
                                        int dimension,
                                        float p1ToX, float p1ToY,
                                        float p2ToX, float p2ToY,
@@ -96,24 +90,32 @@ public abstract class GridSampler {
                                        float p1FromX, float p1FromY,
                                        float p2FromX, float p2FromY,
                                        float p3FromX, float p3FromY,
-                                       float p4FromX, float p4FromY) throws ReaderException;
+                                       float p4FromX, float p4FromY) throws NotFoundException;
+
+  public BitMatrix sampleGrid(BitMatrix image,
+                              int dimension,
+                              PerspectiveTransform transform) throws NotFoundException {
+    throw new IllegalStateException(); // Can't use UnsupportedOperationException
+  }
+  
 
   /**
    * <p>Checks a set of points that have been transformed to sample points on an image against
    * the image's dimensions to see if the point are even within the image.</p>
    *
-   * <p>This method will actually "nudge" the endpoints back onto the image if they are found to be barely
-   * (less than 1 pixel) off the image. This accounts for imperfect detection of finder patterns in an image
-   * where the QR Code runs all the way to the image border.</p>
+   * <p>This method will actually "nudge" the endpoints back onto the image if they are found to be
+   * barely (less than 1 pixel) off the image. This accounts for imperfect detection of finder
+   * patterns in an image where the QR Code runs all the way to the image border.</p>
    *
    * <p>For efficiency, the method will check points from either end of the line until one is found
    * to be within the image. Because the set of points are assumed to be linear, this is valid.</p>
    *
    * @param image image into which the points should map
    * @param points actual points in x1,y1,...,xn,yn form
-   * @throws ReaderException if an endpoint is lies outside the image boundaries
+   * @throws NotFoundException if an endpoint is lies outside the image boundaries
    */
-  protected static void checkAndNudgePoints(MonochromeBitmapSource image, float[] points) throws ReaderException {
+  protected static void checkAndNudgePoints(BitMatrix image, float[] points)
+      throws NotFoundException {
     int width = image.getWidth();
     int height = image.getHeight();
     // Check and nudge points from start until we see some that are OK:
@@ -122,7 +124,7 @@ public abstract class GridSampler {
       int x = (int) points[offset];
       int y = (int) points[offset + 1];
       if (x < -1 || x > width || y < -1 || y > height) {
-        throw ReaderException.getInstance();
+        throw NotFoundException.getNotFoundInstance();
       }
       nudged = false;
       if (x == -1) {
@@ -146,7 +148,7 @@ public abstract class GridSampler {
       int x = (int) points[offset];
       int y = (int) points[offset + 1];
       if (x < -1 || x > width || y < -1 || y > height) {
-        throw ReaderException.getInstance();
+        throw NotFoundException.getNotFoundInstance();
       }
       nudged = false;
       if (x == -1) {

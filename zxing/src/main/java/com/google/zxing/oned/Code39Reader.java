@@ -17,11 +17,12 @@
 package com.google.zxing.oned;
 
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.ReaderException;
+import com.google.zxing.ChecksumException;
+import com.google.zxing.FormatException;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.common.BitArray;
-import com.google.zxing.common.GenericResultPoint;
 
 import java.util.Hashtable;
 
@@ -30,7 +31,7 @@ import java.util.Hashtable;
  *
  * @author Sean Owen
  */
-public final class Code39Reader extends AbstractOneDReader {
+public final class Code39Reader extends OneDReader {
 
   private static final String ALPHABET_STRING = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%";
   private static final char[] ALPHABET = ALPHABET_STRING.toCharArray();
@@ -89,7 +90,8 @@ public final class Code39Reader extends AbstractOneDReader {
     this.extendedMode = extendedMode;
   }
 
-  public Result decodeRow(int rowNumber, BitArray row, Hashtable hints) throws ReaderException {
+  public Result decodeRow(int rowNumber, BitArray row, Hashtable hints)
+      throws NotFoundException, ChecksumException, FormatException {
 
     int[] start = findAsteriskPattern(row);
     int nextStart = start[1];
@@ -100,13 +102,16 @@ public final class Code39Reader extends AbstractOneDReader {
       nextStart++;
     }
 
-    StringBuffer result = new StringBuffer();
+    StringBuffer result = new StringBuffer(20);
     int[] counters = new int[9];
     char decodedChar;
     int lastStart;
     do {
       recordPattern(row, nextStart, counters);
       int pattern = toNarrowWidePattern(counters);
+      if (pattern < 0) {
+        throw NotFoundException.getNotFoundInstance();
+      }
       decodedChar = patternToChar(pattern);
       result.append(decodedChar);
       lastStart = nextStart;
@@ -129,7 +134,7 @@ public final class Code39Reader extends AbstractOneDReader {
     // If 50% of last pattern size, following last pattern, is not whitespace, fail
     // (but if it's whitespace to the very end of the image, that's OK)
     if (nextStart != end && whiteSpaceAfterEnd / 2 < lastPatternSize) {
-      throw ReaderException.getInstance();
+      throw NotFoundException.getNotFoundInstance();
     }
 
     if (usingCheckDigit) {
@@ -139,7 +144,7 @@ public final class Code39Reader extends AbstractOneDReader {
         total += ALPHABET_STRING.indexOf(result.charAt(i));
       }
       if (total % 43 != ALPHABET_STRING.indexOf(result.charAt(max))) {
-        throw ReaderException.getInstance();
+        throw ChecksumException.getChecksumInstance();
       }
       result.deleteCharAt(max);
     }
@@ -151,7 +156,7 @@ public final class Code39Reader extends AbstractOneDReader {
 
     if (resultString.length() == 0) {
       // Almost surely a false positive
-      throw ReaderException.getInstance();
+      throw NotFoundException.getNotFoundInstance();
     }
 
     float left = (float) (start[1] + start[0]) / 2.0f;
@@ -160,13 +165,13 @@ public final class Code39Reader extends AbstractOneDReader {
         resultString,
         null,
         new ResultPoint[]{
-            new GenericResultPoint(left, (float) rowNumber),
-            new GenericResultPoint(right, (float) rowNumber)},
+            new ResultPoint(left, (float) rowNumber),
+            new ResultPoint(right, (float) rowNumber)},
         BarcodeFormat.CODE_39);
 
   }
 
-  private static int[] findAsteriskPattern(BitArray row) throws ReaderException {
+  private static int[] findAsteriskPattern(BitArray row) throws NotFoundException {
     int width = row.getSize();
     int rowOffset = 0;
     while (rowOffset < width) {
@@ -188,15 +193,11 @@ public final class Code39Reader extends AbstractOneDReader {
         counters[counterPosition]++;
       } else {
         if (counterPosition == patternLength - 1) {
-          try {
-            if (toNarrowWidePattern(counters) == ASTERISK_ENCODING) {
-              // Look for whitespace before start pattern, >= 50% of width of start pattern
-              if (row.isRange(Math.max(0, patternStart - (i - patternStart) / 2), patternStart, false)) {
-                return new int[]{patternStart, i};
-              }
+          if (toNarrowWidePattern(counters) == ASTERISK_ENCODING) {
+            // Look for whitespace before start pattern, >= 50% of width of start pattern
+            if (row.isRange(Math.max(0, patternStart - (i - patternStart) / 2), patternStart, false)) {
+              return new int[]{patternStart, i};
             }
-          } catch (ReaderException re) {
-            // no match, continue
           }
           patternStart += counters[0] + counters[1];
           for (int y = 2; y < patternLength; y++) {
@@ -209,13 +210,15 @@ public final class Code39Reader extends AbstractOneDReader {
           counterPosition++;
         }
         counters[counterPosition] = 1;
-        isWhite ^= true; // isWhite = !isWhite;
+        isWhite = !isWhite;
       }
     }
-    throw ReaderException.getInstance();
+    throw NotFoundException.getNotFoundInstance();
   }
 
-  private static int toNarrowWidePattern(int[] counters) throws ReaderException {
+  // For efficiency, returns -1 on failure. Not throwing here saved as many as 700 exceptions
+  // per image when using some of our blackbox images.
+  private static int toNarrowWidePattern(int[] counters) {
     int numCounters = counters.length;
     int maxNarrowCounter = 0;
     int wideCounters;
@@ -249,26 +252,26 @@ public final class Code39Reader extends AbstractOneDReader {
             wideCounters--;
             // totalWideCountersWidth = 3 * average, so this checks if counter >= 3/2 * average
             if ((counter << 1) >= totalWideCountersWidth) {
-              throw ReaderException.getInstance();
+              return -1;
             }
           }
         }
         return pattern;
       }
     } while (wideCounters > 3);
-    throw ReaderException.getInstance();
+    return -1;
   }
 
-  private static char patternToChar(int pattern) throws ReaderException {
+  private static char patternToChar(int pattern) throws NotFoundException {
     for (int i = 0; i < CHARACTER_ENCODINGS.length; i++) {
       if (CHARACTER_ENCODINGS[i] == pattern) {
         return ALPHABET[i];
       }
     }
-    throw ReaderException.getInstance();
+    throw NotFoundException.getNotFoundInstance();
   }
 
-  private static String decodeExtended(String encoded) throws ReaderException {
+  private static String decodeExtended(String encoded) throws FormatException {
     int length = encoded.length();
     StringBuffer decoded = new StringBuffer(length);
     for (int i = 0; i < length; i++) {
@@ -282,7 +285,7 @@ public final class Code39Reader extends AbstractOneDReader {
             if (next >= 'A' && next <= 'Z') {
               decodedChar = (char) (next + 32);
             } else {
-              throw ReaderException.getInstance();
+              throw FormatException.getFormatInstance();
             }
             break;
           case '$':
@@ -290,7 +293,7 @@ public final class Code39Reader extends AbstractOneDReader {
             if (next >= 'A' && next <= 'Z') {
               decodedChar = (char) (next - 64);
             } else {
-              throw ReaderException.getInstance();
+              throw FormatException.getFormatInstance();
             }
             break;
           case '%':
@@ -300,7 +303,7 @@ public final class Code39Reader extends AbstractOneDReader {
             } else if (next >= 'F' && next <= 'W') {
               decodedChar = (char) (next - 11);
             } else {
-              throw ReaderException.getInstance();
+              throw FormatException.getFormatInstance();
             }
             break;
           case '/':
@@ -310,7 +313,7 @@ public final class Code39Reader extends AbstractOneDReader {
             } else if (next == 'Z') {
               decodedChar = ':';
             } else {
-              throw ReaderException.getInstance();
+              throw FormatException.getFormatInstance();
             }
             break;
         }

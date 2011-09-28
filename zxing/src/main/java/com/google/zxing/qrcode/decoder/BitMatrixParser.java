@@ -16,7 +16,7 @@
 
 package com.google.zxing.qrcode.decoder;
 
-import com.google.zxing.ReaderException;
+import com.google.zxing.FormatException;
 import com.google.zxing.common.BitMatrix;
 
 /**
@@ -30,12 +30,12 @@ final class BitMatrixParser {
 
   /**
    * @param bitMatrix {@link BitMatrix} to parse
-   * @throws ReaderException if dimension is not >= 21 and 1 mod 4
+   * @throws FormatException if dimension is not >= 21 and 1 mod 4
    */
-  BitMatrixParser(BitMatrix bitMatrix) throws ReaderException {
+  BitMatrixParser(BitMatrix bitMatrix) throws FormatException {
     int dimension = bitMatrix.getDimension();
     if (dimension < 21 || (dimension & 0x03) != 1) {
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
     this.bitMatrix = bitMatrix;
   }
@@ -44,60 +44,55 @@ final class BitMatrixParser {
    * <p>Reads format information from one of its two locations within the QR Code.</p>
    *
    * @return {@link FormatInformation} encapsulating the QR Code's format info
-   * @throws ReaderException if both format information locations cannot be parsed as
+   * @throws FormatException if both format information locations cannot be parsed as
    * the valid encoding of format information
    */
-  FormatInformation readFormatInformation() throws ReaderException {
+  FormatInformation readFormatInformation() throws FormatException {
 
     if (parsedFormatInfo != null) {
       return parsedFormatInfo;
     }
 
     // Read top-left format info bits
-    int formatInfoBits = 0;
-    for (int j = 0; j < 6; j++) {
-      formatInfoBits = copyBit(8, j, formatInfoBits);
+    int formatInfoBits1 = 0;
+    for (int i = 0; i < 6; i++) {
+      formatInfoBits1 = copyBit(i, 8, formatInfoBits1);
     }
     // .. and skip a bit in the timing pattern ...
-    formatInfoBits = copyBit(8, 7, formatInfoBits);
-    formatInfoBits = copyBit(8, 8, formatInfoBits);
-    formatInfoBits = copyBit(7, 8, formatInfoBits);
+    formatInfoBits1 = copyBit(7, 8, formatInfoBits1);
+    formatInfoBits1 = copyBit(8, 8, formatInfoBits1);
+    formatInfoBits1 = copyBit(8, 7, formatInfoBits1);
     // .. and skip a bit in the timing pattern ...
-    for (int i = 5; i >= 0; i--) {
-      formatInfoBits = copyBit(i, 8, formatInfoBits);
+    for (int j = 5; j >= 0; j--) {
+      formatInfoBits1 = copyBit(8, j, formatInfoBits1);
     }
 
-    parsedFormatInfo = FormatInformation.decodeFormatInformation(formatInfoBits);
-    if (parsedFormatInfo != null) {
-      return parsedFormatInfo;
-    }
-
-    // Hmm, failed. Try the top-right/bottom-left pattern
+    // Read the top-right/bottom-left pattern too
     int dimension = bitMatrix.getDimension();
-    formatInfoBits = 0;
+    int formatInfoBits2 = 0;
     int iMin = dimension - 8;
     for (int i = dimension - 1; i >= iMin; i--) {
-      formatInfoBits = copyBit(i, 8, formatInfoBits);
+      formatInfoBits2 = copyBit(i, 8, formatInfoBits2);
     }
     for (int j = dimension - 7; j < dimension; j++) {
-      formatInfoBits = copyBit(8, j, formatInfoBits);
+      formatInfoBits2 = copyBit(8, j, formatInfoBits2);
     }
 
-    parsedFormatInfo = FormatInformation.decodeFormatInformation(formatInfoBits);
+    parsedFormatInfo = FormatInformation.decodeFormatInformation(formatInfoBits1, formatInfoBits2);
     if (parsedFormatInfo != null) {
       return parsedFormatInfo;
     }
-    throw ReaderException.getInstance();
+    throw FormatException.getFormatInstance();
   }
 
   /**
    * <p>Reads version information from one of its two locations within the QR Code.</p>
    *
    * @return {@link Version} encapsulating the QR Code's version
-   * @throws ReaderException if both version information locations cannot be parsed as
+   * @throws FormatException if both version information locations cannot be parsed as
    * the valid encoding of version information
    */
-  Version readVersion() throws ReaderException {
+  Version readVersion() throws FormatException {
 
     if (parsedVersion != null) {
       return parsedVersion;
@@ -112,32 +107,31 @@ final class BitMatrixParser {
 
     // Read top-right version info: 3 wide by 6 tall
     int versionBits = 0;
-    for (int i = 5; i >= 0; i--) {
-      int jMin = dimension - 11;
-      for (int j = dimension - 9; j >= jMin; j--) {
+    int ijMin = dimension - 11;
+    for (int j = 5; j >= 0; j--) {
+      for (int i = dimension - 9; i >= ijMin; i--) {
         versionBits = copyBit(i, j, versionBits);
       }
     }
 
     parsedVersion = Version.decodeVersionInformation(versionBits);
-    if (parsedVersion != null) {
+    if (parsedVersion != null && parsedVersion.getDimensionForVersion() == dimension) {
       return parsedVersion;
     }
 
     // Hmm, failed. Try bottom left: 6 wide by 3 tall
     versionBits = 0;
-    for (int j = 5; j >= 0; j--) {
-      int iMin = dimension - 11;
-      for (int i = dimension - 11; i >= iMin; i--) {
+    for (int i = 5; i >= 0; i--) {
+      for (int j = dimension - 9; j >= ijMin; j--) {
         versionBits = copyBit(i, j, versionBits);
       }
     }
 
     parsedVersion = Version.decodeVersionInformation(versionBits);
-    if (parsedVersion != null) {
+    if (parsedVersion != null && parsedVersion.getDimensionForVersion() == dimension) {
       return parsedVersion;
     }
-    throw ReaderException.getInstance();
+    throw FormatException.getFormatInstance();
   }
 
   private int copyBit(int i, int j, int versionBits) {
@@ -150,9 +144,9 @@ final class BitMatrixParser {
    * QR Code.</p>
    *
    * @return bytes encoded within the QR Code
-   * @throws ReaderException if the exact number of bytes expected is not read
+   * @throws FormatException if the exact number of bytes expected is not read
    */
-  byte[] readCodewords() throws ReaderException {
+  byte[] readCodewords() throws FormatException {
 
     FormatInformation formatInfo = readFormatInformation();
     Version version = readVersion();
@@ -161,7 +155,7 @@ final class BitMatrixParser {
     // some bits from reading as we wind through the bit matrix.
     DataMask dataMask = DataMask.forReference((int) formatInfo.getDataMask());
     int dimension = bitMatrix.getDimension();
-    dataMask.unmaskBitMatrix(bitMatrix.getBits(), dimension);
+    dataMask.unmaskBitMatrix(bitMatrix, dimension);
 
     BitMatrix functionPattern = version.buildFunctionPattern();
 
@@ -182,11 +176,11 @@ final class BitMatrixParser {
         int i = readingUp ? dimension - 1 - count : count;
         for (int col = 0; col < 2; col++) {
           // Ignore bits covered by the function pattern
-          if (!functionPattern.get(i, j - col)) {
+          if (!functionPattern.get(j - col, i)) {
             // Read a bit
             bitsRead++;
             currentByte <<= 1;
-            if (bitMatrix.get(i, j - col)) {
+            if (bitMatrix.get(j - col, i)) {
               currentByte |= 1;
             }
             // If we've made a whole byte, save it off
@@ -201,7 +195,7 @@ final class BitMatrixParser {
       readingUp ^= true; // readingUp = !readingUp; // switch directions
     }
     if (resultOffset != version.getTotalCodewords()) {
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
     return result;
   }

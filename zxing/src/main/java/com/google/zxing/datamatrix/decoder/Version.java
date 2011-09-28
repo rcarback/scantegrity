@@ -16,7 +16,7 @@
 
 package com.google.zxing.datamatrix.decoder;
 
-import com.google.zxing.ReaderException;
+import com.google.zxing.FormatException;
 
 /**
  * The Version object encapsulates attributes about a particular
@@ -51,11 +51,11 @@ public final class Version {
     
     // Calculate the total number of codewords
     int total = 0;
-    int ecCodewords = ecBlocks.ecCodewords;
-    ECB[] ecbArray = ecBlocks.ecBlocks;
+    int ecCodewords = ecBlocks.getECCodewords();
+    ECB[] ecbArray = ecBlocks.getECBlocks();
     for (int i = 0; i < ecbArray.length; i++) {
       ECB ecBlock = ecbArray[i];
-      total += ecBlock.count * (ecBlock.dataCodewords + ecCodewords);
+      total += ecBlock.getCount() * (ecBlock.getDataCodewords() + ecCodewords);
     }
     this.totalCodewords = total;
   }
@@ -94,11 +94,11 @@ public final class Version {
    * @param numRows Number of rows in modules
    * @param numColumns Number of columns in modules
    * @return {@link Version} for a Data Matrix Code of those dimensions
-   * @throws ReaderException if dimensions do correspond to a valid Data Matrix size
+   * @throws FormatException if dimensions do correspond to a valid Data Matrix size
    */
-  public static Version getVersionForDimensions(int numRows, int numColumns) throws ReaderException {
+  public static Version getVersionForDimensions(int numRows, int numColumns) throws FormatException {
     if ((numRows & 0x01) != 0 || (numColumns & 0x01) != 0) {
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
     
     // TODO(bbrown): This is doing a linear search through the array of versions.
@@ -112,7 +112,7 @@ public final class Version {
       }
     }
     
-    throw ReaderException.getInstance();
+    throw FormatException.getFormatInstance();
   }
 
   /**

@@ -16,9 +16,10 @@
 
 package com.google.zxing.qrcode.detector;
 
-import com.google.zxing.MonochromeBitmapSource;
-import com.google.zxing.ReaderException;
-import com.google.zxing.common.BitArray;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.ResultPoint;
+import com.google.zxing.ResultPointCallback;
+import com.google.zxing.common.BitMatrix;
 
 import java.util.Vector;
 
@@ -32,13 +33,13 @@ import java.util.Vector;
  * pasted and stripped down here for maximum performance but does unfortunately duplicate
  * some code.</p>
  *
- * <p>This class is not thread-safe.</p>
+ * <p>This class is thread-safe but not reentrant. Each thread must allocate its own object.
  *
  * @author Sean Owen
  */
 final class AlignmentPatternFinder {
 
-  private final MonochromeBitmapSource image;
+  private final BitMatrix image;
   private final Vector possibleCenters;
   private final int startX;
   private final int startY;
@@ -46,6 +47,7 @@ final class AlignmentPatternFinder {
   private final int height;
   private final float moduleSize;
   private final int[] crossCheckStateCount;
+  private final ResultPointCallback resultPointCallback;
 
   /**
    * <p>Creates a finder that will look in a portion of the whole image.</p>
@@ -57,12 +59,13 @@ final class AlignmentPatternFinder {
    * @param height height of region to search
    * @param moduleSize estimated module size so far
    */
-  AlignmentPatternFinder(MonochromeBitmapSource image,
+  AlignmentPatternFinder(BitMatrix image,
                          int startX,
                          int startY,
                          int width,
                          int height,
-                         float moduleSize) {
+                         float moduleSize,
+                         ResultPointCallback resultPointCallback) {
     this.image = image;
     this.possibleCenters = new Vector(5);
     this.startX = startX;
@@ -71,6 +74,7 @@ final class AlignmentPatternFinder {
     this.height = height;
     this.moduleSize = moduleSize;
     this.crossCheckStateCount = new int[3];
+    this.resultPointCallback = resultPointCallback;
   }
 
   /**
@@ -78,21 +82,19 @@ final class AlignmentPatternFinder {
    * it's pretty performance-critical and so is written to be fast foremost.</p>
    *
    * @return {@link AlignmentPattern} if found
-   * @throws ReaderException if not found
+   * @throws NotFoundException if not found
    */
-  AlignmentPattern find() throws ReaderException {
+  AlignmentPattern find() throws NotFoundException {
     int startX = this.startX;
     int height = this.height;
     int maxJ = startX + width;
     int middleI = startY + (height >> 1);
-    BitArray luminanceRow = new BitArray(width);
     // We are looking for black/white/black modules in 1:1:1 ratio;
     // this tracks the number of black/white/black modules seen so far
     int[] stateCount = new int[3];
     for (int iGen = 0; iGen < height; iGen++) {
       // Search from middle outwards
       int i = middleI + ((iGen & 0x01) == 0 ? ((iGen + 1) >> 1) : -((iGen + 1) >> 1));
-      image.getBlackRow(i, luminanceRow, startX, width);
       stateCount[0] = 0;
       stateCount[1] = 0;
       stateCount[2] = 0;
@@ -100,12 +102,12 @@ final class AlignmentPatternFinder {
       // Burn off leading white pixels before anything else; if we start in the middle of
       // a white run, it doesn't make sense to count its length, since we don't know if the
       // white run continued to the left of the start point
-      while (j < maxJ && !luminanceRow.get(j - startX)) {
+      while (j < maxJ && !image.get(j, i)) {
         j++;
       }
       int currentState = 0;
       while (j < maxJ) {
-        if (luminanceRow.get(j - startX)) {
+        if (image.get(j, i)) {
           // Black pixel
           if (currentState == 1) { // Counting black pixels
             stateCount[currentState]++;
@@ -148,7 +150,7 @@ final class AlignmentPatternFinder {
       return (AlignmentPattern) possibleCenters.elementAt(0);
     }
 
-    throw ReaderException.getInstance();
+    throw NotFoundException.getNotFoundInstance();
   }
 
   /**
@@ -186,8 +188,9 @@ final class AlignmentPatternFinder {
    * observed in any reading state, based on the results of the horizontal scan
    * @return vertical center of alignment pattern, or {@link Float#NaN} if not found
    */
-  private float crossCheckVertical(int startI, int centerJ, int maxCount, int originalStateCountTotal) {
-    MonochromeBitmapSource image = this.image;
+  private float crossCheckVertical(int startI, int centerJ, int maxCount,
+      int originalStateCountTotal) {
+    BitMatrix image = this.image;
 
     int maxI = image.getHeight();
     int[] stateCount = crossCheckStateCount;
@@ -197,7 +200,7 @@ final class AlignmentPatternFinder {
 
     // Start counting up from center
     int i = startI;
-    while (i >= 0 && image.isBlack(centerJ, i) && stateCount[1] <= maxCount) {
+    while (i >= 0 && image.get(centerJ, i) && stateCount[1] <= maxCount) {
       stateCount[1]++;
       i--;
     }
@@ -205,7 +208,7 @@ final class AlignmentPatternFinder {
     if (i < 0 || stateCount[1] > maxCount) {
       return Float.NaN;
     }
-    while (i >= 0 && !image.isBlack(centerJ, i) && stateCount[0] <= maxCount) {
+    while (i >= 0 && !image.get(centerJ, i) && stateCount[0] <= maxCount) {
       stateCount[0]++;
       i--;
     }
@@ -215,14 +218,14 @@ final class AlignmentPatternFinder {
 
     // Now also count down from center
     i = startI + 1;
-    while (i < maxI && image.isBlack(centerJ, i) && stateCount[1] <= maxCount) {
+    while (i < maxI && image.get(centerJ, i) && stateCount[1] <= maxCount) {
       stateCount[1]++;
       i++;
     }
     if (i == maxI || stateCount[1] > maxCount) {
       return Float.NaN;
     }
-    while (i < maxI && !image.isBlack(centerJ, i) && stateCount[2] <= maxCount) {
+    while (i < maxI && !image.get(centerJ, i) && stateCount[2] <= maxCount) {
       stateCount[2]++;
       i++;
     }
@@ -231,7 +234,7 @@ final class AlignmentPatternFinder {
     }
 
     int stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2];
-    if (5 * Math.abs(stateCountTotal - originalStateCountTotal) >= originalStateCountTotal) {
+    if (5 * Math.abs(stateCountTotal - originalStateCountTotal) >= 2 * originalStateCountTotal) {
       return Float.NaN;
     }
 
@@ -264,7 +267,11 @@ final class AlignmentPatternFinder {
         }
       }
       // Hadn't found this before; save it
-      possibleCenters.addElement(new AlignmentPattern(centerJ, centerI, estimatedModuleSize));
+      ResultPoint point = new AlignmentPattern(centerJ, centerI, estimatedModuleSize);
+      possibleCenters.addElement(point);
+      if (resultPointCallback != null) {
+        resultPointCallback.foundPossibleResultPoint(point);
+      }
     }
     return null;
   }

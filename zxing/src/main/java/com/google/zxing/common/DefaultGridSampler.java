@@ -16,15 +16,14 @@
 
 package com.google.zxing.common;
 
-import com.google.zxing.MonochromeBitmapSource;
-import com.google.zxing.ReaderException;
+import com.google.zxing.NotFoundException;
 
 /**
  * @author Sean Owen
  */
 public final class DefaultGridSampler extends GridSampler {
 
-  public BitMatrix sampleGrid(MonochromeBitmapSource image,
+  public BitMatrix sampleGrid(BitMatrix image,
                               int dimension,
                               float p1ToX, float p1ToY,
                               float p2ToX, float p2ToY,
@@ -33,30 +32,36 @@ public final class DefaultGridSampler extends GridSampler {
                               float p1FromX, float p1FromY,
                               float p2FromX, float p2FromY,
                               float p3FromX, float p3FromY,
-                              float p4FromX, float p4FromY) throws ReaderException {
+                              float p4FromX, float p4FromY) throws NotFoundException {
 
     PerspectiveTransform transform = PerspectiveTransform.quadrilateralToQuadrilateral(
         p1ToX, p1ToY, p2ToX, p2ToY, p3ToX, p3ToY, p4ToX, p4ToY,
         p1FromX, p1FromY, p2FromX, p2FromY, p3FromX, p3FromY, p4FromX, p4FromY);
 
+    return sampleGrid(image, dimension, transform);
+  }
+
+  public BitMatrix sampleGrid(BitMatrix image,
+                              int dimension,
+                              PerspectiveTransform transform) throws NotFoundException {
     BitMatrix bits = new BitMatrix(dimension);
     float[] points = new float[dimension << 1];
-    for (int i = 0; i < dimension; i++) {
+    for (int y = 0; y < dimension; y++) {
       int max = points.length;
-      float iValue = (float) i + 0.5f;
-      for (int j = 0; j < max; j += 2) {
-        points[j] = (float) (j >> 1) + 0.5f;
-        points[j + 1] = iValue;
+      float iValue = (float) y + 0.5f;
+      for (int x = 0; x < max; x += 2) {
+        points[x] = (float) (x >> 1) + 0.5f;
+        points[x + 1] = iValue;
       }
       transform.transformPoints(points);
       // Quick check to see if points transformed to something inside the image;
-      // sufficent to check the endpoints
+      // sufficient to check the endpoints
       checkAndNudgePoints(image, points);
       try {
-        for (int j = 0; j < max; j += 2) {
-          if (image.isBlack((int) points[j], (int) points[j + 1])) {
+        for (int x = 0; x < max; x += 2) {
+          if (image.get((int) points[x], (int) points[x + 1])) {
             // Black(-ish) pixel
-            bits.set(i, j >> 1);
+            bits.set(x >> 1, y);
           }
         }
       } catch (ArrayIndexOutOfBoundsException aioobe) {
@@ -64,10 +69,10 @@ public final class DefaultGridSampler extends GridSampler {
         // transform gets "twisted" such that it maps a straight line of points to a set of points
         // whose endpoints are in bounds, but others are not. There is probably some mathematical
         // way to detect this about the transformation that I don't know yet.
-        // This results in an ugly runtime exception despite our clever checks above -- can't have that.
-        // We could check each point's coordinates but that feels duplicative. We settle for
+        // This results in an ugly runtime exception despite our clever checks above -- can't have
+        // that. We could check each point's coordinates but that feels duplicative. We settle for
         // catching and wrapping ArrayIndexOutOfBoundsException.
-        throw ReaderException.getInstance();
+        throw NotFoundException.getNotFoundInstance();
       }
     }
     return bits;

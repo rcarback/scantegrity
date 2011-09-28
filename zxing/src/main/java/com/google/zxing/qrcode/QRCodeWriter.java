@@ -21,9 +21,9 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.Writer;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.ByteMatrix;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.google.zxing.qrcode.encoder.Encoder;
 import com.google.zxing.qrcode.encoder.QRCode;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 import java.util.Hashtable;
 
@@ -67,7 +67,7 @@ public final class QRCodeWriter implements Writer {
     }
 
     QRCode code = new QRCode();
-    Encoder.encode(contents, errorCorrectionLevel, code);
+    Encoder.encode(contents, errorCorrectionLevel, hints, code);
     return renderResult(code, width, height);
   }
 
@@ -75,22 +75,22 @@ public final class QRCodeWriter implements Writer {
   // 0 == black, 255 == white (i.e. an 8 bit greyscale bitmap).
   private static ByteMatrix renderResult(QRCode code, int width, int height) {
     ByteMatrix input = code.getMatrix();
-    int inputWidth = input.width();
-    int inputHeight = input.height();
+    int inputWidth = input.getWidth();
+    int inputHeight = input.getHeight();
     int qrWidth = inputWidth + (QUIET_ZONE_SIZE << 1);
     int qrHeight = inputHeight + (QUIET_ZONE_SIZE << 1);
     int outputWidth = Math.max(width, qrWidth);
     int outputHeight = Math.max(height, qrHeight);
 
     int multiple = Math.min(outputWidth / qrWidth, outputHeight / qrHeight);
-    // Padding includes both the quiet zone and the extra white pixels to accomodate the requested
+    // Padding includes both the quiet zone and the extra white pixels to accommodate the requested
     // dimensions. For example, if input is 25x25 the QR will be 33x33 including the quiet zone.
     // If the requested size is 200x160, the multiple will be 4, for a QR of 132x132. These will
     // handle all the padding from 100x100 (the actual QR) up to 200x160.
     int leftPadding = (outputWidth - (inputWidth * multiple)) / 2;
     int topPadding = (outputHeight - (inputHeight * multiple)) / 2;
 
-    ByteMatrix output = new ByteMatrix(outputHeight, outputWidth);
+    ByteMatrix output = new ByteMatrix(outputWidth, outputHeight);
     byte[][] outputArray = output.getArray();
 
     // We could be tricky and use the first row in each set of multiple as the temporary storage,

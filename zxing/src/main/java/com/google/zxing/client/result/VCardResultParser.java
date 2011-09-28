@@ -32,8 +32,11 @@ final class VCardResultParser extends ResultParser {
   }
 
   public static AddressBookParsedResult parse(Result result) {
+    // Although we should insist on the raw text ending with "END:VCARD", there's no reason
+    // to throw out everything else we parsed just because this was omitted. In fact, Eclair
+    // is doing just that, and we can't parse its contacts without this leniency.
     String rawText = result.getText();
-    if (rawText == null || !rawText.startsWith("BEGIN:VCARD") || !rawText.endsWith("END:VCARD")) {
+    if (rawText == null || !rawText.startsWith("BEGIN:VCARD")) {
       return null;
     }
     String[] names = matchVCardPrefixedField("FN", rawText, true);
@@ -45,16 +48,20 @@ final class VCardResultParser extends ResultParser {
     String[] phoneNumbers = matchVCardPrefixedField("TEL", rawText, true);
     String[] emails = matchVCardPrefixedField("EMAIL", rawText, true);
     String note = matchSingleVCardPrefixedField("NOTE", rawText, false);
-    String address = matchSingleVCardPrefixedField("ADR", rawText, true);
-    address = formatAddress(address);
+    String[] addresses = matchVCardPrefixedField("ADR", rawText, true);
+    if (addresses != null) {
+      for (int i = 0; i < addresses.length; i++) {
+        addresses[i] = formatAddress(addresses[i]);
+      }
+    }
     String org = matchSingleVCardPrefixedField("ORG", rawText, true);
     String birthday = matchSingleVCardPrefixedField("BDAY", rawText, true);
-    if (birthday != null && !isStringOfDigits(birthday, 8)) {
-      return null;
+    if (!isLikeVCardDate(birthday)) {
+      birthday = null;
     }
     String title = matchSingleVCardPrefixedField("TITLE", rawText, true);
     String url = matchSingleVCardPrefixedField("URL", rawText, true);
-    return new AddressBookParsedResult(names, null, phoneNumbers, emails, note, address, org,
+    return new AddressBookParsedResult(names, null, phoneNumbers, emails, note, addresses, org,
         birthday, title, url);
   }
 
@@ -111,6 +118,25 @@ final class VCardResultParser extends ResultParser {
     return values == null ? null : values[0];
   }
 
+  private static boolean isLikeVCardDate(String value) {
+    if (value == null) {
+      return true;
+    }
+    // Not really sure this is true but matches practice
+    // Mach YYYYMMDD
+    if (isStringOfDigits(value, 8)) {
+      return true;
+    }
+    // or YYYY-MM-DD
+    return
+        value.length() == 10 &&
+        value.charAt(4) == '-' &&
+        value.charAt(7) == '-' &&
+        isSubstringOfDigits(value, 0, 4) &&
+        isSubstringOfDigits(value, 5, 2) &&
+        isSubstringOfDigits(value, 8, 2);
+  }
+
   private static String formatAddress(String address) {
     if (address == null) {
       return null;
@@ -148,7 +174,7 @@ final class VCardResultParser extends ResultParser {
           start = end + 1;
         }
         components[componentIndex] = name.substring(start);
-        StringBuffer newName = new StringBuffer();
+        StringBuffer newName = new StringBuffer(100);
         maybeAppendComponent(components, 3, newName);
         maybeAppendComponent(components, 1, newName);
         maybeAppendComponent(components, 2, newName);

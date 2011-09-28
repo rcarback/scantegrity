@@ -16,14 +16,15 @@
 
 package com.google.zxing.qrcode.detector;
 
-import com.google.zxing.BlackPointEstimationMethod;
-import com.google.zxing.MonochromeBitmapSource;
-import com.google.zxing.ReaderException;
+import com.google.zxing.DecodeHintType;
+import com.google.zxing.FormatException;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.ResultPoint;
+import com.google.zxing.ResultPointCallback;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.DetectorResult;
-import com.google.zxing.common.GenericResultPoint;
 import com.google.zxing.common.GridSampler;
+import com.google.zxing.common.PerspectiveTransform;
 import com.google.zxing.qrcode.decoder.Version;
 
 import java.util.Hashtable;
@@ -34,21 +35,30 @@ import java.util.Hashtable;
  *
  * @author Sean Owen
  */
-public final class Detector {
+public class Detector {
 
-  private final MonochromeBitmapSource image;
+  private final BitMatrix image;
+  private ResultPointCallback resultPointCallback;
 
-  public Detector(MonochromeBitmapSource image) {
+  public Detector(BitMatrix image) {
     this.image = image;
+  }
+
+  protected BitMatrix getImage() {
+    return image;
+  }
+
+  protected ResultPointCallback getResultPointCallback() {
+    return resultPointCallback;
   }
 
   /**
    * <p>Detects a QR Code in an image, simply.</p>
    *
    * @return {@link DetectorResult} encapsulating results of detecting a QR Code
-   * @throws ReaderException if no QR Code can be found
+   * @throws NotFoundException if no QR Code can be found
    */
-  public DetectorResult detect() throws ReaderException {
+  public DetectorResult detect() throws NotFoundException, FormatException {
     return detect(null);
   }
 
@@ -56,18 +66,23 @@ public final class Detector {
    * <p>Detects a QR Code in an image, simply.</p>
    *
    * @param hints optional hints to detector
-   * @return {@link DetectorResult} encapsulating results of detecting a QR Code
-   * @throws ReaderException if no QR Code can be found
+   * @return {@link NotFoundException} encapsulating results of detecting a QR Code
+   * @throws NotFoundException if QR Code cannot be found
+   * @throws FormatException if a QR Code cannot be decoded
    */
-  public DetectorResult detect(Hashtable hints) throws ReaderException {
+  public DetectorResult detect(Hashtable hints) throws NotFoundException, FormatException {
 
-    MonochromeBitmapSource image = this.image;
-    if (!BlackPointEstimationMethod.TWO_D_SAMPLING.equals(image.getLastEstimationMethod())) {
-      image.estimateBlackPoint(BlackPointEstimationMethod.TWO_D_SAMPLING, 0);
-    }
+    resultPointCallback = hints == null ? null :
+        (ResultPointCallback) hints.get(DecodeHintType.NEED_RESULT_POINT_CALLBACK);
 
-    FinderPatternFinder finder = new FinderPatternFinder(image);
+    FinderPatternFinder finder = new FinderPatternFinder(image, resultPointCallback);
     FinderPatternInfo info = finder.find(hints);
+
+    return processFinderPatternInfo(info);
+  }
+
+  protected DetectorResult processFinderPatternInfo(FinderPatternInfo info)
+      throws NotFoundException, FormatException {
 
     FinderPattern topLeft = info.getTopLeft();
     FinderPattern topRight = info.getTopRight();
@@ -75,7 +90,7 @@ public final class Detector {
 
     float moduleSize = calculateModuleSize(topLeft, topRight, bottomLeft);
     if (moduleSize < 1.0f) {
-      throw ReaderException.getInstance();
+      throw NotFoundException.getNotFoundInstance();
     }
     int dimension = computeDimension(topLeft, topRight, bottomLeft, moduleSize);
     Version provisionalVersion = Version.getProvisionalVersionForDimension(dimension);
@@ -103,17 +118,17 @@ public final class Detector {
               estAlignmentY,
               (float) i);
           break;
-        } catch (ReaderException re) {
+        } catch (NotFoundException re) {
           // try next round
         }
       }
-      if (alignmentPattern == null) {
-        throw ReaderException.getInstance();
-      }
-
+      // If we didn't find alignment pattern... well try anyway without it
     }
 
-    BitMatrix bits = sampleGrid(image, topLeft, topRight, bottomLeft, alignmentPattern, dimension);
+    PerspectiveTransform transform =
+        createTransform(topLeft, topRight, bottomLeft, alignmentPattern, dimension);
+
+    BitMatrix bits = sampleGrid(image, transform, dimension);
 
     ResultPoint[] points;
     if (alignmentPattern == null) {
@@ -124,12 +139,11 @@ public final class Detector {
     return new DetectorResult(bits, points);
   }
 
-  private static BitMatrix sampleGrid(MonochromeBitmapSource image,
-                                      ResultPoint topLeft,
-                                      ResultPoint topRight,
-                                      ResultPoint bottomLeft,
-                                      ResultPoint alignmentPattern,
-                                      int dimension) throws ReaderException {
+  public PerspectiveTransform createTransform(ResultPoint topLeft,
+                                              ResultPoint topRight,
+                                              ResultPoint bottomLeft,
+                                              ResultPoint alignmentPattern,
+                                              int dimension) {
     float dimMinusThree = (float) dimension - 3.5f;
     float bottomRightX;
     float bottomRightY;
@@ -146,10 +160,7 @@ public final class Detector {
       sourceBottomRightX = sourceBottomRightY = dimMinusThree;
     }
 
-    GridSampler sampler = GridSampler.getInstance();
-    return sampler.sampleGrid(
-        image,
-        dimension,
+    PerspectiveTransform transform = PerspectiveTransform.quadrilateralToQuadrilateral(
         3.5f,
         3.5f,
         dimMinusThree,
@@ -166,18 +177,28 @@ public final class Detector {
         bottomRightY,
         bottomLeft.getX(),
         bottomLeft.getY());
+
+    return transform;
+  }
+
+  private static BitMatrix sampleGrid(BitMatrix image,
+                                      PerspectiveTransform transform,
+                                      int dimension) throws NotFoundException {
+
+    GridSampler sampler = GridSampler.getInstance();
+    return sampler.sampleGrid(image, dimension, transform);
   }
 
   /**
    * <p>Computes the dimension (number of modules on a size) of the QR Code based on the position
    * of the finder patterns and estimated module size.</p>
    */
-  private static int computeDimension(ResultPoint topLeft,
-                                      ResultPoint topRight,
-                                      ResultPoint bottomLeft,
-                                      float moduleSize) throws ReaderException {
-    int tltrCentersDimension = round(GenericResultPoint.distance(topLeft, topRight) / moduleSize);
-    int tlblCentersDimension = round(GenericResultPoint.distance(topLeft, bottomLeft) / moduleSize);
+  protected static int computeDimension(ResultPoint topLeft,
+                                        ResultPoint topRight,
+                                        ResultPoint bottomLeft,
+                                      float moduleSize) throws NotFoundException {
+    int tltrCentersDimension = round(ResultPoint.distance(topLeft, topRight) / moduleSize);
+    int tlblCentersDimension = round(ResultPoint.distance(topLeft, bottomLeft) / moduleSize);
     int dimension = ((tltrCentersDimension + tlblCentersDimension) >> 1) + 7;
     switch (dimension & 0x03) { // mod 4
       case 0:
@@ -188,7 +209,7 @@ public final class Detector {
         dimension--;
         break;
       case 3:
-        throw ReaderException.getInstance();
+        throw NotFoundException.getNotFoundInstance();
     }
     return dimension;
   }
@@ -197,7 +218,9 @@ public final class Detector {
    * <p>Computes an average estimated module size based on estimated derived from the positions
    * of the three finder patterns.</p>
    */
-  private float calculateModuleSize(ResultPoint topLeft, ResultPoint topRight, ResultPoint bottomLeft) {
+  protected float calculateModuleSize(ResultPoint topLeft,
+                                      ResultPoint topRight,
+                                      ResultPoint bottomLeft) {
     // Take the average
     return (calculateModuleSizeOneWay(topLeft, topRight) +
         calculateModuleSizeOneWay(topLeft, bottomLeft)) / 2.0f;
@@ -218,10 +241,10 @@ public final class Detector {
         (int) pattern.getX(),
         (int) pattern.getY());
     if (Float.isNaN(moduleSizeEst1)) {
-      return moduleSizeEst2;
+      return moduleSizeEst2 / 7.0f;
     }
     if (Float.isNaN(moduleSizeEst2)) {
-      return moduleSizeEst1;
+      return moduleSizeEst1 / 7.0f;
     }
     // Average them, and divide by 7 since we've counted the width of 3 black modules,
     // and 1 white and 1 black module on either side. Ergo, divide sum by 14.
@@ -235,26 +258,33 @@ public final class Detector {
    */
   private float sizeOfBlackWhiteBlackRunBothWays(int fromX, int fromY, int toX, int toY) {
 
-    float result = sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY);
+   float result = sizeOfBlackWhiteBlackRun(fromX, fromY, toX, toY);
 
-    // Now count other way -- don't run off image though of course
-    int otherToX = fromX - (toX - fromX);
-    if (otherToX < 0) {
-      // "to" should the be the first value not included, so, the first value off
-      // the edge is -1
-      otherToX = -1;
-    } else if (otherToX >= image.getWidth()) {
-      otherToX = image.getWidth();
-    }
-    int otherToY = fromY - (toY - fromY);
-    if (otherToY < 0) {
-      otherToY = -1;
-    } else if (otherToY >= image.getHeight()) {
-      otherToY = image.getHeight();
-    }
-    result += sizeOfBlackWhiteBlackRun(fromX, fromY, otherToX, otherToY);
-    return result - 1.0f; // -1 because we counted the middle pixel twice
-  }
+   // Now count other way -- don't run off image though of course
+   float scale = 1.0f;
+   int otherToX = fromX - (toX - fromX);
+   if (otherToX < 0) {
+     scale = (float) fromX / (float) (fromX - otherToX);
+     otherToX = 0;
+   } else if (otherToX >= image.getWidth()) {
+     scale = (float) (image.getWidth() - 1 - fromX) / (float) (otherToX - fromX);
+     otherToX = image.getWidth() - 1;
+   }
+   int otherToY = (int) (fromY - (toY - fromY) * scale);
+
+   scale = 1.0f;
+   if (otherToY < 0) {
+     scale = (float) fromY / (float) (fromY - otherToY);
+     otherToY = 0;
+   } else if (otherToY >= image.getHeight()) {
+     scale = (float) (image.getHeight() - 1 - fromY) / (float) (otherToY - fromY);
+     otherToY = image.getHeight() - 1;
+   }
+   otherToX = (int) (fromX + (otherToX - fromX) * scale);
+
+   result += sizeOfBlackWhiteBlackRun(fromX, fromY, otherToX, otherToY);
+   return result - 1.0f; // -1 because we counted the middle pixel twice
+ }
 
   /**
    * <p>This method traces a line from a point in the image, in the direction towards another point.
@@ -288,11 +318,11 @@ public final class Detector {
       int realX = steep ? y : x;
       int realY = steep ? x : y;
       if (state == 1) { // In white pixels, looking for black
-        if (image.isBlack(realX, realY)) {
+        if (image.get(realX, realY)) {
           state++;
         }
       } else {
-        if (!image.isBlack(realX, realY)) {
+        if (!image.get(realX, realY)) {
           state++;
         }
       }
@@ -304,6 +334,9 @@ public final class Detector {
       }
       error += dy;
       if (error > 0) {
+        if (y == toY) {
+          break;
+        }
         y += ystep;
         error -= dx;
       }
@@ -320,22 +353,22 @@ public final class Detector {
    * @param overallEstModuleSize estimated module size so far
    * @param estAlignmentX x coordinate of center of area probably containing alignment pattern
    * @param estAlignmentY y coordinate of above
-   * @param allowanceFactor number of pixels in all directons to search from the center
+   * @param allowanceFactor number of pixels in all directions to search from the center
    * @return {@link AlignmentPattern} if found, or null otherwise
-   * @throws ReaderException if an unexpected error occurs during detection
+   * @throws NotFoundException if an unexpected error occurs during detection
    */
-  private AlignmentPattern findAlignmentInRegion(float overallEstModuleSize,
-                                                 int estAlignmentX,
-                                                 int estAlignmentY,
-                                                 float allowanceFactor)
-      throws ReaderException {
+  protected AlignmentPattern findAlignmentInRegion(float overallEstModuleSize,
+                                                   int estAlignmentX,
+                                                   int estAlignmentY,
+                                                   float allowanceFactor)
+      throws NotFoundException {
     // Look for an alignment pattern (3 modules in size) around where it
     // should be
     int allowance = (int) (allowanceFactor * overallEstModuleSize);
     int alignmentAreaLeftX = Math.max(0, estAlignmentX - allowance);
     int alignmentAreaRightX = Math.min(image.getWidth() - 1, estAlignmentX + allowance);
     if (alignmentAreaRightX - alignmentAreaLeftX < overallEstModuleSize * 3) {
-      throw ReaderException.getInstance();
+      throw NotFoundException.getNotFoundInstance();
     }
 
     int alignmentAreaTopY = Math.max(0, estAlignmentY - allowance);
@@ -348,7 +381,8 @@ public final class Detector {
             alignmentAreaTopY,
             alignmentAreaRightX - alignmentAreaLeftX,
             alignmentAreaBottomY - alignmentAreaTopY,
-            overallEstModuleSize);
+            overallEstModuleSize,
+            resultPointCallback);
     return alignmentFinder.find();
   }
 
@@ -359,5 +393,4 @@ public final class Detector {
   private static int round(float d) {
     return (int) (d + 0.5f);
   }
-
 }

@@ -17,11 +17,12 @@
 package com.google.zxing.oned;
 
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.ReaderException;
+import com.google.zxing.ChecksumException;
+import com.google.zxing.FormatException;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.Result;
 import com.google.zxing.ResultPoint;
 import com.google.zxing.common.BitArray;
-import com.google.zxing.common.GenericResultPoint;
 
 import java.util.Hashtable;
 
@@ -30,7 +31,7 @@ import java.util.Hashtable;
  *
  * @author Sean Owen
  */
-public final class Code128Reader extends AbstractOneDReader {
+public final class Code128Reader extends OneDReader {
 
   private static final int[][] CODE_PATTERNS = {
       {2, 1, 2, 2, 2, 2}, // 0
@@ -162,7 +163,7 @@ public final class Code128Reader extends AbstractOneDReader {
   private static final int CODE_START_C = 105;
   private static final int CODE_STOP = 106;
 
-  private static int[] findStartPattern(BitArray row) throws ReaderException {
+  private static int[] findStartPattern(BitArray row) throws NotFoundException {
     int width = row.getSize();
     int rowOffset = 0;
     while (rowOffset < width) {
@@ -187,15 +188,17 @@ public final class Code128Reader extends AbstractOneDReader {
           int bestVariance = MAX_AVG_VARIANCE;
           int bestMatch = -1;
           for (int startCode = CODE_START_A; startCode <= CODE_START_C; startCode++) {
-            int variance = patternMatchVariance(counters, CODE_PATTERNS[startCode], MAX_INDIVIDUAL_VARIANCE);
+            int variance = patternMatchVariance(counters, CODE_PATTERNS[startCode],
+                MAX_INDIVIDUAL_VARIANCE);
             if (variance < bestVariance) {
               bestVariance = variance;
               bestMatch = startCode;
             }
           }
           if (bestMatch >= 0) {
-            // Look for whitespace before start pattern, >= 50% of width of start pattern            
-            if (row.isRange(Math.max(0, patternStart - (i - patternStart) / 2), patternStart, false)) {
+            // Look for whitespace before start pattern, >= 50% of width of start pattern
+            if (row.isRange(Math.max(0, patternStart - (i - patternStart) / 2), patternStart,
+                false)) {
               return new int[]{patternStart, i, bestMatch};
             }
           }
@@ -210,13 +213,13 @@ public final class Code128Reader extends AbstractOneDReader {
           counterPosition++;
         }
         counters[counterPosition] = 1;
-        isWhite ^= true; // isWhite = !isWhite;
+        isWhite = !isWhite;
       }
     }
-    throw ReaderException.getInstance();
+    throw NotFoundException.getNotFoundInstance();
   }
 
-  private static int decodeCode(BitArray row, int[] counters, int rowOffset) throws ReaderException {
+  private static int decodeCode(BitArray row, int[] counters, int rowOffset) throws NotFoundException {
     recordPattern(row, rowOffset, counters);
     int bestVariance = MAX_AVG_VARIANCE; // worst variance we'll accept
     int bestMatch = -1;
@@ -228,15 +231,16 @@ public final class Code128Reader extends AbstractOneDReader {
         bestMatch = d;
       }
     }
-    // TODO We're overlooking the fact that the STOP pattern has 7 values, not 6
+    // TODO We're overlooking the fact that the STOP pattern has 7 values, not 6.
     if (bestMatch >= 0) {
       return bestMatch;
     } else {
-      throw ReaderException.getInstance();
+      throw NotFoundException.getNotFoundInstance();
     }
   }
 
-  public Result decodeRow(int rowNumber, BitArray row, Hashtable hints) throws ReaderException {
+  public Result decodeRow(int rowNumber, BitArray row, Hashtable hints)
+      throws NotFoundException, FormatException, ChecksumException {
 
     int[] startPatternInfo = findStartPattern(row);
     int startCode = startPatternInfo[2];
@@ -252,13 +256,13 @@ public final class Code128Reader extends AbstractOneDReader {
         codeSet = CODE_CODE_C;
         break;
       default:
-        throw ReaderException.getInstance();
+        throw FormatException.getFormatInstance();
     }
 
     boolean done = false;
     boolean isNextShifted = false;
 
-    StringBuffer result = new StringBuffer();
+    StringBuffer result = new StringBuffer(20);
     int lastStart = startPatternInfo[0];
     int nextStart = startPatternInfo[1];
     int[] counters = new int[6];
@@ -302,7 +306,7 @@ public final class Code128Reader extends AbstractOneDReader {
         case CODE_START_A:
         case CODE_START_B:
         case CODE_START_C:
-          throw ReaderException.getInstance();
+          throw FormatException.getFormatInstance();
       }
 
       switch (codeSet) {
@@ -313,8 +317,8 @@ public final class Code128Reader extends AbstractOneDReader {
           } else if (code < 96) {
             result.append((char) (code - 64));
           } else {
-            // Don't let CODE_STOP, which always appears, affect whether whether we think the last code
-            // was printable or not
+            // Don't let CODE_STOP, which always appears, affect whether whether we think the last
+            // code was printable or not.
             if (code != CODE_STOP) {
               lastCharacterWasPrintable = false;
             }
@@ -416,27 +420,29 @@ public final class Code128Reader extends AbstractOneDReader {
 
     }
 
-    // Check for ample whitespice following pattern, but, to do this we first need to remember that we
-    // fudged decoding CODE_STOP since it actually has 7 bars, not 6. There is a black bar left to read off.
-    // Would be slightly better to properly read. Here we just skip it:
-    while (row.get(nextStart)) {
+    // Check for ample whitespace following pattern, but, to do this we first need to remember that
+    // we fudged decoding CODE_STOP since it actually has 7 bars, not 6. There is a black bar left
+    // to read off. Would be slightly better to properly read. Here we just skip it:
+    int width = row.getSize();
+    while (nextStart < width && row.get(nextStart)) {
       nextStart++;
     }
-    if (!row.isRange(nextStart, Math.min(row.getSize(), nextStart + (nextStart - lastStart) / 2), false)) {
-      throw ReaderException.getInstance();
+    if (!row.isRange(nextStart, Math.min(width, nextStart + (nextStart - lastStart) / 2),
+        false)) {
+      throw NotFoundException.getNotFoundInstance();
     }
 
     // Pull out from sum the value of the penultimate check code
     checksumTotal -= multiplier * lastCode;
     // lastCode is the checksum then:
     if (checksumTotal % 103 != lastCode) {
-      throw ReaderException.getInstance();
+      throw ChecksumException.getChecksumInstance();
     }
 
     // Need to pull out the check digits from string
     int resultLength = result.length();
-    // Only bother if, well, the result had at least one character, and if the checksum digit happened
-    // to be a printable character. If it was just interpreted as a control code, nothing to remove
+    // Only bother if the result had at least one character, and if the checksum digit happened to
+    // be a printable character. If it was just interpreted as a control code, nothing to remove.
     if (resultLength > 0 && lastCharacterWasPrintable) {
       if (codeSet == CODE_CODE_C) {
         result.delete(resultLength - 2, resultLength);
@@ -449,7 +455,7 @@ public final class Code128Reader extends AbstractOneDReader {
 
     if (resultString.length() == 0) {
       // Almost surely a false positive
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
 
     float left = (float) (startPatternInfo[1] + startPatternInfo[0]) / 2.0f;
@@ -458,8 +464,8 @@ public final class Code128Reader extends AbstractOneDReader {
         resultString,
         null,
         new ResultPoint[]{
-            new GenericResultPoint(left, (float) rowNumber),
-            new GenericResultPoint(right, (float) rowNumber)},
+            new ResultPoint(left, (float) rowNumber),
+            new ResultPoint(right, (float) rowNumber)},
         BarcodeFormat.CODE_128);
 
   }

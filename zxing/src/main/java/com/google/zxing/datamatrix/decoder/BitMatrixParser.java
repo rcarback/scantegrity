@@ -16,7 +16,7 @@
 
 package com.google.zxing.datamatrix.decoder;
 
-import com.google.zxing.ReaderException;
+import com.google.zxing.FormatException;
 import com.google.zxing.common.BitMatrix;
 
 /**
@@ -30,12 +30,12 @@ final class BitMatrixParser {
 
   /**
    * @param bitMatrix {@link BitMatrix} to parse
-   * @throws ReaderException if dimension is < 10 or > 144 or not 0 mod 2
+   * @throws FormatException if dimension is < 10 or > 144 or not 0 mod 2
    */
-  BitMatrixParser(BitMatrix bitMatrix) throws ReaderException {
+  BitMatrixParser(BitMatrix bitMatrix) throws FormatException {
     int dimension = bitMatrix.getDimension();
     if (dimension < 10 || dimension > 144 || (dimension & 0x01) != 0) {
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
     
     version = readVersion(bitMatrix);
@@ -52,10 +52,10 @@ final class BitMatrixParser {
    * 
    * @param bitMatrix Original {@link BitMatrix} including alignment patterns
    * @return {@link Version} encapsulating the Data Matrix Code's "version"
-   * @throws ReaderException if the dimensions of the mapping matrix are not valid
+   * @throws FormatException if the dimensions of the mapping matrix are not valid
    * Data Matrix dimensions.
    */
-  Version readVersion(BitMatrix bitMatrix) throws ReaderException {
+  Version readVersion(BitMatrix bitMatrix) throws FormatException {
 
     if (version != null) {
       return version;
@@ -74,9 +74,9 @@ final class BitMatrixParser {
    * Data Matrix Code.</p>
    *
    * @return bytes encoded within the Data Matrix Code
-   * @throws ReaderException if the exact number of bytes expected is not read
+   * @throws FormatException if the exact number of bytes expected is not read
    */
-  byte[] readCodewords() throws ReaderException {
+  byte[] readCodewords() throws FormatException {
 
     byte[] result = new byte[version.getTotalCodewords()];
     int resultOffset = 0;
@@ -118,7 +118,7 @@ final class BitMatrixParser {
       } else {
         // Sweep upward diagonally to the right
         do {
-          if ((row < numRows) && (column >= 0) && !readMappingMatrix.get(row, column)) {
+          if ((row < numRows) && (column >= 0) && !readMappingMatrix.get(column, row)) {
             result[resultOffset++] = (byte) readUtah(row, column, numRows, numColumns);
           }
           row -= 2;
@@ -129,7 +129,7 @@ final class BitMatrixParser {
         
         // Sweep downward diagonally to the left
         do {
-          if ((row >= 0) && (column < numColumns) && !readMappingMatrix.get(row, column)) {
+          if ((row >= 0) && (column < numColumns) && !readMappingMatrix.get(column, row)) {
              result[resultOffset++] = (byte) readUtah(row, column, numRows, numColumns);
           }
           row += 2;
@@ -141,7 +141,7 @@ final class BitMatrixParser {
     } while ((row < numRows) || (column < numColumns));
 
     if (resultOffset != version.getTotalCodewords()) {
-      throw ReaderException.getInstance();
+      throw FormatException.getFormatInstance();
     }
     return result;
   }
@@ -165,12 +165,12 @@ final class BitMatrixParser {
       column += numColumns;
       row += 4 - ((numColumns + 4) & 0x07);
     }
-    readMappingMatrix.set(row, column);
-    return mappingBitMatrix.get(row, column);
+    readMappingMatrix.set(column, row);
+    return mappingBitMatrix.get(column, row);
   }
   
   /**
-   * <p>Reads the 8 bits of the standard utah shaped pattern.</p>
+   * <p>Reads the 8 bits of the standard Utah-shaped pattern.</p>
    * 
    * <p>See ISO 16022:2006, 5.8.1 Figure 6</p>
    * 
@@ -432,9 +432,9 @@ final class BitMatrixParser {
           int writeRowOffset = dataRegionRowOffset + i;
           for (int j = 0; j < dataRegionSizeColumns; ++j) {
             int readColumnOffset = dataRegionColumn * (dataRegionSizeColumns + 2) + 1 + j;
-            if (bitMatrix.get(readRowOffset, readColumnOffset)) {
+            if (bitMatrix.get(readColumnOffset, readRowOffset)) {
               int writeColumnOffset = dataRegionColumnOffset + j;
-              bitMatrixWithoutAlignment.set(writeRowOffset, writeColumnOffset);
+              bitMatrixWithoutAlignment.set(writeColumnOffset, writeRowOffset);
             }
           }
         }

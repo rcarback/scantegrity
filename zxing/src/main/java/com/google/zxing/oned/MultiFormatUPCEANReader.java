@@ -18,6 +18,8 @@ package com.google.zxing.oned;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.DecodeHintType;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.Reader;
 import com.google.zxing.ReaderException;
 import com.google.zxing.Result;
 import com.google.zxing.common.BitArray;
@@ -27,17 +29,18 @@ import java.util.Vector;
 
 /**
  * <p>A reader that can read all available UPC/EAN formats. If a caller wants to try to
- * read all such formats, it is most efficent to use this implementation rather than invoke
+ * read all such formats, it is most efficient to use this implementation rather than invoke
  * individual readers.</p>
  *
  * @author Sean Owen
  */
-public final class MultiFormatUPCEANReader extends AbstractOneDReader {
+public final class MultiFormatUPCEANReader extends OneDReader {
 
   private final Vector readers;
 
   public MultiFormatUPCEANReader(Hashtable hints) {
-    Vector possibleFormats = hints == null ? null : (Vector) hints.get(DecodeHintType.POSSIBLE_FORMATS);
+    Vector possibleFormats = hints == null ? null :
+        (Vector) hints.get(DecodeHintType.POSSIBLE_FORMATS);
     readers = new Vector();
     if (possibleFormats != null) {
       if (possibleFormats.contains(BarcodeFormat.EAN_13)) {
@@ -60,15 +63,15 @@ public final class MultiFormatUPCEANReader extends AbstractOneDReader {
     }
   }
 
-  public Result decodeRow(int rowNumber, BitArray row, Hashtable hints) throws ReaderException {
+  public Result decodeRow(int rowNumber, BitArray row, Hashtable hints) throws NotFoundException {
     // Compute this location once and reuse it on multiple implementations
-    int[] startGuardPattern = AbstractUPCEANReader.findStartGuardPattern(row);
+    int[] startGuardPattern = UPCEANReader.findStartGuardPattern(row);
     int size = readers.size();
     for (int i = 0; i < size; i++) {
       UPCEANReader reader = (UPCEANReader) readers.elementAt(i);
       Result result;
       try {
-        result = reader.decodeRow(rowNumber, row, startGuardPattern);
+        result = reader.decodeRow(rowNumber, row, startGuardPattern, hints);
       } catch (ReaderException re) {
         continue;
       }
@@ -82,13 +85,23 @@ public final class MultiFormatUPCEANReader extends AbstractOneDReader {
       // a UPC-A code. But for efficiency we only run the EAN-13 decoder to also read
       // UPC-A. So we special case it here, and convert an EAN-13 result to a UPC-A
       // result if appropriate.
-      if (result.getBarcodeFormat().equals(BarcodeFormat.EAN_13) && result.getText().charAt(0) == '0') {
-        return new Result(result.getText().substring(1), null, result.getResultPoints(), BarcodeFormat.UPC_A);
+      if (result.getBarcodeFormat().equals(BarcodeFormat.EAN_13) &&
+          result.getText().charAt(0) == '0') {
+        return new Result(result.getText().substring(1), null, result.getResultPoints(),
+            BarcodeFormat.UPC_A);
       }
       return result;
     }
 
-    throw ReaderException.getInstance();
+    throw NotFoundException.getNotFoundInstance();
+  }
+
+  public void reset() {
+    int size = readers.size();
+    for (int i = 0; i < size; i++) {
+      Reader reader = (Reader) readers.elementAt(i);
+      reader.reset();
+    }
   }
 
 }

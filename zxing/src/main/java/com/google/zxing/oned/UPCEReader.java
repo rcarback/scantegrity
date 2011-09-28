@@ -16,8 +16,10 @@
 
 package com.google.zxing.oned;
 
-import com.google.zxing.ReaderException;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.ChecksumException;
+import com.google.zxing.FormatException;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.common.BitArray;
 
 /**
@@ -28,7 +30,7 @@ import com.google.zxing.common.BitArray;
  *
  * @author Sean Owen
  */
-public final class UPCEReader extends AbstractUPCEANReader {
+public final class UPCEReader extends UPCEANReader {
 
   /**
    * The pattern that marks the middle, and end, of a UPC-E pattern.
@@ -52,7 +54,8 @@ public final class UPCEReader extends AbstractUPCEANReader {
     decodeMiddleCounters = new int[4];
   }
 
-  protected int decodeMiddle(BitArray row, int[] startRange, StringBuffer result) throws ReaderException {
+  protected int decodeMiddle(BitArray row, int[] startRange, StringBuffer result)
+      throws NotFoundException {
     int[] counters = decodeMiddleCounters;
     counters[0] = 0;
     counters[1] = 0;
@@ -79,16 +82,16 @@ public final class UPCEReader extends AbstractUPCEANReader {
     return rowOffset;
   }
 
-  protected int[] decodeEnd(BitArray row, int endStart) throws ReaderException {
+  protected int[] decodeEnd(BitArray row, int endStart) throws NotFoundException {
     return findGuardPattern(row, endStart, true, MIDDLE_END_PATTERN);
   }
 
-  protected boolean checkChecksum(String s) throws ReaderException {
+  protected boolean checkChecksum(String s) throws FormatException, ChecksumException {
     return super.checkChecksum(convertUPCEtoUPCA(s));
   }
 
   private static void determineNumSysAndCheckDigit(StringBuffer resultString, int lgPatternFound)
-      throws ReaderException {
+      throws NotFoundException {
 
     for (int numSys = 0; numSys <= 1; numSys++) {
       for (int d = 0; d < 10; d++) {
@@ -99,11 +102,11 @@ public final class UPCEReader extends AbstractUPCEANReader {
         }
       }
     }
-    throw ReaderException.getInstance();
+    throw NotFoundException.getNotFoundInstance();
   }
 
   BarcodeFormat getBarcodeFormat() {
-    return BarcodeFormat.UPC_E;  
+    return BarcodeFormat.UPC_E;
   }
 
   /**

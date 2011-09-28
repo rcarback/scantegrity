@@ -24,24 +24,13 @@ import com.google.zxing.ResultPoint;
  *
  * @author Sean Owen
  */
-public final class AlignmentPattern implements ResultPoint {
+public final class AlignmentPattern extends ResultPoint {
 
-  private final float posX;
-  private final float posY;
   private final float estimatedModuleSize;
 
   AlignmentPattern(float posX, float posY, float estimatedModuleSize) {
-    this.posX = posX;
-    this.posY = posY;
+    super(posX, posY);
     this.estimatedModuleSize = estimatedModuleSize;
-  }
-
-  public float getX() {
-    return posX;
-  }
-
-  public float getY() {
-    return posY;
   }
 
   /**
@@ -49,11 +38,11 @@ public final class AlignmentPattern implements ResultPoint {
    * position and size -- meaning, it is at nearly the same center with nearly the same size.</p>
    */
   boolean aboutEquals(float moduleSize, float i, float j) {
-    return
-        Math.abs(i - posY) <= moduleSize &&
-            Math.abs(j - posX) <= moduleSize &&
-            (Math.abs(moduleSize - estimatedModuleSize) <= 1.0f ||
-                Math.abs(moduleSize - estimatedModuleSize) / estimatedModuleSize <= 0.1f);
+    if (Math.abs(i - getY()) <= moduleSize && Math.abs(j - getX()) <= moduleSize) {
+      float moduleSizeDiff = Math.abs(moduleSize - estimatedModuleSize);
+      return moduleSizeDiff <= 1.0f || moduleSizeDiff / estimatedModuleSize <= 1.0f;
+    }
+    return false;
   }
 
 }
