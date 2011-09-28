@@ -28,7 +28,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
-import com.lowagie.text.Rectangle;
+import com.itextpdf.text.Rectangle;
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 

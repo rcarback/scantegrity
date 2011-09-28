@@ -188,7 +188,7 @@ public class InvisibleInkCodes {
 			for (int i = 0; i < enc.length; i++)
 			{
 				int l_b = (((int)enc[i]) << (24)) >>> (24);
-				System.out.format("%s\n", Integer.toBinaryString(l_b));
+				//System.out.format("%s\n", Integer.toBinaryString(l_b));
 				ret ^= l_b << l_pz;
 				// Uncomment next line to stop loop at noBits.
 				//if (l_pz >= (noBits-8)) break; 

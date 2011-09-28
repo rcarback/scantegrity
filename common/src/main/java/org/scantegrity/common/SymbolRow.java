@@ -26,7 +26,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 
-import com.lowagie.text.pdf.codec.Base64;
+import com.itextpdf.text.pdf.codec.Base64;
 
 public class SymbolRow implements Serializable {
 

@@ -62,10 +62,10 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import org.scantegrity.common.InvisibleInkFactory;
 
 
@@ -226,7 +226,7 @@ public class Inkerator {
 			}
 			
 			
-			com.lowagie.text.Image l_img = com.lowagie.text.Image.getInstance(
+			com.itextpdf.text.Image l_img = com.itextpdf.text.Image.getInstance(
 														l_tmpRaster.getWidth(), 
 														l_tmpRaster.getHeight(), 
 														4, 8, l_bytes);

@@ -46,9 +46,9 @@ import org.xml.sax.SAXException;
 
 import org.scantegrity.common.CMYKColorSpace;
 
-import com.lowagie.text.BadElementException;
-import com.lowagie.text.Image;
-import com.lowagie.text.Rectangle;
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
 
 /**
  * Helper class
@@ -654,9 +654,9 @@ public class Util {
 			l_bytes[l_i] = (byte)Math.round(l_db.getElemFloat(l_i)*(float)255);
 		}
 
-		com.lowagie.text.Image l_img=null;
+		com.itextpdf.text.Image l_img=null;
 		try {
-			l_img = com.lowagie.text.Image.getInstance(
+			l_img = com.itextpdf.text.Image.getInstance(
 														l_tmpRaster.getWidth(), 
 														l_tmpRaster.getHeight(), 
 														4, 8, l_bytes);

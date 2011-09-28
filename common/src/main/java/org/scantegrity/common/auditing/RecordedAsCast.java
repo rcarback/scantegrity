@@ -13,10 +13,10 @@ import org.scantegrity.common.ballotstandards.basic.Question;
 import org.scantegrity.common.ballotstandards.electionSpecification.ElectionSpecification;
 import org.xml.sax.SAXException;
 
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfFormField;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PdfFormField;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
 
 import org.scantegrity.common.ContestSymbols;
 import org.scantegrity.common.InputConstants;
