@@ -853,7 +853,7 @@ public class FormMaker {
 		//cb.setColorFill(Color.RED);
 		//cb.setColorStroke(Color.RED);
 
-		float wider=0.00f;
+		float wider=0.05f;
 		cb.rectangle(r.getLeft()-r.getWidth()*wider,r.getBottom()-r.getHeight()*wider,r.getWidth()*(1+2*wider),r.getHeight()*(1+2*wider));
 		cb.fillStroke();
 		cb.restoreState();
