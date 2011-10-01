@@ -118,6 +118,24 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 	private JLabel jLabelPublicFolder;
 	private JPanel jPanelGo;
 
+	//GUI elements for remotegrity ballot generation
+	private JPanel jPanelRemotegrity;
+	private JCheckBox jCheckBoxRemotegrityBallots;
+	private JTextField jTextFieldRemotegrityStart;
+	private JTextField jTextFieldRemotegrityEnd;
+	private JLabel jLabelRemotegrityFrom;
+	private JLabel jLabelRemotegrityTo;
+	
+	//GUI elements for accessbility ballot generation
+	private JPanel jPanelAccessibility;
+	private JCheckBox jCheckBoxAccessibilityBallots;
+	private JTextField jTextFieldAccessibilityStart;
+	private JTextField jTextFieldAccessibilityEnd;
+	private JLabel jLabelAccessibilityFrom;
+	private JLabel jLabelAccessibilityTo;
+
+	
+
 	
 	private JFileChooser jFileChooser=new JFileChooser(InputConstants.publicFolder);;
 	
@@ -228,7 +246,7 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 							{
 								jCheckBoxInvisibleInkBallots = new JCheckBox();
 								jPanelPDFSerialNumbers.add(jCheckBoxInvisibleInkBallots);
-								jCheckBoxInvisibleInkBallots.setText("Generate Polling Place Ballot with invisible ink");
+								jCheckBoxInvisibleInkBallots.setText("Generate Polling Place Ballots");
 							}
 							{
 								jLabelPDFFrom = new JLabel();
@@ -252,11 +270,91 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 							{
 								jTextFieldPDFTo = new JTextField();
 								jPanelPDFSerialNumbers.add(jTextFieldPDFTo);
-								jTextFieldPDFTo.setText("1000");
+								jTextFieldPDFTo.setText("999");
 								jTextFieldPDFTo
 									.setPreferredSize(new java.awt.Dimension(
 										45,
 										20));
+							}
+						}
+						{
+							jPanelRemotegrity = new JPanel();
+							jPanelGeneratePDFs.add(jPanelRemotegrity);
+							FlowLayout jPanelRemotegrityLayout = new FlowLayout();
+							jPanelRemotegrityLayout.setVgap(1);
+							jPanelRemotegrity.setLayout(jPanelRemotegrityLayout);
+							{
+								jCheckBoxRemotegrityBallots = new JCheckBox();
+								jPanelRemotegrity.add(jCheckBoxRemotegrityBallots);
+								jCheckBoxRemotegrityBallots.setText("Generate Remotegrity Ballots");
+							}
+							{
+								jLabelRemotegrityFrom = new JLabel();
+								jPanelRemotegrity.add(jLabelRemotegrityFrom);
+								jLabelRemotegrityFrom.setText("From Serial No");
+							}
+							{
+								jTextFieldRemotegrityStart = new JTextField();
+								jPanelRemotegrity.add(jTextFieldRemotegrityStart);
+								jTextFieldRemotegrityStart.setText("2000");
+								jTextFieldRemotegrityStart
+									.setPreferredSize(new java.awt.Dimension(
+										45,
+										20));
+							}
+							{
+								jLabelRemotegrityTo = new JLabel();
+								jPanelRemotegrity.add(jLabelRemotegrityTo);
+								jLabelRemotegrityTo.setText("To Serial No");
+							}
+							{
+								jTextFieldRemotegrityEnd = new JTextField();
+								jPanelRemotegrity.add(jTextFieldRemotegrityEnd);
+								jTextFieldRemotegrityEnd.setText("2099");
+								jTextFieldRemotegrityEnd
+									.setPreferredSize(new java.awt.Dimension(
+										45,
+										20));
+							}
+							{
+								jPanelAccessibility = new JPanel();
+								jPanelGeneratePDFs.add(jPanelAccessibility);
+								FlowLayout jPanelAccessibilityLayout = new FlowLayout();
+								jPanelAccessibilityLayout.setVgap(1);
+								jPanelAccessibility.setLayout(jPanelAccessibilityLayout);
+								{
+									jCheckBoxAccessibilityBallots = new JCheckBox();
+									jPanelAccessibility.add(jCheckBoxAccessibilityBallots);
+									jCheckBoxAccessibilityBallots.setText("Generate Accessibility Ballots");
+								}
+								{
+									jLabelAccessibilityFrom = new JLabel();
+									jPanelAccessibility.add(jLabelAccessibilityFrom);
+									jLabelAccessibilityFrom.setText("From Serial No");
+								}
+								{
+									jTextFieldAccessibilityStart = new JTextField();
+									jPanelAccessibility.add(jTextFieldAccessibilityStart);
+									jTextFieldAccessibilityStart.setText("2100");
+									jTextFieldAccessibilityStart
+										.setPreferredSize(new java.awt.Dimension(
+											45,
+											20));
+								}
+								{
+									jLabelAccessibilityTo = new JLabel();
+									jPanelAccessibility.add(jLabelAccessibilityTo);
+									jLabelAccessibilityTo.setText("To Serial No");
+								}
+								{
+									jTextFieldAccessibilityEnd = new JTextField();
+									jPanelAccessibility.add(jTextFieldAccessibilityEnd);
+									jTextFieldAccessibilityEnd.setText("2199");
+									jTextFieldAccessibilityEnd
+										.setPreferredSize(new java.awt.Dimension(
+											45,
+											20));
+								}
 							}
 						}
 						{
@@ -268,7 +366,7 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 							{
 								jCheckBoxMailInBallots = new JCheckBox();
 								jPanel2.add(jCheckBoxMailInBallots);
-								jCheckBoxMailInBallots.setText("Generate Mail-in ballots B&W");
+								jCheckBoxMailInBallots.setText("Generate Plain B&W Ballots");
 							}
 							{
 								jLabel1 = new JLabel();
@@ -278,7 +376,7 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 							{
 								jTextField1 = new JTextField();
 								jPanel2.add(jTextField1);
-								jTextField1.setText("0");
+								jTextField1.setText("2200");
 								jTextField1
 									.setPreferredSize(new java.awt.Dimension(
 										45,
@@ -292,13 +390,13 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
 							{
 								jTextField2 = new JTextField();
 								jPanel2.add(jTextField2);
-								jTextField2.setText("1000");
+								jTextField2.setText("2299");
 								jTextField2
 									.setPreferredSize(new java.awt.Dimension(
 										45,
 										20));
 							}
-						}
+						}						
 					}
 				}
 				{
@@ -796,6 +894,29 @@ public class ElectionConsole extends javax.swing.JFrame implements ElectionConso
         	
     		System.out.println("generating "+(Integer.parseInt(jTextFieldPDFTo.getText())-Integer.parseInt(jTextFieldPDFFrom.getText()))+" polling place ballots took "+((System.currentTimeMillis()-start))+" mseconds");		
 
+    	}
+    	
+    	if (jCheckBoxRemotegrityBallots.isSelected()) {
+    		checkForM1In();
+    		MeetingOne m1=new MeetingOne(InputConstants.MeetingOneIn);
+    		ElectionSpecification es=m1.getEs();
+    		BallotGeometry geom=new BallotGeometry(InputConstants.Geometry);
+
+        	PrintableBallotMakerWithBarcodes pbm=new PrintableBallotMakerWithBarcodes(es,geom);
+        	pbm.init(InputConstants.PdfTemplate,InputConstants.MeetingTwoPrints);
+        	pbm.makeRemotegrityBallots(InputConstants.privateFolder, Integer.parseInt(jTextFieldRemotegrityStart.getText()), Integer.parseInt(jTextFieldRemotegrityEnd.getText()));
+    	}
+    	
+    	if (jCheckBoxAccessibilityBallots.isSelected())
+    	{
+    		checkForM1In();
+    		MeetingOne m1=new MeetingOne(InputConstants.MeetingOneIn);
+    		ElectionSpecification es=m1.getEs();
+    		BallotGeometry geom=new BallotGeometry(InputConstants.Geometry);
+
+        	PrintableBallotMakerWithBarcodes pbm=new PrintableBallotMakerWithBarcodes(es,geom);
+        	pbm.init(InputConstants.PdfTemplate,InputConstants.MeetingTwoPrints);
+        	pbm.makeAccessibilityBallots(InputConstants.privateFolder, Integer.parseInt(jTextFieldAccessibilityStart.getText()), Integer.parseInt(jTextFieldAccessibilityEnd.getText()));    		
     	}
 
     	if (jCheckBoxMailInBallots.isSelected()) {
