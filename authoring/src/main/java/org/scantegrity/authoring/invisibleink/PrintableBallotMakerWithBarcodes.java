@@ -2,12 +2,20 @@ package org.scantegrity.authoring.invisibleink;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
 
@@ -17,24 +25,17 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BarcodeQRCode;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.qrcode.EncodeHintType;
+import com.itextpdf.text.pdf.qrcode.ErrorCorrectionLevel;
 
 import org.scantegrity.common.BallotGeometry;
 import org.scantegrity.common.BallotRow;
 import org.scantegrity.common.InputConstants;
 import org.scantegrity.common.Util;
 import org.scantegrity.common.InvisibleInkFactory;
-
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.WriterException;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.ByteMatrix;
-
 
 public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 	
@@ -112,120 +113,53 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
     	
         //step3 - add the serial number in latin
     	Rectangle r=null;
-        //for (int i=0;i<geom.getNoDigitsInSerial();i++) {
     	
-    		BallotRow ballotRow=ballotRows.get(Integer.parseInt(serial));
-    	if (true) {
-//    		if ( ! mailIn) {
-	        	
-    		
-        	r=geom.getSerialTop("0");
-        	drawWhiteRectangle(r);
-        	
-//System.out.println("Serial="+serial+" ballotRow="+ballotRow);
-        	
-        	String webSerial=ballotRow.getWebSerial();
-        	
-        	drawRegularText(webSerial, r, this.helv, 12);
-//    		}
-			//float width=r.getWidth();
-
-	        	r=geom.getSerialTop("1");
-	        	drawWhiteRectangle(r);
-	        	String printingKey1=ballotRow.getStubSerial();
-	        	
-	        	drawRegularText(printingKey1, r, this.helv, 12);
-	        	
-	        	//addTextCentered(cb, r, this.helv, 8, Color.BLACK,printingKey1);
-	
-	        	/*
-	        	r=geom.getSerialTop("2");
-	        	drawWhiteRectangle(r);
-	        	String printingKey2=Util.AddleadingZeros(ballotRow.getPassword2(),6);	
-	        	addTextCentered(cb, r, serialFont, 8, symbolColor,printingKey2);
-	        	*/
-    	}
-/*        	
-        	String printingKey2=Util.AddleadingZeros(ballotRow.getPassword2(),6);
-        	r.setLeft(r.getLeft()+width);
-        	r.setRight(r.getRight()+width);
-        	addTextCentered(cb, r, serialFont, 8, symbolColor,printingKey2);
-*/        //}
+    	//Web Serial Number
+    	BallotRow ballotRow=ballotRows.get(Integer.parseInt(serial));
+        r=geom.getSerialTop("0");
+        drawWhiteRectangle(r);
+        String webSerial=ballotRow.getWebSerial();	
+        drawRegularText(webSerial, r, this.helv, 12);
         
+        // Stub Serial number
+	    r=geom.getSerialTop("1");
+	    drawWhiteRectangle(r);
+	    String printingKey1=ballotRow.getStubSerial();
+	    drawRegularText(printingKey1, r, this.helv, 12);
+	        	
 
-        //add the 2D barcode
-        Image barcode=null;
-        try {
-        	BufferedImage bi=GetSerialImage(ballotRow.getBarcodeSerial());
-        	//ImageIO.read(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl="+ballotRow.getBarcodeSerial()));
-  
-        	//BufferedImage bi=ImageIO.read(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl=123456"));
-        	
-        	
-			barcode=Util.CMYKBufferedImageToCMYKImage(
-					Util.RGBBufferedImageToCMYKBufferedImage(bi));
-			
-			barcode.setCompressionLevel(9);
-			
-			//barcode=Image.getInstance(new URL("http://chart.apis.google.com/chart?cht=qr&chs=120x120&chl="+ballotRow.getBarcodeSerial()));
-		} catch (WriterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		
-		Rectangle rect=geom.makeRectangle(geom.getSerialBulletedNode());
-		barcode.setAbsolutePosition(rect.getLeft(),rect.getBottom());
-		float w=rect.getWidth()*1.05f; 
-		float h=rect.getHeight()*1.05f;
-		
-		//float w=barcode.getWidth(); 
-		//float h=barcode.getHeight();
-		
+        //add the 2D barcode		
+		r=geom.makeRectangle(geom.getSerialBulletedNode());
+	    //drawWhiteRectangle(rect);
+		//barcode.setAbsolutePosition(rect.getLeft(),rect.getBottom());
+		float w=r.getWidth()*1.25f; 
+		float h=r.getHeight()*1.25f;
+		float x = r.getLeft()-((w-r.getWidth())/2);
+		float y = r.getBottom()-((h-r.getHeight())/2);
 		
 		try {
-			cb.addImage(barcode, Math.max(w,h), 0, 0, Math.max(w,h), rect.getLeft(),rect.getBottom()-0.5f);
+		    // Level H is the highest level of error correction. 
+		    Map<EncodeHintType, Object> l_hints = 
+		    			new Hashtable<EncodeHintType, Object>();
+		    l_hints.put( EncodeHintType.ERROR_CORRECTION, 
+		    				ErrorCorrectionLevel.H );
+			
+	        BarcodeQRCode l_barcode = 
+								new BarcodeQRCode(ballotRow.getBarcodeSerial(),
+	        										(int)Math.max(w,h), 
+													(int)Math.max(w,h), 
+													l_hints);
+	        Image l_img = l_barcode.getImage();
+			l_img.setDpi(600, 600);
+			l_img.setAbsolutePosition(x, y);
+			//l_img.scaleAbsolute(Math.max(w,h), Math.max(w,h));
+			cb.addImage(l_img);
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}
         
     }	
 	
-	
-	/**
-	 * @param p_barcodeSerial
-	 * @return
-	 * @throws WriterException 
-	 */
-	private BufferedImage GetSerialImage(String p_barcodeSerial) 
-	throws WriterException {
-	    QRCodeWriter l_writer = new QRCodeWriter();    
-
-	    // Level H is the highest level of error correction. 
-	    Hashtable<EncodeHintType, ErrorCorrectionLevel> l_hints = 
-	    				new Hashtable<EncodeHintType, ErrorCorrectionLevel>();
-	    l_hints.put( EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H );
-	    
-	    ByteMatrix l_bm = l_writer.encode(p_barcodeSerial, 
-											BarcodeFormat.QR_CODE, 
-											120, 
-											120, 
-											l_hints 
-										    );
-	    
-	    // There's a bug here, where we need to bitflip everything...otherwise
-	    // white is black and black is white.
-	    for (int i = 0; i < l_bm.getHeight(); i++)
-	    {
-	    	for (int j = 0; j < l_bm.getWidth(); j++)
-	    	{
-	    		if ( l_bm.get(i, j) == 0 ) l_bm.set(i, j, 255);
-	    		else l_bm.set(i, j, 0);
-	    	}
-	    }
-	    
-	    return MatrixToImageWriter.toBufferedImage(l_bm);
-	}
-
 	public void addTextCentered(PdfContentByte cb, Rectangle possition, BaseFont font, int XXXfontSize,BaseColor textColor,String text) {
 		//draw a white background		
 		cb.saveState();
@@ -235,33 +169,14 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 		cb.fillStroke();
 		cb.restoreState();
 		
-		if (mailIn) return;
-		
-		//System.out.format("%f, %f, %f, %f\n", possition.getLeft(), 
-		//										possition.getBottom(), 
-		//										possition.getWidth(), 
-		//										possition.getHeight());
-		
-		//TODO this may eat too much memory
-		//Image l_img=textToImage.get(text);
-		//if (l_img==null) {
+		if (mailIn) return;		
 		Image l_img=Util.CMYKBufferedImageToCMYKImage(iif.getBufferedImage(" "+text+" "));
-		//The previous call is memory intensive...
-        //System.gc();
 		//l_img.setCompressionLevel(9);
-			
-		//	textToImage.put(text, l_img);
-		//}
-		
-		//System.out.println("Adding image at "+ possition.getLeft()+" "+ possition.getBottom());
 		try {
-			//cb.addImage(l_img, img.getWidth(), 0, 0, img.getHeight(), possition.getLeft(), possition.getBottom());
 			l_img.setDpi(300, 300);
 			l_img.setAbsolutePosition(possition.getLeft(), possition.getBottom());
 			l_img.scaleAbsolute(possition.getWidth(), possition.getHeight());
-			//long l_d = System.currentTimeMillis();
 			cb.addImage(l_img);
-			//System.out.format ("addImage: %d\n", System.currentTimeMillis()-l_d);
 		} catch (DocumentException e) {
 			e.printStackTrace();
 		}
@@ -301,4 +216,71 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 //    	pbm.makePrintableBallots(InputConstants.privateFolder+"", 444,445);
 	}
 
+	/**
+	 * Make print codes files for the remotegrity system.
+	 * @param p_privateFolder
+	 * @param p_parseInt
+	 * @param p_parseInt2
+	 * @throws FileNotFoundException 
+	 */
+	public void makeRemotegrityBallots(String p_outputFldr, int p_from,
+			int p_to) throws FileNotFoundException {
+		
+		File l_out = new File(p_outputFldr+"/RemotegrityPrintCodes_" 
+								+ p_from + "-" + p_to + ".xml");
+		makePrintCodesFile(l_out, p_from, p_to);
+	}
+	
+	/**
+	 * Make print codes files for the accessibility system.
+	 * @param p_privateFolder
+	 * @param p_parseInt
+	 * @param p_parseInt2
+	 * @throws FileNotFoundException 
+	 */
+	public void makeAccessibilityBallots(String p_outputFldr, int p_from,
+			int p_to) throws FileNotFoundException {
+		
+		File l_out = new File(p_outputFldr+"/AccessibilityPrintCodes_" 
+								+ p_from + "-" + p_to + ".xml");
+		makePrintCodesFile(l_out, p_from, p_to);
+	}
+
+	/**
+	 * Make print codes file using the specified name.
+	 * @param p_privateFolder
+	 * @param p_parseInt
+	 * @param p_parseInt2
+	 * @throws FileNotFoundException 
+	 */
+	private void makePrintCodesFile(File p_outFile, int p_from, int p_to) 
+	throws FileNotFoundException
+	{
+		PrintStream l_out = new PrintStream(p_outFile);
+
+		l_out.format("<xml>\n\t<codes>\n");
+		
+		for (int i = p_from; i <= p_to; i++)
+		{
+			BallotRow l_b = (BallotRow) ballotRows.get(i);
+			String l_ser = l_b.getBarcodeSerial();
+			l_out.format("\t\t<ballot barcodeSerial=\"%s\" webSerial=\"%s\" " +
+						 "stubSerial=\"%s\">\n", l_ser,
+						 l_b.getWebSerial(), l_b.getStubSerial());
+			 
+			Set<Integer> l_ques = allCodes.get(l_ser).keySet();
+			for (Integer l_q : l_ques)
+			{
+				l_out.format("\t\t\t<question id=\"%d\">\n", l_q);
+				Set<Integer> l_codes = allCodes.get(l_ser).get(l_q).keySet();
+				for (Integer l_c : l_codes)
+				{
+					l_out.format("\t\t\t\t<symbol id=\"%d\" code=\"%s\" />\n",
+									l_c, allCodes.get(l_ser).get(l_q).get(l_c));	
+				}
+				l_out.format("\t\t\t</question>\n");
+			}
+			l_out.format("\t\t</ballot>\n");		
+		}
+	}
 }
