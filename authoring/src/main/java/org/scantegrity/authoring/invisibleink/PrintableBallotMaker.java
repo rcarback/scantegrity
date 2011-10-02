@@ -159,15 +159,15 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 		//stop--;
 		
 		for (int i=start;i<=stop;i++) {
+			//long l_d1 = System.currentTimeMillis();
 			addAlignment(i+"");
 			addSerialNumber(i+"",i+"");			
-			//long l_d1 = System.currentTimeMillis();
 			addContests(ballotRows.get(i).getBarcodeSerial());
-			//System.out.format("GenTime %d\n", System.currentTimeMillis()-l_d1);
 			if (i!=stop) {
 				document.newPage();
 				cb.addTemplate(page1,0,0);
 			}
+			//System.out.format("GenTime %d\n", System.currentTimeMillis()-l_d1);
 		}
 		/*
 		document.newPage();
@@ -175,7 +175,7 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 		document.add(new Paragraph(allDecoyCodes));
 		*/
 		document.close();
-        System.gc();
+        //System.gc();
 	}
 	
 	protected void addOval(PdfContentByte cb, Rectangle possition) {
@@ -266,6 +266,7 @@ public class PrintableBallotMaker extends org.scantegrity.authoring.scantegrity.
 //System.out.println(allCodes.get(printedSerial).get(qno).get(allSymbolsPos));                	
                 	
                 	//addTextCentered(cb,rect,serialFont,symbolTopFontSize,symbolColor,allCodes.get(printedSerial).get(qno).get(allSymbolsPos));
+                	
                 	addTextCentered(cb,rect,serialFont,14,symbolColor,allCodes.get(printedSerial).get(qno).get(allSymbolsPos));
                 	addOval(cb,rect);
                 	allSymbolsPos++;
