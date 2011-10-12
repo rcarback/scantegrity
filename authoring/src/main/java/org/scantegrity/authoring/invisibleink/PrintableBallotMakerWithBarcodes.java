@@ -68,22 +68,23 @@ public class PrintableBallotMakerWithBarcodes extends PrintableBallotMaker {
 			iif.setMaxBgColor(maxBgColor);
 */
 			//David's Settings UMCP
-			float[] minFontColor={0.9f, 0.0f, 0.0f, 0.0f};
+			//					    C	  M		Y	  K
+			float[] minFontColor={0.75f, 0.0f, 0.0f, 0.0f};
 			iif.setMinFontColor(minFontColor);
 			
 			float[] maxFontColor={1.0f, 0.0f, 0.0f, 0.0f};
 			iif.setMaxFontColor(maxFontColor);
 			
-			float[] minBgColor={0.0f, 0.9f, 0.0f, 0.0f};
+			float[] minBgColor={0.0f, 0.0f, 0.6f, 0.0f};
 			iif.setMinBgColor(minBgColor);
 			
-			float[] maxBgColor={0.0f, 1.0f, 0.0f, 0.0f};
+			float[] maxBgColor={0.0f, 0.0f, 0.85f, 0.0f};
 			iif.setMaxBgColor(maxBgColor);
-
-			float[] minMaskColor={0.0f, 0.0f, 0.2f, 0.0f};
+			
+			float[] minMaskColor={0.0f, 0.5f, 0.0f, 0.0f};
 			iif.setMinMaskColor(minMaskColor);
 			
-			float[] maxMaskColor={0.0f, 0.0f, 0.6f, 0.0f};
+			float[] maxMaskColor={0.0f, 1.0f, 0.0f, 0.0f};
 			iif.setMaxMaskColor(maxMaskColor);
 			
 			//Caution: This can eat up memory quickly.
