@@ -36,23 +36,23 @@ public class BmpToGeometry implements BmpTogeometryInterface {
 		
 		Cluster c=null;
 		//Takoma Park November 3, 2009 takomaMockBallot_apr2009draft11.bmp
-		c = new Cluster(new Color(255,2,0),colorVariation,colorDiscountinuity);
+		c = new Cluster(new Color(251,0,7),colorVariation,colorDiscountinuity);
 		c.setName("serialLatin");
 		ScantegrityColors.add(c);
 
-		c = new Cluster(new Color(67,45,255),colorVariation,colorDiscountinuity);
+		c = new Cluster(new Color(79,14,203),colorVariation,colorDiscountinuity);
 		c.setName("serialBulleted");
 		ScantegrityColors.add(c);
 		
-		c=new Cluster(new Color(26,59,255),colorVariation,colorDiscountinuity);
+		c=new Cluster(new Color(0,0,255),colorVariation,colorDiscountinuity);
 		c.setName("alignment");
 		ScantegrityColors.add(c);
 		
-		c = new Cluster(new Color(95,255,0),colorVariation,colorDiscountinuity);
+		c = new Cluster(new Color(42,255,0),colorVariation,colorDiscountinuity);
 		c.setName("candidate1");
 		ScantegrityColors.add(c);
 		
-		c = new Cluster(new Color(239,255,0),colorVariation,colorDiscountinuity);
+		c = new Cluster(new Color(255,255,0),colorVariation,colorDiscountinuity);
 		c.setName("candidate2");
 		ScantegrityColors.add(c);
 		
