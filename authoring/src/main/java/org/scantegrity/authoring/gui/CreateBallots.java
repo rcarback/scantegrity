@@ -293,7 +293,7 @@ public class CreateBallots extends javax.swing.JFrame {
 		imagePanel.setImage(img);
 		//TODO Assuming letter size paper
 		
-		imagePanel.setDpi(img.getHeight() / 11);
+		imagePanel.setDpi(img.getHeight() / 14);
 		
 		imagePanel.setPreferredSize(new Dimension((int)(getWidth()*0.9),(int)(getHeight()*0.9)));		
 		imagePanel.setZoom(imagePanel.getPreferredSize().getWidth() / img.getWidth());
@@ -677,6 +677,9 @@ public class CreateBallots extends javax.swing.JFrame {
 				btg=new org.scantegrity.authoring.BmpToGeometry();
 			} else {
 				if (InputConstants.FrontEnd.equals(InputConstants.BallotType.SCANTEGRITY)) {
+					btg=new org.scantegrity.authoring.scantegrity.BmpToGeometry();
+				}
+				else if (InputConstants.FrontEnd.equals(InputConstants.BallotType.SCANTEGRITY_II)) {
 					btg=new org.scantegrity.authoring.scantegrity.BmpToGeometry();
 				}
 				else {
