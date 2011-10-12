@@ -345,6 +345,8 @@ public class BallotGeometry {
 	 * the number of letters on the top. Otherwise an exception is thrown
 	 */
 	public void addContest(int qno, Vector<Cluster> top, Vector<Cluster> bottom) throws Exception {
+		if (top == null || bottom == null) return;
+		if (bottom.size() == 0 || top.size() == 0) return;
 		if (bottom!=null && bottom.size() % top.size() !=0) {
 			System.out.println(top);
 			System.out.println(bottom);
@@ -551,7 +553,8 @@ public class BallotGeometry {
 	 * @param q - the vector to be sorted (it is modified by this method)
 	 * @return - the number of groups with simmilar X coordinates
 	 */
-	public static int sortOnXThenOnY(Vector<Cluster> q) {		
+	public static int sortOnXThenOnY(Vector<Cluster> q) {
+		if (q.size() == 0) return 0;
 		sortOnX(q, 0, q.size());
 //System.out.println(q);		
 		//go through the sorted clusters and you should see m clusters on the same x
