@@ -77,7 +77,7 @@ public class AffineCropper
 		}
 		/* BEGIN DEBUG * /
 		try {
-			ImageIO.write(l_res,"png",new File("serial" + i + ".png"));
+			ImageIO.write(l_res,"png",new File("code" + i + ".png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
