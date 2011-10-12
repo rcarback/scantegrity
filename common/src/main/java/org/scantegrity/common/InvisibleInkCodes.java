@@ -178,11 +178,21 @@ public class InvisibleInkCodes {
 								TreeSet<Integer> codesAlreadyGenerated) 
 	throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 		String m=printedSerial+" "+qno+" "+rank+" "+ano;
+		if (m.getBytes().length > 15) System.err.print("M greater than 16!!!");
 		SecurityUtil.cipherPkcs5Padding.init(Cipher.ENCRYPT_MODE, key);
 		byte[] enc=m.getBytes();
 		int ret=0;
 		do {
 			enc=SecurityUtil.cipherPkcs5Padding.doFinal(enc);
+			// All 8 bits from byte 1 shifted left by 2.
+			int l_b = (((int)enc[0]) << (24)) >>> (24);
+			ret = (l_b << 2);
+			
+			// Top 2 bits from byte 2, shifted right by 6.
+			l_b = (((int)enc[1]) << (24)) >>> (24);
+			ret ^= (l_b >>> 6);
+			
+			/*
 			int l_d = Math.max(0, noBits-8);
 			int l_pz = l_d;
 			for (int i = 0; i < enc.length; i++)
@@ -198,6 +208,7 @@ public class InvisibleInkCodes {
 				}
 				l_pz = (l_pz+l_d) % noBits; 
 			}
+			*/
 			
 			//Remove the bits we don't need.
 			ret <<= (32-noBits);
