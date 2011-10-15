@@ -70,10 +70,11 @@ public class QRCodeReader implements SerialNumberReader
 		Hashtable<DecodeHintType, Object> hints = null;
 		hints = new Hashtable<DecodeHintType, Object>(3);
 		hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
-		hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
+		//hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
 		hints.put(DecodeHintType.POSSIBLE_FORMATS, l_formats);
 
-		Result result = new MultiFormatReader().decode(l_serialBitMap, hints);
+		com.google.zxing.qrcode.QRCodeReader l_r = new com.google.zxing.qrcode.QRCodeReader();
+		Result result = l_r.decode(l_serialBitMap, hints);
 		
 		
 		//System.out.println("The Result: " + result.getText());
