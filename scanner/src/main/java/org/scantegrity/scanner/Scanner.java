@@ -33,6 +33,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -55,11 +57,13 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.io.FileUtils;
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
+import org.scantegrity.common.Contest;
 import org.scantegrity.common.DrunkDriver;
 import org.scantegrity.common.FindFile;
 import org.scantegrity.common.Logging;
 import org.scantegrity.common.RandomBallotStore;
 import org.scantegrity.common.SysBeep;
+import org.scantegrity.common.methods.TallyMethod;
 
 /**
  * @author John Conway
@@ -617,14 +621,29 @@ public class Scanner
 		{
 			//scan the ballot
 			l_b = l_reader.scanBallot(l_styles, p_ballotImg);
-			//saveErrorImage(p_ballotImg);
 			
-			//couldn't find alignment marks or couldn't read serial number 
+			//as long as we have a ballot and an id return 
+			//the scanned ballot object
 			if(l_b != null && l_b.getId() != null)
-			{	
-				return l_b;
+			{
+				/* 
+				 * check for errors like Overvotes and Undervotes
+				 */ 
+				if(checkForVotingErrors(l_b)) {
+					//we have an error condition. log it and save the 
+					//ballot image as  an error
+					c_log.log(Level.WARNING, "Errors found in contest. Saving ballot image " 
+							+ "for ERM verification."); 
+					saveErrorImage(p_ballotImg);
+					return l_b;
+					
+				} else {
+					//the ballot is ok, return the ballot
+					return l_b;
+				}
 			}
 		}
+		//couldn't find alignment marks or couldn't read serial number 
 		catch (Exception l_e) 
 		{
 			l_err = l_e.getMessage();
@@ -636,6 +655,57 @@ public class Scanner
 		return null; 
 	}
 	
+	/** 
+	 * This method will go through each contest in the ballot and verify 
+	 * with the TallyMethod that there are no voting errors that will need 
+	 * human verification in the ERM. If there are errors (for example Overvotes 
+	 * or Undervotes in IVR) then we will have to save the ballot image have 
+	 * the election judge manually process the ballot in the ERM like we do 
+	 * with Write-Ins. 
+	 * @param c_log2 
+	 * 
+	 * @param Ballot p_ballot: The scanned ballot object
+	 * 
+	 * @return boolean: If an error was found 
+	 */
+	private static boolean checkForVotingErrors(Ballot p_ballot) {
+		TallyMethod l_method = null;
+		Vector<String> l_error_conditions = new Vector<String>(); 
+		boolean l_ret = false; //return value. This will be set to true if any error is found
+		Vector<Contest> l_contests = c_config.getContests();
+		boolean l_error_found = false; 
+		
+		//go through each contest and get it's tally method
+		for (Map.Entry<Integer, Integer[][]> entry : p_ballot.getBallotData().entrySet()) {
+			Integer l_contest_id = entry.getKey(); 
+			Integer[][] l_contest_data = entry.getValue();
+			c_log.log(Level.INFO, "Checking contest " + l_contest_id.toString() + " for errors."); //TODO: testing
+			
+			//find the contest that matches the ballot contest we are working with. 
+			for (Contest l_contest: l_contests) {
+				if (l_contest.getId().equals(l_contest_id)) {
+					
+					//we have the contest, get the tally method and call the error checker
+					l_method = l_contest.getMethod(); 
+					l_error_found = l_method.hasVotingErrors(l_contest_data, l_error_conditions, c_log);
+					//TODO: save in the ballot object which contests were marked as an error condition 
+					//and possibly which condition
+					
+					if (l_error_found) {
+						c_log.log(Level.INFO, "Contest " + l_contest_id + "has errors"); //TODO: testing
+						l_ret = true;
+					}
+				}
+			}
+		}
+		
+		if (l_ret) {
+			c_log.log(Level.INFO, "Ballot has errors: " + l_error_conditions); //TODO: testing
+		}
+		
+		return l_ret;
+	}
+
 	private static Boolean isDuplicate(Ballot p_ballot) 
 	{
 		if(!c_ballotIds.contains(p_ballot.getId()))

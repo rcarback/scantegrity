@@ -1,11 +1,13 @@
 package org.scantegrity.common.methods;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
 import org.scantegrity.common.Contest;
 import org.scantegrity.common.Contestant;
+import org.scantegrity.common.Logging;
 import org.scantegrity.common.constants.TallyConstants;
 
 
@@ -585,6 +587,72 @@ public class InstantRunoffTally implements TallyMethod {
 		} while ((l_c = l_stack.higherKey(l_c)) != null);
 		
 		return l_new;
+	}
+
+
+	/**
+	 * This method checks the given contest data to verify that there 
+	 * are no voting errors that will require human verification of the 
+	 * votes in the ERM. If there are errors (Overvotes 
+	 * or Undervotes) then we will have to save the ballot image have 
+	 * the election judge manually process the ballot in the ERM like we do 
+	 * with Write-Ins. 
+	 * 
+	 * @param Integer[][] p_contest_data: The contest data in 2d array of contestant id and 
+	 * actual ballot marks. 
+	 * @param Vector<String> p_error_condition: String error condition where we will save the 
+	 * error condition we find if any. 
+	 * 
+	 * @return boolean: If an error condition is found. 
+	 */
+	public boolean hasVotingErrors(Integer[][] p_contest_data,
+			Vector<String> p_error_conditions, Logging p_log) {
+		boolean l_undervote = false; 
+		boolean l_overvote = false;
+		int l_num_columns = p_contest_data[0].length;
+		int[] l_zero_count = new int[l_num_columns]; 
+		int[] l_one_count = new int[l_num_columns];
+		
+		//go through each contest
+		for (Integer[] l_contestant: p_contest_data) { 
+			//p_log.log(Level.INFO, "Contestant: " + l_contestant.toString()); //TODO: testing
+			//go through each mark for each contestant row 
+			//and mark how many marks are marked and not marked
+			for (int i = 0; i < l_contestant.length; i++) {
+				int l_mark = l_contestant[i]; 
+				if (l_mark == 0) {
+					//p_log.log(Level.INFO, "Zero count incremented: " + l_mark); //TODO: testing
+					l_zero_count[i]++; 
+				} else {
+					//p_log.log(Level.INFO, "One count incremented: " + l_mark); //TODO: testing
+					l_one_count[i]++; 
+				}
+			}
+		}
+		
+		//if we have all zeroes in the column then we have an undervote
+		for (int l_column = 0; l_column < l_num_columns; l_column++ ) {
+			if (l_zero_count[l_column] == p_contest_data.length) {
+				l_undervote = true;
+				p_log.log(Level.INFO, "Undervote Found in column: " + l_column); //TODO: testing
+			}
+			
+			//if we have more than 1 ark in the column we have an overvote
+			if (l_one_count[l_column] > 1) {
+				l_overvote = true;
+				p_log.log(Level.INFO, "Overvote Found in column: " + l_column); //TODO: testing
+			}
+		}
+		
+		if (l_overvote) { 
+			return l_overvote; 
+		}
+		
+		if (l_undervote) {
+			return l_undervote;
+		}
+		
+		return false; 
 	}
 
 }

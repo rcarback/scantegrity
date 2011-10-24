@@ -38,6 +38,7 @@ import org.scantegrity.common.Ballot;
 import org.scantegrity.common.BallotStyle;
 import org.scantegrity.common.Contest;
 import org.scantegrity.common.Contestant;
+import org.scantegrity.common.Logging;
 import org.scantegrity.common.constants.TallyConstants;
 
 public class PluralityTally implements TallyMethod {
@@ -175,6 +176,13 @@ public class PluralityTally implements TallyMethod {
 		}
 
 		return l_final;
+	}
+
+	@Override
+	public boolean hasVotingErrors(Integer[][] l_contest_data,
+			Vector<String> l_error_conditions, Logging c_log) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 }

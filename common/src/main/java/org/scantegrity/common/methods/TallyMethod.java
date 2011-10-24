@@ -52,6 +52,7 @@ import java.util.Vector;
 
 import org.scantegrity.common.Ballot;
 import org.scantegrity.common.Contest;
+import org.scantegrity.common.Logging;
 import org.scantegrity.common.methods.ContestChoice;
 import org.scantegrity.common.methods.ContestResult;
 
@@ -81,6 +82,24 @@ public interface TallyMethod {
 	 * results.  
 	 */
 	ContestResult tally(Contest p_contest, Vector<ContestChoice> p_ballots);
+
+	/**
+	 * This method checks the given contest data to verify that there 
+	 * are no voting errors that will require human verification of the 
+	 * votes in the ERM. If there are errors (such as Overvotes 
+	 * or Undervotes as in IRV) then we will have to save the ballot image have 
+	 * the election judge manually process the ballot in the ERM like we do 
+	 * with Write-Ins. 
+	 * @param c_log 
+	 * 
+	 * @param Integer[][] p_contest_data: The contest data in 2d array of contestant id and 
+	 * actual ballot marks. 
+	 * @param Vector<String> p_error_condition: String error condition where we will save the 
+	 * error condition we find if any. 
+	 * 
+	 * @return boolean: If an error condition is found. 
+	 */
+	boolean hasVotingErrors(Integer[][] l_contest_data, Vector<String> l_error_conditions, Logging c_log);
 	
 	
 }
