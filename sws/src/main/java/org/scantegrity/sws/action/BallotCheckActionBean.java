@@ -16,7 +16,7 @@ public class BallotCheckActionBean implements ActionBean{
 	 private boolean c_ballots = false;
 	//Parameters for database connection
 	private static final String c_dbAddress = "jdbc:derby:";
-	private static final String c_dbName = "TPDB";
+	private static final String c_dbName = "TPDB2011";
 	private static final String c_dbUser = "APP";
 	private static final String c_dbPass = "";
 	 

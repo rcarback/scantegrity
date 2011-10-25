@@ -59,6 +59,7 @@ public class ContactActionBean extends DefaultActionBean{
 	private String c_msg;
 	
 	
+	@Validate(required=false)
 	private String c_captchaHTML;
 	private ReCaptchaImpl c_ReCaptcha;
 	ResourceBundle c_bundle;
@@ -151,7 +152,7 @@ public class ContactActionBean extends DefaultActionBean{
 				getContext().getValidationErrors().add("ReCaptcha", l_e);
 			}
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 			SimpleError l_e = new SimpleError("Error: {0}", e.toString());
 			
 			getContext().getValidationErrors().add("Exception", l_e);
