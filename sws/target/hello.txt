@@ -1,7 +1,0 @@
-TO=rick.carback@gmail.com, aeessex@gmail.com
-FROM=Takoma Park Web Form <webmaster@scantegrity.org>
-ReCaptchaPub=6LdzsQMAAAAAAG1t12C4eMlUelhIc7Y6vhx3tDq9
-ReCaptchaPriv=6LdzsQMAAAAAAM5zRoDfaKHeRZ3WpFO2wYQdvuzw
-mail.smtp.host=smtp.cs.umbc.edu
-subjectPrefix=[Takoma WebForm]  
-
