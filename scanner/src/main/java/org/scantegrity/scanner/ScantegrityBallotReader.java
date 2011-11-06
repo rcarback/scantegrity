@@ -41,7 +41,6 @@ import com.google.zxing.ReaderException;
  */
 public class ScantegrityBallotReader extends BallotReader
 {
-
 	/**
 	 * 
 	 */
@@ -67,16 +66,16 @@ public class ScantegrityBallotReader extends BallotReader
 		//cut empty space on the bottom of an image 
 		p_img = cutEmptySpace(p_img);
 		
-		AffineTransformOp l_alignmentOp = super.getAlignmentOp(p_img);
+		c_alignmentOp = super.getAlignmentOp(p_img);
 		
-		if(l_alignmentOp == null)
+		if(c_alignmentOp == null)
 			throw new Exception("Unable to get alignment transformation."); 
 		
 		//Read in the Serial Number
 		String l_serial = "";
 		try
 		{
-			l_serial = super.c_serial.readSerial(p_img, l_alignmentOp);
+			l_serial = super.c_serial.readSerial(p_img, c_alignmentOp);
 			//System.out.println("Serial: " + l_serial);
 		}
 		catch (ReaderException l_re)
@@ -165,7 +164,7 @@ public class ScantegrityBallotReader extends BallotReader
 					}
 					try
 					{
-						l_tmp = AffineCropper.crop(p_img, l_alignmentOp, 
+						l_tmp = AffineCropper.crop(p_img, c_alignmentOp, 
 								l_rects.elementAt(l_i).elementAt(l_j).elementAt(l_k));
 						if (isMarked(l_tmp)) {
 							l_r[l_i][l_cid][l_k] = 1;
@@ -191,7 +190,7 @@ public class ScantegrityBallotReader extends BallotReader
 				{
 					try {
 						l_res.addWriteIn(l_conId, l_j, 
-								AffineCropper.crop(p_img, l_alignmentOp, 
+								AffineCropper.crop(p_img, c_alignmentOp, 
 											l_writeInRects.get(l_conId).get(l_j)));
 					} catch (Exception e) {
 						//Don't add it if it fails..

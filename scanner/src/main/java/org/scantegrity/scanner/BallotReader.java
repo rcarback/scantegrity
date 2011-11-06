@@ -53,11 +53,12 @@ public abstract class BallotReader
 {
 	//Alignment marks
 	protected Point[] c_alignment;
-	protected Double c_tolerance = .05;
+	protected Double c_tolerance = .50;
 	//Dimensions of the ballot
 	protected Dimension c_dimension;
 	protected SerialNumberReader c_serial = null;
 	protected AlignmentMarkReader c_alignmentMark = null;
+	public AffineTransformOp c_alignmentOp;
 
 	/**
 	 * Create a ballot from the ballot image. 

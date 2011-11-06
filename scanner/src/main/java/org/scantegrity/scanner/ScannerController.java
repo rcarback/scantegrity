@@ -34,6 +34,8 @@ import javax.imageio.ImageIO;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+
 import org.apache.commons.io.FileUtils;
 import org.scantegrity.common.Logging;
 
@@ -184,6 +186,8 @@ public class ScannerController {
 				{
 					c_log.log(Level.INFO, "Scanner control initialized and working.");				
 				}
+				
+				closeProcess(l_p); 
 			}
 		}
 		catch (Exception l_e)
@@ -262,6 +266,10 @@ public class ScannerController {
 					}
 				}
 			} while (l_pid == getPid(c_scanimgcmd));
+			
+			// Java does not close these streams, so we need to do that here
+			// to prevent too many open files error
+			closeProcess(l_p);
 		}
 		
 		//try to read in the images
@@ -322,6 +330,7 @@ public class ScannerController {
 					c_log.log(Level.FINE, "Could not read " + l_imgFile.getName());
 					//IT does not exist, so we can't move it.
 				}
+				
 			}
 			catch (Exception l_e)
 			{
@@ -356,17 +365,35 @@ public class ScannerController {
 	 * @param p_pid
 	 */
 	private void killPid(int p_pid) {
+		Process l_process = null; 
+		
 		try
 		{
 			synchronized (this) 
 			{
-				Runtime.getRuntime().exec(String.format(c_killcmd, p_pid)).waitFor();
+				l_process = Runtime.getRuntime().exec(String.format(c_killcmd, p_pid)); 
+				l_process.wait(); 
 			}
 		}
 		catch(Exception l_e)
 		{
 			//Nothing.
 		}
+		finally {
+			closeProcess(l_process); 
+		}
+	}
+
+	private void closeProcess(Process p_process) {
+		try {
+			if(p_process != null) {
+				p_process.getErrorStream().close();
+				p_process.getInputStream().close(); 
+				p_process.getOutputStream().close(); 
+			}
+		} catch (Exception e) {
+			//do nothing
+		}		
 	}
 
 	/**
@@ -407,7 +434,7 @@ public class ScannerController {
 	{
 		int l_pid = 0;
 		BufferedReader l_buf;
-		Process l_p;
+		Process l_p = null;
 		try
 		{
 			l_p = Runtime.getRuntime().exec(String.format(c_pgrep, p_cmd));
@@ -425,6 +452,10 @@ public class ScannerController {
 		{
 			//Do nothing.
 			l_pid = 0;
+		}
+		finally 
+		{
+			closeProcess(l_p);
 		}
 		
 		return l_pid;
