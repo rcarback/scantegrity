@@ -208,7 +208,7 @@ public class WriteInPanel extends JPanel {
 		}
 		jList.setModel(l_model);
 		headerLabel.setFont(new Font(null, Font.PLAIN, 22));
-		headerLabel.setText(c_contestName);
+		headerLabel.setText(c_contestName + " RANK " + c_resolver.getRank());
 		imageLabel.setIcon(new ImageIcon(c_writeInImage));
 	}
 	

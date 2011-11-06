@@ -96,12 +96,14 @@ public class WriteInResolver {
 		public ContestChoice choice;
 		public int contestId;
 		public int candidateId;
-		public WriteInLocation(ContestChoice p_choice, Ballot p_ballot, int p_contestId, int p_candidateId)
+		public int rank;
+		public WriteInLocation(ContestChoice p_choice, Ballot p_ballot, int p_contestId, int p_candidateId, int p_rank)
 		{
 			ballot = p_ballot;
 			contestId = p_contestId;
 			candidateId = p_candidateId;
 			choice = p_choice;
+			rank = p_rank;
 		}
 	}
 	
@@ -226,20 +228,24 @@ public class WriteInResolver {
 					if( l_writeInMap.containsKey(l_contestants.get(x).getId()) )
 					{
 						boolean l_voteFound = false;
+						int l_rank = 0;
 						for(int y = 0; y < l_contestData[x].length; y++ )
 						{
 							if( l_contestData[x][y] != 0 )
+							{
 								l_voteFound = true;
+								l_rank = y;
+							}
 						}
 						
 						if( l_voteFound )
 						{
 							if( c_locations.containsKey(l_contestId) )
-								c_locations.get(l_contestId).queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
+								c_locations.get(l_contestId).queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId(), l_rank));
 							else
 							{
 								ContestQueue l_newQueue = new ContestQueue(l_contestId, l_contest.getContestName());
-								l_newQueue.queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
+								l_newQueue.queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId(), l_rank));
 								c_locations.put(l_contestId, l_newQueue);
 							}
 							c_writeInCount++;
@@ -308,20 +314,24 @@ public class WriteInResolver {
 					if( l_writeInMap.containsKey(l_contestants.get(x).getId()) )
 					{
 						boolean l_voteFound = false;
+						int l_rank = 0;
 						for(int y = 0; y < l_contestData[x].length; y++ )
 						{
 							if( l_contestData[x][y] != 0 )
+							{
 								l_voteFound = true;
+								l_rank = y;
+							}
 						}
 						
 						if( l_voteFound )
 						{
 							if( c_locations.containsKey(l_contestId) )
-								c_locations.get(l_contestId).queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
+								c_locations.get(l_contestId).queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId(), l_rank));
 							else
 							{
 								ContestQueue l_newQueue = new ContestQueue(l_contestId, l_contest.getContestName());
-								l_newQueue.queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId()));
+								l_newQueue.queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId(), l_rank));
 								c_locations.put(l_contestId, l_newQueue);
 							}
 							c_writeInCount++;
@@ -761,6 +771,13 @@ public class WriteInResolver {
 
 	public void disableTabs() {
 		c_erm.disableTabs();
+	}
+
+	/**
+	 * @return
+	 */
+	public int getRank() {
+		return c_currentLocation.rank;
 	}
 
 }
