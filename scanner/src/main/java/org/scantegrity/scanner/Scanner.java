@@ -715,7 +715,11 @@ public class Scanner
 			try {
 				if(l_alignmentOp == null)
 					throw new Exception("Unable to get alignment transformation."); 
-				 l_errorImage = AffineCropper.cropUnscaled(p_ballotImg, l_alignmentOp, new Rectangle(0,0,p_ballotImg.getWidth(), p_ballotImg.getHeight()));
+				 l_errorImage = AffineCropper.cropUnscaled(p_ballotImg, 
+						 				l_alignmentOp, 
+						 				new Rectangle(0,0,
+						 						p_ballotImg.getWidth(), 
+						 						p_ballotImg.getHeight()));
 			} catch (Exception e) {
 				c_log.log(Level.WARNING, "Could not rotate error ballot image: " + e.getMessage());
 			}
@@ -738,10 +742,10 @@ public class Scanner
 	
 	private static void saveErrorImage(BufferedImage p_ballotImg)
 	{
-		c_log.log(Level.SEVERE, "Bad Ballot. Saving to Error Directory.");
-		
 		//increment bad image count
 		c_errorCount++;
+		c_log.log(Level.SEVERE, "Bad Ballot " + c_errorCount + ". Saving to Error Directory.");
+		
 		writeCounters(); 
 		
 		//Copy the bad image to the error directory
@@ -775,7 +779,7 @@ public class Scanner
 		{
 			try 
 			{
-				c_log.log(Level.INFO, "Saving to ballot " + c_ballotCount + " store: " + l_store.getLocation());
+				c_log.log(Level.INFO, "Saving ballot " + c_ballotCount + " to store: " + l_store.getLocation());
 				l_store.addBallot(p_ballot);
 			} 
 			catch (IOException e) 
