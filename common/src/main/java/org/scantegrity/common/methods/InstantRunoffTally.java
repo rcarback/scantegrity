@@ -634,13 +634,15 @@ public class InstantRunoffTally implements TallyMethod {
 		for (int l_column = 0; l_column < l_num_columns; l_column++ ) {
 			if (l_zero_count[l_column] == p_contest_data.length) {
 				l_undervote = true;
-				p_log.log(Level.INFO, "Undervote Found in column: " + l_column); //TODO: testing
+				//p_log.log(Level.INFO, "Undervote Found in column: " + l_column); //TODO: testing
+				p_error_conditions.add("Undervote in Choice " + (l_column + 1));
 			}
 			
 			//if we have more than 1 ark in the column we have an overvote
 			if (l_one_count[l_column] > 1) {
 				l_overvote = true;
-				p_log.log(Level.INFO, "Overvote Found in column: " + l_column); //TODO: testing
+				//p_log.log(Level.INFO, "Overvote Found in column: " + l_column); //TODO: testing
+				p_error_conditions.add("Overvote in Choice " + (l_column + 1));
 			}
 		}
 		

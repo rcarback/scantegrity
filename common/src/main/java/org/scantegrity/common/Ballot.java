@@ -60,6 +60,8 @@ public class Ballot
 	private Map<Integer, Integer[][]> c_ballotData;
 	private boolean c_counted;
 	private Vector<String> c_notes;
+	private String c_ballotImage; //image saved when a voting error has occurred
+	private TreeMap<Integer, Vector<String>> c_errorContests; // the contest ids with errors and the errors that occurred. 
 	
 	/* Write-in Support */
 	//Rectangle clippings of write-in ballot location.  Maps contest ID to map of write-in candidate IDs to images
@@ -345,6 +347,56 @@ public class Ballot
 		}
 		
 		return l_img;
+	}
+
+	public void saveErrorImage(BufferedImage p_img, TreeMap<Integer, Vector<String>> p_error_contests) {
+		//Get bytestream
+		ByteArrayOutputStream l_baos = new ByteArrayOutputStream();
+        try {
+        	ImageIO.write(p_img, "png", l_baos);
+        } catch (IOException e) {
+        	return;
+        }	
+ 		//UUEncode
+ 		Base64 l_enc = new Base64();
+	 	c_ballotImage = l_enc.encodeToString(l_baos.toByteArray());
+	 	
+	 	c_errorContests = p_error_contests; 
+	 	
+	}
+	
+	public BufferedImage getImage() {
+		BufferedImage l_img = null; 
+		
+		String l_str = c_ballotImage;
+		Base64 l_dec = new Base64();
+		//Decode and read in the image.
+		try {
+			byte[] l_bais = l_dec.decode(l_str);
+            if (l_bais != null && (l_bais.length > 0)) {
+                l_img = ImageIO.read(new ByteArrayInputStream(l_bais));
+            }
+		} catch (Exception e) {
+			//return null...
+		}
+		
+		return l_img; 
+	}
+	
+	public String getBallotImage() { 
+		return c_ballotImage; 
+	}
+	
+	public void setBallotImage(String p_ballotImage) {
+		c_ballotImage = p_ballotImage;  
+	}
+	
+	public TreeMap<Integer, Vector<String>> getErrorContests() {
+		return c_errorContests; 
+	}
+	
+	public void setErrorContests(TreeMap<Integer, Vector<String>> p_errorContests) {
+		c_errorContests = p_errorContests;
 	}
 		
 }

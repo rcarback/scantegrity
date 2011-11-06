@@ -31,6 +31,7 @@
  */
 package org.scantegrity.common.methods;
 
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
 
@@ -179,8 +180,7 @@ public class PluralityTally implements TallyMethod {
 	}
 
 	@Override
-	public boolean hasVotingErrors(Integer[][] l_contest_data,
-			Vector<String> l_error_conditions, Logging c_log) {
+	public boolean hasVotingErrors(Integer[][] p_contest_data, Vector<String> p_error_conditions, Logging c_log) {
 		// TODO Auto-generated method stub
 		return false;
 	}

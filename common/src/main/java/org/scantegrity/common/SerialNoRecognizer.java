@@ -69,6 +69,7 @@ public class SerialNoRecognizer {
 			process.waitFor();
 			if (process.exitValue() !=0 )
 				throw new Exception("executing "+commands[i]+" failed with exit code "+process.exitValue());
+			closeProcess(process);
 		}		
 		FileInputStream fis = new FileInputStream(serialFile);
 		byte[] serial = new byte[fis.available()];
@@ -82,6 +83,18 @@ public class SerialNoRecognizer {
 		return ret;		
 	}
 	
+	private static void closeProcess(Process p_process) {
+		try {
+			if(p_process != null) {
+				p_process.getErrorStream().close();
+				p_process.getInputStream().close(); 
+				p_process.getOutputStream().close(); 
+			}
+		} catch (Exception e) {
+			//do nothing
+		}		
+	}
+
 	/**
 	 * Given an image with a serial number on it (horizontally streigth), it tries to
 	 * detect the serial number. 
