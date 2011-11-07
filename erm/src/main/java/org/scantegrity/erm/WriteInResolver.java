@@ -179,7 +179,6 @@ public class WriteInResolver {
 		{
 			BallotStyle l_style = c_ballotStyles.get(l_ballot.getBallotStyleID());
 			Vector<Integer> l_contestIds = l_style.getContests();
-			l_x++;
 			//Look in each contest for write-ins
 			for( Integer l_contestId : l_contestIds )
 			{
@@ -190,7 +189,7 @@ public class WriteInResolver {
 					System.out.println("ID: " + l_ballot.getId());
 					continue;
 				}
-				
+				l_x++;
 				Contest l_contest = c_contests.get(l_contestId);
 				Vector<Contestant> l_contestants = l_contest.getContestants();
 				
@@ -266,8 +265,6 @@ public class WriteInResolver {
 		{
 			BallotStyle l_style = c_ballotStyles.get(l_ballot.getBallotStyleID());
 			Vector<Integer> l_contestIds = l_style.getContests();
-			l_x++;
-			
 			//Look in each contest for write-ins
 			for( Integer l_contestId : l_contestIds )
 			{
@@ -278,7 +275,7 @@ public class WriteInResolver {
 					System.out.println("ID: " + l_ballot.getId());
 					continue;
 				}
-
+				l_x++;
 				Contest l_contest = c_contests.get(l_contestId);
 				Vector<Contestant> l_contestants = l_contest.getContestants();
 				
@@ -343,7 +340,7 @@ public class WriteInResolver {
 				}
 			}
 		}
-		return l_x;
+		return p_ballots.size();
 	}
 
 	public void AddCandidate(String p_name) {
@@ -559,8 +556,9 @@ public class WriteInResolver {
 			FileWriter l_outStream = null;
 			try {
 				l_outStream = new FileWriter(new File(l_newDir, "results.txt"), true);
-				l_outStream.write(l_curContest.getContestName()+ "\n\n");
+				l_outStream.write("\n\n=====" + l_curContest.getContestName()+ "=====");
 				l_outStream.write(l_result.toString());
+				l_outStream.write("\n========================================\n");
 				l_outStream.close();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -580,8 +578,9 @@ public class WriteInResolver {
 			l_outStream = null;
 			try {
 				l_outStream = new FileWriter(new File(l_newDir, "writein-results.txt"), true);
-				l_outStream.write(l_writeInContest.getContestName()+ "\n\n");
+				l_outStream.write("\n\n=====" + l_writeInContest.getContestName()+ "=====");
 				l_outStream.write(l_writeInResult.toString());
+				l_outStream.write("\n========================================\n");
 				l_outStream.close();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -766,13 +765,6 @@ public class WriteInResolver {
 	{
 		return c_currentContest.getContestName();
 	}
-
-
-	public String getRankName()
-	{
-		return ""; 
-		//return c_currentContest.getRankName();
-	}
 	
 	public int getWriteInCount()
 	{
@@ -787,7 +779,7 @@ public class WriteInResolver {
 	 * @return
 	 */
 	public int getRank() {
-		return c_currentLocation.rank + 1;
+		return c_currentLocation.rank+1;
 	}
 
 }

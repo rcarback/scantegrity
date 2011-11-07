@@ -242,7 +242,7 @@ public class WriteInPanel extends JPanel {
 				c_candidateList = c_resolver.getCandidates();
 				c_writeInImage = c_resolver.getImage();
 				c_contestName = c_resolver.getContestName();
-				c_rankName = c_resolver.getRankName(); 
+				c_rankName = "" + c_resolver.getRank(); 
 				UpdateState();
 				//Wait for user to resolve write-in
 				try {
