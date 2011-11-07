@@ -54,78 +54,73 @@ import com.lowagie.text.pdf.PdfWriter;
  * resolved.
  */
 
-public class WriteInResolver {
+public class ErrorBallotResolver {
 	
 	private Map<Integer, BallotStyle> c_ballotStyles = null;
-	private Map<Integer, Contest> c_contests = null;
 	private Map<Integer, ContestQueue> c_locations = null;
 	private Contest c_currentContest = null;
 	private ScannerConfig c_config = null;
-	private WriteInLocation c_currentLocation = null;
+	private ErrorBallotLocation c_currentLocation = null;
 	private TreeMap<Integer, Vector<ContestChoice>> c_contestChoices = null;
 	private TreeMap<Integer, Vector<ContestChoice>> c_unalteredChoices = null;
-	private Vector<WriteInResolution> c_resolutions = null;
+	private Vector<ErrorBallotResolution> c_resolutions = null;
 	private HashSet<Integer> c_usedIds = null;
 	private SecureRandom c_random = null;
-	private int c_writeInCount = 0;
+	private int c_errorCount = 0;
 	private boolean c_enableResolve = true;
 	private ERM c_erm = null;
-	private HashMap<Integer, Contest> c_writeInContests;
+	private HashMap<Integer, Contest> c_errorContests;
 	
 	
 	//Represents a resolution that was done by the user.  Used for the resolution pdf.
-	class WriteInResolution
+	class ErrorBallotResolution
 	{
 		public BufferedImage image;
-		public String name;
 		public String id;
 		public Contest contest;
-		public ContestChoice choice;
+		public Integer[][] contestData;
+		public Object choice; 
 		
-		public WriteInResolution(BufferedImage p_image, String p_name, String p_id)
+		public ErrorBallotResolution(BufferedImage p_image, String p_contest_id, Integer[][] p_contestData)
 		{
 			image = p_image;
-			name = p_name;
-			id = p_id;
+			id = p_contest_id;
+			contestData = p_contestData; 
 		}
 	}
 	
-	class WriteInLocation
+	class ErrorBallotLocation
 	{
 		public Ballot ballot;
-		public ContestChoice choice;
 		public int contestId;
-		public int candidateId;
-		public int rank;
-		public WriteInLocation(ContestChoice p_choice, Ballot p_ballot, int p_contestId, int p_candidateId, int p_rank)
+		Vector<String> errorsFound; 
+		public ErrorBallotLocation(Ballot p_ballot, int p_contestId, Vector<String> p_errorsFound)
 		{
 			ballot = p_ballot;
 			contestId = p_contestId;
-			candidateId = p_candidateId;
-			choice = p_choice;
-			rank = p_rank;
+			errorsFound = p_errorsFound;
 		}
 	}
 	
 	class ContestQueue
 	{
 		public int contestId;
-		public Queue<WriteInLocation> queue;
+		public Queue<ErrorBallotLocation> queue;
 		public String contestName;
 		public ContestQueue(int p_id, String p_name)
 		{
-			queue = new LinkedList<WriteInLocation>();
+			queue = new LinkedList<ErrorBallotLocation>();
 			contestName = p_name;
 		}
 	}
 	
-	public WriteInResolver(ScannerConfig p_config, boolean p_enableResolve, ERM p_erm)
+	public ErrorBallotResolver(ScannerConfig p_config, boolean p_enableResolve, ERM p_erm)
 	{
 		this(p_config, p_erm);
 		c_enableResolve = p_enableResolve;
 	}
 	
-	public WriteInResolver(ScannerConfig p_config, ERM p_erm)
+	public ErrorBallotResolver(ScannerConfig p_config, ERM p_erm)
 	{
 		c_config = p_config;
 		c_erm  = p_erm; 
@@ -133,9 +128,8 @@ public class WriteInResolver {
 		c_contestChoices = new TreeMap<Integer, Vector<ContestChoice>>();
 		c_unalteredChoices = new TreeMap<Integer, Vector<ContestChoice>>();
 		c_locations = new TreeMap<Integer, ContestQueue>();
-		c_resolutions = new Vector<WriteInResolution>();
+		c_resolutions = new Vector<ErrorBallotResolution>();
 		
-		c_usedIds = new HashSet<Integer>();
 		c_random = new SecureRandom();
 		
 		c_ballotStyles = new HashMap<Integer, BallotStyle>();
@@ -145,12 +139,11 @@ public class WriteInResolver {
 		}
 		
 		Vector<Contest> l_contests = c_config.getContests();
-		c_contests = new HashMap<Integer, Contest>();
-		c_writeInContests = new HashMap<Integer, Contest>(); 
+		c_errorContests = new HashMap<Integer, Contest>();
+		
 		for( Contest l_contest : l_contests )
 		{
-			c_contests.put(l_contest.getId(), l_contest);
-			c_writeInContests.put(l_contest.getId(), new Contest(l_contest));
+			c_errorContests.put(l_contest.getId(), l_contest);
 		}
 		
 	}
@@ -158,119 +151,38 @@ public class WriteInResolver {
 	//1) Finds ballot stores on all removable disks
 	//2) Reads ballots from each store and figures out which ballot positions need to be resolved
 	//3) Adds each ballot position to a queue for the user to resolve
-	public int LoadBallots(RandomBallotStore p_store) throws IOException
-	{
+	public int LoadBallots(RandomBallotStore p_store) throws IOException {
 			Vector<Ballot> l_ballots;
 			l_ballots = p_store.getBallots();
 			System.out.println("Loading " + l_ballots.size() + " ballots...");
 			return ParseBallots(l_ballots);
 	}
 	
+	// The BallotStorePanel uses this. 
 	public int unloadBallots(RandomBallotStore p_store) throws IOException {
 		Vector<Ballot> l_ballots;
 		l_ballots = p_store.getBallots();
 		System.out.println("Unloading " + l_ballots.size() + " ballots...");
 		
-		
-		
-
-		int l_x = 0;
+		int l_x = 0; //TODO: Is this counting contests?
 		for( Ballot l_ballot : l_ballots )
 		{
-			BallotStyle l_style = c_ballotStyles.get(l_ballot.getBallotStyleID());
-			Vector<Integer> l_contestIds = l_style.getContests();
+			Map<Integer, Vector<String>> l_error_contests = l_ballot.getErrorContests();
 			l_x++;
-			//Look in each contest for write-ins
-			for( Integer l_contestId : l_contestIds )
-			{
-				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
-				if( l_contestData == null )
-				{
-					System.out.println("NULL BALLOT!");
-					System.out.println("ID: " + l_ballot.getId());
-					continue;
-				}
-				
-				Contest l_contest = c_contests.get(l_contestId);
-				Vector<Contestant> l_contestants = l_contest.getContestants();
-				
-				int l_newId = Math.abs(c_random.nextInt());
-				while( c_usedIds.contains(l_newId) )
-				{
-					l_newId = Math.abs(c_random.nextInt());
-				}
-				
-				c_usedIds.add(l_newId);
-				
-				//Create contestchoice and add to vector
-				ContestChoice l_choice = new ContestChoice(l_newId, l_ballot, l_style, l_contest);
-				
-				if( !c_contestChoices.containsKey(l_contestId) )
-				{
-					c_contestChoices.put(l_contestId, new Vector<ContestChoice>());
-					c_unalteredChoices.put(l_contestId, new Vector<ContestChoice>());
-				}
-				
-				c_contestChoices.get(l_contestId).add(l_choice);
-				c_unalteredChoices.get(l_contestId).add(new ContestChoice(l_choice));
-				
-				if( !c_enableResolve )
-					continue;
-				
-				if( !l_style.getWriteInRects().containsKey(l_contestId))
-					continue;
-				
-				
-				TreeMap<Integer, Rectangle> l_writeInMap = l_style.getWriteInRects().get(l_contestId);
-				
-				//If it is a write in contestant, search the row for a vote
-				for(int x = 0; x < l_contestData.length; x++ )
-				{
-					if( l_writeInMap.containsKey(l_contestants.get(x).getId()) )
-					{
-						boolean l_voteFound = false;
-						int l_rank = 0;
-						for(int y = 0; y < l_contestData[x].length; y++ )
-						{
-							if( l_contestData[x][y] != 0 )
-							{
-								l_voteFound = true;
-								l_rank = y;
-							}
-						}
-						
-						if( l_voteFound )
-						{
-							if( c_locations.containsKey(l_contestId) )
-								c_locations.get(l_contestId).queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId(), l_rank));
-							else
-							{
-								ContestQueue l_newQueue = new ContestQueue(l_contestId, l_contest.getContestName());
-								l_newQueue.queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId(), l_rank));
-								c_locations.put(l_contestId, l_newQueue);
-							}
-							c_writeInCount++;
-						}
-					}
-				}
-			}
-		}
-		return l_x;
-	}
-
-	//Search through each ballot to find positions where there are votes for a write-in candidate
-	private int ParseBallots(Vector<Ballot> p_ballots)
-	{
-		int l_x = 0;
-		for( Ballot l_ballot : p_ballots )
-		{
+			
+			// if we dont have any errors in this ballot, continue on
+			if (l_error_contests == null)
+				continue; 
+			
+			//we have errors, get the info we need. 
+			
 			BallotStyle l_style = c_ballotStyles.get(l_ballot.getBallotStyleID());
-			Vector<Integer> l_contestIds = l_style.getContests();
-			l_x++;
+			Vector<Integer> l_contestIds = l_style.getContests();  
 			
 			//Look in each contest for write-ins
 			for( Integer l_contestId : l_contestIds )
 			{
+				Contest l_contest = c_errorContests.get(l_contestId);
 				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
 				if( l_contestData == null )
 				{
@@ -278,149 +190,124 @@ public class WriteInResolver {
 					System.out.println("ID: " + l_ballot.getId());
 					continue;
 				}
-
-				Contest l_contest = c_contests.get(l_contestId);
-				Vector<Contestant> l_contestants = l_contest.getContestants();
-				
-				int l_newId = Math.abs(c_random.nextInt());
-				while( c_usedIds.contains(l_newId) )
-				{
-					l_newId = Math.abs(c_random.nextInt());
-				}
-				
-				c_usedIds.add(l_newId);
-				
-				//Create contestchoice and add to vector
-				ContestChoice l_choice = new ContestChoice(l_newId, l_ballot, l_style, l_contest);
-				
-				if( !c_contestChoices.containsKey(l_contestId) )
-				{
-					c_contestChoices.put(l_contestId, new Vector<ContestChoice>());
-					c_unalteredChoices.put(l_contestId, new Vector<ContestChoice>());
-				}
-				
-				c_contestChoices.get(l_contestId).add(l_choice);
-				c_unalteredChoices.get(l_contestId).add(new ContestChoice(l_choice));
 				
 				if( !c_enableResolve )
 					continue;
 				
-				if( !l_style.getWriteInRects().containsKey(l_contestId))
-					continue;
-				
-				
-				TreeMap<Integer, Rectangle> l_writeInMap = l_style.getWriteInRects().get(l_contestId);
-				
-				//If it is a write in contestant, search the row for a vote
-				for(int x = 0; x < l_contestData.length; x++ )
-				{
-					if( l_writeInMap.containsKey(l_contestants.get(x).getId()) )
-					{
-						boolean l_voteFound = false;
-						int l_rank = 0;
-						for(int y = 0; y < l_contestData[x].length; y++ )
-						{
-							if( l_contestData[x][y] != 0 )
-							{
-								l_voteFound = true;
-								l_rank = y;
-							}
-						}
-						
-						if( l_voteFound )
-						{
-							if( c_locations.containsKey(l_contestId) )
-								c_locations.get(l_contestId).queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId(), l_rank));
-							else
-							{
-								ContestQueue l_newQueue = new ContestQueue(l_contestId, l_contest.getContestName());
-								l_newQueue.queue.add(new WriteInLocation(l_choice, l_ballot, l_contestId, l_contestants.get(x).getId(), l_rank));
-								c_locations.put(l_contestId, l_newQueue);
-							}
-							c_writeInCount++;
-						}
+				if (l_error_contests.containsKey(l_contestId)) { 
+					//There are errors for this contest
+					if (c_locations.containsKey(l_contestId)) {
+						c_locations.get(l_contestId).queue.add(new ErrorBallotLocation(l_ballot, l_contestId, l_error_contests.get(l_contestId)));
 					}
+					else
+					{
+						ContestQueue l_newQueue = new ContestQueue(l_contestId, l_contest.getContestName());
+						l_newQueue.queue.add(new ErrorBallotLocation(l_ballot, l_contestId, l_error_contests.get(l_contestId)));
+						c_locations.put(l_contestId, l_newQueue);
+					}
+					c_errorCount++;
 				}
 			}
 		}
 		return l_x;
 	}
 
-	public void AddCandidate(String p_name) {
-		Contestant l_newContestant = new Contestant(c_currentContest.getNextId(), p_name);
-		c_currentContest.addContestant(l_newContestant);
+	/* 
+	 * For each ballot, see if there are voting errors we need to resolve and 
+	 * if found, add them to a Queue. 
+	 */
+	private int ParseBallots(Vector<Ballot> p_ballots) {
+		int l_x = 0; //This counts the number of ballots. 
+		for( Ballot l_ballot : p_ballots )
+		{
+			Map<Integer, Vector<String>> l_error_contests = l_ballot.getErrorContests();
+			l_x++;
+			
+			// if we dont have any errors in this ballot, continue on
+			if (l_error_contests == null) { 
+				continue; 
+			}
+			
+			//we have errors, get the info we need. 
+			
+			BallotStyle l_style = c_ballotStyles.get(l_ballot.getBallotStyleID());
+			Vector<Integer> l_contestIds = l_style.getContests();  
+			
+			//Look in each contest for write-ins
+			for( Integer l_contestId : l_contestIds )
+			{
+				Contest l_contest = c_errorContests.get(l_contestId);
+				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
+				if( l_contestData == null )
+				{
+					System.out.println("NULL BALLOT!");
+					System.out.println("ID: " + l_ballot.getId());
+					continue;
+				}
+				
+				if( !c_enableResolve )
+					continue;
+				
+				if (l_error_contests.containsKey(l_contestId)) { 
+					//There are errors for this contest
+					if (c_locations.containsKey(l_contestId)) {
+						c_locations.get(l_contestId).queue.add(new ErrorBallotLocation(l_ballot, l_contestId, l_error_contests.get(l_contestId)));
+					}
+					else
+					{
+						ContestQueue l_newQueue = new ContestQueue(l_contestId, l_contest.getContestName());
+						l_newQueue.queue.add(new ErrorBallotLocation(l_ballot, l_contestId, l_error_contests.get(l_contestId)));
+						c_locations.put(l_contestId, l_newQueue);
+					}
+					c_errorCount++;
+				}
+			}
+		}
+		return l_x;
 	}
 
 	public boolean next() {
 		c_currentLocation = null;
-		for( int x = 0; x < c_writeInContests.size() && c_currentLocation == null; x++ )
+		for( int x = 0; x < c_errorContests.size() && c_currentLocation == null; x++ )
 		{
-			int l_id = c_writeInContests.get(x).getId();
+			int l_id = c_errorContests.get(x).getId();
 			if( c_locations.containsKey(l_id) && c_locations.get(l_id).queue.peek() != null )
 			{
 				c_currentLocation = c_locations.get(l_id).queue.poll();
 			}
 		}
-		if( c_currentLocation == null )
+		if( c_currentLocation == null ) { 
 			return false;
-		c_currentContest = c_writeInContests.get(c_currentLocation.contestId);
-		return true;
-	}
-		
-	public Vector<String> getCandidates() {
-		Vector<String> l_contestantList = new Vector<String>();
-		
-		BallotStyle l_style = c_ballotStyles.get(c_currentLocation.ballot.getBallotStyleID());
-		
-		TreeMap<Integer, Rectangle> l_writeInMap = null;
-		
-		//Look in write-in map to see which candidates are write-ins.  Don't include these.
-		if( !l_style.getWriteInRects().containsKey(c_currentContest.getId()))
-			l_writeInMap = new TreeMap<Integer, Rectangle>();
-		else
-			l_writeInMap = l_style.getWriteInRects().get(c_currentContest.getId());
-		
-		for( Contestant l_contestant : c_currentContest.getContestants() )
-		{
-			if( !l_writeInMap.containsKey(l_contestant.getId() ) )
-				l_contestantList.add(l_contestant.getName());
 		}
-		
-		l_contestantList.add("Invalid");
-		return l_contestantList;
+		c_currentContest = c_errorContests.get(c_currentLocation.contestId);
+		return true;
 	}
 
 	public BufferedImage getImage() {
 		Ballot l_curBallot = c_currentLocation.ballot;
-		TreeMap<Integer, TreeMap<Integer, BufferedImage>> l_imageMap = l_curBallot.getWriteInImgs();
-		return l_imageMap.get(c_currentLocation.contestId).get(c_currentLocation.candidateId);
+		return l_curBallot.getImage(); 
 	}
 	
-	public void Resolve(String p_name)
-	{
-		int l_candidateId = -1;
-		WriteInResolution l_res = null;
-		for( Contestant l_contestant : c_currentContest.getContestants() )
-		{
-			if( l_contestant.getName().equalsIgnoreCase(p_name) )
-			{
-				l_candidateId = l_contestant.getId();
-				l_res = new WriteInResolution(getImage(), p_name, Integer.toString(l_contestant.getId()));
-				l_res.contest = c_currentContest;
-				l_res.choice = c_currentLocation.choice;
-			}
-		}
+	public void Resolve(Integer[][] p_contestData) {
+		ErrorBallotResolution l_res = null;
+
+		l_res = new ErrorBallotResolution(getImage(), Integer.toString(c_currentLocation.contestId), p_contestData);
+		l_res.contest = c_currentContest;
 		
 		if( l_res != null )
 			c_resolutions.add(l_res);
 		
-		c_currentLocation.choice.normalizeChoiceWriteIn(c_currentLocation.candidateId, l_candidateId);
-		
+		System.out.println("Results: "); 
+		for (int i = 0; i < p_contestData.length; i++) { 
+			for (int j = 0; j < p_contestData[i].length; j++) { 
+				System.out.print("\t" + p_contestData[i][j]); 
+			}
+			System.out.print("\n");
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void WriteResults(String p_outDir)
-	{
+	public void WriteResults(String p_outDir) {
 		File l_outDir = new File(p_outDir);
 		
 		Collection l_files = FileUtils.listFiles(l_outDir, new String[]{"sbr"}, false);
@@ -459,7 +346,7 @@ public class WriteInResolver {
 						BallotStyle l_style = c_ballotStyles.get(l_ballot.getBallotStyleID());
 						for (Integer l_cId : l_style.getContests())
 						{
-							Contest l_c = c_contests.get(l_cId);
+							Contest l_c = c_errorContests.get(l_cId);
 							if (l_ballot.hasContest(l_c.getId()))
 							{
 								Integer l_data[][] = l_ballot.getContestData(l_c.getId());
@@ -504,8 +391,7 @@ public class WriteInResolver {
 		}
 	}
 	
-	public void Tally(String p_outDir)
-	{
+	public void Tally(String p_outDir) {
 		//if( c_enableResolve )
 		//	return;
 		System.out.println("Tallying " + c_contestChoices.size() + " mappings...");
@@ -550,7 +436,7 @@ public class WriteInResolver {
 			c_unalteredChoices.remove(l_key);
 			
 			//Tally without Write-Ins
-			Contest l_curContest = c_contests.get(l_key);
+			Contest l_curContest = c_errorContests.get(l_key);
 			
 			TallyMethod l_method = l_curContest.getTallyMethod();
 			ContestResult l_result = l_method.tally(l_curContest, l_shortChoices);
@@ -571,7 +457,7 @@ public class WriteInResolver {
 			
 			
 			//Tally with Write-Ins
-			Contest l_writeInContest = c_writeInContests.get(l_key);
+			Contest l_writeInContest = c_errorContests.get(l_key);
 			
 			TallyMethod l_writeInMethod = l_writeInContest.getTallyMethod();
 			ContestResult l_writeInResult = l_writeInMethod.tally(l_writeInContest, l_choices);
@@ -592,8 +478,7 @@ public class WriteInResolver {
 		}
 	}
 	
-	private void WriteContestResults(ContestResult p_result, Contest p_contest, Vector<ContestChoice> p_choices, String p_out)
-	{		
+	private void WriteContestResults(ContestResult p_result, Contest p_contest, Vector<ContestChoice> p_choices, String p_out) {		
 		TreeMap<Integer, Vector<Contestant>> l_rankings = p_result.getRanking();
 
 		DocumentBuilderFactory l_factory = DocumentBuilderFactory.newInstance();
@@ -723,8 +608,7 @@ public class WriteInResolver {
 		
 	}
 	
-	public void WriteResolutionPdf(String p_outDir)
-	{
+	public void WriteResolutionPdf(String p_outDir) {
 		if( c_resolutions.isEmpty() )
 			return;
 		
@@ -737,11 +621,11 @@ public class WriteInResolver {
 			PdfWriter.getInstance(l_doc, new FileOutputStream(p_outDir + File.separator + "Resolves.pdf"));
 			l_doc.open();
 			PdfPTable l_table = new PdfPTable(2);
-			for( WriteInResolution l_res : c_resolutions )
+			for( ErrorBallotResolution l_res : c_resolutions )
 			{
 				l_img = com.lowagie.text.Image.getInstance(l_res.image, null);
 				l_table.addCell(l_img);
-				l_table.addCell(String.format(l_formatString, l_res.name, l_res.id, l_res.contest.getShortName(), l_res.choice.getId()));
+				//l_table.addCell(String.format(l_formatString, l_res.name, l_res.id, l_res.contest.getShortName(), l_res.choice.getId()));
 			}
 			l_doc.add(l_table);
 			com.lowagie.text.Phrase l_phrase = new com.lowagie.text.Phrase();
@@ -762,32 +646,24 @@ public class WriteInResolver {
 		}		
 	}
 	
-	public String getContestName()
-	{
-		return c_currentContest.getContestName();
-	}
-
-
-	public String getRankName()
-	{
-		return ""; 
-		//return c_currentContest.getRankName();
+	public Integer[][] getContestData() { 
+		return c_currentLocation.ballot.getContestData(c_currentLocation.contestId); 
 	}
 	
-	public int getWriteInCount()
-	{
-		return c_writeInCount;
+	public String getContestName() {
+		return c_currentContest.getContestName();
+	}
+	
+	public int getErrorBallotCount() {
+		return c_errorCount;
 	}
 
 	public void disableTabs() {
 		c_erm.disableTabs();
 	}
 
-	/**
-	 * @return
-	 */
-	public int getRank() {
-		return c_currentLocation.rank + 1;
+	public Vector<String> getErrorStrings() {
+		return c_currentLocation.errorsFound; 
 	}
 
 }

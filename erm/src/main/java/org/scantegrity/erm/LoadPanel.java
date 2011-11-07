@@ -10,16 +10,19 @@ public class LoadPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private WriteInResolver c_resolver = null;
+	private ErrorBallotResolver c_errorResolver = null;
 	private JLabel headerLabel = null;
 	private String c_path = null;
 	private BallotStorePanel ballotStorePanel = null;
 	private StatisticsPanel statisticsPanel = null;
 	/**
 	 * This is the default constructor
+	 * @param c_errorResolver 
 	 */
-	public LoadPanel(WriteInResolver p_resolver, String p_destFolder) {
+	public LoadPanel(WriteInResolver p_resolver, ErrorBallotResolver p_errorResolver, String p_destFolder) {
 		super();
 		c_resolver = p_resolver;
+		c_errorResolver = p_errorResolver; 
 		c_path = p_destFolder;
 		File l_file = new File(c_path);
 		if( !l_file.exists() )
@@ -50,7 +53,7 @@ public class LoadPanel extends JPanel {
 	 */
 	private BallotStorePanel getBallotStorePanel() {
 		if (ballotStorePanel == null) {
-			ballotStorePanel = new BallotStorePanel(c_resolver, c_path, getStatisticsPanel());
+			ballotStorePanel = new BallotStorePanel(c_resolver, c_errorResolver, c_path, getStatisticsPanel());
 		}
 		return ballotStorePanel;
 	}

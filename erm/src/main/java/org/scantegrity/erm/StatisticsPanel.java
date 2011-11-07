@@ -14,6 +14,8 @@ public class StatisticsPanel extends JPanel {
 	private JLabel ballotCount = null;
 	private JLabel writeInCountLabel = null;
 	private JLabel writeInCount = null;
+	private JLabel errorCountLabel = null;
+	private JLabel errorCount = null;
 
 	/**
 	 * This is the default constructor
@@ -29,6 +31,19 @@ public class StatisticsPanel extends JPanel {
 	 * @return void
 	 */
 	private void initialize() {
+		GridBagConstraints gridBagConstraints5 = new GridBagConstraints();
+		gridBagConstraints5.gridx = 6;
+		gridBagConstraints5.gridy = 0;
+		errorCount = new JLabel();
+		errorCount.setText("0");
+		GridBagConstraints gridBagConstraints4 = new GridBagConstraints();
+		gridBagConstraints4.gridx = 5;
+		gridBagConstraints4.ipadx = 10;
+		gridBagConstraints4.anchor = GridBagConstraints.EAST;
+		gridBagConstraints4.insets = new Insets(0, 20, 0, 0);
+		gridBagConstraints4.gridy = 0;
+		errorCountLabel = new JLabel();
+		errorCountLabel.setText("Error Contests:");
 		GridBagConstraints gridBagConstraints3 = new GridBagConstraints();
 		gridBagConstraints3.gridx = 4;
 		gridBagConstraints3.gridy = 0;
@@ -59,6 +74,8 @@ public class StatisticsPanel extends JPanel {
 		this.add(ballotCount, gridBagConstraints1);
 		this.add(writeInCountLabel, gridBagConstraints2);
 		this.add(writeInCount, gridBagConstraints3);
+		this.add(errorCountLabel, gridBagConstraints4);
+		this.add(errorCount, gridBagConstraints5);
 	}
 	
 	public void addBallotCount(int p_count)
@@ -74,6 +91,10 @@ public class StatisticsPanel extends JPanel {
 	public void setWriteInCount(int p_count)
 	{
 		writeInCount.setText(Integer.toString(p_count));
+	}
+	
+	public void setErrorCount(int p_count) {
+		errorCount.setText(Integer.toString(p_count));
 	}
 
 }  //  @jve:decl-index=0:visual-constraint="0,0"

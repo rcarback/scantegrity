@@ -1,5 +1,6 @@
 package org.scantegrity.erm;
 
+import java.awt.Component;
 import java.beans.XMLDecoder;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -24,6 +25,7 @@ public class ERM extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JTabbedPane jTabbedPane = null;
 	private WriteInPanel writeInPanel = null;
+	private ErrorPanel errorPanel = null;
 	private File c_scannerConfigFile = null;
 	private ScannerConfig c_config = null;
 	private TallyPanel tallyPanel = null;
@@ -32,6 +34,7 @@ public class ERM extends JFrame {
 	public WriteInResolver c_resolver = null;
 	public WriteInResolver c_spoiledResolver = null;
 	private String c_path = null;
+	private ErrorBallotResolver c_errorBallotResolver = null;
 	
 	/**
 	 * This method initializes jTabbedPane	
@@ -43,10 +46,24 @@ public class ERM extends JFrame {
 			jTabbedPane = new JTabbedPane();
 			jTabbedPane.addTab("Load Ballots", null, getLoadPanel(), null);
 			jTabbedPane.addTab("Write-In Resolution", null, getWriteInPanel(), null);
+			jTabbedPane.addTab("Voting Error Resolution", null, getErrorPanel(), null);
 			jTabbedPane.addTab("Spoiled Ballots", null, getSpoiledPanel(), null);
 			jTabbedPane.addTab("Tally", null, getTallyPanel(), null);
 		}
 		return jTabbedPane;
+	}
+
+	/** 
+	 * The error panel shows the user all of the ballots 
+	 * with voting errors, displaying the ballot on the 
+	 * screen and allowing the user to resolve issues with 
+	 * the ballot so the ballot can be properly cast.  
+	 */
+	private Component getErrorPanel() {
+		if (errorPanel == null) {
+			errorPanel = new ErrorPanel(c_errorBallotResolver);
+		}
+		return errorPanel;
 	}
 
 	/**
@@ -68,7 +85,7 @@ public class ERM extends JFrame {
 	 */
 	private TallyPanel getTallyPanel() {
 		if (tallyPanel == null) {
-			tallyPanel = new TallyPanel(c_resolver, c_spoiledResolver, c_path);
+			tallyPanel = new TallyPanel(c_resolver, c_spoiledResolver, c_errorBallotResolver, c_path);
 		}
 		return tallyPanel;
 	}
@@ -80,7 +97,7 @@ public class ERM extends JFrame {
 	 */
 	private LoadPanel getLoadPanel() {
 		if (loadPanel == null) {
-			loadPanel = new LoadPanel(c_resolver, c_path);
+			loadPanel = new LoadPanel(c_resolver, c_errorBallotResolver, c_path);
 		}
 		return loadPanel;
 	}
@@ -154,6 +171,7 @@ public class ERM extends JFrame {
 			c_config = (ScannerConfig)l_dec.readObject();
 			l_dec.close();	
 			c_resolver = new WriteInResolver(c_config, this);
+			c_errorBallotResolver = new ErrorBallotResolver(c_config, this); 
 		}
 		catch(FileNotFoundException e_fnf)
 		{
@@ -192,6 +210,7 @@ public class ERM extends JFrame {
 	private void initialize() {
 		c_resolver = new WriteInResolver(c_config, this);
 		c_spoiledResolver = new WriteInResolver(c_config, false, this);
+		c_errorBallotResolver  = new ErrorBallotResolver(c_config, true, this);
 		this.setSize(1024, 768);
 		this.setContentPane(getJTabbedPane());
 		this.setTitle("Election Resolution Manager");

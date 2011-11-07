@@ -58,6 +58,7 @@ public class BallotStorePanel extends JPanel {
 	//private HashSet<Integer> c_loadedIds = new HashSet<Integer>();  //  @jve:decl-index=0:
 	private FinderThread c_findThread = null;  //  @jve:decl-index=0:
 	private WriteInResolver c_resolver = null;
+	private ErrorBallotResolver c_errorResolver = null;
 	private String c_path = null;
 	private StatisticsPanel c_panel = null;
 	
@@ -88,10 +89,12 @@ public class BallotStorePanel extends JPanel {
 	/**
 	 * This is the default constructor
 	 */
-	public BallotStorePanel(WriteInResolver p_resolver, String p_path, StatisticsPanel p_panel) {
+	public BallotStorePanel(WriteInResolver p_resolver, ErrorBallotResolver p_errorResolver, 
+			String p_path, StatisticsPanel p_panel) {
 		super();
 		c_panel = p_panel;
 		c_resolver = p_resolver;
+		c_errorResolver = p_errorResolver; 
 		c_path = p_path;
 		initialize();
 	}
@@ -436,12 +439,16 @@ public class BallotStorePanel extends JPanel {
 		//have to reverse everything that is done in LoaderThread
 		try {
 			c_panel.removeBallotCount(c_resolver.unloadBallots(p_store));
+			if(c_errorResolver != null)
+				c_errorResolver.unloadBallots(p_store); 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		c_panel.setWriteInCount(c_resolver.getWriteInCount());
+		c_panel.setErrorCount(c_errorResolver.getErrorBallotCount());
 		c_foundStores.put(p_store.getScannerId(), p_store);
+		//TODO: Add Error Ballot stuff here
 	}
 
 	class LoaderThread extends Thread
@@ -464,6 +471,9 @@ public class BallotStorePanel extends JPanel {
 					int l_count = c_resolver.LoadBallots(c_store);
 					c_panel.addBallotCount(l_count);
 					c_panel.setWriteInCount(c_resolver.getWriteInCount());
+					if (c_errorResolver != null)
+						c_errorResolver.LoadBallots(c_store);
+					c_panel.setErrorCount(c_errorResolver.getErrorBallotCount());
 					c_store.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

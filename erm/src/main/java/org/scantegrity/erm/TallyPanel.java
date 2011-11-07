@@ -23,11 +23,13 @@ public class TallyPanel extends JPanel {
 	private JScrollPane resultsPane = null;
 	private JTextArea resultsText = null;
 	private WriteInResolver c_spoiledResolver = null;
+	private ErrorBallotResolver c_errorResolver = null;
 
 	/**
 	 * This is the default constructor
 	 */
-	public TallyPanel(WriteInResolver p_resolver, WriteInResolver p_spoiledResolver, String p_path) {
+	public TallyPanel(WriteInResolver p_resolver, WriteInResolver p_spoiledResolver, 
+			ErrorBallotResolver p_errorResolver, String p_path) {
 		super();
 		c_path = p_path;
 		c_resolver = p_resolver;
@@ -80,6 +82,10 @@ public class TallyPanel extends JPanel {
 							c_resolver.Tally(c_path);
 							c_resolver.WriteResults(c_path);
 							c_resolver.WriteResolutionPdf(c_path);
+							c_errorResolver.disableTabs(); 
+							c_errorResolver.Tally(c_path); 
+							c_errorResolver.WriteResults(c_path); 
+							c_errorResolver.WriteResolutionPdf(c_path); 
 							c_spoiledResolver.WriteResults(c_path);
 							showResults(); 
 							return null;

@@ -12,7 +12,7 @@ public class SpoiledPanel extends LoadPanel {
 	 * This is the default constructor
 	 */
 	public SpoiledPanel(WriteInResolver p_resolver, String p_destFolder) {
-		super(p_resolver, p_destFolder);
+		super(p_resolver, null, p_destFolder);
 		c_resolver = p_resolver;
 	}
 
