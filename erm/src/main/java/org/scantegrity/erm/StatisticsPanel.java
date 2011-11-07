@@ -67,7 +67,7 @@ public class StatisticsPanel extends JPanel {
 		gridBagConstraints.ipadx = 10;
 		gridBagConstraints.gridy = 0;
 		ballotCountLabel = new JLabel();
-		ballotCountLabel.setText("Ballots:");
+		ballotCountLabel.setText("Valid Ballots:");
 		this.setSize(500, 300);
 		this.setLayout(new GridBagLayout());
 		this.add(ballotCountLabel, gridBagConstraints);
