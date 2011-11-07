@@ -718,8 +718,8 @@ public class Scanner
 				 l_errorImage = AffineCropper.cropUnscaled(p_ballotImg, 
 						 				l_alignmentOp, 
 						 				new Rectangle(0,0,
-						 						p_ballotImg.getWidth(), 
-						 						p_ballotImg.getHeight()));
+						 					(int)l_reader.getDimension().getWidth(), 
+						 					(int)l_reader.getDimension().getHeight()));
 			} catch (Exception e) {
 				c_log.log(Level.WARNING, "Could not rotate error ballot image: " + e.getMessage());
 			}
