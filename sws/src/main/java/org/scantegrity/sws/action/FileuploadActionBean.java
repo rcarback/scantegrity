@@ -34,20 +34,14 @@ import net.sourceforge.stripes.validation.Validate;
 import org.scantegrity.common.*;
 import org.scantegrity.common.methods.*;
 import org.scantegrity.scanner.*;
+import org.scantegrity.sws.action.DAOFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class FileuploadActionBean extends RestrictedActionBean {
-
-	//Parameters for database connection
-	private static final String c_dbAddress = "jdbc:derby:";
-	private static final String c_dbName = "TPDB2011";
-	private static final String c_dbUser = "APP";
-	private static final String c_dbPass = "";
-	
+public class FileuploadActionBean extends RestrictedActionBean {	
 	@Validate(required=true) FileBean c_file;
 	int c_styleId;
 	String c_result = "";
@@ -163,7 +157,7 @@ public class FileuploadActionBean extends RestrictedActionBean {
 					//Load derby database driver
 					Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
 					//Create connection to database.  Create database if it doesn't exist.
-					Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
+					Connection l_conn = DAOFactory.getInstance().getConnection();
 
 					//Create SQL statement object
 					Statement l_query = l_conn.createStatement();

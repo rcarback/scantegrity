@@ -12,16 +12,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.scantegrity.sws.action.DAOFactory;
+
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
-public class UserManage {
-	private static final String c_dbAddress = "jdbc:derby:";
-	private static final String c_dbName = "TPDB2011";
-	private static final String c_dbUser = "APP";
-	private static final String c_dbPass = "";
-	
-	
+public class UserManage {	
 	static String addUser(String p_userName, String p_password) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException
 	{
 		byte[] l_seed = null;
@@ -44,10 +40,7 @@ public class UserManage {
 			e.printStackTrace();
 		}
 		
-		//Load derby database driver
-		Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
-		//Create connection to database.  Create database if it doesn't exist.
-		Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
+		Connection l_conn = DAOFactory.getInstance().getConnection();
 
 		//Create SQL statement object
 		Statement l_query = l_conn.createStatement();
@@ -61,6 +54,7 @@ public class UserManage {
 		try
 		{
 			l_query.execute("SELECT COUNT(*) FROM Users");
+			if (p_userName == "default") return "Users table already exists";
 		}
 		catch( SQLException e )
 		{
@@ -101,7 +95,7 @@ public class UserManage {
 		//Load derby database driver
 		Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
 		//Create connection to database.  Create database if it doesn't exist.
-		Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
+		Connection l_conn = DAOFactory.getInstance().getConnection();
 
 		PreparedStatement l_query = l_conn.prepareStatement("SELECT username FROM Users");
 		
@@ -124,7 +118,7 @@ public class UserManage {
 		//Load derby database driver
 		Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
 		//Create connection to database.  Create database if it doesn't exist.
-		Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
+		Connection l_conn = DAOFactory.getInstance().getConnection();
 
 		PreparedStatement l_query = l_conn.prepareStatement("DELETE FROM Users WHERE username=?");
 		l_query.setString(1, p_user);
@@ -140,7 +134,7 @@ public class UserManage {
 		//Load derby database driver
 		Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
 		//Create connection to database.  Create database if it doesn't exist.
-		Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
+		Connection l_conn = DAOFactory.getInstance().getConnection();
 
 		//Create SQL statement object
 		Statement l_tableQuery = l_conn.createStatement();

@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.scantegrity.sws.action.DAOFactory;
+
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
@@ -14,11 +16,6 @@ import net.sourceforge.stripes.action.Resolution;
 
 public class BallotCheckActionBean implements ActionBean{
 	 private boolean c_ballots = false;
-	//Parameters for database connection
-	private static final String c_dbAddress = "jdbc:derby:";
-	private static final String c_dbName = "TPDB2011";
-	private static final String c_dbUser = "APP";
-	private static final String c_dbPass = "";
 	 
 	 public boolean getBallots()
 	 {
@@ -47,10 +44,7 @@ public class BallotCheckActionBean implements ActionBean{
 	 {
 		 try
 		 {
-		 	//Load derby database driver
-			Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
-			//Create connection to database.  Create database if it doesn't exist.
-			Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
+			Connection l_conn = DAOFactory.getInstance().getConnection();
 	
 			//Create SQL statement object
 			Statement l_query = l_conn.createStatement();

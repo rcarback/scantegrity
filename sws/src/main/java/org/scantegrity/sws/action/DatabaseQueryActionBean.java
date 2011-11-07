@@ -8,18 +8,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
+import org.scantegrity.sws.action.DAOFactory;
+
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.validation.Validate;
 
 public class DatabaseQueryActionBean extends RestrictedActionBean {
-	//Parameters for database connection
-	private static final String c_dbAddress = "jdbc:derby:";
-	private static final String c_dbName = "TPDB2011";
-	private static final String c_dbUser = "APP";
-	private static final String c_dbPass = "";
-	
 	String c_dbRes = "";
 	@Validate(required=true) String c_queryText;
 	
@@ -46,10 +42,8 @@ public class DatabaseQueryActionBean extends RestrictedActionBean {
 			return new ForwardResolution("/WEB-INF/pages/databasequery.jsp");
 		
 		try {
-			//Load derby database driver
-			Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
-			//Create connection to database.  Create database if it doesn't exist.
-			Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
+			//get connection to database.
+			Connection l_conn = DAOFactory.getInstance().getConnection();
 
 			//Create SQL statement object
 			Statement l_query = l_conn.createStatement();

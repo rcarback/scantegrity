@@ -46,7 +46,8 @@
 		<ul id="navigation">
 
 			<li><a href="/index.html">Home</a></li>
-			<li><a href="http://takomaparkmd.gov/clerk/">City Clerk Election Website</a></li>
+			<li><a href="http://takomaparkmd.gov/2011cityelection/index.html">Main Election Website</a></li>
+			<li><a href="https://takoma.remotegrity.org/">Absentee Voter Website</a></li>
 			<li><a href="${pageContext.request.contextPath}/faq">FAQ</a></li>
 			<li><a href="${pageContext.request.contextPath}/contact">Contact Us</a></li>
 			<li><a href="https://scantegrity.org/svn/data/takoma-nov8-2011/">Audit Data</a></li>

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.scantegrity.sws.action.DAOFactory;
+
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -17,12 +19,6 @@ import net.sourceforge.stripes.action.Resolution;
 
 public class UserAddActionBean extends RestrictedActionBean {
 	private static final String VIEW = "/WEB-INF/pages/useradd.jsp";
-	
-	//Parameters for database connection
-	private static final String c_dbAddress = "jdbc:derby:";
-	private static final String c_dbName = "TPDB2011";
-	private static final String c_dbUser = "APP";
-	private static final String c_dbPass = "";
 	
 	private List<String> c_allUsers;
 	private String c_error = "";
@@ -121,7 +117,7 @@ public class UserAddActionBean extends RestrictedActionBean {
 			//Load derby database driver
 			Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
 			//Create connection to database.  Create database if it doesn't exist.
-			Connection l_conn = DriverManager.getConnection(c_dbAddress + c_dbName + ";create=true;" + "user=" + c_dbUser + ";password=" + c_dbPass);
+			Connection l_conn = DAOFactory.getInstance().getConnection();
 	
 			//Create SQL statement object
 			PreparedStatement l_query = l_conn.prepareStatement("SELECT username FROM users");
