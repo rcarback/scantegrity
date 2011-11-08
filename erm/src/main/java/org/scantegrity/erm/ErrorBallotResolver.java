@@ -42,10 +42,12 @@ import org.scantegrity.common.RandomBallotStore;
 import org.scantegrity.common.methods.ContestChoice;
 import org.scantegrity.common.methods.ContestResult;
 import org.scantegrity.common.methods.TallyMethod;
+import org.scantegrity.erm.WriteInResolver.WriteInResolution;
 import org.scantegrity.scanner.ScannerConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.itextpdf.text.log.Level;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -70,6 +72,7 @@ public class ErrorBallotResolver {
 	private boolean c_enableResolve = true;
 	private ERM c_erm = null;
 	private HashMap<Integer, Contest> c_errorContests;
+	private WriteInResolver c_writeinResolver = null;
 	
 	
 	//Represents a resolution that was done by the user.  Used for the resolution pdf.
@@ -114,13 +117,14 @@ public class ErrorBallotResolver {
 		}
 	}
 	
-	public ErrorBallotResolver(ScannerConfig p_config, boolean p_enableResolve, ERM p_erm)
+	public ErrorBallotResolver(ScannerConfig p_config, boolean p_enableResolve, ERM p_erm, WriteInResolver p_writeinResolver)
 	{
-		this(p_config, p_erm);
+		this(p_config, p_erm, p_writeinResolver);
 		c_enableResolve = p_enableResolve;
+		c_writeinResolver = p_writeinResolver;
 	}
 	
-	public ErrorBallotResolver(ScannerConfig p_config, ERM p_erm)
+	public ErrorBallotResolver(ScannerConfig p_config, ERM p_erm, WriteInResolver p_writeinResolver)
 	{
 		c_config = p_config;
 		c_erm  = p_erm; 
@@ -129,6 +133,7 @@ public class ErrorBallotResolver {
 		c_unalteredChoices = new TreeMap<Integer, Vector<ContestChoice>>();
 		c_locations = new TreeMap<Integer, ContestQueue>();
 		c_resolutions = new Vector<ErrorBallotResolution>();
+		c_writeinResolver = p_writeinResolver;
 		
 		c_random = new SecureRandom();
 		
@@ -288,14 +293,17 @@ public class ErrorBallotResolver {
 		return l_curBallot.getImage(); 
 	}
 	
-	public void Resolve(Integer[][] p_contestData) {
+	public void Resolve(Integer[][] p_contestData) {		
 		ErrorBallotResolution l_res = null;
-
 		l_res = new ErrorBallotResolution(getImage(), Integer.toString(c_currentLocation.contestId), p_contestData);
 		l_res.contest = c_currentContest;
+		int l_ballotId = c_currentLocation.ballot.getId();
+		
+		c_writeinResolver.addContestData(c_currentContest, p_contestData, l_ballotId);
 		
 		if( l_res != null )
 			c_resolutions.add(l_res);
+		
 		
 		/* Debug: Prints the new contest data from the resolver * /
 		System.out.println("Results: "); 
@@ -611,23 +619,33 @@ public class ErrorBallotResolver {
 	}
 	
 	public void WriteResolutionPdf(String p_outDir) {
-		if( c_resolutions.isEmpty() )
+		if( c_resolutions.isEmpty() ) { 
+			System.out.println("No error resolutions to print.");
 			return;
+		}
 		
 		com.lowagie.text.Document l_doc = new com.lowagie.text.Document();
 		com.lowagie.text.Image l_img;
-		String l_formatString = "Name: %s (%s)\nContest Name: %s\nWrite-in Choice ID: %s";
+		String l_formatString = "Contest Name: %s\nContest Data: \n%s";
 		
 		//Make sure we don't overwrite previous saves.
 		try {
-			PdfWriter.getInstance(l_doc, new FileOutputStream(p_outDir + File.separator + "Resolves.pdf"));
+			PdfWriter.getInstance(l_doc, new FileOutputStream(p_outDir + File.separator + "ErrorResolves.pdf"));
 			l_doc.open();
 			PdfPTable l_table = new PdfPTable(2);
 			for( ErrorBallotResolution l_res : c_resolutions )
 			{
-				l_img = com.lowagie.text.Image.getInstance(l_res.image, null);
+				l_img = com.lowagie.text.Image.getInstance(l_res.image.getScaledInstance(510, 660, BufferedImage.SCALE_DEFAULT), null);
 				l_table.addCell(l_img);
-				//l_table.addCell(String.format(l_formatString, l_res.name, l_res.id, l_res.contest.getShortName(), l_res.choice.getId()));
+				
+				String l_contestData = "";  
+				for (int i = 0; i < l_res.contestData.length; i++) { 
+					for (int j = 0; j < l_res.contestData[i].length; j++) { 
+						l_contestData += l_res.contestData[i][j] + " "; 
+					}
+					l_contestData += "\n"; 
+				}
+				l_table.addCell(String.format(l_formatString, l_res.contest.getContestName(), l_contestData));
 			}
 			l_doc.add(l_table);
 			com.lowagie.text.Phrase l_phrase = new com.lowagie.text.Phrase();

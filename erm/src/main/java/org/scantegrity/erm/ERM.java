@@ -171,7 +171,7 @@ public class ERM extends JFrame {
 			c_config = (ScannerConfig)l_dec.readObject();
 			l_dec.close();	
 			c_resolver = new WriteInResolver(c_config, this);
-			c_errorBallotResolver = new ErrorBallotResolver(c_config, this); 
+			c_errorBallotResolver = new ErrorBallotResolver(c_config, this, c_resolver); 
 		}
 		catch(FileNotFoundException e_fnf)
 		{
@@ -210,7 +210,7 @@ public class ERM extends JFrame {
 	private void initialize() {
 		c_resolver = new WriteInResolver(c_config, this);
 		c_spoiledResolver = new WriteInResolver(c_config, false, this);
-		c_errorBallotResolver  = new ErrorBallotResolver(c_config, true, this);
+		c_errorBallotResolver  = new ErrorBallotResolver(c_config, true, this, c_resolver);
 		this.setSize(1024, 768);
 		this.setContentPane(getJTabbedPane());
 		this.setTitle("Election Resolution Manager");

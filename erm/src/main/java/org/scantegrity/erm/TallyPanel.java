@@ -33,6 +33,7 @@ public class TallyPanel extends JPanel {
 		super();
 		c_path = p_path;
 		c_resolver = p_resolver;
+		c_errorResolver = p_errorResolver; 
 		c_spoiledResolver = p_spoiledResolver;
 		initialize();
 	}
@@ -79,14 +80,20 @@ public class TallyPanel extends JPanel {
 						@Override
 						protected Void doInBackground() throws Exception {
 							c_resolver.disableTabs();
+							System.out.println("Tallying....");
 							c_resolver.Tally(c_path);
+							System.out.println("Writing Results Files....");
 							c_resolver.WriteResults(c_path);
+							System.out.println("Writing Write-in Resolution PDF...");
 							c_resolver.WriteResolutionPdf(c_path);
 							c_errorResolver.disableTabs(); 
-							c_errorResolver.Tally(c_path); 
-							c_errorResolver.WriteResults(c_path); 
+							//c_errorResolver.Tally(c_path); 
+							//c_errorResolver.WriteResults(c_path);  
+							System.out.println("Writing Error Resolution PDF...");
 							c_errorResolver.WriteResolutionPdf(c_path); 
+							System.out.println("Writing Spoiled Results...");
 							c_spoiledResolver.WriteResults(c_path);
+							System.out.println("Complete. Showing Results Now.");
 							showResults(); 
 							return null;
 						}

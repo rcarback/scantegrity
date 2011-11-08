@@ -556,7 +556,7 @@ public class WriteInResolver {
 			FileWriter l_outStream = null;
 			try {
 				l_outStream = new FileWriter(new File(l_newDir, "results.txt"), true);
-				l_outStream.write("\n\n=====" + l_curContest.getContestName()+ "=====");
+				l_outStream.write("\n\n=====" + l_curContest.getContestName()+ "=====\n");
 				l_outStream.write(l_result.toString());
 				l_outStream.write("\n========================================\n");
 				l_outStream.close();
@@ -577,8 +577,8 @@ public class WriteInResolver {
 			//print out results to file
 			l_outStream = null;
 			try {
-				l_outStream = new FileWriter(new File(l_newDir, "writein-results.txt"), true);
-				l_outStream.write("\n\n=====" + l_writeInContest.getContestName()+ "=====");
+				l_outStream = new FileWriter(new File(l_newDir, "resolved-results.txt"), true);
+				l_outStream.write("\n\n=====" + l_writeInContest.getContestName()+ "=====\n");
 				l_outStream.write(l_writeInResult.toString());
 				l_outStream.write("\n========================================\n");
 				l_outStream.close();
@@ -780,6 +780,48 @@ public class WriteInResolver {
 	 */
 	public int getRank() {
 		return c_currentLocation.rank+1;
+	}
+
+	public void addContestData(Contest p_currentContest,
+			Integer[][] p_contestData, int p_ballotId) {
+		
+		//first convert Integer[][] to int[][]
+		int[][] l_contestData = new int[p_contestData.length][p_contestData[0].length]; 
+		for(int i = 0; i < p_contestData.length; i++) { 
+			for (int j = 0; j < p_contestData[i].length; j++) { 
+				l_contestData[i][j] = p_contestData[i][j]; 
+			}
+		}
+		
+		for (Integer l_contestId : c_contestChoices.keySet()) {
+			if (l_contestId == p_currentContest.getId().intValue()) {
+				for (ContestChoice l_choice : c_contestChoices.get(l_contestId)) {
+					if(l_choice.getBallotId() == p_ballotId) {
+						l_choice.setChoices(l_contestData);
+						return; 
+					}
+				}
+			}
+		}
+		
+	}
+	
+	private void printData(int[][] p_contestData) { 
+		for(int i = 0; i < p_contestData.length; i++) { 
+			for (int j = 0; j < p_contestData[i].length; j++) { 
+				System.out.print(p_contestData[i][j] + " "); 
+			}
+			System.out.print("\n");
+		}
+	}
+	
+	private void printData(Integer[][] p_contestData) { 
+		for(int i = 0; i < p_contestData.length; i++) { 
+			for (int j = 0; j < p_contestData[i].length; j++) { 
+				System.out.print(p_contestData[i][j] + " "); 
+			}
+			System.out.print("\n");
+		}
 	}
 
 }
