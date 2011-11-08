@@ -186,8 +186,8 @@ public class ErrorBallotResolver {
 				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
 				if( l_contestData == null )
 				{
-					System.out.println("NULL BALLOT!");
-					System.out.println("ID: " + l_ballot.getId());
+					//System.out.println("NULL BALLOT!");
+					//System.out.println("ID: " + l_ballot.getId());
 					continue;
 				}
 				
@@ -240,8 +240,8 @@ public class ErrorBallotResolver {
 				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
 				if( l_contestData == null )
 				{
-					System.out.println("NULL BALLOT!");
-					System.out.println("ID: " + l_ballot.getId());
+					//System.out.println("NULL BALLOT!");
+					//System.out.println("ID: " + l_ballot.getId());
 					continue;
 				}
 				
@@ -297,6 +297,7 @@ public class ErrorBallotResolver {
 		if( l_res != null )
 			c_resolutions.add(l_res);
 		
+		/* Debug: Prints the new contest data from the resolver * /
 		System.out.println("Results: "); 
 		for (int i = 0; i < p_contestData.length; i++) { 
 			for (int j = 0; j < p_contestData[i].length; j++) { 
@@ -304,6 +305,7 @@ public class ErrorBallotResolver {
 			}
 			System.out.print("\n");
 		}
+		/* End Debug */
 	}
 	
 	@SuppressWarnings("unchecked")

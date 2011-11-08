@@ -57,6 +57,7 @@ public class ErrorPanel extends JPanel {
 	private Panel c_errorPanel = null; 
 	private JTextArea c_errorTextArea = null;
 	private Panel c_buttonGrid = null; 
+	private JButton c_continueButton = null; 
 
 	/**
 	 * This is the default constructor
@@ -114,36 +115,38 @@ public class ErrorPanel extends JPanel {
 			    	 AddVote();
 			     }
 			};
-			JButton l_continueButton = new JButton("Save and Continue");
-			l_continueButton.addMouseListener(l_mouseListener);
-			c_buttonPanel.add(l_continueButton, BorderLayout.SOUTH);
+			c_continueButton = new JButton("Save and Continue");
+			c_continueButton.addMouseListener(l_mouseListener);
+			c_buttonPanel.add(c_continueButton, BorderLayout.SOUTH);
 		}
 		return c_buttonPanel;
 	}
 	
 	public void AddVote() { 
-		int l_res = JOptionPane.NO_OPTION;
-		l_res = JOptionPane.showConfirmDialog(getParent(), "Save new results?", "Confirm Resolve", JOptionPane.YES_NO_OPTION  );
-		if( l_res == JOptionPane.YES_OPTION ) {
-			Integer[][] p_contestData = c_resolver.getContestData();
-			
-			int l_elementCount = 0; 
-			Component[] elements = c_buttonGrid.getComponents(); 
-			for (int i = 0; i < p_contestData.length; i++) { 
-				for (int j = 0; j < p_contestData[i].length; j++) {
-					if (((JToggleButton) (elements[l_elementCount])).isSelected()) { 
-						p_contestData[i][j] = 1; 
-					} else {
-						p_contestData[i][j] = 0; 
+		if (c_continueButton.isEnabled()) { 
+			int l_res = JOptionPane.NO_OPTION;
+			l_res = JOptionPane.showConfirmDialog(getParent(), "Save new results?", "Confirm Resolve", JOptionPane.YES_NO_OPTION  );
+			if( l_res == JOptionPane.YES_OPTION ) {
+				Integer[][] p_contestData = c_resolver.getContestData();
+				
+				int l_elementCount = 0; 
+				Component[] elements = c_buttonGrid.getComponents(); 
+				for (int i = 0; i < p_contestData.length; i++) { 
+					for (int j = 0; j < p_contestData[i].length; j++) {
+						if (((JToggleButton) (elements[l_elementCount])).isSelected()) { 
+							p_contestData[i][j] = 1; 
+						} else {
+							p_contestData[i][j] = 0; 
+						}
+						
+						l_elementCount++; 
 					}
-					
-					l_elementCount++; 
 				}
-			}
-			c_resolver.Resolve(p_contestData);
-			synchronized(c_loader)
-			{
-				c_loader.notify();
+				c_resolver.Resolve(p_contestData);
+				synchronized(c_loader)
+				{
+					c_loader.notify();
+				}
 			}
 		}
 	}
@@ -217,6 +220,9 @@ public class ErrorPanel extends JPanel {
 					{
 						JOptionPane.showMessageDialog(getParent(), "Ballot errors resolution complete");
 						c_hadErrorBallots = false;
+						if (c_continueButton != null) { 
+							c_continueButton.setEnabled(false);
+						}
 					}
 					try {
 						synchronized(this)

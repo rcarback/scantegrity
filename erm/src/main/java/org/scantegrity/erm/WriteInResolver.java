@@ -185,8 +185,8 @@ public class WriteInResolver {
 				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
 				if( l_contestData == null )
 				{
-					System.out.println("NULL BALLOT!");
-					System.out.println("ID: " + l_ballot.getId());
+					//System.out.println("NULL BALLOT!");
+					//System.out.println("ID: " + l_ballot.getId());
 					continue;
 				}
 				l_x++;
@@ -271,8 +271,8 @@ public class WriteInResolver {
 				Integer[][] l_contestData = l_ballot.getContestData(l_contestId);
 				if( l_contestData == null )
 				{
-					System.out.println("NULL BALLOT!");
-					System.out.println("ID: " + l_ballot.getId());
+					//System.out.println("NULL BALLOT!");
+					//System.out.println("ID: " + l_ballot.getId());
 					continue;
 				}
 				l_x++;
