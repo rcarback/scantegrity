@@ -116,7 +116,7 @@ public class TallyPanel extends JPanel {
 
 	private void showResults() {
 		Scanner scanner = null;
-		File resultsFile = new File(c_path + File.separator + "Results" + File.separator + "writein-results.txt");
+		File resultsFile = new File(c_path + File.separator + "Results" + File.separator + "resolved-results.txt");
 		if(!resultsFile.exists()) {
 			resultsText.setText("Could not find the results file.");
 			return;
