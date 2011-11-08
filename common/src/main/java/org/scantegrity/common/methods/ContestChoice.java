@@ -56,6 +56,8 @@ public class ContestChoice {
 	//         v - The Rank
 	private int[][] c_choices = null;
 	//            ^ - The candidate ID
+
+	private Integer c_ballotId = 0;
 	
 	
 	/**
@@ -104,6 +106,7 @@ public class ContestChoice {
 			System.arraycopy(p_choice.c_choices[l_i], 0, c_choices[l_i], 0, 
 								p_choice.c_choices[l_i].length);
 		}
+		c_ballotId = p_choice.c_ballotId; 
 	}
 	
 	
@@ -128,7 +131,7 @@ public class ContestChoice {
 		
 		//Search and replace for Write-Ins.
 		//normalizeChoiceWriteIn(p_style, p_ballot);
-		
+		c_ballotId = p_ballot.getId(); 
 	}
 
 	/**
@@ -161,6 +164,13 @@ public class ContestChoice {
 		c_choices = p_choices;
 	}
 	
+	public Integer getBallotId() { 
+		return c_ballotId; 
+	}
+	
+	public void setBallotId(Integer p_ballotId) {
+		c_ballotId = p_ballotId; 
+	}
 	
 	private int[][] getChoices(Integer[][] p_raw)
 	{
