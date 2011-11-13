@@ -108,6 +108,7 @@ public class ContestChoice {
 								p_choice.c_choices[l_i].length);
 		}
 		c_ballotId = p_choice.c_ballotId; 
+		c_ward = p_choice.c_ward; 
 	}
 	
 	
