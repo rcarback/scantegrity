@@ -58,6 +58,7 @@ public class ContestChoice {
 	//            ^ - The candidate ID
 
 	private Integer c_ballotId = 0;
+	private int c_ward = 0; 
 	
 	
 	/**
@@ -131,7 +132,9 @@ public class ContestChoice {
 		
 		//Search and replace for Write-Ins.
 		//normalizeChoiceWriteIn(p_style, p_ballot);
-		c_ballotId = p_ballot.getId(); 
+		c_ballotId = p_ballot.getId();
+		
+		c_ward = Integer.parseInt(Character.toString(c_ballotId.toString().charAt(0)));
 	}
 
 	/**
@@ -154,6 +157,14 @@ public class ContestChoice {
 
 	public void setContest(int p_contest) {
 		c_contest = p_contest;
+	}
+	
+	public Integer getWard() { 
+		return c_ward; 
+	}
+	
+	public void setWard(Integer p_ward) { 
+		c_ward = p_ward; 
 	}
 
 	public int[][] getChoices() {

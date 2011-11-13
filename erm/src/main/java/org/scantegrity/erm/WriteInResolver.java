@@ -588,6 +588,53 @@ public class WriteInResolver {
 			}
 			
 			WriteContestResults(l_writeInResult, l_writeInContest, l_choices, new File(l_newDir, l_writeInContest.getShortName() + "Short.xml").getPath());
+			
+			//Tally For Each Ward
+			
+			//first we need to split the ballots into wards
+			if (l_key == 0) {
+				TreeMap<Integer, Vector<ContestChoice>> l_wardContestChoices = new TreeMap<Integer, Vector<ContestChoice>>(); 
+				
+				// this contest is for the mayor. 
+				for (ContestChoice l_choice: l_choices) {
+					int l_ward = l_choice.getWard(); 
+					
+					if( !l_wardContestChoices.containsKey(l_ward) ) { 
+						l_wardContestChoices.put(l_ward, new Vector<ContestChoice>());
+					}
+					
+					l_wardContestChoices.get(l_ward).add(l_choice); 
+				}
+				
+				Contest l_wardContest = c_writeInContests.get(l_key);
+				for (Vector<ContestChoice> l_wardChoices: l_wardContestChoices.values()) { 
+					
+					if (l_wardChoices.size() <= 0) {
+						System.out.println("No votes for Contest " + l_wardContest.getContestName() + "for Ward"); 
+						continue; 
+					}
+					
+					int l_ward = l_wardChoices.get(0).getWard();
+					
+					TallyMethod l_wardMethod = l_wardContest.getTallyMethod();
+					ContestResult l_wardResult = l_wardMethod.tally(l_wardContest, l_wardChoices);
+					
+					//print out results to file
+					l_outStream = null;
+					try {
+						l_outStream = new FileWriter(new File(l_newDir, "results-ward-" + l_ward + ".txt"), true);
+						l_outStream.write("\n\n=====" + l_wardContest.getContestName()+ "=====\n");
+						l_outStream.write(l_wardResult.toString());
+						l_outStream.write("\n========================================\n");
+						l_outStream.close();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					WriteContestResults(l_wardResult, l_wardContest, l_wardChoices, new File(l_newDir, l_wardContest.getShortName() + "Ward"  + l_ward + ".xml").getPath());
+				}
+			}
 		}
 	}
 	
