@@ -81,6 +81,7 @@ public class WriteInResolver {
 		public String id;
 		public Contest contest;
 		public ContestChoice choice;
+		public int rank;
 		
 		public WriteInResolution(BufferedImage p_image, String p_name, String p_id)
 		{
@@ -405,6 +406,7 @@ public class WriteInResolver {
 				l_res = new WriteInResolution(getImage(), p_name, Integer.toString(l_contestant.getId()));
 				l_res.contest = c_currentContest;
 				l_res.choice = c_currentLocation.choice;
+				l_res.rank = c_currentLocation.rank;
 			}
 		}
 		
@@ -537,13 +539,9 @@ public class WriteInResolver {
 		while( !c_contestChoices.isEmpty() )
 		{
 			Integer l_key = c_contestChoices.firstKey();
-			
-			Vector<ContestChoice> l_choices = c_contestChoices.get(l_key);
-			Collections.shuffle(l_choices, new SecureRandom());
-			c_contestChoices.remove(l_key);
-			
+						
 			Vector<ContestChoice> l_shortChoices = c_unalteredChoices.get(l_key);
-			Collections.shuffle(l_choices, new SecureRandom());
+			//Collections.shuffle(l_shortChoices, new SecureRandom());
 			c_unalteredChoices.remove(l_key);
 			
 			//Tally without Write-Ins
@@ -567,6 +565,9 @@ public class WriteInResolver {
 			
 			WriteContestResults(l_result, l_curContest, l_shortChoices, new File(l_newDir, l_curContest.getShortName() + ".xml").getPath());
 			
+			Vector<ContestChoice> l_choices = c_contestChoices.get(l_key);
+			//Collections.shuffle(l_choices, new SecureRandom());
+			c_contestChoices.remove(l_key);
 			
 			//Tally with Write-Ins
 			Contest l_writeInContest = c_writeInContests.get(l_key);
@@ -776,7 +777,7 @@ public class WriteInResolver {
 		
 		com.lowagie.text.Document l_doc = new com.lowagie.text.Document();
 		com.lowagie.text.Image l_img;
-		String l_formatString = "Name: %s (%s)\nContest Name: %s\nWrite-in Choice ID: %s";
+		String l_formatString = "Name: %s (%s)\nContest Name: %s Rank %d\nWrite-in Choice ID: %s";
 		
 		//Make sure we don't overwrite previous saves.
 		try {
@@ -787,7 +788,7 @@ public class WriteInResolver {
 			{
 				l_img = com.lowagie.text.Image.getInstance(l_res.image, null);
 				l_table.addCell(l_img);
-				l_table.addCell(String.format(l_formatString, l_res.name, l_res.id, l_res.contest.getShortName(), l_res.choice.getId()));
+				l_table.addCell(String.format(l_formatString, l_res.name, l_res.id, l_res.contest.getShortName(), l_res.rank+1, l_res.choice.getId()));
 			}
 			l_doc.add(l_table);
 			com.lowagie.text.Phrase l_phrase = new com.lowagie.text.Phrase();
@@ -833,14 +834,14 @@ public class WriteInResolver {
 			Integer[][] p_contestData, int p_ballotId) {
 		
 		//first convert Integer[][] to int[][]
-		int[][] l_contestData = new int[p_contestData.length][p_contestData[0].length]; 
+		/*int[][] l_contestData = new int[p_contestData.length][p_contestData[0].length]; 
 		for(int i = 0; i < p_contestData.length; i++) { 
 			for (int j = 0; j < p_contestData[i].length; j++) { 
 				l_contestData[i][j] = p_contestData[i][j]; 
 			}
-		}
+		}*/
 		
-		for (Integer l_contestId : c_contestChoices.keySet()) {
+/*		for (Integer l_contestId : c_contestChoices.keySet()) { * /
 			if (l_contestId == p_currentContest.getId().intValue()) {
 				for (ContestChoice l_choice : c_contestChoices.get(l_contestId)) {
 					if(l_choice.getBallotId() == p_ballotId) {
@@ -849,7 +850,18 @@ public class WriteInResolver {
 					}
 				}
 			}
+		}*/
+		
+		Vector<ContestChoice> l_choices = 
+					c_contestChoices.get(p_currentContest.getId().intValue());
+		for (ContestChoice l_choice : l_choices)
+		{
+			if (l_choice.getBallotId().equals(p_ballotId))
+			{
+				l_choice.setChoices(p_contestData);
+			}
 		}
+		
 		
 	}
 	
