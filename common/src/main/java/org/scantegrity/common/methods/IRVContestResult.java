@@ -360,12 +360,14 @@ public class IRVContestResult extends ContestResult
 			StringWriter l_out = new StringWriter();
 			int l_change = 0, l_tot = 0;
 			//ROUND\t\tCONTESTANTS\t\tCHANGE\t\tTOTALS
-			String l_fmt = "RESULTS FOR ROUND %s%s \n\n";
+			String l_fmt = "\n\nRESULTS FOR ROUND %s%s\n";
 			l_out.write(String.format(l_fmt, c_id, c_desc));
-			l_out.write("\t\tCONTESTANT\t\t      CHANGE\t\t\tTOTALS\t\t\t   STATE\n");
+			l_out.write("----------------------------------------\n\n");
+			l_out.write("\t\tCONTESTANT\t\t\tCHANGE\t\t\tTOTALS\t\t\tSTATE\n");
 			l_fmt = "%26s";
 			for(int l_i = 0; l_i < c_contestants.size(); l_i++)
 			{
+				
 				l_out.write(String.format(l_fmt, c_contestants.get(l_i)));
 				l_out.write(String.format("%+26d", c_delta.get(l_i)));
 				l_out.write(String.format(l_fmt, c_totals.get(l_i)));
@@ -391,24 +393,33 @@ public class IRVContestResult extends ContestResult
 			int l_change = 0, l_tot = 0;
 			//ROUND\t\tCONTESTANTS\t\tCHANGE\t\tTOTALS
 			l_out.write("<h4>Round " + getId() + ": ");
-			l_out.write("<table style=\"width:100%; text-alignment: left; \">");
-			l_out.write("<tr><th>Contestant</th><th>Change</th><th>Total</th> <th>State</th></tr>");
+			l_out.write("<table style=\"width:100%; text-alignment: left; border: 1px solid black; \">");
+			//l_out.write("<tr><th>Contestant</th><th>Change</th><th>Total</th> <th>State</th></tr>");
+			l_out.write("<tr><th><em>Contestant</em></th><th><em>Total</em></th><th><em>State</em></th></tr>");
+			boolean l_odd = false;
 			for(int l_i = 0; l_i < c_contestants.size(); l_i++)
 			{
-				l_out.write("<tr>");
-				l_out.write("<td>" +  c_contestants.get(l_i).getName() + "</td>");
-				l_out.write("<td>" + String.format("%+d", c_delta.get(l_i)) + "</td>");
-				l_out.write("<td>" +  c_totals.get(l_i) + "</td>");
-				l_out.write("<td>" +  c_state.get(l_i) + "</td>");
+				if (l_odd == false) {
+					l_out.write("<tr style=\"background-color:#c3e4c3; border: 1px solid black;\">");
+					l_odd = true;
+				}
+				else {
+					l_out.write("<tr>");
+					l_odd = false;
+				}
+				l_out.write("<td style=\"border: 1px solid black;\">" +  c_contestants.get(l_i).getName() + "</td>");
+				//l_out.write("<td>" + String.format("%+d", c_delta.get(l_i)) + "</td>");
+				l_out.write("<td style=\"border: 1px solid black;\">" +  c_totals.get(l_i) + "</td>");
+				l_out.write("<td style=\"border: 1px solid black;\">" +  c_state.get(l_i) + "</td>");
 				l_out.write("</tr>");
 				
 				l_change += c_delta.get(l_i);
 				l_tot += c_totals.get(l_i);
 			}
-			l_out.write("<tr>");
-			l_out.write("<td>Totals:</td>");
-			l_out.write("<td>" + l_change + "</td>");
-			l_out.write("<td>" + l_tot + "</td><td/>");
+			l_out.write("<tr style=\"border: 1px solid black;\">");
+			l_out.write("<td style=\"border: 1px solid black;\">Totals:</td>");
+			//l_out.write("<td>" + l_change + "</td>");
+			l_out.write("<td style=\"border: 1px solid black;\">" + l_tot + "</td><td/>");
 			l_out.write("</tr>");
 			l_out.write("</table>");
 			l_out.write("<p>");
