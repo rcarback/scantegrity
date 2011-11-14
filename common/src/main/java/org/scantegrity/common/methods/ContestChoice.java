@@ -175,6 +175,10 @@ public class ContestChoice {
 	public void setChoices(int[][] p_choices) {
 		c_choices = p_choices;
 	}
+
+	public void setChoices(Integer[][] p_choices) {
+		c_choices = getChoices(p_choices);
+	}
 	
 	public Integer getBallotId() { 
 		return c_ballotId; 
