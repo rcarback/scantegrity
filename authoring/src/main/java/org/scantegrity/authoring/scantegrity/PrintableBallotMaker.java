@@ -1,6 +1,9 @@
+// edited by Carsten 
+
 package org.scantegrity.authoring.scantegrity;
 
-import java.awt.Color;
+// import java.awt.Color;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,18 +16,19 @@ import org.scantegrity.common.InputConstants;
 
 import org.scantegrity.common.Util;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfAnnotation;
-import com.lowagie.text.pdf.PdfAppearance;
-import com.lowagie.text.pdf.PdfBorderDictionary;
-import com.lowagie.text.pdf.PdfFormField;
-import com.lowagie.text.pdf.PdfImportedPage;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfWriter;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfAnnotation;
+import com.itextpdf.text.pdf.PdfAppearance;
+import com.itextpdf.text.pdf.PdfBorderDictionary;
+import com.itextpdf.text.pdf.PdfFormField;
+import com.itextpdf.text.pdf.PdfImportedPage;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfWriter;
 
 public class PrintableBallotMaker extends FormMaker 
 {
@@ -36,7 +40,7 @@ public class PrintableBallotMaker extends FormMaker
 	public PrintableBallotMaker(ElectionSpecification es,BallotGeometry geom) throws Exception {
 		super(es,geom);
 		this.es=es;
-		symbolColor=new Color(127,127,255);//Color.BLUE;
+		symbolColor=new BaseColor(127,127,255);//Color.BLUE;
 	}
 
 	protected void addJavaScript() {
@@ -152,7 +156,7 @@ public class PrintableBallotMaker extends FormMaker
         PdfAppearance tp = cb.createAppearance(w,h);
         PdfAppearance da = (PdfAppearance)tp.getDuplicate();
         da.setFontAndSize(font, fontSize);
-        da.setColorFill(Color.BLACK);
+        da.setColorFill(BaseColor.BLACK);
         field.setDefaultAppearanceString(da);
         tp.beginVariableText();
         tp.saveState();
@@ -161,7 +165,7 @@ public class PrintableBallotMaker extends FormMaker
         tp.newPath();
         tp.beginText();
         tp.setFontAndSize(font, fontSize);
-        tp.setColorFill(Color.BLACK);
+        tp.setColorFill(BaseColor.BLACK);
         tp.setTextMatrix(0,0);
         tp.showText(text);
         tp.endText();
@@ -172,7 +176,7 @@ public class PrintableBallotMaker extends FormMaker
 	}
 
 	private void createBlankBackgroundPage(float w,float h) {
-		com.lowagie.text.Document document = new com.lowagie.text.Document(new Rectangle(w,h));
+		com.itextpdf.text.Document document = new com.itextpdf.text.Document(new Rectangle(w,h));
 		try {
 			PdfWriter.getInstance(document,
 					new FileOutputStream("__BlankPdf.pdf"));
